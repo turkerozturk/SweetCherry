@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="rootNodeContentFragment">
+
+
+    <div id="rootNodeContent">
+
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-bookmark"></i>
+                            <a href="/bookmarks" th:text="#{root.bookmarks}"></a>
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.bookmarks.description}"></span>
+                        </p>
+
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/bookmarks" th:text="#{root.bookmarks}">Yer İşaretleri</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-search"></i>
+                            <a href="/nodesadvancedwithbinding" th:text="#{root.advancedSearch}"></a>
+
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.advancedSearch.description}"></span>
+                        </p>
+
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/advanced-search" th:text="#{root.advancedSearch}">Arama Yap</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-download"></i>
+                            <a href="/attachments" th:text="#{root.attachments}"></a>
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.attachments.description}"></span>
+                        </p>
+
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/attachments" th:text="#{root.attachments}">Ekli Dosyalar</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-list"></i>
+                            <a href="/cherrytemplatetasks" th:text="#{root.customizedNodeListViews}"></a>
+
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.customizedNodeListViews.description}"></span>
+
+                        </p>
+
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/custom-lists"
+                                   th:text="#{root.customizedNodeListViews}">
+                                    Kişiselleştirilmiş Liste Tipi Görünümler
+                                </a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-icons"></i>
+                            <a href="/icons" th:text="#{root.icons}"></a>
+
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.icons.description}"></span>
+
+
+                        </p>
+
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/icons" th:text="#{root.icons}">İkonlar</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-gear"></i>
+                            <th:block sec:authorize="hasRole('USER')">
+                                <span th:text="#{root.settings}"></span>
+                                <img src="/img/icons/ct_locked.svg" class="childiconcss">
+                            </th:block>
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <a href="/settings" th:text="#{root.settings}"></a>
+                                <img src="/img/icons/ct_star.svg" class="childiconcss">
+                            </th:block>
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.settings.description}"></span>
+                        </p>
+
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/settings" th:text="#{root.settings}">Program Ayarları</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-info-circle"></i>
+                            <th:block sec:authorize="hasRole('USER')">
+                                <span th:text="#{root.informationBoard}"></span>
+                                <img src="/img/icons/ct_locked.svg" class="childiconcss">
+                            </th:block>
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <a href="/dashboardold" th:text="#{root.informationBoard}"></a>
+                                <img src="/img/icons/ct_star.svg" class="childiconcss">
+                            </th:block>
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.informationBoard.description}"></span>
+
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/information-panel" th:text="#{root.informationBoard}">Info</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-life-ring"></i>
+                            <th:block sec:authorize="hasRole('USER')">
+                                <span th:text="#{root.help}"></span>
+                                <img src="/img/icons/ct_locked.svg" class="childiconcss">
+                            </th:block>
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <a href="/help/index" th:text="#{root.help}"></a>
+                                <img src="/img/icons/ct_star.svg" class="childiconcss">
+                            </th:block>
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.help.description}"></span>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/index" th:text="#{root.help}">Yardım</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col">
+                <div class="card h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="10"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap"
+                         preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#a6ce96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
+                    </svg>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-rainbow"></i>
+                            <a href="/about" th:text="#{root.about}"></a>
+
+                        </h5>
+                        <p class="card-text">
+                            <span th:text="#{root.about.description}"></span>
+
+
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <img src="/img/icons/ct_help.svg" class="childiconcss">
+                                <a href="/help/about" th:text="#{root.about}">Hakkında</a>
+                            </th:block>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

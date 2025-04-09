@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+
+</head>
+<body>
+
+
+<div th:fragment="tenantFragment">
+
+
+    <table class="table table-hover">
+
+        <tbody>
+
+
+        <tr th:if="${dataSourceMessage}">
+            <td>
+                <b><span class="text-danger" th:text="${dataSourceMessage}"></span></b>
+            </td>
+
+        </tr>
+
+
+        <tr th:unless="${tenantNames}">
+            <td>
+
+                <h3>
+                <span class="text-danger"
+                      th:text="#{tenantfragment.please_create_data_source_properties_files}"
+                >&nbsp;</span>
+                    <span class="text-success"
+                          th:text="${ALL_TENANTS_FOLDER}"
+                    ></span>
+                </h3>
+            </td>
+
+
+        </tr>
+
+
+        <th:block th:if="${tenantNames}">
+
+
+
+
+
+            <tr>
+                <td>
+
+                    <form action="#" th:action="@{/setTenant}" method="post">
+                        <!-- <label for="tenant">Tenant Sec:</label> -->
+                        <select id="tenant"
+                                name="tenant"
+                                onchange="this.form.submit()"
+                                class="form-select"
+                        >
+
+
+                            <option th:unless="${currentTenantName}"
+                                    value=""
+                                    th:text="#{tenantfragment.option_select_database}"
+                            >
+                                Select Database
+                            </option>
+                            <option th:each="tenantName : *{tenantNames}"
+                                    th:value="${tenantName}"
+                                    th:text="${tenantName}"
+                                    th:selected="${tenantName == currentTenantName}"
+                            >
+                            </option>
+                            <!-- Diger tenant seceneklerini ekleyin -->
+
+                        </select>
+                        <button class="btn"
+                                type="submit"
+
+
+                        >
+                            <i class="fas fa-plug-circle-plus"></i>
+                            <span th:text="#{tenant.load}">
+
+                            </span>
+
+                        </button>
+                    </form>
+
+                </td>
+
+            </tr>
+        </th:block>
+
+
+        <tr>
+            <td>
+
+
+                <form action="#" th:action="@{/reload-datasources}" method="post">
+
+                    <button class="btn"
+                            type="submit"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                        <span
+                                th:text="#{tenant.reload}"
+                        >Reload</span>
+
+                    </button>
+                </form>
+
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+
+
+                <form action="#" th:action="@{/close-datasources}" method="post">
+
+                    <button class="btn"
+                            type="submit"
+                    >
+                        <i class="fa-solid fa-plug-circle-xmark"></i>
+                        <span
+                                th:text="#{tenant.closeCTB}"
+                        >Close CTB</span>
+
+                    </button>
+                </form>
+
+            </td>
+
+        </tr>
+
+
+        </th:block>
+
+        <tr>
+            <td>
+
+
+                <a href="/upload-form"
+                   id="uploadButton"
+                   class="btn "
+                   th:title="#{selectdatasource.upload}"
+                >
+                    <i class="fas fa-upload"></i>
+                    <span th:text="#{selectdatasource.upload}"></span>
+                </a>
+
+            </td>
+
+        </tr>
+
+        <th:block sec:authorize="hasRole('ADMIN')">
+            <tr>
+
+                <td>
+
+                    <a href="/tenants"
+                       class="btn"
+
+                    >
+                        <i class="fas fa-database"></i>
+                        <span th:text="#{tenantfragment.link_to_tenants_list}">
+                            Tenants list
+
+                            </span>
+
+
+
+                    </a>
+
+                </td>
+
+
+            </tr>
+        </th:block>
+
+        </tbody>
+
+    </table>
+</div>
+</body>
+</html>

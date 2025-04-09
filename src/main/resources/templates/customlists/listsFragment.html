@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<div th:fragment="listsFragment">
+
+    <span th:text="${godNode.name}"></span><p>vvvvv</p>
+    <div th:if="${godNode}" class="row">
+
+
+        <div class="col-6 ">
+
+            <th:block th:each="templateNode, iStat : ${godNode.templateNodes}">
+                <hr/>
+
+                <div>
+
+
+                    <div class="row">
+                        <div class="col-1">
+
+                            <img th:src="@{/img/icons/__${templateNode.nodeIcon.iconName}__.svg}"
+                                 th:alt="${'/img/icons/' + templateNode.nodeIcon.iconName}"
+                                 class="templateiconcss"/>
+                        </div>
+                        <div class="col-1">
+
+                            <img src="/img/webpage/symbol_template_class.svg" class="childiconcss"/>
+                        </div>
+                        <div class="col">
+
+                            <span th:text="${descriptions[iStat.index]}"></span>
+                        </div>
+                        <div class="col">
+
+                            <a th:href="@{'/cherrytemplatenode/' + ${templateNode.nodeId}}"
+                               th:text="${templateNode.name}"></a>
+                        </div>
+                        <div class="col-1">
+
+                            <img src="/img/webpage/symbol_template_class.svg" class="childiconcss"/>
+                        </div>
+
+
+                    </div>
+                </div>
+            </th:block>
+            <hr/>
+        </div>
+
+
+        <div class="col-6">
+
+            <p>
+
+                <span th:text="${godNode.name}"></span> ana düğümü içeriğiyle mevcut. <br/>Şablon işlemleri
+                yapılabilir.
+            </p>
+
+            <table border="1">
+                <tbody>
+                <tr>
+                    <th>Custom Lists Node Id</th>
+                    <th><a th:href="${'/nodes/' + godNode.nodeId}" th:text="${godNode.nodeId}"></a></th>
+                </tr>
+                <tr>
+                    <th>Custom Lists Node Name</th>
+                    <td th:text="${godNode.name}"></td>
+                </tr>
+
+
+                </tbody>
+            </table>
+
+
+
+
+
+        </div>
+
+    </div>
+
+
+
+</div>
+
+</body>
+</html>

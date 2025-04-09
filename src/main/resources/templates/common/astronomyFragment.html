@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="astronomyFragment">
+
+
+    <span id="clock"></span>
+
+    <span id="moonphase" th:text="${moonTime4j.moonPhaseWidget}"
+         th:title="${moonTime4j.moonPhaseWidgetSecondary}"></span>
+
+
+
+    <button type="button"
+            id="AlertsBellButton"
+            class="btn"
+            data-bs-toggle="popover"
+            data-bs-placement="bottom"
+            data-bs-trigger="focus"
+            title="Sun And Moon"
+            data-bs-html="true"
+            data-bs-content="<div id='AlertBellContainer'>Loading...</div>">
+
+      <!--  <img th:src="@{/img/icons/ct_w-sunny.svg}"/>
+        <img th:src="@{/img/icons/ct_w-night-clear.svg}"/> -->
+        <i class="fas fa-sun"></i>
+        <i class="fas fa-moon"></i>
+
+    </button>
+
+
+
+</div>
+
+</body>
+</html>

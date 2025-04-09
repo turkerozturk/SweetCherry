@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Node's Codeboxes</title>
+
+    <!-- for pygments syntax highlighter colorization -->
+    <link rel="stylesheet" th:href="@{/css/syntaxhighlighter.css}" />
+
+</head>
+<body>
+<section th:fragment="content">
+
+
+
+                <pre class="highlight" th:utext="${codeHighLighter.mappedhighlightLanguage(codebox.syntax, codebox.txt)}">icerik</pre>
+
+
+
+</section>
+</body>
+</html>

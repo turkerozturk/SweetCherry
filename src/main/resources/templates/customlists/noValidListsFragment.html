@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<div th:fragment="noValidListsFragment">
+
+    <div class="row">
+
+
+        <div class="text-center col-3">
+
+        </div>
+
+        <div class="text-start col-6">
+
+            <h3 class="text-danger">İşimiz Daha Bitmedi</h3>
+
+
+            <table class="table table-bordered text-start border-black">
+
+                <tr>
+
+                    <th class="col-1">Durum</th>
+                    <th class="col-11">Ana Düğüm</th>
+
+                </tr>
+
+                <tr th:each="node, iterStat : ${nodes}">
+                    <td class="text-center">
+                        <span th:if="${iterStat.index == 0}">
+                            <img src="/img/icons/ct_done.svg" class="childiconcss"/>
+                        </span>
+                        <span th:if="${iterStat.index > 0}">
+                            <img src="/img/icons/ct_warning.svg" class="childiconcss"/>
+                        </span>
+                    </td>
+
+                    <td>
+                        <a th:href="${'/nodes/'+ node.nodeId}"
+                           th:text="${node.name}"
+                           class="text-decoration-none font-monospace"
+                        ></a>
+                        (node id: <span th:text="${node.nodeId}"></span>)
+                        <span th:if="${iterStat.index == 0}">
+                           <span class="fw-bold text-success">Bulundu. Sayfayı okumaya devam edin.</span>
+                            (Ayrıca bkz. <a href="#example" class="text-decoration-none">örnek</a>)
+
+                        </span>
+                        <b th:if="${iterStat.index > 0}">
+                            Dikkate alınmaz.
+                            <span class="text-danger">Farklı isim vermek doğru olur.</span>
+                            Üstüne tıklayın.
+                        </b>
+                    </td>
+
+                </tr>
+
+            </table>
+
+
+            <hr/>
+
+            <h3 class="text-danger">
+                <img src="/img/icons/ct_cancel.svg" class="childiconcss"/>
+                <a href="#anadugumnedir">
+                    Ana düğüm
+                </a>
+                içeriğinde hiçbir
+                <a href="#sablondugumnedir">Şablon Düğüm
+                </a>
+                adı yeralmıyor!
+            </h3>
+
+            <p>Bu sayfayı geçebilmek için hem ana düğüm içeriğinde şablon adları belirtmek gerekiyor, hem de onlara karşılık gelen başka düğümler oluşturmak.</p>
+
+            <p><span class="fw-bold text-success">Şablon tanımlamak için ana düğüm içeriğine bir kelime yazın, kaydedin, bu sayfayı tazeleyin.</span></p>
+
+            <p>Ana düğüm içeriği kuralları aşağıdaki gibidir;</p>
+
+            <ul>
+                <li>Her satırda bir adet şablon adı bulunur.</li>
+                <ul>
+                    <li>Opsiyonel olarak, şablon adından sonra bir sekme(<span class="fw-bold font-monospace">TAB</span> tuşu) karakteri
+                    sonrası yazı yazılırsa, websayfasnda o yazı görüntülenir. Yazılmazsa şablon adı görüntülenir.</li>
+                </ul>
+                <li>Aynı şablon adı birden fazla satırda bile yazılsa bir tane olarak işlem görür.</li>
+                <li>Boş bırakılan satırlar dikkate alınmaz.</li>
+                <li>Diyez(<span class="fw-bold font-monospace">#</span> tuşu) ile başlayan satırlar da dikkate alınmaz.</li>
+                <li>Belirtilen şablon adına karşılık, veritabanındaki düğümler arasında
+                    ismi cherrytemplate-
+                    ile başlayıp şablon adı ile biten bir adet düğüm olmak zorundadır.
+                </li>
+
+            </ul>
+
+            <div th:if="${customListNamesAndDescriptionsRaw}">
+
+
+
+            <table class="table table-bordered text-start border-black">
+                <tr>
+                    <th class="col-2">Ana Düğümdeki Satırlar</th>
+                    <th class="col-4">Varsa İnsanca Yazılışları</th>
+                    <th class="col-6">Veritabanında Şu İsimde Bir Adet Düğüm Oluşturun</th>
+                </tr>
+                <tr th:each="entry : ${customListNamesAndDescriptionsRaw}">
+                    <td>
+                        <span th:text="${entry.key}"></span>
+                    </td>
+
+                    <td>
+                        <span th:text="${entry.value}"></span>
+                    </td>
+
+                    <td>
+                        <span class="text-danger font-monospace">
+                            cherrytemplate-<b th:text="${entry.key}"></b>
+                        </span>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+
+
+        <hr/>
+
+            <div th:if="${uselessLinesMap}">
+                <span class="fw-bold text-primary">Ana düğümde geçersiz (devredışı bırakılmış şablon isimleri, yorum satırları, boş satırlar) satırlar bulundu.</span>
+                <table class="table table-bordered text-start border-black">
+                    <tr>
+                        <th class="col-6">Ana Düğümdeki Geçersiz Satırlar</th>
+                        <th class="col-6">Açıklama</th>
+
+                    </tr>
+                    <tr th:each="entry : ${uselessLinesMap}">
+                        <td>
+                            <span th:text="${entry.key}"></span>
+                        </td>
+
+                        <td>
+                            <span th:text="${entry.value}"></span>
+                        </td>
+
+
+
+                    </tr>
+                </table>
+            </div>
+
+            <h3 id="example">ÖRNEK</h3>
+            <p>Örneğin eğer aşağıdaki düğüm içeriğindeki bir satırda ajanda kelimesi yazılı ise, program veritabanındaki
+                tags alanında cherrytemplate-ajanda isminde bir adet düğümün varlığını arar.</p>
+            <p>O düğüm eğer varsa bir şablon
+                düğümüdür. Bulamadığı için bu mesajı okumaktasınız.</p>
+            <p>Düğüm ID numarasına tıklayıp, içeriğini
+                ve ağaç içindeki konumunu görebilirsiniz.</p>
+
+
+        </div>
+
+
+    </div>
+
+    <div class="text-center col-3">
+
+    </div>
+
+</div>
+
+</body>
+</html>

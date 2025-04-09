@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<th:block th:fragment="siblingAndChildrenNavigationFragment">
+
+    <style>
+
+
+
+        ul.no-bullets {
+          list-style-type: none; /* Remove bullets */
+          padding: 0; /* Remove padding */
+          margin: 0; /* Remove margins */
+          background-color: #e0fcfe;
+        }
+
+
+        ul.indent-no-bullets {
+          list-style-type: none;
+          padding: 0;
+          margin-left: 1.3em;
+          background-color: #effcfe;
+
+        }
+
+    </style>
+
+
+
+    <th:block th:if="${siblingNaviNodes}">
+
+        <!--
+        <th:block th:unless="${isRootNode}">
+            <p class="text-center"><b th:utext="#{label.siblingAndSubNodes}">&empty; Sibling And Sub Nodes</b></p>
+        </th:block>
+        -->
+
+        <ul class="no-bullets">
+
+
+            <!-- TODO sunun calisanini yap: th:attr="data-bs-title=${childNode.name}" data-bs-toggle="tooltip" -->
+            <li class="" th:each="siblingNaviNode : ${siblingNaviNodes}">
+                <th:block th:if="${siblingNaviNode != null}">
+
+                        <a class="linkinternal" th:href="'/nodes/' + ${siblingNaviNode.nodeId}"
+                           th:title="${siblingNaviNode.name}">
+
+                            <th:block th:unless="${isRootNode}">
+
+                                <th:block th:unless="${siblingNaviNode.nodeId == node.nodeId}">
+                                    <i th:class="${siblingNaviNode.hasChildren ? 'fas fa-caret-right childiconcssfas' : 'fas fa-square childiconcssfas'}"
+                                       th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
+                                    ></i>
+
+                                    <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
+                                         th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
+
+                                    <span th:text="${siblingNaviNode.name}"
+                                          th:style="${'color:' + siblingNaviNode.titleColorAsHtmlHex + ';'}"
+                                          th:class="${siblingNaviNode.boldnessBit ? 'boldTitle' : ''}"></span>
+
+                                </th:block>
+
+
+                                <th:block th:if="${siblingNaviNode.nodeId == node.nodeId}">
+                                    <i th:class="${siblingNaviNode.hasChildren ? 'fas fa-caret-down childiconcssfas' : 'fas fa-square childiconcssfas'}"
+                                       th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
+                                    ></i>
+
+                                    <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
+                                         th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
+
+                                    <span th:text="${siblingNaviNode.name}"
+                                          id="selectedNaviNodeItem"
+                                          th:style="${'color:' + siblingNaviNode.titleColorAsHtmlHex + ';' + 'background-color:#ffeecc;'}"
+                                          th:class="${siblingNaviNode.boldnessBit ? 'boldTitle' : ''}"></span>
+
+                                </th:block>
+                            </th:block>
+
+
+                            <th:block th:if="${isRootNode}">
+
+
+                                <i th:class="${siblingNaviNode.hasChildren ? 'fas fa-caret-down childiconcssfas' : 'fas fa-square childiconcssfas'}"
+                                       th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
+                                ></i>
+
+                                <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
+                                     th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
+
+                                <span th:text="${siblingNaviNode.name}"
+                                      th:style="${'color:' + siblingNaviNode.titleColorAsHtmlHex + ';'}"
+                                      th:class="${siblingNaviNode.boldnessBit ? 'boldTitle' : ''}"></span>
+
+                            </th:block>
+
+
+
+                        </a>
+
+
+
+
+
+                    <th:block th:unless="${isRootNode}">
+
+                        <th:block th:if="${siblingNaviNode.nodeId == node.nodeId}">
+
+
+
+
+
+                            <div th:replace="~{node/childrenNavigationFragment :: childrenNavigationFragment}"></div>
+
+
+
+                        </th:block>
+                    </th:block>
+
+                </th:block>
+                <th:block th:unless="${siblingNaviNode}">
+                    <span style="color: black;">Sibling node is null</span>
+
+                </th:block>
+
+
+            </li>
+
+        </ul>
+
+
+    </th:block>
+
+</th:block>
+
+</body>
+</html>

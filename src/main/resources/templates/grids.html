@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+      <title>Grids</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Grid List</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Node Id</th>
+        <th>Offset</th>
+        <th>Raw Content</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="grid, iStats : ${grids}">
+        <td th:text="${iStats.index + 1}"></td>
+        <td><a th:href="@{/nodes/{nodeId}(nodeId=${grid.id.nodeId})}" th:text="${grid.id.nodeId}"></a></td>
+        <td th:text="${grid.id.offset}"></td>
+        <td th:text="${grid.txt}"></td>
+
+    </tr>
+    </tbody>
+</table>
+</section>
+
+</body>
+</html>

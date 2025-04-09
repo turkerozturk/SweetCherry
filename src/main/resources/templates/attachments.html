@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Attachments</title>
+
+
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Attachments</h1>
+
+
+    <th:block th:unless="${images}">
+
+        <p>
+            Resimde görüldüğü gibi bir düğüme bir ekli dosya eklemeniz halinde bu sayfa aktif hale gelecektir.
+            İşlem sonrasında sayfayı yenilemeyi unutmayınız.
+
+        </p>
+        <img src="/img/help/attachments/help-add-attachment.jpg"
+             class="border border-3 border-black rounded-2"
+             alt="">
+
+    </th:block>
+
+
+
+    <th:block th:if="${images}">
+
+
+    <table class="table table-bordered border-primary">
+    <thead>
+    <tr>
+        <th scope="col" class="col-1" >Node Id</th>
+        <th scope="col" class="col-7" >File Name (Click to download)</th>
+
+        <th scope="col" class="col-2" >Attached Date</th>
+        <th scope="col" class="col-1" >File Type</th>
+        <th scope="col" class="col-1" >File Size</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="image:${images}">
+        <td>
+            <a th:href="@{/nodes/{nodeId}(nodeId=${image.nodeId})}"
+               th:text="${image.nodeId}"
+               th:title="${'offset in node content: ' + image.offset}"
+            ></a>
+        </td>
+
+        <td>
+            <a th:href="@{/download/{nodeId}/{offset}(nodeId=${image.nodeId},offset=${image.offset})}"
+               th:text="${#strings.abbreviate(image.fileName, 80)}"
+               th:title="${image.fileName}"
+            ></a>
+        </td>
+
+        <td th:text="${#dates.format(new java.util.Date(image.time * 1000), 'yyyy-MM-dd')}"
+            th:title="${#dates.format(new java.util.Date(image.time * 1000), 'yyyy-MM-dd HH:mm:ss') + ', ' + image.time}"
+        ></td>
+
+        <td th:text="${image.fileExtension}"></td>
+
+        <td th:text="${T(com.example.sqlitedemo.helpers.StringHelper).formatFileSize(image.fileSize)}"
+            th:title="${image.fileSize + ' bytes'}"
+        ></td>
+    </tr>
+    </tbody>
+</table>
+
+    </th:block>
+</section>
+
+</body>
+</html>

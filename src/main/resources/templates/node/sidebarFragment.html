@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<th:block th:fragment="sidebarFragment">
+
+
+    <aside id="sidebar" class="">
+
+        <div class="resizer"></div>
+
+        <div class="d-flex">
+            <button id="btn-toggle-sidebar" type="button">
+                <i class="fas fa-arrows-h childiconcss"></i>
+            </button>
+
+            <div class="sidebar-logo">
+
+                <th:block th:if="${parentNodeId}">
+                    <a
+                            th:href="'/nodes/' + ${parentNodeId}"
+                    >
+                                    <span th:title="#{tree.goToParentNode}">
+                                        <i class="fas fa-level-up childiconcssfas"></i>
+                                    </span>
+
+
+                        <span th:if="${node}"
+                              th:text="${node.fatherNode.name}"
+                              style="color: white; font-weight: bold;"
+                        >
+                                    Node Name
+                                    </span>
+
+                        <span th:unless="${node}"
+                              th:text="${'Database: ' + currentTenantName}"
+                              style="color: white; font-weight: bold;"
+                        >
+                                        Data source Name
+                                    </span>
+
+                    </a>
+
+
+                </th:block>
+
+                <th:block th:unless="${parentNodeId}">
+
+                    <th:block th:if="${node}">
+
+                        <a href="/nodes/0">
+                        <span th:title="#{tree.goToParentNode}"
+                              style="color: white; font-weight: bold;"
+                        >
+                           <i class="fas fa-level-up childiconcssfas"></i>
+                        </span>
+
+
+                            <span th:text="${node.name}"
+                                  style="color: white; font-weight: bold;"
+                            >
+                            Node Name
+                        </span>
+                        </a>
+
+                    </th:block>
+
+
+                    <span th:unless="${node}"
+                          th:text="${'Database: ' + currentTenantName}"
+                          style="color: white; font-weight: bold;"
+                    >
+                        Data source Name
+                    </span>
+
+                </th:block>
+
+
+            </div>
+
+        </div>
+
+        <div id="sideBarContent">
+
+            <th:block th:if="${childNodes}">
+                <th:block th:if="${parentNodeId}">
+                    <h4><img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
+                             th:alt="${'/img/icons/' + node.nodeIcon.iconName}"
+                             th:title="${'Content rendered as: ' + node.syntax}"
+                             class="iconcss"/>
+                        <span th:text="${node.name}"
+                              id="nodeName"
+                              style="color: gray; font-weight: bold;"
+                        >Dugum Adi</span>
+
+                    </h4>
+                </th:block>
+
+                <ul class="sidebar-nav">
+
+
+                    <!-- TODO sunun calisanini yap: th:attr="data-bs-title=${childNode.name}" data-bs-toggle="tooltip" -->
+                    <li class="sidebar-item" th:each="childNode : ${childNodes}">
+                        <th:block th:if="${childNode != null}">
+                            <a class="sidebar-link" th:href="'/nodes/' + ${childNode.nodeId}"
+                               th:title="${childNode.name}">
+
+                                <i th:class="${childNode.hasChildren ? 'fas fa-caret-right childiconcssfas' : 'fas fa-square childiconcssfas'}"
+                                   th:style="${childNode.hasChildren ? '' : 'visibility: hidden;'}"
+                                ></i>
+
+                                <img th:src="@{/img/icons/__${childNode.nodeIcon.iconName}__.svg}"
+                                     th:alt="${'/img/icons/' + childNode.nodeIcon.iconName}" class="childiconcss"/>
+
+                                <span th:text="${childNode.name}"
+                                      th:style="${'color:' + childNode.titleColorAsHtmlHex + ';'}"
+                                      th:class="${childNode.boldnessBit ? 'boldTitle' : ''}"></span>
+                            </a>
+                        </th:block>
+                        <th:block th:unless="${childNode}">
+                            <span style="color: white;">Child node is null</span>
+
+                        </th:block>
+
+
+                    </li>
+
+                </ul>
+            </th:block>
+            <th:block th:unless="${childNodes}">
+                <div th:replace="~{node/nodeMetaDataFragment :: nodeMetaDataFragment}"></div>
+
+            </th:block>
+
+            <hr />
+
+            <div th:replace="~{node/siblingAndChildrenNavigationFragment :: siblingAndChildrenNavigationFragment}"></div>
+
+
+        </div>
+
+
+    </aside>
+
+
+</th:block>
+
+</body>
+</html>

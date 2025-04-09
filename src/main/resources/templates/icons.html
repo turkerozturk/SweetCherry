@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Icons</title>
+
+    <style>
+        .childiconcss {
+            max-width: 25px;
+            max-height: 25px;
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <h1 th:text="#{icons.header}">Icons List</h1>
+    <p th:text="#{icons.description}">Sorted by the human readable name alphabetically.</p>
+
+    <table class="table table-bordered border-success table-sm">
+        <thead>
+        <tr>
+            <th class="col-3">-</th>
+
+            <th class="col-1" th:text="#{icons.column.index}">Index</th>
+            <th class="col-1" th:text="#{icons.column.icon}">Icon</th>
+            <th class="col-1" th:text="#{icons.column.name}">Name</th>
+            <th class="col-1" th:text="#{icons.column.humanReadableName}">Human Readable Name</th>
+            <th class="col-1" th:text="#{icons.column.idIn16bit}">Id in 16 bit</th>
+            <th class="col-1" th:text="#{icons.column.id}">Id</th>
+
+            <th class="col-3">-</th>
+
+        </tr>
+        </thead>
+        <tbody>
+
+
+        <tr th:each="nodeIcon, iStats : ${nodeIcons}">
+            <td></td>
+            <td th:text="${iStats.index + 1}"></td>
+
+            <td>
+                <img
+                        th:src="@{/img/icons/__${nodeIcon.iconName}__.svg}"
+                        th:alt="${'/img/icons/' + nodeIcon.iconName}" class="childiconcss"/>
+
+            </td>
+            <td th:text="${nodeIcon.name}"></td>
+            <td th:text="${nodeIcon.iconNameForHuman}"></td>
+            <td th:text="${nodeIcon.iconIdIn16bit}"></td>
+            <td th:text="${nodeIcon.iconId}"></td>
+            <td></td>
+
+
+        </tr>
+        </tbody>
+    </table>
+
+</section>
+</body>
+</html>

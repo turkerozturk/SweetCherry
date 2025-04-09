@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+       <title>Nodes</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Project Nodes Listesi</h1>
+
+    <!--/*--> Bu sayfa orphan gibi duruyor. <!--/*-->
+
+    <table border="1">
+    <thead>
+    <tr>
+        <th>Node Id</th>
+        <th>Name</th>
+        <th>Syntax</th>
+        <th>Tags</th>
+        <th>Is Rich Text</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="node:${nodes}">
+        <td><a th:href="@{'/nodes/' + ${node.nodeId}}"><span th:text="${node.nodeId}"></span></a></td>
+        <td>
+            <a th:href="@{'/cherryprojectnode/' + ${node.nodeId}}" th:text="${node.name}"/>
+        </td>
+        <td th:text="${node.syntax}"></td>
+        <td th:text="${node.tags}"></td>
+        <td th:text="${node.isRichText}"></td>
+
+
+    </tr>
+    </tbody>
+</table>
+</section>
+
+</body>
+</html>

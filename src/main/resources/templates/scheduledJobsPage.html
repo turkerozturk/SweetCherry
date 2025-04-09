@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Scheduled Jobs</title>
+</head>
+<body>
+<h2>Scheduled Jobs</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Job Name</th>
+        <th>Schedule</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Planlanmış işlerin listesi -->
+    <tr th:each="task : ${scheduledFutures}">
+        <td th:text="${task.task.getRunnable().getClass().getSimpleName()}"></td>
+        <td th:text="${task.expression}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

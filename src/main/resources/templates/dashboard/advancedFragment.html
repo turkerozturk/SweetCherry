@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<th:block th:fragment="advancedFragment">
+
+    <div class="card mb-4 rounded-3 shadow-sm">
+        <div class="card-header py-3">
+            <h4 class="my-0 fw-normal" th:text="#{dashboard.box.middle}"></h4>
+        </div>
+        <div class="card-body">
+            <h3>SweetCherry</h3>
+
+            <dl>
+
+                <dt>🌱<a href="/cherrytemplatetasks">Şablon Görünümler</a></dt>
+                <dd>İşte SweetCherry farkı!</dd>
+
+                <dt>🌱<a href="/nodesadvanced">Nodes++</a></dt>
+                <dd>Gelişmiş "node" filtreleme sayfası</dd>
+
+                <dt>🌱<a href="/rootnode">Node Gezgini</a></dt>
+                <dd>Node Gezgini <i>kişisel ansiklopediniz</i> CherryTree'yi heryerden erişilebilir kılıyor!
+                </dd>
+
+                <dt>🌱<a href="/attachments">Ekli Dosyalar</a></dt>
+                <dd>Nodüllere eklenmiş tüm dosyalar indirilebilir biçimde listelenir.
+                </dd>
+
+                <dt>🌱Son <a href="/nodes/timeline/created">Oluşturulan</a> ve <a
+                        href="/nodes/timeline/modified">Güncellenenler</a></dt>
+                <dd>Oluşturduğunuz veya güncellediğiniz son 50 içeriği görün.
+                </dd>
+
+                <dt>🌱<a href="/findchildrenbyfatherid">Node Ara</a></dt>
+                <dd>Node Ara ile bir içeriğin id numarası belirtilerek alt içerikleri görülebilir.
+                </dd>
+
+            </dl>
+
+        </div>
+    </div>
+
+</th:block>
+
+</body>
+</html>

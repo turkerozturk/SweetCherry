@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Features Comparison</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin-top: 20px;
+        }
+        .comparison-table {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            text-align: center;
+            padding: 20px;
+        }
+        .comparison-table th {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .comparison-table tr:nth-child(odd) {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center mb-4">İki Yazılımın Karşılaştırması</h1>
+    <h2 class="text-center mb-4">Farklar</h2>
+
+    <div class="row justify-content-center">
+
+        <a href="/">giriş</a>
+
+
+        <div class="col-md-8">
+            <table class="table table-bordered comparison-table">
+                <thead>
+                <tr>
+                    <th>Açıklama</th>
+                    <th>Özellik</th>
+                    <th>CherryTree 1.1.3</th>
+                    <th>SweetCherry</th>
+                </tr>
+                </thead>
+                <tbody>
+
+
+                <tr>
+                    <td>Not ekleme çıkarma düzenleme.</td>
+                    <th>Veri Girişi</th>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-ban"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Webden Veri Okuma</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+
+
+                <tr>
+                    <td></td>
+                    <th>Gelişmiş Yer İşaretleri</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Tüm Ekli Dosyalar</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Hızlı CTB Dışa Aktarım</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Açıklayıcı İkon Listesi</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Veritabanı Sunucularına Bağlanabilme</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td>Tek yönlü ve farklı sunucular arası eşleştirme.</td>
+                    <th>Veri Senkronizasyonu</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Mobil Görünüm</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Hızlı Arama</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Farklı Görünümler</th>
+                    <td><i class="fas fa-ban"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>%100 Doğru Not Görünümü</th>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-ban"></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Latex içerik görünümü</th>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-ban"></i></td>
+                </tr>
+
+
+                </tbody>
+            </table>
+
+
+            <table class="table table-bordered comparison-table">
+                <thead>
+                <tr>
+                    <th>Özellik</th>
+                    <th>Açıklama</th>
+                    <th>CherryTree 1.1.3</th>
+                    <th>SweetCherry</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th>&nbsp;</th>
+                    <td>Ücretsiz</td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th>Operating System</th>
+                    <td>Windows, macOS, Linux</td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th>Veri Girişi</th>
+                    <td>Not ekleme çıkarma düzenleme.</td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-ban"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                    <td><i class="fas fa-check"></i></td>
+                    <td><i class="fas fa-check"></i></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

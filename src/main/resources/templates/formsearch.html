@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+
+
+    <div style="background-color: #aaeeff;">
+        <form id="paginationForm" action="#" th:action="@{/formsearch}" th:object="${formSearch}" method="post" class="form-inline">
+            <div class="row" style="background-color: #99ddee;">
+
+                <div class="col-2">
+
+                </div>
+
+                <div class="col-7">
+
+                </div>
+
+                <div class="col-1">
+                    <button type="submit" formaction="#" class="btn btn-primary">Filtre Uygula</button>
+                </div>
+
+                <div class="col-1">
+                    <button type="submit" formaction="/nodesadvanced/pdf" class="btn btn-primary">PDF</button>
+                </div>
+
+                <div class="col-1">
+
+                    <label for="pageNumber">Sayfa No:</label>
+                    <select name="pageNumber" id="pageNumber" class="form-select" onchange="changePage(this)">
+                        <th:block th:each="page : ${pages}">
+                            <option th:value="${page}"
+                                    th:text="${page + 1}"
+                                    th:selected="${page == pageNumber}"></option>
+                        </th:block>
+                    </select>
+                  <!--  <span th:if="${#fields.hasErrors('pageNumber')}" th:errors="*{pageNumber}">pageNumber Error</span> -->
+
+                        <span th:text="${'Sayfa: ' + pageNumber}"></span>
+
+
+                    <label for="PAGE_SIZE_OPTIONS">Sayfalama:</label>
+                    <select name="PAGE_SIZE_OPTIONS" id="PAGE_SIZE_OPTIONS" th:field="*{pageSize}" class="form-select" onchange="changePageSize(this)">
+                        <option th:each="opt : *{PAGE_SIZE_OPTIONS}"
+                                th:value="${opt}"
+                                th:text="${opt}"
+                                th:selected="${formSearch.getPageSize != null and opt == formSearch.getPageSize}">x
+                        </option>
+                    </select>
+                    <span th:if="${#fields.hasErrors('PAGE_SIZE_OPTIONS')}" th:errors="*{PAGE_SIZE_OPTIONS}">pageSize Error</span>
+
+
+                        <span th:text="${'Sayfalama: ' + pageSize}"></span>
+                </div>
+
+
+            </div>
+
+            <div class="row">
+
+                <!-- ICONS -->
+                <div class="col-1">
+
+                      <label for="nodeIcons">Ikon:</label>
+                      <select multiple size="10" name="nodeIcons" id="nodeIcons"  class="form-select">
+                          <option th:each="nodeIcon : *{allIcons}"
+                                  th:value="${nodeIcon.name}"
+                                  th:text="${nodeIcon.iconNameForHuman}"
+                                  th:selected="${formSearch.getNodeIcons != null and formSearch.getNodeIcons.contains(nodeIcon)}"
+                          >
+                          </option>
+                      </select>
+                    <span th:if="${#fields.hasErrors('nodeIcons')}" th:errors="*{nodeIcons}">nodeIcons Error</span>
+
+                </div>
+
+                <!-- NODE IDS -->
+                <div class="col-1">
+                    <label for="nodeIdStartFilter">Düğüm Id Baş:</label>
+                    <input type="text" id="nodeIdStartFilter" th:field="*{nodeIdStartFilter}" name="nodeIdStartFilter" class="form-control"/>
+                    <span th:if="${#fields.hasErrors('nodeIdStartFilter')}" th:errors="*{nodeIdStartFilter}">nodeIdStartFilter Error</span>
+
+                    <label for="nodeIdEndFilter">Düğüm Id Bit:</label>
+                    <input type="text" id="nodeIdEndFilter" th:field="*{nodeIdEndFilter}" name="nodeIdEndFilter" class="form-control"/>
+                    <span th:if="${#fields.hasErrors('nodeIdEndFilter')}" th:errors="*{nodeIdEndFilter}">nodeIdEndFilter Error</span>
+
+                </div>
+
+                <!-- CREATION DATE -->
+                <div class="col col-1">
+                    <label for="tsCreationStartFilter">Oluşturma Baş.:</label>
+                    <input type="date" id="tsCreationStartFilter" th:field="*{tsCreationStartFilter}" name="tsCreationStartFilter" class="form-control"
+                           th:value="${tsCreationStartFilter}">
+                    <span th:if="${#fields.hasErrors('tsCreationStartFilter')}" th:errors="*{tsCreationStartFilter}">tsCreationStartFilter Error</span>
+
+
+                    <label for="tsCreationEndFilter">Bitiş Tarihi:</label>
+                    <input type="date" id="tsCreationEndFilter" th:field="*{tsCreationEndFilter}" name="tsCreationEndFilter" class="form-control"
+                           th:value="${tsCreationEndFilter}">
+                    <span th:if="${#fields.hasErrors('tsCreationEndFilter')}" th:errors="*{tsCreationEndFilter}">tsCreationEndFilter Error</span>
+
+                </div>
+
+                <!-- MODIFICATION DATE -->
+                <div class="col col-1">
+                    <label for="tsModificationStartFilter">Düzenleme Baş.:</label>
+                    <input type="date" id="tsModificationStartFilter" th:field="*{tsModificationStartFilter}" name="tsModificationStartFilter"
+                           class="form-control" th:value="${tsModificationStartFilter}">
+                    <span th:if="${#fields.hasErrors('tsModificationStartFilter')}" th:errors="*{tsModificationStartFilter}">tsModificationStartFilter Error</span>
+
+
+                    <label for="tsModificationEndFilter">Bitiş Tarihi:</label>
+                    <input type="date" id="tsModificationEndFilter" th:field="*{tsModificationEndFilter}" name="tsModificationEndFilter" class="form-control"
+                           th:value="${tsModificationEndFilter}">
+                    <span th:if="${#fields.hasErrors('tsModificationEndFilter')}" th:errors="*{tsModificationEndFilter}">tsModificationEndFilter Error</span>
+
+                </div>
+
+                <!-- NAME -->
+                <div class="col-3">
+                    <div class="form-check">
+                        <label for="nameFilter">Name Filtresi:</label>
+                        <input type="text" id="nameFilter" th:field="*{nameFilter}" class="form-control"/>
+                        <span th:if="${#fields.hasErrors('nameFilter')}" th:errors="*{nameFilter}">nameFilter Error</span>
+                    </div>
+                    <div class="form-check">
+                        <label class="col-form-check-label" for="nameStartsWith">İle Başlayan:</label>
+                        <input type="checkbox" id="nameStartsWith" name="nameStartsWith" class="form-check-input">
+                    </div>
+                </div>
+
+                <!-- CONTENT -->
+                <div class="col-2">
+                    <label for="textFilter">Text Filtresi:</label>
+                    <input type="text" id="textFilter" th:field="*{textFilter}" name="textFilter" class="form-control"
+                           th:value="${textFilter}">
+                    <span th:if="${#fields.hasErrors('textFilter')}" th:errors="*{textFilter}">nameFilter Error</span>
+                </div>
+
+                <!-- TAGS -->
+                <div class="col-1">
+                    <label for="tagsFilter">Tags Filtresi:</label>
+                    <input type="text" id="tagsFilter" th:field="*{tagsFilter}" name="tagsFilter" class="form-control"
+                           th:value="${tagsFilter}">
+                    <span th:if="${#fields.hasErrors('tagsFilter')}" th:errors="*{tagsFilter}">nameFilter Error</span>
+                </div>
+
+                <!-- SYNTAX -->
+                <div class="col-1">
+                    <label for="syntaxFilter">Syntax Filtresi:</label>
+                    <input type="text" id="syntaxFilter" th:field="*{syntaxFilter}" name="syntaxFilter" class="form-control"
+                           th:value="${syntaxFilter}">
+                    <span th:if="${#fields.hasErrors('syntaxFilter')}" th:errors="*{syntaxFilter}">nameFilter Error</span>
+
+                </div>
+
+                <!-- SUBMIT -->
+                <div class="col col-1">
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+</section>
+
+</body>
+</html>

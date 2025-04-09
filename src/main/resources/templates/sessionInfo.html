@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layoutMobile}">
+<head>
+    <title>Session Info</title>
+
+
+</head>
+<body>
+<section layout:fragment="content">
+
+
+
+    <h1>Session Parameters</h1>
+
+
+    <table class="table">
+        <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Session Max Inactive Interval</td>
+            <td th:text="${sessionMaxInactiveInterval}"></td>
+        </tr>
+        <tr>
+            <td>Session Creation Time</td>
+            <td th:text="${#dates.format(sessionCreationTime, 'dd-MM-yyyy HH:mm:ss')}"></td>
+        </tr>
+        <tr>
+            <td>Session Last Accessed Time</td>
+            <td th:text="${#dates.format(sessionLastAccessedTime, 'dd-MM-yyyy HH:mm:ss')}"></td>
+        </tr>
+        <tr>
+            <td>Session ID</td>
+            <td th:text="${sessionId}"></td>
+        </tr>
+
+    </table>
+
+
+    <h1>Session Attributes</h1>
+    <table class="table">
+        <tr th:each="entry : ${sessionAttributes}">
+            <td th:text="'Session Attribute: ' + ${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+    </table>
+
+    <h1>Cookies</h1>
+    <table class="table">
+        <tr>
+            <th>Cookie Name</th>
+            <th>Cookie Value</th>
+        </tr>
+        <tr th:each="entry : ${cookies}">
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+    </table>
+
+    <h1>ServletContext Parameters</h1>
+    <table class="table">
+        <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+        </tr>
+        <tr th:each="entry : ${servletContextParams}">
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+    </table>
+
+
+    <h1>ServletContext Attributes</h1>
+    <table class="table">
+        <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+        </tr>
+        <tr th:each="entry : ${servletContextAttributes}">
+            <td th:text="'Context Attribute: ' + ${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+    </table>
+
+    <h1>SessionStorage Information</h1>
+    <table id="sessionStorageTable" class="table">
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+    </table>
+
+    <h1>localStorage Information</h1>
+    <table id="localStorageTable" class="table">
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+    </table>
+
+    <h1>IndexedDB Information</h1>
+    <table id="indexedDBTable" class="table">
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+    </table>
+
+
+    <script>
+        function displaySessionStorage() {
+            let sessionStorageTable = document.getElementById('sessionStorageTable');
+
+            for (let i = 0; i < sessionStorage.length; i++) {
+                let key = sessionStorage.key(i);
+                let value = sessionStorage.getItem(key);
+
+                let row = sessionStorageTable.insertRow();
+                let cellKey = row.insertCell(0);
+                let cellValue = row.insertCell(1);
+
+                cellKey.innerHTML = key;
+                cellValue.innerHTML = value;
+            }
+        }
+
+        window.onload = displaySessionStorage;
+    </script>
+
+    <script>
+        function displayStorage(storage, tableId) {
+            let storageTable = document.getElementById(tableId);
+
+            for (let i = 0; i < storage.length; i++) {
+                let key = storage.key(i);
+                let value = storage.getItem(key);
+
+                let row = storageTable.insertRow();
+                let cellKey = row.insertCell(0);
+                let cellValue = row.insertCell(1);
+
+                cellKey.innerHTML = key;
+                cellValue.innerHTML = value;
+            }
+        }
+
+        window.onload = function() {
+            displayStorage(sessionStorage, 'sessionStorageTable');
+            displayStorage(localStorage, 'localStorageTable');
+        };
+    </script>
+
+    <script>
+        function displayIndexedDB() {
+            let indexedDBTable = document.getElementById('indexedDBTable');
+
+            let request = indexedDB.open('myDatabase', 1);
+
+            request.onupgradeneeded = function(event) {
+                let db = event.target.result;
+                if (!db.objectStoreNames.contains('myStore')) {
+                    db.createObjectStore('myStore', { keyPath: 'id' });
+                }
+            };
+
+            request.onsuccess = function(event) {
+                let db = event.target.result;
+                let transaction = db.transaction('myStore', 'readonly');
+                let objectStore = transaction.objectStore('myStore');
+
+                objectStore.openCursor().onsuccess = function(event) {
+                    let cursor = event.target.result;
+                    if (cursor) {
+                        let row = indexedDBTable.insertRow();
+                        let cellKey = row.insertCell(0);
+                        let cellValue = row.insertCell(1);
+
+                        cellKey.innerHTML = cursor.key;
+                        cellValue.innerHTML = JSON.stringify(cursor.value);
+
+                        cursor.continue();
+                    }
+                };
+            };
+
+            request.onerror = function(event) {
+                console.error('IndexedDB error:', event.target.errorCode);
+            };
+        }
+
+        window.onload = function() {
+            displayIndexedDB();
+        };
+    </script>
+
+
+</section>
+</body>
+</html>

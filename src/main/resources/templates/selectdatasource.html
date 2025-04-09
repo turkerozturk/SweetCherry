@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+
+<head>
+    <title>Select Data Source</title>
+
+
+
+
+
+
+        <th:block th:fragment="pageSpecificCssStyles">
+
+            <style>
+                .kutu {
+                    margin-left: 0;
+                    margin-right: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    background-color: #f5f5f5;
+
+                }
+
+                .container {
+                    background-color: #ffccff;
+                    padding: 20px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    box-sizing: border-box;
+                    max-width: 100%;
+                }
+
+                @media (min-aspect-ratio: 1/1) {
+                    /* Ekran genişliği yüksekliğinden fazla olduğunda */
+                    .container {
+                        width: 33vw; /* Ekranın genişliğinin 3'te 1'i kadar */
+                    }
+                }
+
+                @media (max-aspect-ratio: 1/1) {
+                    /* Ekran yüksekliği genişliğinden fazla olduğunda */
+                    .container {
+                        width: 100vw; /* Ekran genişliğine tam sığacak */
+                    }
+                }
+
+
+
+
+            </style>
+
+
+        </th:block>
+
+
+
+
+
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div  class="kutu" >
+
+
+
+
+
+
+            <div th:replace="~{common/tenantFragment :: tenantFragment}"></div>
+
+
+
+
+    </div>
+
+
+</section>
+</body>
+</html>

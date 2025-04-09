@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="navbarFragment">
+
+
+    <nav class="navbar navbar-expand-lg bg-light" style="z-index: 100;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/" title="🌱🍒👨‍🌾 CherryTree WebViewer 🌱🍒👨🏼‍">
+
+                CherryTree WebViewer
+
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!--
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                    -->
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           th:text="#{navbar.application}"
+                        >
+                            Application
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="/"
+                                   th:title="#{root.nodeTree.description}"
+                                >
+                                    <i class=" fas fa-tree"></i>
+                                    <span href="" th:text="#{root.nodeTree}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/bookmarks"
+                                   th:title="#{root.bookmarks.description}"
+                                >
+                                    <i class=" fas fa-bookmark"></i>
+                                    <span href="" th:text="#{root.bookmarks}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/nodesadvancedwithbinding"
+                                   th:title="#{root.advancedSearch.description}"
+                                >
+                                    <i class=" fas fa-search"></i>
+                                    <span href="" th:text="#{root.advancedSearch}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/attachments"
+                                   th:title="#{root.attachments.description}"
+                                >
+                                    <i class=" fas fa-download"></i>
+                                    <span href="" th:text="#{root.attachments}"></span>
+                                </a>
+                            </li>
+
+                            <div class="dropdown-divider"></div>
+
+
+                            <li>
+                                <a class="dropdown-item" href="/cherrytemplatetasks"
+                                   th:title="#{root.customizedNodeListViews.description}"
+                                >
+                                    <i class=" fas fa-list"></i>
+                                    <span href="" th:text="#{root.customizedNodeListViews}"></span>
+                                </a>
+                            </li>
+
+                            <div class="dropdown-divider"></div>
+
+
+                            <li>
+                                <a class="dropdown-item" href="/icons"
+                                   th:title="#{root.icons.description}"
+                                >
+                                    <i class=" fas fa-icons"></i>
+                                    <span href="" th:text="#{root.icons}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/settings"
+                                   th:title="#{root.settings.description}"
+                                >
+                                    <i class=" fas fa-gear"></i>
+                                    <span href="" th:text="#{root.settings}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/dashboardold"
+                                   th:title="#{root.informationBoard.description}"
+                                >
+                                    <i class=" fas fa-info-circle"></i>
+                                    <span href="" th:text="#{root.informationBoard}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/help/index"
+                                   th:title="#{root.help.description}"
+                                >
+                                    <i class=" fas fa-life-ring"></i>
+                                    <span href="" th:text="#{root.help}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/about"
+                                   th:title="#{root.about.description}"
+                                >
+                                    <i class=" fas fa-rainbow"></i>
+                                    <span href="" th:text="#{root.about}"></span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           th:text="#{navbar.language}"
+                        >
+                            Language
+                        </a>
+                        <ul class="dropdown-menu">
+
+                            <th:block th:replace="~{common/languageFragment :: languageFragment}"></th:block>
+
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           th:text="#{navbar.viewMode}"
+                        >
+                            View Mode
+                        </a>
+                        <ul class="dropdown-menu">
+
+                            <th:block th:replace="~{common/viewModeFragment :: viewModeFragment}"></th:block>
+
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           th:text="#{navbar.dataSources}"
+                        >
+                            Data Sources
+                        </a>
+
+                        <ul class="dropdown-menu" style="width: 250px;">
+
+
+                            <th:block th:if="${tenantNames}">
+
+
+
+
+
+                                <li>
+
+                                    <form action="#" th:action="@{/setTenant}" method="post">
+
+                                        <div class="input-group">
+
+
+                                            <!-- <label for="tenant">Tenant Sec:</label> -->
+                                            <select class="form-control form-select" id="tenant" name="tenant"
+                                                    onchange="this.form.submit()">
+
+
+                                                <option th:unless="${currentTenantName}"
+                                                        value=""
+                                                        th:text="#{tenantfragment.option_select_database}"
+                                                >
+                                                    Select Database
+                                                </option>
+                                                <option th:each="tenantName : *{tenantNames}"
+                                                        th:value="${tenantName}"
+                                                        th:text="${tenantName}"
+                                                        th:selected="${tenantName == currentTenantName}"
+                                                >
+                                                </option>
+                                                <!-- Diger tenant seceneklerini ekleyin -->
+
+                                            </select>
+
+                                            <div class="input-group-append">
+                                                <div class="input-group-text">
+                                                    <label class="col-form-check-label sr-only"
+                                                           for="nameStartsWith">f:</label>
+                                                    <button class="btn btn-sm" type="submit" id="nameStartsWith">&gt;
+                                                    </button>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </form>
+
+                                </li>
+
+
+                            </th:block>
+
+                            <div class="dropdown-divider"></div>
+
+
+
+                            <li>
+
+                                <form action="#" th:action="@{/close-datasources}" method="post">
+
+                                    <button class="btn btn-sm"
+                                            type="submit"
+                                            th:title="#{navbar.closeCTB.description}"
+                                    >
+                                        &nbsp;<i class="fas fa-regular fa-xmark"></i>
+
+                                        <span th:text="#{navbar.closeCTB}">Close CTB</span>
+                                    </button>
+                                </form>
+                            </li>
+
+                            <div class="dropdown-divider"></div>
+
+
+                            <th:block th:if="${tenantNames}">
+                                <li>
+
+                                    <th:block sec:authorize="hasRole('ADMIN')">
+                                        <a class="dropdown-item"
+                                           href="/tenants"
+
+                                        >
+                                            <i class="fas fa-regular fa-list"></i>
+                                            <span
+                                                    th:text="#{tenantfragment.link_to_tenants_list}">
+                                                Tenants list
+                                            </span>
+
+
+                                        </a>
+                                    </th:block>
+                                </li>
+
+                            </th:block>
+
+                            <div class="dropdown-divider"></div>
+
+
+                            <li>
+
+                                <a href="/upload-form" id="uploadButton" class="dropdown-item" title="Yükle">
+                                    <i class="fas fa-upload"></i>
+                                    <span
+                                            th:text="#{navbar.loadDataSourceConfig}"
+                                    >Yükle
+                                    </span>
+                                </a>
+
+                            </li>
+
+                            <div class="dropdown-divider"></div>
+
+
+                            <li>
+                                <form action="#" th:action="@{/reload-datasources}" method="post">
+
+                                    <button class="btn btn-sm"
+                                            type="submit"
+                                            th:title="#{navbar.reloadDatasources.description}"
+                                    >
+                                        <i class="fas fa-regular fa-rotate"></i>
+                                        <span
+                                                th:text="#{navbar.reloadDatasources}"
+                                        >Reload
+                                    </span>
+
+                                    </button>
+                                </form>
+                            </li>
+
+                            <div class="dropdown-divider"></div>
+
+                            <li>
+                                <a class="dropdown-item" href="/exportedFiles"
+                                   th:title="#{root.exportedFiles.description}"
+                                >
+                                    <i class=" fas fa-folder"></i>
+                                    <span href="" th:text="#{root.exportedFiles}"></span>
+                                </a>
+                            </li>
+
+
+                        </ul>
+
+
+                    </li>
+
+
+
+
+
+
+
+
+
+
+
+                    <!--
+                    <li class="nav-item">
+                        <a class="nav-link disabled">Disabled</a>
+                    </li>
+                    -->
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">
+
+                            <div th:replace="~{common/astronomyFragment :: astronomyFragment}"></div>
+
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           th:text="#{navbar.system}"
+                        >
+                            System
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li sec:authorize="isAuthenticated()">
+                                <th:block sec:authorize="hasRole('ADMIN')">
+                                    <a class="dropdown-item" href="/shutdownContext"
+
+                                    >
+                                        <i class="fa-solid fa-power-off"></i>
+                                        <span
+                                                th:text="#{navbar.shutDownApp}"
+                                        >
+                                            Shut Down App
+
+                                        </span>
+
+                                    </a>
+                                </th:block>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           th:text="#{navbar.user}"
+                        >
+                            User
+                        </a>
+                        <ul class="dropdown-menu">
+
+
+                            <th:block sec:authorize="isAuthenticated()">
+<!--
+                                <li>Session will expire in: <span id="countdown"></span> seconds.
+                                </li>
+
+                                <div class="dropdown-divider"></div>
+-->
+
+                                <li>
+                                    <a class="dropdown-item" href="/sessionInfo"
+
+                                    >
+                                        <i class="fa-solid fa-info"></i>
+                                        <span
+                                                th:text="#{navbar.sessionInfo}"
+                                        >Session Info
+                                        </span>
+
+                                    </a>
+                                </li>
+
+                                <div class="dropdown-divider"></div>
+
+
+                                <li>
+                                    <a class="dropdown-item" href="/logout">
+                                        <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>
+                                        <span
+                                                th:text="#{navbar.logout}"
+                                        >Logout
+                                        </span>
+                                        &nbsp;
+                                        <span
+                                        sec:authentication="name"></span>
+                                    </a>
+                                </li>
+
+                            </th:block>
+
+
+                        </ul>
+                    </li>
+
+                </ul>
+                <!--
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+                -->
+
+            </div>
+        </div>
+    </nav>
+
+
+</div>
+
+</body>
+</html>

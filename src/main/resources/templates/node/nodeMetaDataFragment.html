@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="nodeMetaDataFragment">
+
+    <!-- Node Meta Popup (Hidden by default) -->
+    <th:block th:if="${node}">
+
+
+        <div id="nodeMeta"></div>
+        <h4><img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
+                 th:alt="${'/img/icons/' + node.nodeIcon.iconName}"
+                 th:title="${'Content rendered as: ' + node.syntax}"
+                 class="iconcss"/>
+            <span th:text="${node.name}"
+                  id="nodeName"
+                  style="color: gray; font-weight: bold;"
+            >Dugum Adi</span>
+
+        </h4>
+
+        <table class="table table-hover table-sm">
+            <thead>
+            <tr>
+                <th th:text="#{node.meta.key}">Key</th>
+                <th th:text="#{node.meta.value}">Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th th:text="#{node.meta.isMasterNode}">Node Id</th>
+                <td th:text="${node.isMasterNode}"></td>
+            </tr>
+            <th:block th:if="${sharedNodeIds}">
+                <tr>
+                    <th th:text="#{node.meta.sharedNodeIds}">Shared Node Ids</th>
+                    <td>
+                            <th:block th:each="id : ${sharedNodeIds}">
+                                <a th:href="@{/nodes/{id}(id=${id})}" th:text="${id}"></a>
+                            </th:block>&nbsp;
+                    </td>
+                </tr>
+            </th:block>
+            <tr>
+                <th th:text="#{node.meta.nodeId}">Node Id</th>
+                <td th:text="${node.nodeId}"></td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.tags}">Tags</th>
+                <td th:text="${node.tags}"></td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.syntax}">Syntax</th>
+                <td th:text="${node.syntax}"></td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.isReadOnly}">Is Read Only</th>
+                <td th:if="${node.isReadOnly}" th:text="#{node.meta.yes}">Yes</td>
+                <td th:unless="${node.isReadOnly}" th:text="#{node.meta.no}">No</td>
+
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.isRichText}">Is Rich Text</th>
+                <td th:text="${node.isRichText}"></td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.hasCodeBox}">Has Code Box</th>
+                <td>
+                    <th:blcck th:if="${node.hasCodeBox}">
+                        <a th:href="${'/codeboxes/' + node.nodeId}"
+                           th:text="#{node.meta.yes}"
+                        >Yes</a>
+                        <th:block
+                                th:text="#{list.item.count(${#lists.size(node.codeBoxes)})}"
+                        >
+                        </th:block>
+                    </th:blcck>
+                    <span th:unless="${node.hasCodeBox}" th:text="#{node.meta.no}">No</span>
+                </td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.hasTable}">Has Table</th>
+                <td>
+                    <th:blcck th:if="${node.hasTable}">
+                        <a th:href="${'/grids/' + node.nodeId}"
+                           th:text="#{node.meta.yes}"
+                        >Yes</a>
+
+
+                        <th:block
+                                th:text="#{list.item.count(${#lists.size(node.grids)})}"
+                        >
+                        </th:block>
+
+                    </th:blcck>
+                    <span th:unless="${node.hasTable}" th:text="#{node.meta.no}">No</span>
+                </td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.hasImage}">Has Image</th>
+                <td>
+                    <th:blcck th:if="${node.hasImage}">
+                        <a th:href="${'/images/' + node.nodeId}"
+                           th:text="#{node.meta.yes}"
+                        >Yes</a>
+                        <!--
+                        <th:block
+                                th:text="#{list.item.count(${#lists.size(node.images)})}"
+                        >
+                        </th:block>
+                        -->
+                    </th:blcck>
+                    <span th:unless="${node.hasImage}" th:text="#{node.meta.no}">No</span>
+                </td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.level}">Level</th>
+                <td th:text="${node.level}"></td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.creationTimestamp}">Creation Timestamp</th>
+                <td th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
+                    th:title="${node.creationTimestamp}"></td>
+            </tr>
+            <tr>
+                <th th:text="#{node.meta.lastSaveTimestamp}">Last Save Timestamp</th>
+                <td th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
+                    th:title="${node.lastSaveTimestamp}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+
+    </th:block>
+
+</div>
+
+</body>
+</html>

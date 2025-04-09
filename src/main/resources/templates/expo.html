@@ -1,0 +1,34 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <meta charset="UTF-8"/>
+    <title>>Export Node</title>
+</head>
+<body>
+
+<section layout:fragment="content">
+
+
+
+            <pre th:text="${contentText}"></pre>
+
+            <br />
+
+
+    <a href="/exportedFiles"
+       th:title="#{root.exportedFiles.description}"
+    >
+        <span th:text="#{root.exportedFiles}"></span>
+    </a>
+    <br />
+    <br />
+
+    <a href="javascript:history.back()">Önceki Sayfaya Dön</a>
+
+
+</section>
+
+
+</body>
+</html>

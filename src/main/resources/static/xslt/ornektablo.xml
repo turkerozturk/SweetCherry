@@ -1,0 +1,23 @@
+<?xml version='1.0'?>
+<table>
+    <row>
+        <cell>IMAGE</cell>
+        <cell>WhatsApp Image Keys</cell>
+    </row>
+    <row>
+        <cell>VIDEO</cell>
+        <cell>WhatsApp Video Keys</cell>
+    </row>
+    <row>
+        <cell>AUDIO</cell>
+        <cell>WhatsApp Audio Keys</cell>
+    </row>
+    <row>
+        <cell>DOCUMENT</cell>
+        <cell>WhatsApp Document Keys</cell>
+    </row>
+    <row>
+        <cell>Media Type</cell>
+        <cell>Application Info</cell>
+    </row>
+</table>

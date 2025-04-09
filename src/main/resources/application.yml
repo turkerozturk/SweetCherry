@@ -1,0 +1,174 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# https://shredzone.org/maven/commons-suncalc/examples.html
+# LOCATION
+astronomy:
+  latitude: 40°59'21.5"N
+  longitude: 29°02'14.4"E
+  timezone: Europe/Istanbul
+  zonalOffset: 10800
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# EMAIL
+# https://www.baeldung.com/spring-email
+# https://dev.to/vatana7/how-to-send-email-in-springboot-springboot-tutorial-4jjm
+# https://www.baeldung.com/spring-value-annotation
+# https://stackoverflow.com/questions/34529216/boolean-values-in-spring-application-properties-file
+# https://stackoverflow.com/questions/13585259/evaluating-spring-value-annotation-as-primitive-boolean
+
+spring:
+  mail: # EMAIL
+    host: smtp.gmail.com
+    port: 587
+    username: username@gmail.com
+    password: password
+    properties:
+      mail.transport.protocol: smtp
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+    debug: true
+  lifecycle:
+    timeout-per-shutdown-phase: 25s
+  http:
+    encoding:
+      charset: UTF-8
+  mvc:
+    locale: en_US, tr_TR # MULTILANGUAGE Supported languages
+  jpa: # DATABASE
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false #https://www.baeldung.com/spring-data-jpa-run-app-without-db
+    hibernate:
+      ddl-auto: none #https://www.baeldung.com/spring-data-jpa-run-app-without-db
+  properties:
+    hibernate:
+      format_sql: true
+  datasource: # PLEASE LOOK AT THE "allTenants" folder.
+  main:
+    banner-mode: off
+  thymeleaf: # boot-calendar github: https://github.com/metronome12/boot-calendar
+    cache: true
+  cache:
+    type: simple
+
+# https://www.baeldung.com/multitenancy-with-spring-data-jpa
+# Artik Multitenancy den dolayi veritabanlarinin baglanti bilgileri allTenants isimli olusturdugumuz klasorde duruyor.
+# asagidaki degisken hic atanmamis null olsa bile varsayilan degerini kod icerisinde tenant_1 olarak ayarladik.
+#defaultTenant: tenant_1
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#  Setting up an SSL in a Spring Boot application without using a keytool and keystore
+# https://www.youtube.com/watch?v=B4FxG2Diio0
+# SSL HTTPS
+server:
+  port: 443
+ # ssl:
+ #   certificate: "classpath:ssl-self-signed-certificate/certificate.crt"
+ #   certificate-private-key: "classpath:ssl-self-signed-certificate/private.key"
+  shutdown: graceful
+  http:
+    port: 8080
+  error:
+    whitelabel:
+      enabled: false
+
+# Asagidaki 4 satirin aciklamasi kisisel notlar node/6443 icinde. Bu dosyada degil de JAR olustuktan sonra ayni klasorde
+# bir application.properties dosyasi olusturup onun icinde dort satir kullanildiginda lets encrypt sertifikasiyla
+# calistigi gorulur. Bu satirlar olmaz ise o zaman ayni portlardan sertifikasiz yani http olarak calisir, simdiki gibi.
+#  server.ssl.key-store=/etc/letsencrypt/live/your.domain.com/keystore.p12
+#  server.ssl.key-store-password=yourpassword
+#  server.ssl.key-store-type=PKCS12
+#  server.ssl.key-alias=tomcat
+# https://dzone.com/articles/spring-boot-secured-by-lets-encrypt
+
+# https://spring.io/blog/2023/11/07/ssl-hot-reload-in-spring-boot-3-2-0
+#server.ssl.bundle: "demo"
+
+#spring.ssl.bundle.pem:
+#  demo:
+#    reload-on-update: true
+#    keystore:
+#      certificate: "certs/demo.crt"
+#      private-key: "certs/demo.key"
+
+
+# ssl:
+#   bundle:
+#     jks:
+#       web-server:
+#         key:
+#           alias: "local_ssl"
+#           password: "kisiselbiruygulama"
+#         keystore:
+#           location: "classpath:keystore/local-ssl.p12"
+#           password: "kisiselbiruygulama"
+#           type: "PKCS12"
+#     pem:
+#       client:
+#         truststore:
+#           certificate: "classpath:keystore/local-cert.crt"
+#
+#server:
+# ssl:
+#   bundle: "web-server"
+#   client-auth: NEED
+#
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# LOGGING
+# Her zaman su linkten bakilmali kullanilabilecek degisken isimlerine:
+# https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#appendix.application-properties.core
+logging:
+  file:
+    name: myapp.log
+  threshold:
+    console: INFO
+    file: TRACE
+
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My custom variables
+myapp:
+  command-line-runner:
+    enabled: false
+  openWebBrowserOnStartup: false
+  debug: false
+  exportingFolderName: exportedFiles
+  login: # default values are inside my class
+    admin:
+      name: admin
+      password: adminPassword
+    user:
+      name: user
+      password: password
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ACTUATOR
+# (DEVOPS larin gozlem yapmasi icin yazagi url ler)
+# health, info vs. diye de tek tek yazmak mumkun, hepsi icin wildcard * kullanilir
+# <severurl>/actuator/health varsayilanda aciktir. Digerleri * ile acilmis oldu.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Not determined yet. Maybe CherrySpring.
+    version: Alfa
+
+
+endpoints:
+  shutdown:
+    enabled: true

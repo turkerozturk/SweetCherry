@@ -1,0 +1,125 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+.wrapper {
+  display: flex;
+}
+
+/*
+.main {
+    min-height: 50vh;
+    width: 100%;
+    overflow: hidden;
+    transition: all 0.35s ease-in-out;
+    background-color: #fafbfe;
+}
+*/
+#sidebar {
+  position: relative; /* Bu gerekli olabilir */
+  width: 360px;
+  min-width: 360px;
+  /* z-index: 1000; */
+  transition: all 0.25s ease-in-out;
+  background-color: #0e2238;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+#sidebar.expand {
+    width: $expandedWidth;
+    min-width: $expandedWidth;
+}
+*/
+#sidebar.shrink {
+  width: 20px;
+  min-width: 20px;
+}
+
+#sidebar .resizer {
+  width: 10px;
+  height: 100%;
+  background: #aaa;
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: ew-resize;
+  z-index: 1; /* Sidebar'ın üstünde olmalı */
+}
+
+#sideBarContent, .sidebar-logo {
+  overflow-y: scroll; /* Show vertical scrollbar */
+  overflow-x: scroll; /* Show horizontal scrollbar */
+  user-select: none; /* Tüm modern tarayıcılar için */
+  -webkit-user-select: none; /* Chrome, Safari ve Opera */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+.toggle-btn {
+  background-color: transparent;
+  cursor: pointer;
+  border: 0;
+  /* padding: 1rem 1.5rem; */
+}
+
+.toggle-btn i {
+  font-size: 1.5rem;
+  color: #FFF;
+}
+
+.sidebar-logo {
+  margin: auto 0;
+}
+
+.sidebar-logo a {
+  color: #FFF;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  padding: 2rem 0;
+  flex: 1 1 auto;
+}
+
+a.sidebar-link {
+  color: #FFF;
+  display: block;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-link i {
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
+}
+
+a.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.075);
+  border-left: 3px solid #3b7ddd;
+}
+
+.sidebar-item {
+  position: relative;
+  /* overflow: hidden; */ /* Taşma durumunda içeriği gizle */
+  /*   text-overflow: ellipsis;  Taşan içeriği üç nokta (...) ile kısalt */
+  /*   white-space: nowrap;  Metinlerin taşmadan bir satırda kalmasını sağla */
+}
+
+.d-flex {
+  display: flex;
+  overflow: hidden; /* Taşan içeriği gizle */
+  white-space: nowrap; /* Metni tek satırda tut */
+}
+
+#btn-toggle-sidebar {
+  flex-shrink: 0; /* Düğmenin genişliğinin değişmesini engelle */
+}
+
+.sidebar-logo {
+  overflow: hidden; /* Taşan içeriği gizle */
+  text-overflow: ellipsis; /* Taşan metni ... ile göster */
+}
+
+/*# sourceMappingURL=sidebar.css.map */

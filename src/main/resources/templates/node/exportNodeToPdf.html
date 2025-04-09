@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title></title>
+</head>
+<body>
+
+<div th:if="${node}">
+
+
+    <div th:if="${node.syntax eq 'plain-text'}"
+         th:utext="${#strings.replace(node.txt, newlinechar, '&lt;br /&gt;')}"
+         class="nodetextformatting">icerik
+    </div>
+    <hr/>
+
+    <div th:if="${node.syntax eq 'custom-colors'}"
+         th:utext="${node.txtAsHtml}">
+        icerik
+    </div>
+    <hr/>
+
+    <div th:unless="${node.syntax eq 'plain-text' or node.syntax eq 'custom-colors'}"
+         class="">
+        <pre class="highlight" th:utext="${node.txtAsHtml}">icerik</pre>
+    </div>
+
+</div>
+
+</body>
+</html>

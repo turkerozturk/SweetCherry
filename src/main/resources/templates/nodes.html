@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Nodes</title>
+
+    <style>
+        .iconcss {
+            max-width: 30px;
+            max-height: 30px;
+            width: 30px;
+            height: 30px;
+        }
+
+        .childiconcss {
+            max-width: 15px;
+            max-height: 15px;
+            width: 15px;
+            height: 15px;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Nodes Listesi</h1>
+
+<!-- Filtreleme için metin kutusu ve düğme -->
+<form action="#" th:action="@{/nodes}" method="get">
+    <input type="text" name="filter" placeholder="Tags filtresi" th:value="${filter}"> <!-- Filtre değerini göster -->
+    <button type="submit">Filtrele</button>
+</form>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Icon</th>
+        <th>Node Id</th>
+        <th>Name</th>
+        <th>Syntax</th>
+        <th>Tags</th>
+        <th>Is Rich Text</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="node:${nodes}">
+        <td><img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}" th:alt="${'/img/icons/' + node.nodeIcon.iconName}" class="childiconcss"/></td>
+        <td><a th:href="@{'/nodes/' + ${node.nodeId}}"><span th:text="${node.nodeId}"></span></a></td>
+        <td th:text="${node.name}"></td>
+        <td th:text="${node.syntax}"></td>
+        <td th:text="${node.tags}"></td>
+        <td th:text="${node.isRichText}"></td>
+
+
+    </tr>
+    </tbody>
+</table>
+</section>
+
+</body>
+</html>

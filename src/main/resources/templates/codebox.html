@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Node's Codeboxes</title>
+
+    <section layout:fragment="pageSpecificCssStyles">
+
+        <!-- for pygments syntax highlighter colorization -->
+        <link rel="stylesheet" th:href="@{/css/syntaxhighlighter.css}" />
+
+    </section>
+
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Codeboxes of Node #
+    <a th:href="@{/nodes/{nodeId}(nodeId=${codeboxes[0].id.nodeId})}"
+       th:text="${codeboxes[0].id.nodeId}"
+    ></a>
+</h1>
+
+<p>
+    <b>Node Name: </b>
+    <span th:text="${codeboxes[0].node.name}"></span>
+</p>
+
+<table class="table table-border">
+    <thead>
+    <tr>
+        <th>Node Id</th>
+        <th>Offset</th>
+        <th>Justification</th>
+        <th>Text(Highlighted)</th>
+        <th>Syntax</th>
+        <th>Width</th>
+        <th>Height</th>
+        <th>is_width_pix</th>
+        <th>do_highl_bra</th>
+        <th>do_show_linenum</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="codebox : ${codeboxes}">
+        <tr>
+            <td th:text="${codebox.id.nodeId}"></td>
+            <td th:text="${codebox.id.offset}"></td>
+            <td th:text="${codebox.justification}"></td>
+            <td>
+                <pre class="highlight" th:utext="${codeHighLighter.mappedhighlightLanguage(codebox.syntax, codebox.txt)}">icerik</pre>
+            </td>
+            <td th:text="${codebox.syntax}"></td>
+            <td th:text="${codebox.width}"></td>
+            <td th:text="${codebox.height}"></td>
+            <td th:text="${codebox.isWidthPix}"></td>
+            <td th:text="${codebox.doHighlBra}"></td>
+            <td th:text="${codebox.doShowLinenum}"></td>
+
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+
+
+</section>
+</body>
+</html>

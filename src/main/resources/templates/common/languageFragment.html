@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="languageFragment">
+
+    <li>
+        <a class="dropdown-item" href="/?lang=en">
+            <img src="/img/icons/ct_en.svg" alt="/img/icons/ct_rainbow" class="childiconcss">
+            <span th:text="#{label.english}">English</span>
+            &nbsp;<i th:if="${#locale.language == 'en'}" class="fas fa-check"></i>
+        </a>
+    </li>
+
+    <li>
+        <a class="dropdown-item" href="/?lang=tr">
+            <img src="/img/icons/ct_tr.svg" alt="/img/icons/ct_rainbow" class="childiconcss">
+            <span th:text="#{label.turkish}">Turkish</span>
+            &nbsp;<i th:if="${#locale.language == 'tr'}" class="fas fa-check"></i>
+        </a>
+    </li>
+
+<!--
+    <form th:action="@{/}" method="get">
+        <select name="lang" onchange="this.form.submit()">
+            <option th:value="en" th:text="#{label.english}" th:selected="${#locale.language == 'en'}">English</option>
+            <option th:value="tr" th:text="#{label.turkish}" th:selected="${#locale.language == 'tr'}">Türkçe</option>
+        </select>
+    </form>
+-->
+
+</div>
+</body>
+</html>

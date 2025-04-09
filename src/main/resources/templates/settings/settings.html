@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Settings</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+
+
+    <table class="table">
+        <thead>
+
+
+
+        <tr>
+            <th th:text="#{settings.tableColumnHeader.valueLabel}">
+            </th>
+            <th th:text="#{settings.tableColumnHeader.currentValue}">
+            </th>
+            <th th:text="#{settings.tableColumnHeader.defaultValue}">
+            </th>>
+            <th th:text="#{settings.tableColumnHeader.valueDescription}">
+            </th>>
+        </tr>
+
+        </thead>
+        <tbody>
+
+        <tr>
+            <td>ALL_TENANTS_FOLDER</td>
+            <td th:text="${ALL_TENANTS_FOLDER}"></td>
+            <td></td>
+            <td>    <a href="/tenants">Veri Kaynakları</a>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>openWebBrowserOnStartup</td>
+            <td th:text="${openWebBrowserOnStartup}"></td>
+            <td>true</td> <!-- Default value, update as per your requirement -->
+            <td>Whether to open the web browser automatically on application startup.</td>
+        </tr>
+
+        <tr>
+            <td>Latitude</td>
+            <td th:text="${astronomyProperties.latitude}"></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>Longitude</td>
+            <td th:text="${astronomyProperties.longitude}"></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>Timezone</td>
+            <td th:text="${astronomyProperties.timezone}"></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>Timezone</td>
+            <td th:text="${astronomyProperties.timezone}"></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+        <tr>
+            <td>Zonal Offset</td>
+            <td th:text="${astronomyProperties.zonalOffset}"></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>Debug</td>
+            <td th:text="${debug}"></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>HTTP Port</td>
+            <td th:text="${httpPort}"></td>
+            <td></td>
+            <td>feat: Ability To tun the Spring Boot HTTPS Application also through a HTTP Port</td>
+        </tr>
+
+        <tr>
+            <td>HTTPS Port</td>
+            <td th:text="${httpsPort}"></td>
+            <td></td>
+            <td>feat: Setting up an SSL HTTPS without using a keytool and keystore</td>
+        </tr>
+
+        <tr>
+            <td>Certificate</td>
+            <td th:text="${certificate}"></td>
+            <td></td>
+            <td>feat: Setting up an SSL HTTPS without using a keytool and keystore</td>
+        </tr>
+
+        <tr>
+            <td>Certificate Private Key</td>
+            <td th:text="${certificatePrivateKey}"></td>
+            <td></td>
+            <td>feat: Setting up an SSL HTTPS without using a keytool and keystore</td>
+        </tr>
+
+        <!-- Add other settings here -->
+        </tbody>
+
+    </table>
+
+
+    <h1>SSL Configuration</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${sslConfig}">
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <h2>Info About Logged In User</h2>
+    <div sec:authorize="hasRole('USER')">You have USER role.</div>
+    <div sec:authorize="hasRole('ADMIN')">You have ADMIN role.</div>
+    <div sec:authorize="isAuthenticated()">You are authenticated.
+
+        username:
+        <div sec:authentication="name"></div>
+        <!--
+        firstName:
+        <div sec:authentication="principal.firstName"></div>
+        lastName:
+        <div sec:authentication="principal.lastName"></div>
+        email:
+        <div sec:authentication="principal.lastName"></div>
+        Authenticated user roles:
+        <div sec:authentication="principal.authorities"></div>
+        -->
+
+    </div>
+
+
+    <p>
+Açılışta web gezginini çalıştırsın: myapp.openWebBrowserOnStartup=true
+    </p>
+    <p>
+CTB Veritabanının yolunu değiştirin: spring.datasource.url = jdbc:sqlite:C:/Users/udername/Desktop/mycherrytreedatabase.ctb
+    </p>
+    <p>
+Debug moduna geçin.
+    </p>
+    <p>
+Konum ve Zaman Dilimi Ayarı: astronomy.latitude=40°59'21.5"N
+        astronomy.longitude=29°02'14.4"E
+        astronomy.timezone=Europe/Istanbul
+        astronomy.zonalOffset=10800
+    </p>
+    <p>
+Sunucu Port ayarı: server.port=8090
+
+        For a random port use:
+
+        server.port=0
+
+    </p>
+    <p>
+Sesleri Aç Kapat: HENÜZ YOK
+    </p>
+    <p>
+Email Aç Kapat: HENÜZ YOK
+        spring.mail.host=smtp.gmail.com
+        spring.mail.port=587
+
+        spring.mail.username=username@gmail.com
+        spring.mail.password=password
+
+        spring.mail.properties.mail.transport.protocol=smtp
+        spring.mail.properties.mail.smtp.auth=true
+        spring.mail.properties.mail.smtp.starttls.enable=true
+        spring.mail.properties.mail.smtp.starttls.required=true
+        spring.mail.debug=true
+
+    </p>
+    <p>
+MP3 klasör Yolu: HRNÜZ YOK
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+
+</section>
+</body>
+</html>

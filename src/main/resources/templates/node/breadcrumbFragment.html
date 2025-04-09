@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="breadcrumbFragment">
+
+    <th:block th:if="${node}">
+
+        <!-- class="breadcrumbs" -->
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <th:block th:if="${node.breadcrumbs != null and !node.breadcrumbs.isEmpty()}">
+
+                <!-- Son elemanı ayrıca kontrol ederek dışarıda göster -->
+                <th:block th:each="entry, stat : ${node.breadcrumbs}" th:if="${stat.index == node.breadcrumbs.size() - 1}">
+                    <h2>
+                        <b>
+                            <a th:href="'/nodes/' + ${entry.key}"
+                               th:text="${entry.value}"
+                               style="color: #666666;"
+                            ></a>
+                        </b>
+                    </h2>
+                </th:block>
+
+                <ol class="breadcrumb">
+
+                    <li>
+                        <a
+                                data-bs-toggle="offcanvas"
+                                href="#offcanvasScrolling"
+                                role="button"
+                                aria-controls="offcanvasScrolling"
+                                th:title="#{tree.nodeInfo}"
+                                styke="color: blue;"
+                        >
+                            &nbsp;<i class="fas fa-info-circle"></i>&nbsp;
+                        </a>
+                    </li>
+
+
+
+                    <li class="breadcrumb-item">
+                        <a href="/rootnode">Kök</a>
+                    </li>
+
+                    <!--
+                    <li th:each="entry : ${node.breadcrumbs}" class="breadcrumb-item">
+                        <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}"></a>
+                    </li>
+                    -->
+
+
+                        <li th:each="entry, stat : ${node.breadcrumbs}" th:if="${stat.index < node.breadcrumbs.size() - 1}" class="breadcrumb-item">
+                            <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}"></a>
+                        </li>
+
+
+
+                    <!-- Eğer breadcrumbs boşsa alternatif bir mesaj göstermek için -->
+                    <p th:if="${node.breadcrumbs == null or node.breadcrumbs.isEmpty()}">Breadcrumbs bulunamadı.</p>
+
+
+
+
+                </ol>
+
+
+            </th:block>
+
+        </nav>
+
+
+    </th:block>
+
+
+</div>
+
+</body>
+</html>

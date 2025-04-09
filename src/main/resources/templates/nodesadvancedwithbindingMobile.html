@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title th:text="#{search.title}">Nodes</title>
+
+
+    <style>
+        .icon-option {
+            background-repeat: no-repeat;
+            padding-left: 20px; /* İkonun seçenek metninden uzaklığını ayarlayabilirsiniz */
+        }
+
+        .ct_done {
+/*            background-image: url('/img/icons/ct_done.svg'); */
+                        background-image: url('http://localhost:8080/img/icons/ct_done.svg');
+
+            background-color: #ff0000;
+        }
+
+        .ct_stackoverflow {
+            background-image: url('/img/icons/ct_stackoverflow.svg');
+        }
+
+        /* Diğer ikonlar için de aynı şekilde sınıflar tanımlayın */
+    </style>
+
+    <style>
+
+          #scrollToTopBtn {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          display: none;
+          z-index: 100; /* Düğmenin diğer elemanların üstünde görünmesini sağlar */
+          background-color: #007bff; /* Butonun arka plan rengi */
+          color: white; /* Butonun metin rengi */
+          border: none;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          text-align: center;
+          font-size: 24px;
+          cursor: pointer;
+          box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3); /* Gölge efekti */
+        }
+
+        #scrollToTopBtn:hover {
+          background-color: #444;
+        }
+
+    </style>
+
+
+</head>
+<body>
+<section layout:fragment="content">
+
+
+    <h1 th:text="#{search.title}">Nodes</h1>
+
+
+
+    <div class="accordion" id="accordionExample">
+
+
+        <div class="accordion-item" style="background-color: #aaeeff;">
+            <h3 class="accordion-header" id="headingOne">
+                <button class="accordion-button "
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne"
+                        aria-expanded="false"
+                        aria-controls="collapseOne"
+                        style="background-color: #99ccee;"
+                >
+                    <b th:text="#{search.toggleFormFilter}">Filtre Formu (Gizlemek/Göstermek İçin Tıklayın)</b>
+                    &nbsp;
+                    <i class=" fas fa-search"></i>
+
+                </button>
+            </h3>
+            <div id="collapseOne"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingOne"
+                 data-bs-parent="#accordionExample"
+            >
+                <div class="accordion-body">
+                    <form id="paginationForm" action="#" th:action="@{/nodesadvancedwithbinding}"
+                          th:object="${formSearch}"
+                          method="post"
+                          class="form-inline">
+
+
+                        <div class="row">
+
+                            <!-- ICONS -->
+                            <div class="">
+
+                                <label for="nodeIcons" th:text="#{search.icon}">Ikon:</label>
+                                <select multiple size="4" name="nodeIcons" id="nodeIcons" class="form-select">
+                                    <option th:each="nodeIcon : *{allIcons}"
+                                            th:value="${nodeIcon.name}"
+                                            th:text="${nodeIcon.iconNameForHuman}"
+                                            th:selected="${formSearch.getNodeIcons != null and formSearch.getNodeIcons.contains(nodeIcon)}"
+                                    >
+                                    </option>
+                                </select>
+                                <span th:if="${#fields.hasErrors('nodeIcons')}"
+                                      th:errors="*{nodeIcons}">nodeIcons Error</span>
+
+                            </div>
+
+                            <!-- NODE IDS -->
+                            <div class="col">
+                                <label for="nodeIdStartFilter" th:text="#{search.nodeIdStart}">Düğüm Id Baş:</label>
+                                <input type="text" id="nodeIdStartFilter" th:field="*{nodeIdStartFilter}"
+                                       name="nodeIdStartFilter"
+                                       class="form-control"/>
+                                <span th:if="${#fields.hasErrors('nodeIdStartFilter')}"
+                                      th:errors="*{nodeIdStartFilter}">nodeIdStartFilter Error</span>
+
+                                <label for="nodeIdEndFilter" th:text="#{search.nodeIdEnd}">Düğüm Id Bit:</label>
+                                <input type="text" id="nodeIdEndFilter" th:field="*{nodeIdEndFilter}"
+                                       name="nodeIdEndFilter"
+                                       class="form-control"/>
+                                <span th:if="${#fields.hasErrors('nodeIdEndFilter')}" th:errors="*{nodeIdEndFilter}">nodeIdEndFilter Error</span>
+
+                            </div>
+
+                            <!-- CREATION DATE -->
+                            <div class="col">
+                                <label for="tsCreationStartFilter" th:text="#{search.creationStart}">Oluşturma
+                                    Baş.:</label>
+                                <input type="date" id="tsCreationStartFilter" th:field="*{tsCreationStartFilter}"
+                                       name="tsCreationStartFilter" class="form-control"
+                                       th:value="${tsCreationStartFilter}">
+                                <span th:if="${#fields.hasErrors('tsCreationStartFilter')}"
+                                      th:errors="*{tsCreationStartFilter}">tsCreationStartFilter Error</span>
+
+
+                                <label for="tsCreationEndFilter" th:text="#{search.creationEnd}">Bitiş Tarihi:</label>
+                                <input type="date" id="tsCreationEndFilter" th:field="*{tsCreationEndFilter}"
+                                       name="tsCreationEndFilter" class="form-control"
+                                       th:value="${tsCreationEndFilter}">
+                                <span th:if="${#fields.hasErrors('tsCreationEndFilter')}"
+                                      th:errors="*{tsCreationEndFilter}">tsCreationEndFilter Error</span>
+
+                            </div>
+
+                            <!-- MODIFICATION DATE -->
+                            <div class="col">
+                                <label for="tsModificationStartFilter" th:text="#{search.modificationStart}">Düzenleme
+                                    Baş.:</label>
+                                <input type="date" id="tsModificationStartFilter"
+                                       th:field="*{tsModificationStartFilter}"
+                                       name="tsModificationStartFilter"
+                                       class="form-control" th:value="${tsModificationStartFilter}">
+                                <span th:if="${#fields.hasErrors('tsModificationStartFilter')}"
+                                      th:errors="*{tsModificationStartFilter}">tsModificationStartFilter Error</span>
+
+
+                                <label for="tsModificationEndFilter" th:text="#{search.modificationEnd}">Bitiş
+                                    Tarihi:</label>
+                                <input type="date" id="tsModificationEndFilter" th:field="*{tsModificationEndFilter}"
+                                       name="tsModificationEndFilter" class="form-control"
+                                       th:value="${tsModificationEndFilter}">
+                                <span th:if="${#fields.hasErrors('tsModificationEndFilter')}"
+                                      th:errors="*{tsModificationEndFilter}">tsModificationEndFilter Error</span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+
+                            <!-- NAME -->
+                            <div class="">
+                                <div class="input-group ">
+
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+
+                                            <label class="col-form-check-label sr-only"
+                                                   for="nameStartsWith">İle Başlayan:</label>
+                                            <input type="checkbox" id="nameStartsWith"
+                                                   name="nameStartsWith"
+                                                   class="form-check"
+                                            />
+
+                                        </div>
+                                    </div>
+
+
+                                    <label for="nameFilter" class="sr-only" th:text="#{search.name}">Name
+                                        Filtresi:</label>
+                                    <input type="text"
+                                           id="nameFilter"
+                                           th:field="*{nameFilter}"
+                                           class="form-control"
+                                           th:placeholder="#{search.placeholder.name}"
+                                    />
+                                    <span th:if="${#fields.hasErrors('nameFilter')}"
+                                          th:errors="*{nameFilter}">nameFilter Error</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <!-- CONTENT -->
+                            <div class="">
+                                <label for="textFilter" class="sr-only" th:text="#{search.contentText}">Text
+                                    Filtresi:</label>
+                                <input type="text" id="textFilter"
+                                       th:field="*{textFilter}"
+                                       name="textFilter"
+                                       class="form-control"
+                                       th:value="${textFilter}"
+                                       th:placeholder="#{search.placeholder.contentText}"
+                                />
+                                <span th:if="${#fields.hasErrors('textFilter')}"
+                                      th:errors="*{textFilter}">nameFilter Error</span>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <!-- TAGS -->
+                            <div class="">
+                                <label for="tagsFilter" class="sr-only" th:text="#{search.tags}">Tags Filtresi:</label>
+                                <input type="text" id="tagsFilter"
+                                       th:field="*{tagsFilter}"
+                                       name="tagsFilter"
+                                       class="form-control"
+                                       th:value="${tagsFilter}"
+                                       th:placeholder="#{search.placeholder.tags}"
+                                />
+                                <span th:if="${#fields.hasErrors('tagsFilter')}"
+                                      th:errors="*{tagsFilter}">nameFilter Error</span>
+                            </div>
+
+                            <!-- SYNTAX -->
+                            <div class="">
+                                <label for="syntaxFilter" class="sr-only" th:text="#{search.syntax}">Syntax
+                                    Filtresi:</label>
+                                <input type="text" id="syntaxFilter"
+                                       th:field="*{syntaxFilter}"
+                                       name="syntaxFilter"
+                                       class="form-control"
+                                       th:value="${syntaxFilter}"
+                                       th:placeholder="#{search.placeholder.syntax}"
+                                />
+                                <span th:if="${#fields.hasErrors('syntaxFilter')}"
+                                      th:errors="*{syntaxFilter}">nameFilter Error</span>
+
+                            </div>
+
+                            <div class="row" style="background-color: #99ddee;">
+
+                                <div class="text-center">
+
+                                    <div class="input-group mb-3">
+
+                                        <div class="w-20">-
+                                        </div>
+
+                                        <div class="w-40">
+
+                                            <a href="/nodesadvancedwithbinding" class="btn btn-primary"
+                                               title="Filtreyi Temizle">
+                                                <img th:src="@{/img/icons/ct_clear.svg}"/>
+                                                <span th:text="#{search.clear}">Temizle</span>
+                                            </a>
+
+
+                                            <button type="submit"
+                                                    formaction="#"
+                                                    class="btn btn-success"
+                                                    title="Filtreyi Uygula"
+                                                    id="submitButtonOfFilterForm"
+                                            >
+
+                                                <img th:src="@{/img/icons/ct_index.svg}"/>
+                                                <span th:text="#{search.startFiltering}">Filtrele</span>
+                                            </button>
+
+
+                                            <button type="submit" formaction="/nodesadvancedwithbinding/pdf"
+                                                    class="btn btn-warning">
+                                                <img th:src="@{/img/icons/ct_file.svg}"/>
+                                                <span th:text="#{search.downloadAsPdf}">PDF</span>
+                                            </button>
+
+                                        </div>
+
+
+                                        <div class="w-15">
+
+                                            <label for="pageNumber" th:text="#{search.pageNumber}">Sayfa No:</label>
+                                            <select name="pageNumber"
+                                                    id="pageNumber"
+                                                    class="form-select"
+                                                    onchange="changePage(this)"
+                                            >
+                                                <th:block th:each="page : ${pages}">
+                                                    <option th:value="${page}"
+                                                            th:text="${page + 1}"
+                                                            th:selected="${page == pageNumber}"></option>
+                                                </th:block>
+                                            </select>
+
+                                            <!--    <span th:text="${'Sayfa: ' + pageNumber}"></span> -->
+
+
+                                        </div>
+
+
+                                        <div class="w-15">
+
+                                            <!--  <span th:if="${#fields.hasErrors('pageNumber')}" th:errors="*{pageNumber}">pageNumber Error</span> -->
+
+
+                                            <label for="PAGE_SIZE_OPTIONS"
+                                                   th:text="#{search.pageSize}">Sayfalama:</label>
+                                            <select name="PAGE_SIZE_OPTIONS" id="PAGE_SIZE_OPTIONS"
+                                                    th:field="*{pageSize}"
+                                                    class="form-select"
+                                                    onchange="changePageSize(this)">
+                                                <option th:each="opt : *{PAGE_SIZE_OPTIONS}"
+                                                        th:value="${opt}"
+                                                        th:text="${opt}"
+                                                        th:selected="${formSearch.getPageSize != null and opt == formSearch.getPageSize}">
+                                                    x
+                                                </option>
+                                            </select>
+                                            <span th:if="${#fields.hasErrors('PAGE_SIZE_OPTIONS')}"
+                                                  th:errors="*{PAGE_SIZE_OPTIONS}">pageSize Error</span>
+
+
+                                            <span th:text="${'Sayfalama: ' + pageSize}"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                            <!-- SUBMIT -->
+                            <div class="">
+
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div th:if="${nodes}">
+        <div th:if="${nodes.getTotalElements() > 0}">
+
+            <table class="table table-bordered border-success table-sm table-striped">
+                <thead>
+                <tr>
+
+
+                    <td>
+                        <div th:if="${nodes}">
+                            <p>
+                                Search Results
+
+                                <span th:text="#{search.resultCount}"></span>
+
+                                <b><span th:text="${nodes.getTotalElements()}"></span></b>
+                            </p>
+                        </div>
+                        <!--
+                        <span class="" th:text="#{search.column.name}">Name</span>
+
+                        <span class="" th:text="#{search.column.nodeId}">Node Id</span>
+                        <span scope="" class="" th:text="#{search.column.creationDate}">Oluşturma Tarihi</span>
+                        <span scope="" class="" th:text="#{search.column.modificationDate}">LAst Modified Date
+                        </span>
+                        <span class="" th:text="#{search.column.tags}">Tags</span>
+                        <span class="" th:text="#{search.column.syntax}">Syntax</span>
+                        -->
+                    </td>
+                    <!--   <th class="col-1">Is Rich Text</th> -->
+
+                    <!--
+                    <td class="col-1">
+                        <div class="" th:text="#{search.column.numbering}">
+                            Num
+                        </div>
+                    </td>
+                    -->
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="node, iStats : ${nodes}">
+
+
+                    <td style="word-break: break-word; white-space: normal;">
+
+
+                        <img
+                                th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
+                                th:alt="${'/img/icons/' + node.nodeIcon.iconName}" class="childiconcss"
+                        />
+
+                        <span th:text="${ (pageNumber * formSearch.getPageSize) + iStats.index + 1 }"
+                              class="formatted-number">
+                        </span>&nbsp;|&nbsp;
+
+
+                        <b>
+                            <a th:href="@{'/nodes/' + ${node.nodeId}}"
+                               style="color: black; text-decoration: none;"
+                               th:text="${node.name}"
+                               th:title="${node.nodeId}"
+                            >
+
+
+                            </a>
+                        </b>
+
+                        <br/>
+
+                        <i style="color: #333333;">
+                            (
+                            <span th:text="${'id: ' + node.nodeId}"></span>
+                            )
+
+
+                            (
+                            <span class="text-center"
+                                  th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd')}"
+                                  th:title="${node.creationTimestamp} + ', ' + ${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></span>
+                            &nbsp;-&nbsp;
+
+
+                                <span class="text-center"
+                                      th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd')}"
+                                      th:title="${node.lastSaveTimestamp} + ', ' + ${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></span>
+                            )
+                            (
+                            <span th:text="${node.tags}"></span>
+                            )
+                            (
+                            <span th:text="${node.syntax}"></span>
+                            )
+                        </i>
+                        <!--    <td class="text-center" th:text="${node.isRichText}"></td> -->
+
+                        <!--
+                        </td>
+
+
+                        <td class="text-center">
+                        -->
+
+
+
+
+
+
+
+
+                    </td>
+
+
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div th:unless="${nodes.getTotalElements() > 0}">
+
+            <h3 th:text="#{search.noNodesFound}">Filtreleme kurallarına uyan hiçbir düğüm bulunamadı. Kuralları azaltıp
+                tekrar deneyin.</h3>
+
+        </div>
+
+    </div>
+    <div th:unless="${nodes}">
+        <!-- nodes yoksa yapılacak islemler -->
+        <h3 th:text="#{search.noFilterAppliedYet}">Henüz hiçbir filtre uygulanmadı.</h3>
+    </div>
+</section>
+
+
+
+
+
+
+<section layout:fragment="pageSpecificJsScripts">
+
+    <button id="scrollToTopBtn">⬆️</button>
+
+
+    <script type="text/javascript" th:src="@{/js/node/scrollToTop.js}"></script>
+
+
+    <script th:inline="javascript">
+
+
+        // Liste boyutu veya sayfa numarası değiştiğinde
+        function changePageSize(select) {
+
+
+            document.getElementById('paginationForm').submit();
+        }
+
+        function changePage(select) {
+
+
+            document.getElementById('paginationForm').submit();
+        }
+
+        function changeNodeIcon(select) {
+
+
+            document.getElementById('paginationForm').submit();
+        }
+    </script>
+
+
+    <script>
+        $(document).ready(function(){
+            $(".toggle-btn").click(function(){
+                var content = $(this).closest('.row').next('.row');
+                content.toggle();
+            });
+        });
+    </script>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.formatted-number').forEach(function (element) {
+                let number = parseInt(element.textContent);
+                if (number < 10) {
+                    element.textContent = '00000' + number;
+                } else if (number < 100) {
+                    element.textContent = '0000' + number;
+                } else if (number < 1000) {
+                    element.textContent = '000' + number;
+                } else if (number < 10000) {
+                    element.textContent = '00' + number;
+                } else if (number < 100000) {
+                    element.textContent = '0' + number;
+                }
+            });
+        });
+    </script>
+
+
+</section>
+
+</body>
+</html>

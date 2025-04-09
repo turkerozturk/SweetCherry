@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layoutMobile}">
+<head>
+
+    <title th:if="${node}" th:text="${'(Node) ' + node.name}"></title>
+
+    <!-- for pygments syntax highlighter colorization -->
+    <link rel="stylesheet" th:href="@{/css/syntaxhighlighter.css}"/>
+
+
+    <section layout:fragment="pageSpecificCssStyles">
+
+        <link rel="stylesheet" th:href="@{/css/node/node.css}"/>
+
+        <link rel="stylesheet" th:href="@{/css/sidebar.css}"/>
+
+        <!-- node meta bilgisini gostermek icin popup -->
+        <link rel="stylesheet" th:href="@{/css/popup.css}"/>
+
+    </section>
+
+    <style>
+        #nodeContent {
+            width: 300px; /* Div'in genişliğini belirleyin */
+            height: 200px; /* Div'in yüksekliğini belirleyin */
+            overflow-x: auto; /* Yatay kaydırma çubuğu */
+            overflow-y: hidden; /* Dikey kaydırmayı gizle */
+            border: 1px solid #ccc; /* Sınır çizgisi (isteğe bağlı) */
+        }
+    </style>
+
+</head>
+<body>
+<section layout:fragment="content">
+
+
+    <!--/*-->
+        akordeon kapali iken yuksekliklerini azaltarak mobil ekranda goruntu tasarrufu saglar.
+    <!--*/-->
+    <style>
+        .accordion-button {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+    </style>
+
+
+    <style>
+        #navigation-section.accordion-body {
+            max-height: 40vh; /* Ekranın %40'si kadar yüksekliğe izin verir */
+            overflow-y: auto; /* İçerik büyükse dikey kaydırma çubuğunu ekler */
+        }
+    </style>
+
+
+    <div class="main">
+
+        <div class="accordion" id="accordionExample">
+
+            <div class="accordion-item"
+                 data-bs-toggle="collapse" type="button"
+                 data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne"
+            >
+                <div class="accordion-header" id="headingOne">
+
+                    <div  class="accordion-button">
+
+
+
+                        <span
+                        >
+                            <i class="fas fa-arrows-up-down fa-xl"></i>
+
+                            <th:block th:text="#{nodeMobile.toggleNodeTree}"
+                            >
+                            </th:block>
+                            &nbsp;
+                        </span>
+
+                        &nbsp;&nbsp;&nbsp;
+
+                        (
+                        &nbsp;&nbsp;
+                        <th:block th:if="${prevSiblingNaviNode}">
+                            <a
+                                    th:href="'/nodes/' + ${prevSiblingNaviNode.nodeId}"
+                                    style="color: black; font-weight: bold;"
+                            >
+                                &nbsp;&nbsp;
+                                <span>
+                                   <i class="fas fa-caret-left fa-2xl"></i>
+                                </span>
+                                &nbsp;&nbsp;
+                            </a>
+                        </th:block>
+
+
+                        <th:block th:unless="${isRootNode}">
+                            <a
+                                    th:href="'/nodes/' + ${parentNodeId}"
+                                    style="color: black; font-weight: bold;"
+                            >
+                                &nbsp;&nbsp;
+                                <span th:title="#{tree.goToParentNode}">
+                                        <i class="fas fa-caret-up fa-2xl"></i>
+                                </span>
+                                &nbsp;&nbsp;
+                            </a>
+                        </th:block>
+
+
+                        <th:block th:if="${nextSiblingNaviNode}">
+                            <a
+                                    th:href="'/nodes/' + ${nextSiblingNaviNode.nodeId}"
+                                    style="color: black; font-weight: bold;"
+                            >
+                                &nbsp;&nbsp;
+                                <span>
+                                    <i class="fas fa-caret-right fa-2xl"></i>
+                                </span>
+                                &nbsp;&nbsp;
+                            </a>
+                        </th:block>
+                        &nbsp;&nbsp;
+                        )
+
+                    </div>
+
+
+
+                </div>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                     data-bs-parent="#accordionExample">
+                    <div class="accordion-body" id="navigation-section">
+
+
+
+
+
+
+
+
+
+
+                        <div th:replace="~{node/siblingAndChildrenNavigationFragment :: siblingAndChildrenNavigationFragment}"></div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+
+            <th:block th:unless="${isRootNode}">
+
+
+
+
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingTwo">
+                        <div  type="button" class="accordion-button collapsed"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"
+                        >
+
+                            <i class="fas fa-light fa-file-export fa-xl"></i>
+
+                            &nbsp;
+
+                            <span
+                                    th:text="#{nodeMobile.exportOptions}"
+                            >
+
+                            </span>
+                        </div>
+
+                    </div>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                         data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+
+
+
+
+                                <a type="submit" th:href="${'/export-node-to-pdf/' + node.nodeId}" class="btn btn-warning btn-sm">
+                                    <img th:src="@{/img/icons/ct_file.svg}"/>
+                                    <span th:text="#{search.downloadAsPdf}">PDF</span>
+                                </a>
+
+                                <a type="submit" th:href="${'/expo/' + node.nodeId}" class="btn btn-warning btn-sm">
+                                    <img th:src="@{/img/icons/ct_file.svg}"/>
+                                    <span th:text="#{exportnodes.exportToCollection}">exportnodes.ctb</span>
+                                </a>
+
+                                <a type="submit" th:href="${'/exportWithSubNodes/' + node.nodeId}" class="btn btn-warning btn-sm">
+                                    <img th:src="@{/img/icons/ct_file.svg}"/>
+                                    <span th:text="#{exportnodes.untouchedIds}">CTB export separately</span>
+                                </a>
+
+                                <a type="submit" th:href="${'/nodes/delete/' + node.nodeId}" class="btn btn-danger btn-sm">
+                                    <img th:src="@{/img/icons/ct_file.svg}"/>
+                                    <span th:text="Delete">Delete Node</span>
+                                </a>
+
+
+
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </th:block>
+
+
+
+        </div>
+
+        <hr style="border: 2px dashed #000;" />
+
+
+
+        <th:block th:unless="${isRootNode}">
+
+
+            <div>
+
+                <span class="h1"
+                      th:text="${node.name}"></span>
+                &nbsp;
+
+
+                <a
+                        data-bs-toggle="offcanvas"
+                        href="#offcanvasScrolling"
+                        role="button"
+                        aria-controls="offcanvasScrolling"
+                        th:title="#{tree.nodeInfo}"
+                        styke="color: blue;"
+                >
+                    &nbsp;<i class="fas fa-info-circle"></i>&nbsp;
+                </a>
+
+                &nbsp;&nbsp;
+
+                <i th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd')}"
+                    th:title="${node.creationTimestamp}"></i>
+
+                -
+
+                <i th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"
+                   th:title="${node.lastSaveTimestamp}"></i>
+
+
+
+
+            </div>
+
+
+            <hr style="border: 1px dashed #000;" />
+
+
+            <th:block th:unless="${hasEmptyContent}">
+
+
+
+
+                <div th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></div>
+
+
+            </th:block>
+
+
+            <th:block th:if="${hasEmptyContent == true}">
+
+
+                <p class="text-center"><b th:utext="#{node.emptyContent}">&empty; Empty Content</b></p>
+
+
+            </th:block>
+
+            <hr style="border: 2px dashed #000;" />
+
+
+
+            <!--/*--> BASLA etiketleri olan navigasyon <!--*/-->
+            <div th:unless="${isRootNode}"
+                 style="background-color: #EEEEEE;"
+            >
+                <div class="text-center">
+
+                    <a
+                            th:href="'/nodes/' + ${parentNodeId}"
+                            style="color: black; font-weight: bold;"
+                    >
+                        <span th:title="#{tree.goToParentNode}">
+                            <i class="fas fa-caret-up"></i>
+                        </span>
+                        <span th:if="${parentNodeId}"
+                              th:text="${node.fatherNode.name}"
+                              style="color: black; font-weight: bold;"
+                        >
+                            Node Name
+                        </span>
+                        <span th:unless="${parentNodeId}"
+                              th:text="${'Root'}"
+                        >
+                            Data source Name
+                        </span>
+
+                        <span th:title="#{tree.goToParentNode}">
+                            <i class="fas fa-caret-up"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <div class="text-start">
+
+                    <th:block th:if="${prevSiblingNaviNode}">
+                        <a
+                                th:href="'/nodes/' + ${prevSiblingNaviNode.nodeId}"
+                                style="color: black; font-weight: bold;"
+                        >
+                            <span>
+                                <i class="fas fa-caret-left childiconcssfas"></i>
+                            </span>
+                            <span th:text="${prevSiblingNaviNode.name}">
+                            </span>
+                            <span>
+                                <i class="fas fa-caret-left childiconcssfas"></i>
+                            </span>
+                        </a>
+                    </th:block>
+                </div>
+
+                <div class="text-end">
+
+                    <th:block th:if="${nextSiblingNaviNode}">
+                        <a
+                                th:href="'/nodes/' + ${nextSiblingNaviNode.nodeId}"
+                                style="color: black; font-weight: bold;"
+                        >
+                            <span>
+                                <i class="fas fa-caret-right childiconcssfas"></i>
+                            </span>
+                            <span th:text="${nextSiblingNaviNode.name}">
+                            </span>
+                            <span>
+                                <i class="fas fa-caret-right childiconcssfas"></i>
+                            </span>
+                        </a>
+                    </th:block>
+
+                </div>
+
+            </div>
+            <div th:if="${isRootNode}"
+                 style="background-color: #EEEEEE;"
+                 class="text-center"
+            >
+                <span
+                        th:text="${'Database: ' + currentTenantName}"
+                >
+                        Data source Name
+                </span>
+            </div>
+            <!--/*--> BITTI etiketleri olan navigasyon <!--*/-->
+
+
+
+
+        </th:block>
+
+        <th:block th:if="${isRootNode}">
+            <p>Not ağacının kökündesiniz. Navigasyon yazısına tıklayıp genişleterek
+                not ağacınının dallarını görebilirsiniz.</p>
+            <p>You are at the root of the note tree. By clicking on the navigation text and expanding it,
+                you can see the branches of the note tree.</p>
+        </th:block>
+
+
+
+
+
+
+    </div> <!-- bu da sidebarla alakali main p-3 -->
+
+    <!--/*--> Sol taraftan açılan offcanvas panel
+    https://getbootstrap.com/docs/5.3/components/offcanvas/
+    <!--*/-->
+    <div th:replace="~{node/offcanvasFragment :: offcanvasFragment}"></div>
+
+
+
+
+</section>
+
+<section layout:fragment="pageSpecificJsScripts">
+
+    <!-- kapanış etiketinden hemen önce ekleyin (mevcut yerleşiminize göre
+aşağıda sağ alt köşede olmasını sağlamak için en uygun yer burasıdır): -->
+
+    <button id="scrollToTopBtn">⬆️</button>
+
+
+    <script type="text/javascript" th:src="@{/js/node/scrollToTop.js}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var collapseElement = document.getElementById('collapseOne');
+            var isExpanded = collapseElement.classList.contains('show');
+
+            // Zamanlayıcıyı ayarla
+            var timeoutId = setTimeout(function() {
+                if (isExpanded) {
+                    var bsCollapse = new bootstrap.Collapse(collapseElement, {
+                        toggle: false
+                    });
+                    bsCollapse.hide();  // Öğeyi daralt
+                }
+            }, 12000);
+
+            // Kullanıcı manuel olarak akordeonu değiştirirse zamanlayıcıyı iptal et
+            collapseElement.addEventListener('show.bs.collapse', function() {
+                clearTimeout(timeoutId);
+            });
+            collapseElement.addEventListener('hide.bs.collapse', function() {
+                clearTimeout(timeoutId);
+            });
+        });
+    </script>
+
+    <script>
+
+        /**
+         navigasyon düğüm ağacında seçili düğümü ağacın içinde bulunduğu konteyner elementin üst satırına kaydırır(scroll).
+         böylece uzun bir düğüm listesinde hangi düğümün içeriğinin sayfada görüntülendiği anlaşılmış olur.
+        **/
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var selectedItem = document.getElementById('selectedNaviNodeItem');
+            var navigationSection = document.getElementById('navigation-section');
+
+            if (selectedItem && navigationSection) {
+                // selectedItem öğesinin navigationSection içindeki konumunu al
+                var offsetTop = selectedItem.offsetTop;
+
+                // navigationSection içini offsetTop kadar kaydır
+                navigationSection.scrollTop = offsetTop - navigationSection.offsetTop;
+            }
+        });
+
+
+
+    </script>
+
+
+</section>
+
+</body>
+</html>

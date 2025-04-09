@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Node's Images</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Pictures of Node #<a th:href="@{/nodes/{nodeId}(nodeId=${images[0].nodeId})}" th:text="${images[0].nodeId}"></a></h1>
+    <p>
+        <b>Node Name: </b>
+        <span th:text="${images[0].node.name}"></span>
+    </p>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Node Id</th>
+        <th>Offset</th>
+        <th>Justification</th>
+        <th>anchor</th>
+        <th class="col-1">Image</th>
+        <th>File Name</th>
+        <th>Link</th>
+        <th>Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="image : ${images}">
+        <tr>
+            <td th:text="${image.nodeId}"></td>
+            <td th:text="${image.offset}"></td>
+            <td th:text="${image.justification}"></td>
+            <td th:text="${image.anchor}"></td>
+            <td>
+            <!--    <img th:src="${'data:image/png;base64,' + #strings.encodeBase64(image.png)}" width="100"/> -->
+                <img class='img-thumbnail'
+                     style
+                     th:src="'data:image/png;base64,' + ${imgUtil.getImgData(image.png)}" />
+            </td>
+            <td th:text="${image.fileName}"></td>
+            <td th:text="${image.link}"></td>
+            <td th:text="${image.time}"></td>
+
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+
+</section>
+
+
+</body>
+</html>

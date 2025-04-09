@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Template</title>
+</head>
+<body>
+<h1>Hello, <b>World</b>!</h1>
+<h2>Türkçe karakterler: ğüşıöçĞÜŞİÖÇ</h2>
+<h3 th:text="${degisken1}" />
+
+
+<p>Hello. This is a <b>template</b> page</p>
+
+<div th:if="${cherryTemplateNode}">
+
+    <table border="1" id="reportTable" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Project Node Id</th>
+            <th>Project Name</th>
+            <th>Data</th>
+        </tr>
+        </thead>
+        <tbody>a
+        <tr th:each="projectNode : ${cherryTemplateNode.projectNodes}">
+            <td th:text="${projectNode.nodeId}"></td>
+            <td th:text="${projectNode.name}" class="sortAlphabetic"></td>
+            <td>
+                <table border="1" width="100%" class="dataTable">
+                    <tbody>
+                    <tr th:each="mapKeyValue : ${projectNode.dataNodes}">
+                        <td th:text="${mapKeyValue.value.modificationDateTime}" class="nodedateformatting">keyvalue</td>
+                        <td th:text="${mapKeyValue.key}" class="nodenameformatting">keyvalue</td>
+                        <!--     <td th:utext="${#strings.replace(mapKeyValue.value.data, newlinechar, '&lt;br /&gt;')}" class="nodetextformatting">içerik</td> -->
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<th:block th:fragment="developerFragment">
+
+    <div class="card mb-4 rounded-3 shadow-sm">
+        <div class="card-header py-3">
+            <h4 class="my-0 fw-normal" th:text="#{dashboard.box.right}"></h4>
+        </div>
+        <div class="card-body">
+            <h3 class="card-title">Actuator<small class="text-body-secondary fw-light">/(page)</small></h3>
+            <dl>
+
+                <dt>🌈"info"</dt>
+                <dd><a href="/actuator/info">Info</a></dd>
+                <dt>🌈"health"</dt>
+                <dd><a href="/actuator/health">Health</a></dd>
+                <dt>🌈"mappings"</dt>
+                <dd><a href="/actuator/mappings">Mappings</a></dd>
+                <dt>🌈"beans"</dt>
+                <dd><a href="/actuator/beans">Beans</a></dd>
+                <dt>🌈"auditinfo"</dt>
+                <dd><a href="/actuator/auditinfo">Audit Info</a></dd>
+                <dt>🌈"scheduledtasks"</dt>
+                <dd><a href="/actuator/scheduledtasks">Scheduled Tasks</a></dd>
+                <dt>🌈Swagger UI - OpenApi - api-docs</dt>
+                <dd><a href="/swagger-ui/index.html">Swagger UI</a></dd>
+
+                <dt>🌈"shutdown"</dt>
+                <dd><form method="POST" action="/actuator/shutdown">
+                    <input type="submit" />
+                </form>
+                </dd>
+
+
+
+
+            </dl>
+
+        </div>
+    </div>
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Images</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Images List</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Node Id</th>
+        <th>Offset</th>
+        <th>File Name</th>
+        <th>Link</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="image:${images}">
+        <td><a th:href="@{/nodes/{nodeId}(nodeId=${image.nodeId})}" th:text="${image.nodeId}"></a></td>
+        <td th:text="${image.offset}"></td>
+        <td><a th:href="@{/download/{nodeId}/{offset}(nodeId=${image.nodeId},offset=${image.offset})}" th:text="${image.fileName}"></a></td>
+        <td th:text="${image.link}"></td>
+
+    </tr>
+    </tbody>
+</table>
+</section>
+
+</body>
+</html>

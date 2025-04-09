@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Dosya Yükleme</title>
+</head>
+<body>
+
+<section layout:fragment="content">
+
+<h1>Dosya Yükleme Sonucu</h1>
+
+
+
+
+<div th:if="${message}">
+    <p th:text="${message}"></p>
+</div>
+
+</section>
+</body>
+</html>

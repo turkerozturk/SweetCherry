@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+
+    <title th:if="${node}" th:text="${'(Node) ' + node.name}"></title>
+
+    <!-- for pygments syntax highlighter colorization -->
+    <link rel="stylesheet" th:href="@{/css/syntaxhighlighter.css}"/>
+
+
+    <section layout:fragment="pageSpecificCssStyles">
+
+        <link rel="stylesheet" th:href="@{/css/node/node.css}"/>
+
+        <link rel="stylesheet" th:href="@{/css/sidebar.css}"/>
+
+        <!-- node meta bilgisini gostermek icin popup -->
+        <link rel="stylesheet" th:href="@{/css/popup.css}"/>
+
+    </section>
+
+
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div class="wrapper">
+
+        <th:block th:replace="~{node/sidebarFragment :: sidebarFragment}"></th:block>
+
+        <div class="main p-3">
+
+            <div th:replace="~{node/breadcrumbFragment :: breadcrumbFragment}"></div>
+
+            <hr/>
+
+            <th:block th:unless="${isRootNode}">
+
+                <th:block th:unless="${isRootNode}">
+
+
+                    <th:block th:unless="${hasEmptyContent}">
+
+                        <a type="submit" th:href="${'/export-node-to-pdf/' + node.nodeId}" class="btn btn-warning">
+                            <img th:src="@{/img/icons/ct_file.svg}"/>
+                            <span th:text="#{search.downloadAsPdf}">PDF</span>
+                        </a>
+
+                        <a type="submit" th:href="${'/expo/' + node.nodeId}" class="btn btn-warning">
+                            <img th:src="@{/img/icons/ct_file.svg}"/>
+                            <span th:text="CTB">CTB</span>
+                        </a>
+
+
+
+
+
+
+                        <div th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></div>
+
+
+                    </th:block>
+
+
+                    <th:block th:if="${hasEmptyContent == true}">
+
+
+
+                        <h1 class="text-center" th:utext="#{node.emptyContent}">&empty; Empty Content</h1>
+
+                    </th:block>
+
+                </th:block>
+            </th:block>
+
+            <th:block th:if="${isRootNode}">
+                <div th:replace="~{node/rootNodeContentFragment :: rootNodeContentFragment}"></div>
+            </th:block>
+
+            <!--/*-->
+            Because the root node is not a real node, model comes without node variable.
+            Therefore this block below is valid only for normal nodes.
+            <!--*/-->
+            <th:block th:if="${node} and ${myappIsDebugEnabled}">
+
+
+                <div th:replace="~{node/accordeonFragment :: accordeonFragment}"></div>
+
+
+            </th:block>
+
+
+        </div> <!-- bu da sidebarla alakali main p-3 -->
+    </div> <!-- sidebar bitimi tek div -->
+
+    <!--/*--> Sol taraftan açılan offcanvas panel
+    https://getbootstrap.com/docs/5.3/components/offcanvas/
+    <!--*/-->
+    <div th:replace="~{node/offcanvasFragment :: offcanvasFragment}"></div>
+
+
+
+
+</section>
+
+<section layout:fragment="pageSpecificJsScripts">
+
+    <!-- kapanış etiketinden hemen önce ekleyin (mevcut yerleşiminize göre
+    aşağıda sağ alt köşede olmasını sağlamak için en uygun yer burasıdır): -->
+
+    <button id="scrollToTopBtn">⬆️</button>
+
+
+    <script type="text/javascript" th:src="@{/js/node/metadata.js}"></script>
+
+    <script type="text/javascript" th:src="@{/js/node/sidebar.js}"></script>
+
+    <script type="text/javascript" th:src="@{/js/node/scrollToTop.js}"></script>
+
+
+
+
+</section>
+
+</body>
+</html>

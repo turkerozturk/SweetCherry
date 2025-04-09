@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Nodes</title>
+
+    <section layout:fragment="pageSpecificCssStyles">
+
+        <style>
+            .childiconcss {
+                max-width: 27px;
+                max-height: 27px;
+                width: 27px;
+                height: 27px;
+            }
+        </style>
+
+        <style>
+            .icon-option {
+                background-repeat: no-repeat;
+                padding-left: 20px; /* İkonun seçenek metninden uzaklığını ayarlayabilirsiniz */
+            }
+
+            .ct_done {
+    /*            background-image: url('/img/icons/ct_done.svg'); */
+                            background-image: url('http://localhost:8080/img/icons/ct_done.svg');
+
+                background-color: #ff0000;
+            }
+
+            .ct_stackoverflow {
+                background-image: url('/img/icons/ct_stackoverflow.svg');
+            }
+
+            /* Diğer ikonlar için de aynı şekilde sınıflar tanımlayın */
+        </style>
+
+    </section>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <h1 th:text="${pageTitle}">Nodes</h1>
+
+    <div>
+        <p>Liste boyutu: <span th:text="${nodes.getTotalElements()}"></span></p>
+    </div>
+
+    <div style="background-color: #aaeeff;">
+        <form id="paginationForm" action="#" th:action="@{/nodesadvanced}" method="post" class="form-inline">
+            <div class="row" style="background-color: #99ddee;">
+
+                <div class="col-2">
+
+                </div>
+
+                <div class="col-7">
+
+                </div>
+
+                <div class="col-1">
+                    <button type="submit" formaction="#" class="btn btn-primary">Filtre Uygula</button>
+                </div>
+
+                <div class="col-1">
+                    <button type="submit" formaction="/nodesadvanced/pdf" class="btn btn-primary">PDF</button>
+                </div>
+
+                <div class="col-1">
+
+                    <label for="pageNumber">Sayfa No:</label>
+                    <select name="pageNumber" id="pageNumber" class="form-select" onchange="changePage(this)">
+                        <th:block th:each="page : ${pages}">
+                            <option th:value="${page}"
+                                    th:text="${page + 1}"
+                                    th:selected="${page == pageNumber}"></option>
+                        </th:block>
+                    </select>
+
+                    <!--    <span th:text="${'Sayfa: ' + pageNumber}"></span> -->
+
+
+                    <label for="pageSize">Sayfalama:</label>
+                    <select name="pageSize" id="pageSize" class="form-select" onchange="changePageSize(this)">
+                        <option th:each="opt : ${pageSizeOptions}"
+                                th:value="${opt}"
+                                th:text="${opt}"
+                                th:selected="${opt == pageSize}"></option>
+                    </select>
+
+                    <input type="hidden" id="oldPageSize" name="oldPageSize" value="${oldPageSize}">
+                    <!--    <span th:text="${'Sayfalama: ' + pageSize}"></span> -->
+                </div>
+
+
+            </div>
+
+            <div class="row">
+
+                <!-- ICONS -->
+                <div class="col-1">
+                    <label for="nodeIcons">Ikon:</label>
+                    <select name="nodeIcons" id="nodeIcons" class="form-select" onchange="changeNodeIcon(this)">
+                        <option value="" th:text="ALL"
+                                th:class="'icon-option all-icons'"></option>
+                        <option th:each="icon : ${nodeIcons}"
+                                th:value="${icon.iconIdIn16bit}"
+                                th:text="${icon.iconNameForHuman}"
+                                th:class="'icon-option ' + ${icon.iconName}"
+                                th:selected="${icon.iconIdIn16bit == selectedIcon}"></option>
+                    </select>
+                </div>
+
+                <!-- NODE IDS -->
+                <div class="col-1">
+                    <label for="nodeIdStartFilter">Düğüm Id Baş:</label>
+                    <input type="text" id="nodeIdStartFilter" name="nodeIdStartFilter" class="form-control"
+                           th:value="${nodeIdStartFilter}">
+                    <label for="nodeIdEndFilter">Düğüm Id Bit:</label>
+                    <input type="text" id="nodeIdEndFilter" name="nodeIdEndFilter" class="form-control"
+                           th:value="${nodeIdEndFilter}">
+
+                </div>
+
+                <!-- CREATION DATE -->
+                <div class="col col-1">
+                    <label for="tsCreationStartFilter">Oluşturma Baş.:</label>
+                    <input type="date" id="tsCreationStartFilter" name="tsCreationStartFilter" class="form-control"
+                           th:value="${tsCreationStartFilter}">
+
+                    <label for="tsCreationEndFilter">Bitiş Tarihi:</label>
+                    <input type="date" id="tsCreationEndFilter" name="tsCreationEndFilter" class="form-control"
+                           th:value="${tsCreationEndFilter}">
+                </div>
+
+                <!-- MODIFICATION DATE -->
+                <div class="col col-1">
+                    <label for="tsModificationStartFilter">Düzenleme Baş.:</label>
+                    <input type="date" id="tsModificationStartFilter" name="tsModificationStartFilter"
+                           class="form-control" th:value="${tsModificationStartFilter}">
+
+                    <label for="tsModificationEndFilter">Bitiş Tarihi:</label>
+                    <input type="date" id="tsModificationEndFilter" name="tsModificationEndFilter" class="form-control"
+                           th:value="${tsModificationEndFilter}">
+                </div>
+
+                <!-- NAME -->
+                <div class="col-3">
+                    <div class="form-check">
+                        <label for="nameFilter">Name Filtresi:</label>
+                        <input type="text" id="nameFilter" name="nameFilter" class="form-control"
+                               th:value="${nameFilter}">
+                    </div>
+                    <div class="form-check">
+                        <label class="col-form-check-label" for="nameStartsWith">İle Başlayan:</label>
+                        <input type="checkbox" id="nameStartsWith" name="nameStartsWith" class="form-check-input">
+                    </div>
+                </div>
+
+                <!-- CONTENT -->
+                <div class="col-2">
+                    <label for="textFilter">Text Filtresi:</label>
+                    <input type="text" id="textFilter" name="textFilter" class="form-control" th:value="${textFilter}">
+                </div>
+
+                <!-- TAGS -->
+                <div class="col-1">
+                    <label for="tagsFilter">Tags Filtresi:</label>
+                    <input type="text" id="tagsFilter" name="tagsFilter" class="form-control" th:value="${tagsFilter}">
+                </div>
+
+                <!-- SYNTAX -->
+                <div class="col-1">
+                    <label for="syntaxFilter">Syntax Filtresi:</label>
+                    <input type="text" id="syntaxFilter" name="syntaxFilter" class="form-control"
+                           th:value="${syntaxFilter}">
+                </div>
+
+                <!-- SUBMIT -->
+                <div class="col col-1">
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table class="table table-bordered border-primary">
+        <thead>
+        <tr>
+            <th class="col-1">Icon</th>
+            <th class="col-1">Node Id</th>
+            <th scope="col" class="col-1">Oluşturma Tarihi</th>
+            <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.lastModifiedDate}">LAst Modified Date</th>
+            <th class="col-5">Name</th>
+            <th class="col-1">Tags</th>
+            <th class="col-1">Syntax</th>
+            <th class="col-1">Is Rich Text</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="node:${nodes}">
+            <td class="text-center" th:title="${'/img/icons/' + node.nodeIcon.iconName}"><img
+                    th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
+                    th:alt="${'/img/icons/' + node.nodeIcon.iconName}" class="childiconcss"/></td>
+            <td class="text-center"><a th:href="@{'/nodes/' + ${node.nodeId}}"><span
+                    th:text="${node.nodeId}"></span></a></td>
+            <td class="text-center"
+                th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"
+                th:title="${node.creationTimestamp} + ', ' + ${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td class="text-center"
+                th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"
+                th:title="${node.lastSaveTimestamp} + ', ' + ${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td th:text="${node.name}"></td>
+            <td th:text="${node.tags}"></td>
+            <td th:text="${node.syntax}"></td>
+            <td class="text-center" th:text="${node.isRichText}"></td>
+
+
+        </tr>
+        </tbody>
+    </table>
+
+</section>
+
+<section layout:fragment="pageSpecificJsScripts">
+
+
+    <script th:inline="javascript">
+
+
+        // Liste boyutu veya sayfa numarası değiştiğinde
+        function changePageSize(select) {
+
+
+            document.getElementById('paginationForm').submit();
+        }
+
+        function changePage(select) {
+
+
+            document.getElementById('paginationForm').submit();
+        }
+
+        function changeNodeIcon(select) {
+
+
+            document.getElementById('paginationForm').submit();
+        }
+    </script>
+
+
+</section>
+
+</body>
+</html>

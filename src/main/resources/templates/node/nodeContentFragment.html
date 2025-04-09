@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="nodeContentFragment">
+
+
+
+    <div th:if="${node}">
+
+        <div id="content">
+
+            <div id="nodeContent">
+
+
+
+
+                <div>
+                    <!-- https://stackoverflow.com/questions/71798488/bootstrap-5-table-equal-column-width -->
+                <!--    <p scope="col" class="col-1">Content As <i
+                            th:text="${node.syntax}"/> -->
+                    </p>
+                    <div th:if="${node.syntax eq 'plain-text'}"
+                         th:utext="${#strings.replace(node.txt, newlinechar, '&lt;br /&gt;')}"
+                         class="nodetextformatting">icerik
+                    </div>
+                    <div th:if="${node.syntax eq 'custom-colors'}"
+                         th:utext="${node.txtAsHtml}">
+                        icerik
+                    </div>
+                    <div th:unless="${node.syntax eq 'plain-text' or node.syntax eq 'custom-colors'}"
+                         class="">
+                        <pre class="highlight" th:utext="${node.txtAsHtml}">icerik</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+</body>
+</html>

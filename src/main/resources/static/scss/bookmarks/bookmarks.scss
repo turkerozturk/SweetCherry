@@ -1,0 +1,18 @@
+$iconSizes: 30px;
+
+/* https://stackoverflow.com/questions/15115052/how-to-set-up-fixed-width-for-td */
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+.iconcss {
+    max-width: $iconSizes;
+    max-height: $iconSizes;
+    width: $iconSizes;
+    height: $iconSizes;
+}
+
+.boldTitle {
+    font-weight: bold;
+}

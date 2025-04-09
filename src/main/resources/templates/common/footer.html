@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- bootstrap kutuphanesi sitesinden klonlanmis footer html iceren bir fragment -->
+<div th:fragment="footer">
+
+    <!--
+    <header style="text-align: center; background-color: #8fbcbb;">
+        ️🌿🌱🍃🌳
+        <img th:src="@{/img/webpage/decoration/horizontal-line.png}"
+             class="img-fluid"
+        />
+        🍃🌳🌿🌱
+    </header>
+    -->
+
+
+
+    <th:block sec:authorize="hasRole('ADMIN')">
+
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <p class="col-md-4 mb-0 text-body-secondary">© 2024 SweetCherry | 🛟<a th:href="@{'/help/index'}"
+                                                                                    th:text="Help"/>
+                | <a href="https://www.giuspen.net/cherrytree/">CherryTree</a>
+            </p>
+
+            <a href="/"
+               class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                <svg class="bi me-2" width="40" height="32">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+            </a>
+
+            <ul class="nav col-md-4 justify-content-end">
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Home</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Features</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Pricing</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">FAQs</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">About</a></li>
+            </ul>
+        </footer>
+
+    </th:block>
+
+
+</div>
+
+
+<!-- javascript kutuphaneleri icin diger bir fragment -->
+<div th:fragment="footerJsLibraries" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+
+    <!--   <script type="text/javascript" th:src="@{/webjars/popper/popper.js}"></script> -->
+    <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.js}"></script>
+
+    <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+    <!-- <script type="text/javascript" th:src="@{/webjars/hyperscript/index.js}"></script> require not defined hatasi veriyor -->
+
+    <script type="text/javascript" th:src="@{/js/common/selectlanguage.js}"></script>
+    <script type="text/javascript" th:src="@{/js/common/clock.js}"></script>
+
+    <script>
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+    </script>
+
+
+    <script>
+        $('#AlertsBellButton').on('show.bs.popover', function (e) {
+    $.ajax({
+        url: '/astronomy',
+        type: 'get',
+        cache: false,
+        success: function (data) {
+            $('#AlertBellContainer').html(data);
+        }
+    });
+});
+    </script>
+
+
+</div>
+
+</body>
+</html>

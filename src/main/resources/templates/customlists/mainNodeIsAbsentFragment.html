@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<div th:fragment="mainNodeIsAbsentFragment">
+
+    <div class="row">
+
+        <div class="col-3">
+
+        </div>
+
+        <div class="col-6">
+
+            <!--/*-->
+            <p><a th:href="@{'/help/cherrytemplatetasks'}" th:text="Help"/></p>
+            <!--*/-->
+
+            <h3>SEBEP: Ana düğümü oluşturmamışsınız!</h3>
+            <h3>ÇÖZÜM: Aşağıdaki adımları uygulayın.</h3>
+            <p><b>ADIM:</b> CherryTree programı ile veritabanınızı açın.</p>
+            <p><b>ADIM:</b> Tree menüsü Add Node.. Seçeneğine Tıklayın. </p>
+            <p class="text-center">
+                <img src="/img/help/customlists/help-newnode.jpg"
+                     class="border border-3 border-black rounded-2"
+                     alt="">
+            </p>
+
+            <p><b>ADIM:</b> Düğüme hem <b>cherrytemplatetasks</b> adını verin, hem de düğüm tipini <b><code>Plain-Text</code></b> seçin ve OK düğmesine basın.</p>
+            <p class="text-center">
+                <img src="/img/help/customlists/help-newnode-name.jpg"
+                     class="border border-3 border-black rounded-2"
+                     alt="">
+            </p>
+
+            <p><b>ADIM:</b> Veritabanını kaydedin.</p>
+            <p class="text-center">
+                <img src="/img/help/customlists/help-save-ctb.jpg"
+                     class="border border-3 border-black rounded-2"
+                     alt="">
+            </p>
+
+            <p><b>ADIM:</b> Bu websayfasını yeniden yükleyin.</p>
+            <p class="text-center">
+                <img src="/img/help/customlists/help-refresh-webpage.jpg"
+                     class="border border-3 border-black rounded-2"
+                     alt="">
+            </p>
+
+        </div>
+
+        <div class="col-3">
+
+        </div>
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

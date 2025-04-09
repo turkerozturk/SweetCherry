@@ -1,0 +1,36 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Nodes by Father ID</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Nodes by Father ID</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Text</th>
+        <th>Text</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="node : ${nodes}">
+        <td>
+            <a th:href="@{'/father?fatherId=' + ${node.nodeId}}" th:text="${node.nodeId}"></a>
+        </td>
+        <td th:text="${node.name}"></td>
+
+
+
+
+    </tr>
+    </tbody>
+</table>
+</section>
+</body>
+</html>

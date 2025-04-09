@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<th:block th:fragment="childrenNavigationFragment">
+
+
+
+
+
+
+    <th:block th:if="${childNodes}">
+
+        <!--
+        <th:block th:unless="${isRootNode}">
+            <p class="text-center"><b th:utext="#{label.subNodes}">&empty; Sub Nodes</b></p>
+        </th:block>
+        -->
+
+        <ul class="indent-no-bullets">
+
+
+            <!-- TODO sunun calisanini yap: th:attr="data-bs-title=${childNode.name}" data-bs-toggle="tooltip" -->
+            <li class="" th:each="childNode : ${childNodes}">
+                <th:block th:if="${childNode != null}">
+                    <a class="linkinternal" th:href="'/nodes/' + ${childNode.nodeId}"
+                       th:title="${childNode.name}">
+
+                        <i th:class="${childNode.hasChildren ? 'fas fa-caret-right childiconcssfas' : 'fas fa-square childiconcssfas'}"
+                           th:style="${childNode.hasChildren ? '' : 'visibility: hidden;'}"
+                        ></i>
+
+                        <img th:src="@{/img/icons/__${childNode.nodeIcon.iconName}__.svg}"
+                             th:alt="${'/img/icons/' + childNode.nodeIcon.iconName}" class="childiconcss"/>
+
+                        <span th:text="${childNode.name}"
+                              th:style="${'color:' + childNode.titleColorAsHtmlHex + ';'}"
+                              th:class="${childNode.boldnessBit ? 'boldTitle' : ''}"></span>
+                    </a>
+                </th:block>
+                <th:block th:unless="${childNode}">
+                    <span style="color: black;">Child node is null</span>
+
+                </th:block>
+
+
+            </li>
+
+        </ul>
+
+
+    </th:block>
+
+</th:block>
+
+</body>
+</html>

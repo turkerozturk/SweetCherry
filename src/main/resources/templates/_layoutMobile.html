@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <head>
+
+        <title>CherryTree WebViewer</title>
+
+        <div th:replace="~{common/meta :: headerMeta}"></div>
+
+        <div th:replace="~{common/meta :: headerCssLibraries}"></div>
+
+        <th:block layout:fragment="pageSpecificCssStyles"></th:block>
+
+        <style>
+            .loader {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background-color: #3498db; /* Mavi renk yükleme çubuğu */
+                z-index: 10000;
+                display: none; /* Başlangıçta gizli */
+                animation: loading 2s linear infinite;
+            }
+
+            @keyframes loading {
+                0% {
+                    width: 0;
+                }
+                100% {
+                    width: 100%;
+                }
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <div id="loader" class="loader"></div>
+
+
+        <div th:replace="~{common/header :: header}"></div>
+
+        <section layout:fragment="content"></section>
+
+        <div th:replace="~{common/footer :: footer}"></div>
+
+        <div th:replace="~{common/footer :: footerJsLibraries}"></div>
+
+        <section layout:fragment="pageSpecificJsScripts"></section>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var loader = document.getElementById("loader");
+
+                document.querySelectorAll('a').forEach(function(link) {
+                    link.addEventListener('click', function(event) {
+                        var targetUrl = new URL(link.href, window.location.origin);
+                        if (targetUrl.origin !== window.location.origin || targetUrl.pathname !== window.location.pathname) {
+                            // Eğer link başka bir sayfaya gidiyorsa loading indicator'ı göster
+                            loader.style.display = 'block';
+                        }
+                    });
+                });
+
+                window.addEventListener('load', function() {
+                    loader.style.display = 'none';
+                });
+            });
+        </script>
+
+
+    </body>
+
+</html>
+

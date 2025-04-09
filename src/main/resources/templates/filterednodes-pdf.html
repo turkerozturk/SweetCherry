@@ -1,0 +1,34 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+
+<table border="1">
+    <thead>
+    <tr>
+
+        <th>Node Id</th>
+        <th>Oluşturma Tarihi</th>
+        <th th:text="${lastModifiedDate}">Last Modification Date</th>
+        <th>Name</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="node:${nodes}">
+        <td class="text-center"><span th:text="${node.nodeId}"></span></td>
+        <td class="text-center"
+            th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"
+            th:title="${node.creationTimestamp} + ', ' + ${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td class="text-center"
+            th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"
+            th:title="${node.lastSaveTimestamp} + ', ' + ${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="${node.name}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

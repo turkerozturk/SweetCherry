@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Cherry Project Node</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Cherry Project Node</h1>
+<div th:if="${message}">
+    <p th:text="${message}"></p>
+</div>
+
+<div th:if="${cherryProjectNode}">
+    <h2>
+        <span th:text="${cherryProjectNode.nodeId}"></span>  id numaralı
+        <span th:text="${cherryProjectNode.name}"></span> proje düğümü içeriğiyle mevcut. Data variable işlemleri yapılabilir.
+    </h2>
+
+    <table border="1">
+        <tr>
+            <th>Project Node Id</th>
+            <td th:text="${cherryProjectNode.nodeId}"></td>
+        </tr>
+        <tr>
+            <th>Project Name</th>
+            <td th:text="${cherryProjectNode.name}"></td>
+        </tr>
+        <tr>
+            <th>Project Template Name</th>
+            <td th:text="${cherryProjectNode.templateName}"></td>
+        </tr>
+
+    </table>
+
+
+
+</div>
+</section>
+
+</body>
+</html>

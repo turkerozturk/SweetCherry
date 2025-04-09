@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+
+    <title>Dashboard</title>
+
+    <th:block layout:fragment="pageSpecificCssStyles">
+        <link rel="stylesheet" th:href="@{/css/dashboard/dashboard.css}"/>
+        <!--   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/morris.js/morris.css"> -->
+    </th:block>
+
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div class="row">
+
+        <div class="col-12 rounded shadow-sm">
+            <div th:replace="~{dashboard/mottoFragment :: mottoFragment}"></div>
+        </div>
+
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+        <div class="col">
+            <div th:replace="~{dashboard/standartFragment :: standartFragment}"></div>
+        </div>
+        <div class="col">
+            <div th:replace="~{dashboard/advancedFragment :: advancedFragment}"></div>
+        </div>
+        <div class="col">
+            <div th:replace="~{dashboard/developerFragment :: developerFragment}"></div>
+        </div>
+    </div>
+
+    <div id="donut-chart"></div>
+
+</section>
+
+<th:block layout:fragment="pageSpecificJsScripts">
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<div th:fragment="multipleListsFragment">
+
+
+    <div class="text-center">
+
+
+        <h3>Liste isimlerini içeren birden çok ana düğüm oluşturmuşsunuz!</h3>
+        <p>Karışıklık olmaması için, düğümlerden sadece birinin adını <b>cherrytemplatetasks</b> olarak bırakıp,
+            diğerlerini farklı adlandırınız.</p>
+        <p>Düğüm ID numaralarına tıklayıp, içeriklerini
+            ve ağaç içindeki konumlarını görebilirsiniz.</p>
+
+        <div class="col-12 text-center">
+
+            <th:block th:each="node, iStat : ${nodes}">
+
+                <p>
+                    <a th:href="${'/nodes/'+ node.nodeId}" th:text="${node.nodeId}"></a>
+                    <span th:text="${node.name}"></span>
+                </p>
+
+            </th:block>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

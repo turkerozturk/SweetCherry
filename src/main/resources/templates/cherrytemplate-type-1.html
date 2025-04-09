@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+
+    <title>Cherry Template Node Type 1</title>
+
+
+    <section layout:fragment="pageSpecificCssStyles">
+
+        <style>
+            .nodedateformatting, .nodenameformatting {
+                white-space: nowrap; /* Uzun tarih bilgisinin satır sonunda kesilmesini önler */
+                width: 1%; /* Genişliği sabit tutar */
+            }
+        </style>
+
+
+        <style>
+            .highlight-todo {
+              animation: highlight-orange 1s infinite alternate;
+            }
+            .highlight-empty {
+              animation: highlight-red 1s infinite alternate;
+            }
+            .highlight-focus {
+              animation: highlight-green 1s infinite alternate;
+            }
+            @keyframes highlight-orange {
+              from { background-color: white; }
+              to { background-color: orange; }
+            }
+            @keyframes highlight-red {
+              from { color: white; }
+              to { color: red; }
+            }
+            @keyframes highlight-green {
+              from { background-color: white; }
+              to { background-color: green; }
+            }
+        </style>
+
+        <!-- Table outline border and column border only in Bootstrap -->
+        <style>
+            .table {
+            border: 1px solid black;
+            }
+
+            .table th {
+            border-top: 1px solid #000!important;
+            border-bottom: 1px solid #000!important;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            vertical-align:top;
+            }
+
+            .table td {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-top: none!important;
+            vertical-align:top;
+            }
+
+            /* it makes "label" to "label               "
+            and "very very long label"
+            */
+            th.dataLabel {
+                max-width: 20ch;
+                min-width: 20ch;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        </style>
+
+        <style>
+            .popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                padding: 20px;
+                border: 2px solid #000;
+                border-radius: 5px;
+                z-index: 9999;
+            }
+        </style>
+    </section>
+</head>
+<body>
+<section layout:fragment="content">
+
+
+    <!-- Node Meta Popup'u acmak icin bir dugme -->
+
+    <div th:if="${message}">
+        <p th:text="${message}"></p>
+    </div>
+
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Yardım
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                 data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+
+
+                    <td><a th:href="@{'/help/cherrytemplatenode'}" th:text="Help"></a></td>
+
+                    <div th:replace="~{help/cherrytemplatenode :: helpContentfragment}"></div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <th:block th:if="${cherryTemplateNode}">
+
+
+            <div class="accordion-item" style="background-color: #aaeeff;">
+
+
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne"
+                            aria-expanded="false" aria-controls="collapseOne">
+                        Şablon Hakkında - Aşağıdaki çubuk genişletildiğinde, şablonda kullanılabilecek düğüm isimleri ve
+                        diğer bilgiler görülebilir.
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                     data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+
+                        <div id="nodeMeta"></div>
+
+
+                        <div th:if="${cherryTemplateNode}">
+
+                            <table class="table table-border table-sm">
+                                <tr>
+                                    <th>Template Node Id</th>
+                                    <td><a th:href="${'/nodes/' + cherryTemplateNode.nodeId}"
+                                           th:text="${cherryTemplateNode.nodeId}"></a></td>
+                                </tr>
+                                <tr>
+                                    <th>Template(Project) Name</th>
+                                    <td th:text="${cherryTemplateNode.name}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Template Text</th>
+                                    <td>
+                                        <table class="table table-border table-sm table-striped">
+                                            <tr th:each="dataLabel : ${cherryTemplateNode.dataLabels}">
+                                                <td th:text="${dataLabel}"></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Which Project Nodes Are Using It</th>
+                                    <td>
+                                        <a th:href="@{'/check/' + ${cherryTemplateNode.name}}"><span
+                                                th:text="${cherryTemplateNode.name}"></span></a>
+                                        <br/>
+                                        <a th:href="@{'/cherryprojectnodes/' + ${cherryTemplateNode.name}}"><span
+                                                th:text="${cherryTemplateNode.name}"></span></a>
+                                    </td>
+
+                                </tr>
+                                <!--
+                                <tr>
+                                    <th>
+                                        <img th:src="@{/img/icons/CT_LIFEBUOY.svg}" class="childiconcss"/>
+                                        Download as PDF File
+                                    </th>
+                                    <td><a th:href="@{'/cherrytemplatenode/pdf/' + ${cherryTemplateNode.nodeId}}"><span
+                                            th:text="${cherryTemplateNode.name}"></span></a></td>
+                                </tr>
+                                -->
+
+                            </table>
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+            </div>
+
+        </th:block>
+
+    </div>
+
+
+    <div th:if="${hasProjectNodes}">
+
+
+        <table class="table table-border table-sm">
+
+            <!--
+            <tr>
+                <th th:each="dataLabel : ${cherryTemplateNode.dataLabels}">
+                    <span th:text="${dataLabel}"></span>
+                </th>
+
+            </tr>
+            -->
+
+
+            <th:block th:each="row, iStats : ${dataRowsAsStringArray}">
+
+                <tr th:if="${iStats.index == 0}">
+                    <th>#</th>
+
+                    <th:block th:each="cell, kStats : ${row}">
+
+                        <th th:if="${kStats.index <= 1}"
+                            th:with="dynamicKey=${cell}"
+                        >
+                            <span th:text="#{${dynamicKey}}"></span>
+                        </th>
+
+
+
+                        <th th:if="${kStats.index > 1}">
+                            <span th:text="${cell}"></span>
+                        </th>
+
+                    </th:block>
+
+                </tr>
+
+                <tr th:unless="${iStats.index == 0}">
+                    <td th:text="${iStats.index}"></td>
+
+
+
+                    <th:block th:each="cell, jStats : ${row}">
+                        <td th:if="${jStats.index == 0}">
+                            <a th:href="'/nodes/' + ${cell}"
+                               th:text="${cell}"></a>
+                        </td>
+
+                        <td th:unless="${jStats.index == 0}">
+                            <span th:text="${cell}"></span>
+                        </td>
+                    </th:block>
+
+                </tr>
+
+                </th:block>
+
+        </table>
+
+
+    </div>
+
+
+</section>
+
+
+<section layout:fragment="pageSpecificJsScripts">
+
+    <script>
+        $(document).ready(function(){
+          $(".dataTable td").each(function(){
+            var text = $(this).text().toUpperCase().trim();
+            if (text === "") {
+              $(this).addClass("highlight-empty").text("BOŞ");
+            } else if (text.includes("TODO ")) {
+              $(this).addClass("highlight-todo");
+            } else if (text.includes("FOCUS ")) {
+              $(this).addClass("highlight-focus");
+            }
+          });
+        });
+    </script>
+
+    <script>
+        /*
+        $(document).ready(function(){
+          $(".nodetextformatting").each(function(){
+            var text = $(this).text().trim();
+            $(this).html(text.replace(/\r\n/g, "<br>"));
+          });
+        });
+        */
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            var today = new Date(); // Bugünün tarihini al
+            var formattedDate = today.getFullYear() + '-' + (today.getMonth() + 1).toString().padStart(2, '0') + '-' + today.getDate().toString().padStart(2, '0'); // Bugünün tarihini belirtilen formata çevir
+
+            // Her bir projectNode hücresini kontrol et
+            $('.projectNode').each(function() {
+                var cellDate = $(this).text().trim(); // Hücredeki tarihi al
+                if (cellDate === formattedDate) { // Eğer hücredeki tarih bugünün tarihine eşitse
+                    $(this).css('font-weight', 'bold'); // Hücrenin metnini bold yap
+                    var offset = $(this).offset().top - ($(window).height() / 2); // Sayfanın dikey ortasına kaydırmak için gerekli ofset hesapla
+                    $('html, body').animate({scrollTop: offset}, 'slow'); // Sayfayı animasyonlu bir şekilde kaydır
+                    return false; // Döngüyü sonlandır
+                }
+            });
+        });
+
+    </script>
+
+
+    <script>
+        $(document).ready(function() {
+            // Bugünün tarihini elde et
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            var todayDate = yyyy + '-' + mm + '-' + dd;
+
+            // Alarm aralığını belirle
+            var alarmLookupDays = 90;
+            var endDate = new Date();
+            endDate.setDate(endDate.getDate() + alarmLookupDays);
+            var endDateFormatted = endDate.toISOString().slice(0,10);
+
+            // Popup içeriğini oluştur
+            var popupContent = '<h2 align="center">' + todayDate + '</h2>';
+
+            popupContent += '<ul>';
+            $('table').each(function() {
+                var tableDate = $(this).attr('id');
+                if (tableDate >= todayDate && tableDate <= endDateFormatted) {
+                    $(this).find('th.dailyalarm').each(function() {
+                        var alarmText = $(this).text();
+                        var additionalText = $(this).closest('tr').find('td').text();
+                        var tableId = $(this).closest('table').attr('id');
+                        popupContent += '<li>' + alarmText + ' - ' + tableId + ' - '  + additionalText + '</li>';
+                    });
+                }
+            });
+            popupContent += '</ul>';
+
+            // Popup oluştur ve göster
+            if (popupContent !== '<ul></ul>') {
+                $('body').append('<div class="popup">' + popupContent + '</div>');
+                $('.popup').fadeIn();
+            }
+
+            // Popup'u kapatma işlemi
+            $(document).on('click', function(event) {
+                if (!$(event.target).closest('.popup').length && !$(event.target).is('.popup')) {
+                    $('.popup').fadeOut();
+                }
+            });
+
+            $(document).keyup(function(event) {
+                if (event.key === "Escape") {
+                    $('.popup').fadeOut();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // PANOYA KOPYALAMA BETIGI
+
+        $(document).ready(function() {
+            $('#copyButton').click(function() {
+                // Get the text from the element with id 'templateName'
+                var textToCopy = $('#templateName').text();
+
+                // Create a temporary textarea element to hold the text
+                var $temp = $('<textarea>');
+                $('body').append($temp);
+                $temp.val(textToCopy).select();
+
+                // Copy the text inside the textarea
+                document.execCommand('copy');
+
+                // Remove the temporary textarea
+                $temp.remove();
+
+                // Show the popup message
+                $('#copyToClipboardPopup').css("display", "inline").delay(2000).fadeOut();
+            });
+        });
+    </script>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Children</title>
+</head>
+<body background="black">
+<section layout:fragment="content">
+
+<h1>Children List</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Node Id</th>
+        <th>Father Id</th>
+        <th>Sequence</th>
+        <th>Master Id</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="child:${children}">
+        <td th:text="${child.nodeId}"></td>
+        <td th:text="${child.fatherId}"></td>
+        <td th:text="${child.sequence}"></td>
+        <td th:text="${child.masterId}"></td>
+
+    </tr>
+    </tbody>
+</table>
+</section>
+
+</body>
+</html>

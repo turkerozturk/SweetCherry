@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+
+</head>
+<body>
+    <section th:fragment="content">
+
+        <table class="table">
+            <tr>
+                <td th:text="${astronomyWidget.sunRiseFormatted}"></td>
+
+                <td th:text="${astronomyWidget.moonRiseFormatted}"></td>
+            </tr>
+            <tr>
+                <td>
+                    <img th:src="@{/img/icons/ct_W-sunny.svg}"/>
+                </td>
+
+                <td>
+                    <img th:src="@{/img/icons/ct_W-night-clear.svg}"/>
+                </td>
+            </tr>
+            <tr>
+                <td th:text="${astronomyWidget.sunSetFormatted}"></td>
+
+                <td th:text="${astronomyWidget.moonSetFormatted}"></td>
+            </tr>
+        </table>
+
+    </section>
+</body>
+</html>

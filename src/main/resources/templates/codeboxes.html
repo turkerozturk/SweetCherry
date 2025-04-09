@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>CodeBoxes</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>CodeBox List</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Node Id</th>
+        <th>Offset</th>
+        <th>Syntax</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="codebox, iStats : ${codeboxes}">
+        <td th:text="${iStats.index + 1}"></td>
+        <td><a th:href="@{/nodes/{nodeId}(nodeId=${codebox.id.nodeId})}" th:text="${codebox.id.nodeId}"></a></td>
+        <td th:text="${codebox.id.offset}"></td>
+        <td th:text="${codebox.syntax}"></td>
+
+    </tr>
+    </tbody>
+</table>
+</section>
+</body>
+</html>

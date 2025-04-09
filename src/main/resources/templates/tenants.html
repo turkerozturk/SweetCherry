@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title th:text="#{tenants.title}">Data Sources (technically Tenants)</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <h1 th:text="#{tenants.title}">Data Sources (technically Tenants)</h1>
+
+    <p th:text="#{tenants.description}"> description</p>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th th:text="#{tenants.data_sources_table.status}">Status</th>
+            <th th:text="#{tenants.data_sources_table.human_friendly_name}">Name</th>
+            <th th:text="#{tenants.data_sources_table.url}">URL</th>
+            <th th:text="#{tenants.data_sources_table.username}">Username</th>
+            <th th:text="#{tenants.data_sources_table.password}">Password</th>
+            <th th:text="#{tenants.data_sources_table.driver_class_name}">Driver Class Name</th>
+            <th th:text="#{tenants.data_sources_table.file_name}">File Name</th>
+            <th th:text="#{tenants.data_sources_table.isWritable}">Is Writable</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tenant : ${tenants}">
+            <td th:text="${tenant.tenantName == currentTenantName ? 'Active' : 'Passive'}"></td>
+            <td><i><b th:text="${tenant.tenantName}"></b></i></td>
+            <td th:text="${tenant.url}"></td>
+            <td th:text="${tenant.username}"></td>
+            <td th:text="${tenant.password}"></td>
+            <td th:text="${tenant.driverClassName}"></td>
+            <td th:text="${tenant.fileName}"></td>
+            <td th:text="${tenant.isWritable}"></td>
+
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

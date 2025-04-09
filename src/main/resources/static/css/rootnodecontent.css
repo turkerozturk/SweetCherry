@@ -1,0 +1,9 @@
+@charset "UTF-8";
+#rootNodeContent {
+  user-select: none; /* Tüm modern tarayıcılar için */
+  -webkit-user-select: none; /* Chrome, Safari ve Opera */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+/*# sourceMappingURL=rootnodecontent.css.map */

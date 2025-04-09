@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Check Nodes With Name CherryTemplateTasks</title>
+
+    <style>
+        .templateiconcss {
+            max-width: 47px;
+            max-height: 47px;
+            width: 47px;
+            height: 47px;
+        }
+
+                .childiconcss {
+            max-width: 27px;
+            max-height: 27px;
+            width: 27px;
+            height: 27px;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <h1 th:text="${customListsNodeStatus}" class="text-center text-danger d-none"></h1>
+
+    <th:block th:switch="${customListsNodeStatus}"
+              th:with="Topic=${T(com.example.sqlitedemo.node.CustomListsNodeStatus)}">
+        <th:block th:case="${Topic.MAIN_NODE_IS_ABSENT}">
+            <!--/*-->
+            ana düğüm yok demek. no lists değil! TODO
+            <!--*/-->
+
+            <div th:replace="~{customlists/mainNodeIsAbsentFragment :: mainNodeIsAbsentFragment}"></div>
+        </th:block>
+
+        <th:block th:case="${Topic.EXIST_BUT_ITS_CONTENT_IS_RICH_TEXT}">
+            <div th:replace="~{customlists/mainNodeIsRichTextFragment :: mainNodeIsRichTextFragment}"></div>
+        </th:block>
+
+        <th:block th:case="${Topic.EXIST}">
+             <div th:replace="~{customlists/listsFragment :: listsFragment}"></div>
+        </th:block>
+
+        <th:block th:case="${Topic.EXIST_BUT_EMPTY}">
+             <div th:replace="~{customlists/emptylistsFragment :: emptylistsFragment}"></div>
+        </th:block>
+
+        <th:block th:case="${Topic.EXIST_MULTIPLE}">
+            <div th:replace="~{customlists/multipleListsFragment :: multipleListsFragment}"></div>
+        </th:block>
+
+        <th:block th:case="${Topic.EXIST_BUT_HAS_NO_VALID_LIST_NAMES}">
+            <div th:replace="~{customlists/noValidListsFragment :: noValidListsFragment}"></div>
+        </th:block>
+
+    </th:block>
+
+</section>
+
+</body>
+</html>

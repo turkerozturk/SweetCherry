@@ -1,0 +1,12 @@
+@charset "UTF-8";
+body {
+  background-color: #fcfcfc; /* #D8DEE9; */
+  /* Medya sorgusu: Ekran genişliği 600 pikselden küçük olduğunda */
+}
+@media (max-width: 600px) {
+  body {
+    background-color: #ffffff;
+  }
+}
+
+/*# sourceMappingURL=webpage.css.map */

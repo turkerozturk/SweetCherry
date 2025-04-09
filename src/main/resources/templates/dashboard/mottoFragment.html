@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<th:block th:fragment="mottoFragment">
+
+    <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+        <h1 class="display-4 fw-normal text-body-emphasis" th:text="#{dashboard.heading}"></h1>
+        <p class="fs-5 text-body-secondary">SweetCherry, CherryTree yazılımını kullananların bazı ek
+            ihtiyaçlarını karşılayan tamamlayıcı ve bağımsız bir yazılımdır.
+        </p>
+        <p>CherryTree, zengin metin ve sözdizimi vurgulaması özellikleri sunan, verileri tek bir dosyada (xml
+            veya sqlite) veya birden fazla dosya ve dizinde depolayabilen hiyerarşik bir not alma
+            uygulamasıdır.</p>
+    </div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="viewModeFragment">
+
+    <li>
+        <a class="dropdown-item" href="/changeView?mode=desktop">
+            &nbsp;<i class="fas fa-regular fa-desktop"></i>
+            <span th:text="#{label.desktopView}">Desktop View</span>
+            &nbsp;<i th:if="${viewMode == 'desktop'}" class="fas fa-check"></i>
+        </a>
+    </li>
+
+    <li>
+        <a class="dropdown-item" href="/changeView?mode=mobile">
+            &nbsp;<i class="fas fa-regular fa-mobile"></i>
+            <span th:text="#{label.mobileView}">Mobile View</span>
+            &nbsp;<i th:if="${viewMode == 'mobile'}" class="fas fa-check"></i>
+        </a>
+    </li>
+
+
+</div>
+</body>
+</html>

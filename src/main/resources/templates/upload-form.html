@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Dosya Yükleme</title>
+    <th:block layout:fragment="pageSpecificCssStyles">
+
+        <!-- for pygments syntax highlighter colorization -->
+        <link rel="stylesheet" th:href="@{/css/syntaxhighlighter.css}"/>
+
+
+
+
+
+
+    </th:block>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div class="kutu">
+
+        <div class="row text-center">
+
+            <h1>Dosya Yükleme Formu</h1>
+
+            <form method="post" th:action="@{/upload-database}" enctype="multipart/form-data">
+                <label for="file">Dosya Seç:</label>
+                <input type="file" id="file" name="dosya"/>
+                <button type="submit">Yükle</button>
+            </form>
+
+            <div th:if="${message}" class="row">
+                <p th:text="${message}"></p>
+            </div>
+
+        </div>
+
+        <hr/>
+
+        <div class="row text-center">
+            <h3
+                    th:text="#{selectdatasource.to_create_a_new_datasource_heading}"
+            ></h3>
+
+            <p
+                    th:text="#{selectdatasource.to_create_a_new_datasource}"
+            ></p>
+            <span class="text-success"
+                  th:text="${ALL_TENANTS_FOLDER}"
+            ></span>
+            <br/>
+
+            <th:block sec:authorize="hasRole('ADMIN')">
+
+
+                <a href="/upload-form"
+                   id="uploadButton"
+                   class="btn btn-primary"
+                   th:title="#{selectdatasource.upload}"
+                >
+                    <i class="fas fa-upload"></i>
+                    <span th:text="#{selectdatasource.upload}"></span>
+                </a>
+            </th:block>
+
+
+        </div>
+
+        <br/>
+
+
+        <div class="bg-light row">
+                <pre class="highlight"
+                     th:utext="${exampleDataSourceHighlighted}">icerik
+                </pre>
+        </div>
+
+    </div>
+
+</section>
+</body>
+</html>

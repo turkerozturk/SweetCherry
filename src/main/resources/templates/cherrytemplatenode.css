@@ -1,0 +1,26 @@
+p {
+  background-color: #fefbd8;
+}
+
+.nodedateformatting, .nodenameformatting {
+    white-space: nowrap; /* Uzun tarih bilgisinin satir sonunda kesilmesini onler */
+    width: 1%; /* Genisligi sabit tutar */
+}
+
+.table {
+    border: 1px solid black;
+}
+
+.table thead th {
+    border-top: 1px solid #000!important;
+    border-bottom: 1px solid #000!important;
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+}
+
+.table td {
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+    border-top: none!important;
+  background-color: #f18973;
+}

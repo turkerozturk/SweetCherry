@@ -1,0 +1,54 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layoutMobile}">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Download Files</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <h1>Download Files</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>File Name</th>
+            <th>Creation Date</th>
+            <th>Size (bytes)</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="file, iStats : ${files}">
+            <td th:text="${iStats.index + 1}"></td>
+            <td th:text="${file.name}">sample.ctb</td>
+            <td th:text="${#dates.format(file.creationDate, 'dd-MM-yyyy HH:mm:ss')}">12-08-2024 12:34:56</td>
+            <td th:text="${file.size}">123456</td>
+            <td>
+                <a th:href="@{'/download/' + ${file.name}}" class="btn btn-success">
+                    <i class="fas fa-download"></i> Download
+                </a>
+                <a href="#" th:data-filename="${file.name}" class="btn btn-danger delete-button">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Silme Onayı için JavaScript ve Bootstrap Modal -->
+    <script>
+        document.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const fileName = this.getAttribute('data-filename');
+                if (confirm('Are you sure you want to delete ' + fileName + '?')) {
+                    window.location.href = '/delete/' + fileName;
+                }
+            });
+        });
+    </script>
+
+</section>
+</body>
+</html>

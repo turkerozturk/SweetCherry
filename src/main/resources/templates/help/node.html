@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<div th:fragment="helpContentfragment" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+
+    <a th:href="@{'/help/index'}"/>Help</a>
+
+    <h1>Düğüm</h1>
+
+    <h2>CherryTree Düğüm için Hangi Özellikleri Sunuyor?</h2>
+
+    <p>
+
+        CherryTree'de her içerik düğüm adı verilen bir yapı içinde bulunur.
+        Düğümlerin alt düğümleri olabilir.
+        Düğümlerin özellikleri:
+    <ul>
+        <li>Kimlik Numarası
+            <ul>
+                <li>0 kimlik numaralı düğüm ana düğümdür ve gerçekte yoktur. Dolayısıyla ilk alt düğüm oluşturulmadığı
+                    sürece 0 numaralı ana düğüm de yoktur.
+                    0 numaralı ana düğümün varlığı, oluşturulmuş en az bir alt düğümün kimlik numarasına veritabanındaki
+                    children tablosunda eşlik etmesi ile anlaşılır.
+                    <br/>CherryTree 1.1.0 sürümünden itibaren paylaşımlı düğüm adında bir düğüm çeşidi bulunmaktadır.
+                    Paylaşımlı düğüm, orijinal bir düğümü gösteren kimlik numarasından ibarettir.
+                    Sadece hangi düğüme aitse onun kimlik numarasını ve kendi kimlik numarasını içerir.
+                    <br/>CherryTree 1.1.0 sürümüyle birlikte düğüm özellikleri penceresinde, düğümün ve varsa paylaşımlı
+                    düğümlerinin kimlik numaraları görülebilir.
+                    <br/>Başlangıçta veritabanının oluşması için en az bir adet düğüm oluşturulması gerekir.
+                    <br/>İlk düğümün kimlik numarası 1 dir.
+                    <br/>Kullanıcı zaman içerisinde bazı düğümleri silerse, onların kimlik numaraları yeni düğümlerde
+                    görülmez.
+                    <br/>Yeni oluşturulan düğümler, en son oluşturulmuş ve silinmemiş düğümün kimlik numarasından
+                    sonraki sırada kimlik numarası alırlar.
+
+                </li>
+            </ul>
+        </li>
+
+        <li>Adı
+            <ul>
+                <li>Yazı Kalınlığı normal veya kalın olabilir.</li>
+                <li>Yazı Rengi olabilir.</li>
+            </ul>
+        </li>
+        <li>İkonu seçilmemişse varsayılan bir ikon ile temsil edilir. Seçilmişse ikonlar sayfasında listelenen
+            ikonlardan biri olabilir.
+            <br/>İkonu seçilmemiş olmasına rağmen, düğüm içerik tipi bir programlama dili olarak seçilmişse, o dile ait
+            ikonu varmış gibi görünür.
+            <br/>Gerçekte seçili değildir, veya istenirse başka bir ikon olarak görünmesi, başka ikon seçilir.
+            <br/>Veya istenirse o dilin ikonu seçilir.
+            Elle ikon seçmiş olmak, içerikten dolayı ikon görüntülenmesinden arkaplanda teknik olarak farklıdır.
+        </li>
+
+        <li>İçeriği
+            <ul>
+                <li>Düz metin olabilir.</li>
+                <li>Düz metin olmakla birlikte, bilgisayar dili seçimi yapılmışsa o dile özel renklendirme yapılır.</li>
+                <li> Yukarıdakiler veritabanında metin belgelerindeki gibi görünürler. Yeni satırlar enter karakterleri
+                    ile ayrılır.
+                </li>
+                <li>Zengin metin biçimine benzer bir yapıda bulunabilir.
+                    <ul>
+                        <li>Zengin metin yapısında eğer varsa resim, ekli dosya, veri tablosu bulunmaz. Onlar
+                            veritabanında başka yapıda depolanırlar.
+                            İçerikte ise sadece onların ofsetleri bulunur.
+                            <br/>>Ofset hesaplaması yapıp onları içeriğe yerleştirme işlemi orta düzey zorluk
+                            seviyesindedir.
+                        </li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </li>
+                <li>Boş olabilir. Veya boşluk karakterlerinden, boş satırlardan oluşabilir.
+                    <br/> Boş görünse bile, eğer zengin metin biçiminde ise, veritabanında minimal XML yapısını
+                    bulundurur.
+                </li>
+
+                <li></li>
+            </ul>
+        </li>
+        <li>Tags (Etiketler)
+            <ul>
+                <li>Arama yaparken içerikleri hızlı bulmak için etiketler yazılabilir. Veya kategori amacıyla.</li>
+                <li>Web Viewer'da ise özel bir önemi vardır.</li>
+            </ul>
+        </li>
+        <li>Aramaların Dışında Tutmak
+            <ul>
+                <li>Bu düğümü</li>
+                <li>Alt düğümleri de</li>
+            </ul>
+        </li>
+
+        <li>Salt Okunur
+            <ul>
+                <li>İçeriğin yanlışlıkla değiştirilmesi istenmiyorsa salt okunur olarak işaretlenebilir.</li>
+            </ul>
+        </li>
+        <li>Oluşturma ve son güncelleme tarihleri.</li>
+
+
+    </ul>
+
+
+    </p>
+
+
+    <h2>CherryTreeWebViewer Düğüm için Hangi Özellikleri Sunuyor?</h2>
+    <p>
+        Navigasyon
+        Düğümün bağlı olduğu üst düğümden en tepedeki ana düğüme kadar tüm üst düğümlerine, ve varsa alt düğümlere
+        erişim.
+
+        <li>Meta Bilgisi
+    <ul>
+
+        <li>Oluşturma ve son güncelleme tarihleri.</li>
+        <li>level?</li>
+        <li>Zengin metin olup olmadığı.
+            <ul>
+                <li>Kod kutusu, resim, ekli dosya, tablo içerip içermediği.</li>
+            </ul>
+        </li>
+
+        <li>Salt okunur olup olmadığı.</li>
+        <li>İçerik tipi sentaks.</li>
+        <li>etiketler tags.</li>
+        <li>düğüm Idsi.</li>
+        <li>Düğüm ikonu. Yok ise varsayılan bir ikon.</li>
+        <li>Son kullanıcı ve teknik kullanıcı için yardım dökümanı.</li>
+        <li>Hata ayıklamayı kolaylaştırmak için, eğer içerik zengin metin biçimindeyse hamdan dönüştürülmüş içeriğin
+            kaynak kodu.
+        </li>
+        <li> Hata ayıklamayı kolaylaştırmak için ham haliyle içeriğin kaynak kodu.
+        </li>
+        <li></li>
+    </ul>
+
+    </li>
+
+
+    </p>
+
+
+    <h2>DEBUG Yardımı. Nasıl hata kontrolü yapılır?</h2>
+
+    <p>Düğümdeki zengin metin içeriği, özel bir XML yapısı kullanıyor.
+
+    <br />İlk satır xml tanımlama elementi var.
+        <br />Sonraki element node.
+        <br />node nin içindeki tüm elementler rich_text adında.
+        <br />Fakat rolleri farklı.
+        <br />Rollerini html koduna dönüştürünce zengin metin içeriği oluşuyor.
+        <br />Resimler, ekli dosyalar, tablolara, kod kutuları yok, onların yerine de bir rich_text elementi var.
+        <br />Ancak onlara bakarak hiçbirşey anlamak mümkün değil.
+        <br />O elementler bir çeşit yer tutucu ve burada onlarla ilgili hiçbir bilgi yok.
+        <br />Sadece düğümde resim, kod kutusu veya tablo olup olmadığına dair bilgi var.
+        <br />O bilgiler offset değeri olarak resim, tablo v eya kod kutusu tablolarının sütunlarında offset değerleri olarak var.
+        <br />Offsetleri açıklaması kolay fakat uygulaması zor.
+        <br />Uygulaması tam doğru programlanmadığı sürece içerik CherryTree programında göründüğü gibi eksiksiz ve aynı yerleşimde görünemez.
+        <br />Offsetler, rich text elementlerinin içeriğin başından itibaren iç metin karakter sayılarının toplanması sonucu elde ediliyor.
+        <br />İçeriğinde hiç metin olmayan rich_text elementleri için ise o offset toplamına 1 eklenerek devam ediliyor ve her aşamada elde edilen offset değerinin
+        <br />veritabanındaki ilgili tablolardan elde edilen offset değerleriyle eşit olup olmadığına bakılıyor.
+        <br />Çünkü bir eşitlik durumu olduğunda o offsetle bağlantılı olarak yer tutucu görevi gören ilgili rich_text elementi yerine resim mi, ekli dosya mı, kod kutusu mu yoksa tablo mu geleceği anlaşılmış oluyor.
+        <br />Offset hesaplama işlemi bir rakam bile kayarsa yanlış hesaplanırsa, içerikte materyal olarak eksikler ve görsel hatalar oluşacaktır.
+        <br />Aynı zamanda rich_text elementlerinin içindeki tab, boşluk ve yeni satır karakterlerinin korunması, satır başlarında bulunan boşluk ve tab karakterlerinin girinti olarak gösterilecek şekilde dönüştürülmesi gerekiyor.
+
+
+    </p>
+
+    <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+
+
+
+
+
+</div>
+
+
+</body>
+</html>

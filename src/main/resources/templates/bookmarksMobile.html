@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layoutMobile}">
+
+<head>
+    <title>Bookmarks</title>
+    <section layout:fragment="pageSpecificCssStyles">
+
+        <link rel="stylesheet" th:href="@{/css/bookmarks/bookmarks.css}"/>
+
+    </section>
+
+</head>
+<body>
+<section layout:fragment="content">
+
+    <th:block th:unless="${bookmarks}">
+
+        <p><b>ADIM:</b> CherryTree programını kullanarak bir düğüm seçin ve menüden yer işaretlerine ekleyin.</p>>
+
+
+        <p class="text-center">
+            <img src="/img/help/bookmarks/menu-add-bookmark.jpg"
+                 class="border border-3 border-black rounded-2"
+                 alt="">
+        </p>
+
+
+    </th:block>
+
+
+    <th:block th:if="${bookmarks}">
+
+
+        <h1 th:text="#{bookmarks.heading}"></h1>
+
+        <table class="table table-bordered border-success table-sm">
+            <thead>
+            <tr>
+                <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.sequence}">Sequence</th>
+
+                <!--   <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.lastModifiedDate}">LAst Modified Date</th> -->
+                   <!--  <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.icon}">Icon</th> -->
+
+                <!-- <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.nodeId}">Node Id</th> -->
+
+                <th scope="col" class="col-10" th:text="#{bookmarks.grid.th.nodeName}">Node Name</th>
+
+                +
+                <!-- <th scope="col" class="col-2" th:text="#{bookmarks.grid.th.tags}">Tags</th> -->
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="bookmark:${bookmarks}">
+                <td th:text="${bookmark.sequence}"></td>
+
+
+
+
+                <td>
+
+                     <span th:text="${#dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd')}"
+                           th:title="${bookmark.node.lastSaveTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
+                           class="text-center"
+                     ></span>
+
+                    <br />
+                    <!-- <td><a th:href="@{/nodes/{nodeId}(nodeId=${bookmark.nodeId})}" th:text="${bookmark.nodeId}"></a></td> -->
+
+
+                    <th:block>
+                        <a th:href="'/nodes/' + ${bookmark.node.nodeId}">
+
+                            <img th:src="@{/img/icons/__${bookmark.node.nodeIcon.iconName}__.svg}"
+                                 th:alt="${'/img/icons/' + bookmark.node.nodeIcon.iconName}" class="iconcss"
+                                 th:title="${bookmark.node.nodeIcon.iconName}"/>
+                        </a>
+
+                        <span th:text="${bookmark.node.name}"
+                              th:style="${'color:' + bookmark.node.titleColorAsHtmlHex + ';'}"
+                              th:class="${bookmark.node.boldnessBit ? 'boldTitle' : ''}">
+                        </span>
+                        &nbsp;-&nbsp;(id:&nbsp;
+                        <a th:href="'/nodes/' + ${bookmark.node.nodeId}">
+                            <span th:text="${bookmark.nodeId}"></span>
+                        </a>
+                        &nbsp;)
+
+                        <span th:unless="${#strings.isEmpty(bookmark.node.tags)}"
+                              th:text="${' - (tags: ' + bookmark.node.tags + ')'}"></span>
+                    </th:block>
+
+
+                    <th:block th:if="${bookmark.node.breadcrumbs}" class="breadcrumbs">
+
+                        <a href="/rootnode">Kök</a>
+                        <span th:each="entry : ${bookmark.node.breadcrumbs}">
+                        <span>/</span>
+                        <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}"></a>
+                        </span>
+
+                    </th:block>
+
+                </td>
+
+
+                <!-- <td th:text="${bookmark.node.tags}"></td> -->
+
+            </tr>
+            </tbody>
+        </table>
+
+    </th:block>
+
+</section>
+</body>
+</html>

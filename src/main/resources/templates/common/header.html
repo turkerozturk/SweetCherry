@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+
+
+</head>
+<body>
+<div th:fragment="header">
+    <style>
+        #clock {
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+    </style>
+
+
+    <header class="">
+        <!--
+        <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-1 mb-1 border-bottom">
+        -->
+
+        <div th:replace="~{common/navbarFragment :: navbarFragment}"></div>
+
+
+        <!--
+        <div class="col-md-3 mb-2 mb-md-0">
+            <div th:replace="~{common/astronomyFragment :: astronomyFragment}"></div>
+        </div>
+        -->
+
+        <!--
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+            <li><h4><a href="/" class="nav-link px-2">🌱🍒👨‍🌾 CherryTree WebViewer 🌱🍒👨🏼‍🌾</a></h4></li>
+        </ul>
+        -->
+
+        <!-- https://docs.spring.io/spring-security/reference/servlet/authentication/logout.html
+        Spring Security will add its logout support and by default respond both to GET /logout and POST /logout. -->
+        <!--
+
+        <div class="col-2 text-start">
+
+            <div sec:authorize="isAuthenticated()">
+
+                <a href="/logout">Logout <span sec:authentication="name"></span></a>
+
+
+                <div sec:authorize="hasRole('ADMIN')">
+                 | <a href="/shutdownContext">Shut Down Application</a>
+                </div>
+
+            </div>
+
+        </div>
+        -->
+        <!--
+                <div class="col-1 text-end">
+
+                  <div th:replace="~{common/tenantFragment :: tenantFragment}"></div>
+
+           <div th:replace="~{common/languageFragment :: languageFragment}"></div>
+
+        </div>
+        -->
+
+    </header>
+
+
+</div>
+</body>
+</html>

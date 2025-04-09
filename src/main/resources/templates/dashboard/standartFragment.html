@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<th:block th:fragment="standartFragment">
+
+
+    <div class="card mb-4 rounded-3 shadow-sm">
+        <div class="card-header py-3">
+            <h4 class="my-0 fw-normal" th:text="#{dashboard.box.left}"></h4>
+        </div>
+        <div class="card-body">
+            <h3>CherryTree Veritabanı Yapısı</h3>
+
+            <dl>
+
+                <dt><a href="/nodesadvancedwithbinding">nodesadvancedwithbinding</a></dt>
+                <dd>🍒formsearch</dd>
+
+                <dt><a href="/bookmarks">Bookmarks</a></dt>
+                <dd>🍒"bookmark" tablosunun tamamı</dd>
+
+                <dt><a href="/nodes">Nodes</a></dt>
+                <dd>🍒"node" tablosunun tamamı</dd>
+
+                <dt><a href="/children">Children</a></dt>
+                <dd>🍒"children" tablosunun tamamı</dd>
+
+
+                <dt><a href="/images">Images</a></dt>
+                <dd>🍒"image" tablosunun tamamı</dd>
+
+                <dt><a href="/codeboxes">Codeboxes</a></dt>
+                <dd>🍒"codebox" tablosunun tamamı</dd>
+
+                <dt><a href="/grids">Tables</a></dt>
+                <dd>🍒"grid" tablosunun tamamı</dd>
+
+                <dt><a href="/icons">Icons</a></dt>
+                <dd>🍒İkonların tamamı</dd>
+
+            </dl>
+
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

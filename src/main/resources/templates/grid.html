@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+
+    <title>Node's Grids(Tables)</title>
+
+    <!-- for pygments syntax highlighter colorization -->
+    <link rel="stylesheet" th:href="@{/css/syntaxhighlighter.css}" />
+
+</head>
+<body>
+<section layout:fragment="content">
+
+<h1>Tables of Node #<a th:href="@{/nodes/{nodeId}(nodeId=${grids[0].id.nodeId})}" th:text="${grids[0].id.nodeId}"></a></h1>
+    <p>
+        <b>Node Name: </b>
+        <span th:text="${grids[0].node.name}"></span>
+    </p>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Node Id</th>
+        <th>Offset</th>
+        <th>Justification</th>
+        <th>Table</th>
+        <th>Col Min</th>
+        <th>Col Max</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="grid : ${grids}">
+        <tr>
+            <td th:text="${grid.id.nodeId}"></td>
+            <td th:text="${grid.id.offset}"></td>
+            <td th:text="${grid.justification}"></td>
+            <td>
+                <pre class="highlight" th:utext="${xmlHelper.convertXmlTableToHtml(grid.txt)}">icerik</pre>
+
+            </td>
+            <td th:text="${grid.colMin}"></td>
+            <td th:text="${grid.colMax}"></td>
+
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+
+
+</section>
+</body>
+</html>

@@ -1,0 +1,18 @@
+/* https://stackoverflow.com/questions/15115052/how-to-set-up-fixed-width-for-td */
+table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.iconcss {
+  max-width: 30px;
+  max-height: 30px;
+  width: 30px;
+  height: 30px;
+}
+
+.boldTitle {
+  font-weight: bold;
+}
+
+/*# sourceMappingURL=bookmarks.css.map */
