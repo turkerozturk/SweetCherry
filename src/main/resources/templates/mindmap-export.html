@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Freeplane Mind Map Export</title>
+
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-light">
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-7 col-lg-6">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    CherryTree → Freeplane
+                </div>
+
+                <div class="card-body">
+
+                    <form th:action="@{/mindmap-export}"
+                          method="post">
+
+                        <div class="mb-3">
+
+                            <label for="nodeId"
+                                   class="form-label">
+                                Root node ID
+                            </label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="nodeId"
+                                   name="nodeId"
+                                   min="1"
+                                   step="1"
+                                   required>
+
+                            <div class="form-text">
+                                CherryTree GUI'de görünen
+                                node ID değerini yazın.
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label for="level"
+                                   class="form-label">
+                                Maksimum alt seviye
+                            </label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="level"
+                                   name="level"
+                                   min="0"
+                                   step="1"
+                                   placeholder="Boş bırakılırsa tümü">
+
+                            <div class="form-text">
+                                0: yalnızca root,
+                                1: root ve doğrudan çocukları.
+                                Boş bırakılırsa bütün alt ağaç
+                                dışa aktarılır.
+                            </div>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Mind map indir
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

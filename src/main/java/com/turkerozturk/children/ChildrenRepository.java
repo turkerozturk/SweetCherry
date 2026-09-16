@@ -34,4 +34,6 @@ public interface ChildrenRepository extends JpaRepository<Children, Long> {
 
     void deleteByNodeId(Long nodeId);
 
+    List<Children> findByFatherIdOrderBySequenceAsc(long fatherId);
+
 }
