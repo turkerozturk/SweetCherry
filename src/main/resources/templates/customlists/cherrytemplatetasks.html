@@ -26,7 +26,7 @@
     <h1 th:text="${customListsNodeStatus}" class="text-center text-danger d-none"></h1>
 
     <th:block th:switch="${customListsNodeStatus}"
-              th:with="Topic=${T(com.example.sqlitedemo.node.CustomListsNodeStatus)}">
+              th:with="Topic=${T(com.turkerozturk.node.CustomListsNodeStatus)}">
         <th:block th:case="${Topic.MAIN_NODE_IS_ABSENT}">
             <!--/*-->
             ana düğüm yok demek. no lists değil! TODO

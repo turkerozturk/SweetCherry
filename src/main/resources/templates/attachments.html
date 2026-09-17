@@ -63,7 +63,7 @@
 
         <td th:text="${image.fileExtension}"></td>
 
-        <td th:text="${T(com.example.sqlitedemo.helpers.StringHelper).formatFileSize(image.fileSize)}"
+        <td th:text="${T(com.turkerozturk.helpers.StringHelper).formatFileSize(image.fileSize)}"
             th:title="${image.fileSize + ' bytes'}"
         ></td>
     </tr>

@@ -21,7 +21,7 @@
 package com.turkerozturk.dashboard;
 
 //import com.turkerozturk.sunandmoon.MoonTime4j;
-//import com.example.sqlitedemo.helpers.CommonsSunCalc;
+//import com.turkerozturk.helpers.CommonsSunCalc;
 
 import com.turkerozturk.node.*;
 import com.turkerozturk.xlsx.XlsxController;
