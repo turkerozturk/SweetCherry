@@ -250,7 +250,7 @@ public class MindMapExportController {
 
             writer.writeAttribute(
                     "URI",
-                    "ctbicons/" + icon.getIconName() + ".jpg"
+                    "ctbicons/" + icon.getIconName() + ".png"
             );
 
             writer.writeAttribute(
