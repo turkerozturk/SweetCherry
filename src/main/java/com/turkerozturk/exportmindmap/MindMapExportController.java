@@ -3,6 +3,7 @@ package com.turkerozturk.exportmindmap;
 
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
+import com.turkerozturk.helpers.NodeIcon;
 import com.turkerozturk.node.Node;
 import com.turkerozturk.node.NodeRepository;
 import org.springframework.http.ContentDisposition;
@@ -218,6 +219,52 @@ public class MindMapExportController {
                         )
                 )
         );
+
+
+        if(displayNode.getTitleColorAsHtmlHex().length() == 7) {
+            writer.writeAttribute(
+                  "COLOR", displayNode.getTitleColorAsHtmlHex()
+            );
+        }
+
+        boolean isBold = displayNode.isBoldnessBit();
+        if(isBold) {
+            writer.writeCharacters("\n");
+
+            writer.writeStartElement("font");
+
+            writer.writeAttribute(
+                    "BOLD",
+                    String.valueOf(isBold)
+            );
+
+            writer.writeEndElement();
+        }
+
+        NodeIcon icon = displayNode.getNodeIcon();
+        //System.out.println("iconname: " +icon.getIconName());
+        if(!icon.getIconName().equals("zero")) {
+            writer.writeCharacters("\n");
+
+            writer.writeStartElement("hook");
+
+            writer.writeAttribute(
+                    "URI",
+                    "ctbicons/" + icon.getIconName() + ".jpg"
+            );
+
+            writer.writeAttribute(
+                    "SIZE",
+                    "1.0"
+            );
+
+            writer.writeAttribute(
+                    "NAME",
+                    "ExternalObject"
+            );
+
+            writer.writeEndElement();
+        }
 
         boolean mayWriteChildren =
                 maximumLevel == null

@@ -228,7 +228,7 @@ public class Node {
 
     public void parseNodeTitleColorAndBoldnessAndTextType() {
 
-        this.titleColor = (isRichText >> 2) & 0xFFFFFF; // Foreground rengini al
+        this.titleColor = (isRichText >> 3) & 0xFFFFFF; // Foreground rengini al
         this.titleColorAsHtmlHex = HtmlColorUtil.longToHtmlHex(this.titleColor);
         this.boldnessBit = ((isRichText >> 1) & 0x01) == 1; // Bold bilgisini al
         this.isRichTextBit = (isRichText & 0x01) == 1; // Rich text bilgisini al
