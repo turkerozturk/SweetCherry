@@ -1,6 +1,5 @@
 package com.turkerozturk.exportmindmap;
 
-
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.helpers.NodeIcon;
@@ -26,10 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Controller
 public class MindMapExportController {
+
+    private static final String DEFAULT_FOLD_MODE = "chat";
 
     private final ChildrenRepository childrenRepository;
     private final NodeRepository nodeRepository;
@@ -53,14 +55,31 @@ public class MindMapExportController {
             @RequestParam(
                     name = "level",
                     required = false
-            ) Integer maximumLevel
+            ) Integer maximumLevel,
+            @RequestParam(
+                    name = "foldMode",
+                    defaultValue = DEFAULT_FOLD_MODE
+            ) String foldModeValue,
+            @RequestParam(
+                    name = "includeIcons",
+                    defaultValue = "false"
+            ) boolean includeIcons,
+            @RequestParam(
+                    name = "includeColors",
+                    defaultValue = "true"
+            ) boolean includeColors
     ) throws XMLStreamException {
 
         if (maximumLevel != null && maximumLevel < 0) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    BAD_REQUEST,
                     "Level değeri negatif olamaz."
             );
         }
+
+        FoldMode foldMode = FoldMode.fromRequestValue(
+                foldModeValue
+        );
 
         Children rootChildren =
                 childrenRepository.findByNodeId(nodeId);
@@ -77,7 +96,10 @@ public class MindMapExportController {
 
         byte[] mindMapContent = createMindMap(
                 rootChildren,
-                maximumLevel
+                maximumLevel,
+                foldMode,
+                includeIcons,
+                includeColors
         );
 
         String rootName = rootDisplayNode.getName();
@@ -112,7 +134,10 @@ public class MindMapExportController {
 
     private byte[] createMindMap(
             Children root,
-            Integer maximumLevel
+            Integer maximumLevel,
+            FoldMode foldMode,
+            boolean includeIcons,
+            boolean includeColors
     ) throws XMLStreamException {
 
         ByteArrayOutputStream output =
@@ -132,7 +157,6 @@ public class MindMapExportController {
                     StandardCharsets.UTF_8.name(),
                     "1.0"
             );
-
             writer.writeCharacters("\n");
 
             writer.writeStartElement("map");
@@ -140,7 +164,15 @@ public class MindMapExportController {
                     "version",
                     "freeplane 1.12.15"
             );
+            writer.writeCharacters("\n");
 
+            writer.writeComment(
+                    "To view this file, download free mind mapping software "
+                            + "Freeplane from https://www.freeplane.org"
+            );
+            writer.writeCharacters("\n");
+
+            writer.writeEmptyElement("bookmarks");
             writer.writeCharacters("\n");
 
             Set<Long> visitedNodeIds = new HashSet<>();
@@ -150,6 +182,9 @@ public class MindMapExportController {
                     root,
                     0,
                     maximumLevel,
+                    foldMode,
+                    includeIcons,
+                    includeColors,
                     visitedNodeIds
             );
 
@@ -170,38 +205,40 @@ public class MindMapExportController {
             Children treeNode,
             int currentLevel,
             Integer maximumLevel,
+            FoldMode foldMode,
+            boolean includeIcons,
+            boolean includeColors,
             Set<Long> visitedNodeIds
     ) throws XMLStreamException {
 
         long treeNodeId = treeNode.getNodeId();
 
-        /*
-         * Bozuk bir veritabanı bağlantısının aynı node'a
-         * yeniden dönmesi durumunda sonsuz recursion'ı önler.
-         */
         if (!visitedNodeIds.add(treeNodeId)) {
             return;
         }
 
         Node displayNode = findDisplayNode(treeNode);
+        boolean isRootNode = currentLevel == 0;
 
         writer.writeStartElement("node");
-
         writer.writeAttribute(
                 "TEXT",
                 nullToEmpty(displayNode.getName())
         );
-
-        /*
-         * Freeplane ID'lerinin dosya içinde benzersiz
-         * olması yeterlidir. CherryTree nodeId değerini
-         * kullanmak bu gereksinimi karşılar.
-         */
+        writer.writeAttribute(
+                "FOLDED",
+                Boolean.toString(
+                        shouldFold(
+                                displayNode,
+                                isRootNode,
+                                foldMode
+                        )
+                )
+        );
         writer.writeAttribute(
                 "ID",
                 "ID_" + treeNodeId
         );
-
         writer.writeAttribute(
                 "CREATED",
                 Long.toString(
@@ -210,7 +247,6 @@ public class MindMapExportController {
                         )
                 )
         );
-
         writer.writeAttribute(
                 "MODIFIED",
                 Long.toString(
@@ -220,50 +256,27 @@ public class MindMapExportController {
                 )
         );
 
-
-        if(displayNode.getTitleColorAsHtmlHex().length() == 7) {
-            writer.writeAttribute(
-                  "COLOR", displayNode.getTitleColorAsHtmlHex()
-            );
+        if (isRootNode) {
+            writer.writeAttribute("STYLE", "oval");
         }
 
-        boolean isBold = displayNode.isBoldnessBit();
-        if(isBold) {
-            writer.writeCharacters("\n");
-
-            writer.writeStartElement("font");
-
-            writer.writeAttribute(
-                    "BOLD",
-                    String.valueOf(isBold)
-            );
-
-            writer.writeEndElement();
+        String color = displayNode.getTitleColorAsHtmlHex();
+        if (includeColors && isValidHtmlColor(color)) {
+            writer.writeAttribute("COLOR", color);
         }
 
-        NodeIcon icon = displayNode.getNodeIcon();
-        //System.out.println("iconname: " +icon.getIconName());
-        if(!icon.getIconName().equals("zero")) {
-            writer.writeCharacters("\n");
+        writeFontElement(
+                writer,
+                isRootNode,
+                displayNode.isBoldnessBit()
+        );
 
-            writer.writeStartElement("hook");
+        if (isRootNode) {
+            writeMapStyleHook(writer);
+        }
 
-            writer.writeAttribute(
-                    "URI",
-                    "ctbicons/" + icon.getIconName() + ".png"
-            );
-
-            writer.writeAttribute(
-                    "SIZE",
-                    "1.0"
-            );
-
-            writer.writeAttribute(
-                    "NAME",
-                    "ExternalObject"
-            );
-
-            writer.writeEndElement();
+        if (includeIcons) {
+            writeIconHook(writer, displayNode);
         }
 
         boolean mayWriteChildren =
@@ -285,6 +298,9 @@ public class MindMapExportController {
                         child,
                         currentLevel + 1,
                         maximumLevel,
+                        foldMode,
+                        includeIcons,
+                        includeColors,
                         visitedNodeIds
                 );
             }
@@ -293,18 +309,87 @@ public class MindMapExportController {
         writer.writeEndElement();
     }
 
-    /**
-     * Normal düğüm:
-     *     children.node_id -> node.node_id
-     *
-     * Alias/shared düğüm:
-     *     children.master_id -> node.node_id
-     *
-     * XML içindeki ID ise alias'ın ağaçtaki gerçek
-     * children.node_id değeri olarak kalır.
-     */
-    private Node findDisplayNode(Children children) {
+    private boolean shouldFold(
+            Node displayNode,
+            boolean isRootNode,
+            FoldMode foldMode
+    ) {
+        // Freeplane ana düğümü açık kalmalıdır.
+        if (isRootNode) {
+            return false;
+        }
 
+        return switch (foldMode) {
+            case ALL_FOLDED -> true;
+            case ALL_UNFOLDED -> false;
+            case CHAT -> "chat".equals(displayNode.getName());
+        };
+    }
+
+    private void writeFontElement(
+            XMLStreamWriter writer,
+            boolean isRootNode,
+            boolean isBold
+    ) throws XMLStreamException {
+
+        if (!isRootNode && !isBold) {
+            return;
+        }
+
+        writer.writeCharacters("\n");
+        writer.writeStartElement("font");
+
+        if (isRootNode) {
+            writer.writeAttribute("SIZE", "22");
+        }
+
+        if (isBold) {
+            writer.writeAttribute("BOLD", "true");
+        }
+
+        writer.writeEndElement();
+    }
+
+    private void writeMapStyleHook(
+            XMLStreamWriter writer
+    ) throws XMLStreamException {
+        writer.writeCharacters("\n");
+        writer.writeStartElement("hook");
+        writer.writeAttribute("NAME", "MapStyle");
+        writer.writeAttribute("background", "#ffffccff");
+        writer.writeEndElement();
+    }
+
+    private void writeIconHook(
+            XMLStreamWriter writer,
+            Node displayNode
+    ) throws XMLStreamException {
+
+        NodeIcon icon = displayNode.getNodeIcon();
+
+        if (icon == null
+                || icon.getIconName() == null
+                || "zero".equals(icon.getIconName())) {
+            return;
+        }
+
+        writer.writeCharacters("\n");
+        writer.writeStartElement("hook");
+        writer.writeAttribute(
+                "URI",
+                "ctbicons/" + icon.getIconName() + ".png"
+        );
+        writer.writeAttribute("SIZE", "1.0");
+        writer.writeAttribute("NAME", "ExternalObject");
+        writer.writeEndElement();
+    }
+
+    private boolean isValidHtmlColor(String color) {
+        return color != null
+                && color.matches("#[0-9A-Fa-f]{6}");
+    }
+
+    private Node findDisplayNode(Children children) {
         Long masterId = children.getMasterId();
 
         long contentNodeId =
@@ -325,12 +410,7 @@ public class MindMapExportController {
         return node;
     }
 
-    /**
-     * CherryTree timestamp değerleri bazı sürümlerde
-     * saniye, Freeplane'de ise milisaniye olabilir.
-     */
     private long toFreeplaneTimestamp(long timestamp) {
-
         if (timestamp <= 0) {
             return Instant.now().toEpochMilli();
         }
@@ -347,16 +427,12 @@ public class MindMapExportController {
     }
 
     private String sanitizeFilename(String name) {
-
         if (name == null || name.isBlank()) {
             return "cherrytree-mindmap";
         }
 
         String sanitized = name
-                .replaceAll(
-                        "[\\\\/:*?\"<>|]",
-                        "_"
-                )
+                .replaceAll("[\\\\/:*?\"<>|]", "_")
                 .replaceAll("\\s+", " ")
                 .trim();
 
@@ -365,5 +441,27 @@ public class MindMapExportController {
         }
 
         return sanitized;
+    }
+
+    private enum FoldMode {
+        CHAT,
+        ALL_FOLDED,
+        ALL_UNFOLDED;
+
+        private static FoldMode fromRequestValue(String value) {
+            if (value == null) {
+                return CHAT;
+            }
+
+            return switch (value) {
+                case "chat" -> CHAT;
+                case "all-folded" -> ALL_FOLDED;
+                case "all-unfolded" -> ALL_UNFOLDED;
+                default -> throw new ResponseStatusException(
+                        BAD_REQUEST,
+                        "Geçersiz foldMode değeri: " + value
+                );
+            };
+        }
     }
 }

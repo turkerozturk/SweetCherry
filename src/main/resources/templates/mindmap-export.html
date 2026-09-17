@@ -3,7 +3,6 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
 
@@ -16,24 +15,23 @@
 <body class="bg-light">
 
 <div class="container py-5">
-
     <div class="row justify-content-center">
-
-        <div class="col-md-7 col-lg-6">
-
+        <div class="col-md-8 col-lg-7">
             <div class="card shadow-sm">
-
                 <div class="card-header">
                     CherryTree → Freeplane
                 </div>
 
                 <div class="card-body">
-
                     <form th:action="@{/mindmap-export}"
                           method="post">
 
-                        <div class="mb-3">
+                        <input type="hidden"
+                               th:if="${_csrf != null}"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
 
+                        <div class="mb-3">
                             <label for="nodeId"
                                    class="form-label">
                                 Root node ID
@@ -48,14 +46,12 @@
                                    required>
 
                             <div class="form-text">
-                                CherryTree GUI'de görünen
-                                node ID değerini yazın.
+                                CherryTree GUI'de görünen node ID
+                                değerini yazın.
                             </div>
-
                         </div>
 
                         <div class="mb-3">
-
                             <label for="level"
                                    class="form-label">
                                 Maksimum alt seviye
@@ -70,29 +66,97 @@
                                    placeholder="Boş bırakılırsa tümü">
 
                             <div class="form-text">
-                                0: yalnızca root,
-                                1: root ve doğrudan çocukları.
-                                Boş bırakılırsa bütün alt ağaç
-                                dışa aktarılır.
+                                0: yalnızca root, 1: root ve doğrudan
+                                çocukları. Boş bırakılırsa bütün alt
+                                ağaç dışa aktarılır.
                             </div>
+                        </div>
 
+                        <div class="mb-3">
+                            <label for="foldMode"
+                                   class="form-label">
+                                Düğümlerin açık/kapalı durumu
+                            </label>
+
+                            <select class="form-select"
+                                    id="foldMode"
+                                    name="foldMode">
+                                <option value="chat" selected>
+                                    Yalnız adı “chat” olanları kapat
+                                </option>
+                                <option value="all-folded">
+                                    Tüm alt düğümleri kapat
+                                </option>
+                                <option value="all-unfolded">
+                                    Tüm düğümleri açık bırak
+                                </option>
+                            </select>
+
+                            <div class="form-text">
+                                Ana düğüm her zaman açık bırakılır.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="includeColors"
+                                   class="form-label">
+                                Düğüm başlık renkleri
+                            </label>
+
+                            <select class="form-select"
+                                    id="includeColors"
+                                    name="includeColors">
+                                <option value="true" selected>
+                                    Renkleri ekle
+                                </option>
+                                <option value="false">
+                                    Renkleri ekleme
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="includeIcons"
+                                   class="form-label">
+                                CherryTree ikonları
+                            </label>
+
+                            <select class="form-select"
+                                    id="includeIcons"
+                                    name="includeIcons">
+                                <option value="false" selected>
+                                    İkonları ekleme
+                                </option>
+                                <option value="true">
+                                    İkonları ekle
+                                </option>
+                            </select>
+
+                            <div class="form-text mt-2">
+                                Seçerseniz, download edeceğiniz mindmap
+                                dosyası kendisiyle aynı klasörde
+                                <strong>ctbicons</strong> isimli bir klasör
+                                olmasını ve içinde orijinal adları CherryTree
+                                uygulamasının kaynak kodlarında bulunan SVG
+                                uzantılı dosyalardan dönüştürülmüş aynı isimde
+                                PNG uzantılı dosyaların olmasını bekler.
+                                Freeplane uygulaması o dosyaları bulamazsa
+                                düğümlerin altında bulamadığına dair hata
+                                mesajı gösterir ve çirkin bir görünüm oluşur.
+                                <strong>ctbicons</strong> klasörünüz varsa
+                                seçin, yoksa seçmeyin.
+                            </div>
                         </div>
 
                         <button type="submit"
                                 class="btn btn-primary">
                             Mind map indir
                         </button>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 </body>
