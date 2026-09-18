@@ -61,13 +61,24 @@
             height: 100%;
         }
 
+        .markmap-node-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .markmap-node-title.is-bold {
+            font-weight: 700;
+        }
+
         .markmap-node-icon {
-            margin-left: .35rem;
-            padding: .05rem .3rem;
-            border: 1px solid currentColor;
-            border-radius: .25rem;
-            font-size: .65em;
-            opacity: .65;
+            display: inline-block;
+            flex: 0 0 16px;
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -122,6 +133,7 @@
         const dataJson = /*[[${markmapDataJson}]]*/ '{}';
         const colorsEnabled = /*[[${colors}]]*/ true;
         const iconsEnabled = /*[[${icons}]]*/ false;
+        const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
         const data = JSON.parse(dataJson);
 
         prepareLabels(data);
@@ -150,8 +162,6 @@
 
         // Fontların ve Bootstrap'in yerleşmesi tamamlandıktan sonra haritayı
         // görünür alana yeniden oturtur.
-        //window.addEventListener('load', () => markmap.fit());
-        //ustteki satır yerine alttakini kullanıyoruz:
         window.addEventListener('load', () => {
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
@@ -162,21 +172,55 @@
 
         function prepareLabels(node) {
             const iconName = node.payload?.iconName;
+            const isBold = node.payload?.bold === true;
+            const color = normalizeColor(node.payload?.color);
 
             // Markmap düğüm içeriğini HTML olarak işler. Veritabanından gelen
             // başlık önce metne çevrilerek script/HTML çalıştırması engellenir.
-            node.content = escapeHtml(node.content || '');
+            const safeTitle = escapeHtml(node.content || '');
+            const titleClasses = isBold
+                ? 'markmap-node-title is-bold'
+                : 'markmap-node-title';
+            const colorStyle = colorsEnabled && color
+                ? ' style="color:' + color + '"'
+                : '';
+
+            let iconHtml = '';
 
             if (iconsEnabled && iconName) {
-                node.content +=
-                    ' <span class="markmap-node-icon" data-icon-name="'
-                    + escapeHtmlAttribute(iconName)
-                    + '">'
-                    + escapeHtml(iconName)
-                    + '</span>';
+                const safeIconName = String(iconName);
+                const iconUrl = iconBaseUrl
+                    + encodeURIComponent(safeIconName)
+                    + '.png';
+
+                iconHtml =
+                    '<img class="markmap-node-icon" src="'
+                    + escapeHtmlAttribute(iconUrl)
+                    + '" alt="" aria-hidden="true"'
+                    + ' data-icon-name="'
+                    + escapeHtmlAttribute(safeIconName)
+                    + '">';
             }
 
+            node.content =
+                '<span class="markmap-node-label">'
+                + iconHtml
+                + '<span class="'
+                + titleClasses
+                + '"'
+                + colorStyle
+                + '>'
+                + safeTitle
+                + '</span></span>';
+
             (node.children || []).forEach(prepareLabels);
+        }
+
+        function normalizeColor(value) {
+            const normalized = String(value || '').trim().toUpperCase();
+            return /^#[0-9A-F]{6}$/.test(normalized)
+                ? normalized
+                : null;
         }
 
         function escapeHtml(value) {

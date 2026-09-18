@@ -1,4 +1,4 @@
-package com.turkerozturk.mindmap;
+package com.turkerozturk.quickmindmapmarkmap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -135,8 +135,9 @@ public class MarkmapQuickMindMapController {
 
             ObjectNode payload = result.putObject("payload");
             payload.put("nodeId", treeNodeId);
+            payload.put("bold", displayNode.isBoldnessBit());
 
-            if (colors && (displayNode.getTitleColorAsHtmlHex().length() == 7)) {
+            if (colors) {
                 String color = normalizeHtmlColor(
                         displayNode.getTitleColorAsHtmlHex()
                 );
@@ -148,8 +149,7 @@ public class MarkmapQuickMindMapController {
             if (icons) {
                 String iconName = findIconName(displayNode);
                 if (iconName != null) {
-                    // İkon adı veri içinde taşınır. İleride SVG eşlemesi yapılırken
-                    // payload.iconName doğrudan kullanılabilir.
+                    // Şablon bu adı /img/ctbicons/<ikon-adi>.png yoluna dönüştürür.
                     payload.put("iconName", iconName);
                 }
             }
