@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${rootNodeName} + ' - Markmap Quick Mind Map'">
+        Markmap Quick Mind Map
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}">
+
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            min-height: 0;
+        }
+
+        .mind-map-page {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .mind-map-toolbar {
+            flex: 0 0 auto;
+        }
+
+        .mind-map-panel {
+            position: relative;
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .mind-map-panel .card-body {
+            position: absolute;
+            inset: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #markmap {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .markmap-node-icon {
+            margin-left: .35rem;
+            padding: .05rem .3rem;
+            border: 1px solid currentColor;
+            border-radius: .25rem;
+            font-size: .65em;
+            opacity: .65;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<main class="container-fluid py-3 mind-map-page">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3 mind-map-toolbar">
+        <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
+
+        <span class="badge text-bg-secondary"
+              th:text="'Node ' + ${rootNodeId}">Node</span>
+
+        <span class="badge text-bg-light border"
+              th:text="'Level ' + ${maximumLevel}">Level</span>
+
+        <span th:if="${foldChat}"
+              class="badge text-bg-light border">
+            chat dalları başlangıçta kapalı
+        </span>
+
+        <span th:if="${colors}"
+              class="badge text-bg-light border">
+            renkler açık
+        </span>
+
+        <span th:if="${icons}"
+              class="badge text-bg-warning">
+            ikon adları açık
+        </span>
+    </div>
+
+    <div class="card shadow-sm mind-map-panel">
+        <div class="card-body">
+            <svg id="markmap"
+                 role="img"
+                 th:attr="aria-label=${rootNodeName} + ' düşünce haritası'">
+            </svg>
+        </div>
+    </div>
+</main>
+
+
+<!-- Markmap View, tarayıcı sürümünde global d3 nesnesini kullanır. -->
+<script th:src="@{/js/thirdparty/markmap/d3.min.js}"></script>
+<script th:src="@{/js/thirdparty/markmap/markmap-view.min.js}"></script>
+
+<script th:inline="javascript">
+    (() => {
+        'use strict';
+
+        const dataJson = /*[[${markmapDataJson}]]*/ '{}';
+        const colorsEnabled = /*[[${colors}]]*/ true;
+        const iconsEnabled = /*[[${icons}]]*/ false;
+        const data = JSON.parse(dataJson);
+
+        prepareLabels(data);
+
+        const options = {
+            autoFit: true,
+            duration: 300,
+            fitRatio: 0.92,
+            maxInitialScale: 1.5,
+            maxWidth: 320,
+            paddingX: 14,
+            spacingHorizontal: 100,
+            spacingVertical: 8
+        };
+
+        if (colorsEnabled) {
+            const fallbackColor = d3.scaleOrdinal(d3.schemeTableau10);
+
+            options.color = node =>
+                node.data?.payload?.color
+                || fallbackColor(String(node.depth));
+        }
+
+        const {Markmap} = window.markmap;
+        const markmap = Markmap.create('#markmap', options, data);
+
+        // Fontların ve Bootstrap'in yerleşmesi tamamlandıktan sonra haritayı
+        // görünür alana yeniden oturtur.
+        //window.addEventListener('load', () => markmap.fit());
+        //ustteki satır yerine alttakini kullanıyoruz:
+        window.addEventListener('load', () => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    markmap.fit();
+                });
+            });
+        });
+
+        function prepareLabels(node) {
+            const iconName = node.payload?.iconName;
+
+            // Markmap düğüm içeriğini HTML olarak işler. Veritabanından gelen
+            // başlık önce metne çevrilerek script/HTML çalıştırması engellenir.
+            node.content = escapeHtml(node.content || '');
+
+            if (iconsEnabled && iconName) {
+                node.content +=
+                    ' <span class="markmap-node-icon" data-icon-name="'
+                    + escapeHtmlAttribute(iconName)
+                    + '">'
+                    + escapeHtml(iconName)
+                    + '</span>';
+            }
+
+            (node.children || []).forEach(prepareLabels);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+        }
+
+        function escapeHtmlAttribute(value) {
+            return escapeHtml(value);
+        }
+    })();
+</script>
+
+</body>
+</html>

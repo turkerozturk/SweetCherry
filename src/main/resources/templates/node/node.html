@@ -51,6 +51,18 @@
                         Quick mind map
                     </a>
 
+                    <a class="btn btn-outline-primary"
+                       target="_blank"
+                       th:href="@{/markmap-quick-mind-map/{nodeId}(
+                       nodeId=${node.nodeId},
+                       level=3,
+                       icons=false,
+                       colors=true,
+                       foldChat=true
+                       )}">
+                        Markmap quick mind map
+                    </a>
+
 
                     <th:block th:unless="${hasEmptyContent}">
 

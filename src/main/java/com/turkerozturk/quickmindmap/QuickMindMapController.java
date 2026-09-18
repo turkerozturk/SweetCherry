@@ -137,7 +137,7 @@ public class QuickMindMapController {
             definition.append(" ".repeat((currentLevel + 1) * INDENT_SIZE));
             definition.append(":::").append(nodeClass).append('\n');
 
-            if (colors && (displayNode.getTitleColorAsHtmlHex().length() > 7)) {
+            if (colors && (displayNode.getTitleColorAsHtmlHex().length() == 7)) {
                 String color = normalizeHtmlColor(
                         displayNode.getTitleColorAsHtmlHex()
                 );
