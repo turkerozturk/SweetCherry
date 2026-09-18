@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +70,7 @@ public class QuickMindMapController {
 
         Node rootDisplayNode = findDisplayNode(root);
         Map<String, String> colorClasses = new LinkedHashMap<>();
+        List<Map<String, String>> iconNodes = new ArrayList<>();
         StringBuilder definition = new StringBuilder("mindmap\n");
 
         writeNodeRecursively(
@@ -80,7 +82,8 @@ public class QuickMindMapController {
                 colors,
                 foldChat,
                 new HashSet<>(),
-                colorClasses
+                colorClasses,
+                iconNodes
         );
 
         model.addAttribute("rootNodeId", nodeId);
@@ -91,6 +94,7 @@ public class QuickMindMapController {
         model.addAttribute("foldChat", foldChat);
         model.addAttribute("mermaidDefinition", definition.toString());
         model.addAttribute("mermaidColorCss", createColorCss(colorClasses));
+        model.addAttribute("iconNodes", iconNodes);
 
         return "quick-mind-map";
     }
@@ -104,7 +108,8 @@ public class QuickMindMapController {
             boolean colors,
             boolean foldChat,
             Set<Long> currentPath,
-            Map<String, String> colorClasses
+            Map<String, String> colorClasses,
+            List<Map<String, String>> iconNodes
     ) {
         long treeNodeId = treeNode.getNodeId();
 
@@ -135,7 +140,13 @@ public class QuickMindMapController {
             // Mermaid'in mindmap sözdiziminde class ve icon direktifleri,
             // ait oldukları düğümün hemen ardından aynı girinti seviyesinde yazılır.
             definition.append(" ".repeat((currentLevel + 1) * INDENT_SIZE));
-            definition.append(":::").append(nodeClass).append('\n');
+            definition.append(":::").append(nodeClass);
+
+            if (displayNode.isBoldnessBit()) {
+                definition.append(" ct-bold");
+            }
+
+            definition.append('\n');
 
             if (colors && (displayNode.getTitleColorAsHtmlHex().length() == 7)) {
                 String color = normalizeHtmlColor(
@@ -147,7 +158,7 @@ public class QuickMindMapController {
             }
 
             if (icons) {
-                appendIconDirective(definition, displayNode, currentLevel);
+                addIconNode(iconNodes, nodeClass, displayNode);
             }
 
             boolean isFoldedChatNode =
@@ -175,7 +186,8 @@ public class QuickMindMapController {
                         colors,
                         foldChat,
                         currentPath,
-                        colorClasses
+                        colorClasses,
+                        iconNodes
                 );
             }
         } finally {
@@ -183,15 +195,10 @@ public class QuickMindMapController {
         }
     }
 
-    /**
-     * Bu aşamada gerçek CherryTree SVG ikonlarını kaydetmez.
-     * Yalnız ileride CSS veya ikon paketiyle eşleştirilebilecek sınıfları Mermaid'e taşır:
-     * ::icon(ctb ctb-icon-<ikon-adi>)
-     */
-    private void appendIconDirective(
-            StringBuilder definition,
-            Node displayNode,
-            int currentLevel
+    private void addIconNode(
+            List<Map<String, String>> iconNodes,
+            String nodeClass,
+            Node displayNode
     ) {
         NodeIcon icon = displayNode.getNodeIcon();
         if (icon == null || icon.getIconName() == null) {
@@ -203,19 +210,15 @@ public class QuickMindMapController {
             return;
         }
 
-        String cssSafeIconName = iconName
-                .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9_-]", "-")
-                .replaceAll("-+", "-");
-
-        if (cssSafeIconName.isEmpty()) {
+        // Dosya adı dışında bir yol yazılmasını engeller.
+        if (!iconName.matches("[A-Za-z0-9_-]+")) {
             return;
         }
 
-        definition.append(" ".repeat((currentLevel + 1) * INDENT_SIZE));
-        definition.append("::icon(ctb ctb-icon-")
-                .append(cssSafeIconName)
-                .append(")\n");
+        Map<String, String> iconNode = new LinkedHashMap<>();
+        iconNode.put("nodeClass", nodeClass);
+        iconNode.put("iconName", iconName);
+        iconNodes.add(iconNode);
     }
 
     private Node findDisplayNode(Children children) {

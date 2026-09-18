@@ -30,6 +30,25 @@
             max-width: none !important;
             height: auto;
         }
+
+        .mermaid .ct-bold .nodeLabel,
+        .mermaid .ct-bold span,
+        .mermaid .ct-bold p {
+            font-weight: 700 !important;
+        }
+
+        .mermaid-node-label-with-icon {
+            display: inline-flex !important;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .mermaid-node-icon {
+            width: 16px;
+            height: 16px;
+            flex: 0 0 16px;
+            object-fit: contain;
+        }
     </style>
 
     <!--
@@ -80,20 +99,72 @@ mindmap
             </pre>
         </div>
     </div>
+
+    <div id="mermaid-icon-data" hidden>
+        <span th:each="iconNode : ${iconNodes}"
+              th:attr="data-node-class=${iconNode.nodeClass},
+                       data-icon-name=${iconNode.iconName}"></span>
+    </div>
 </main>
 
-<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.js}"></script>
-
 <script th:src="@{/js/thirdparty/mermaid/mermaid.min.js}"></script>
-<script>
-    mermaid.initialize({
-        startOnLoad: true,
-        securityLevel: 'strict',
-        theme: 'default',
-        mindmap: {
-            useMaxWidth: false
+
+<script th:inline="javascript">
+    (async () => {
+        const iconsEnabled = /*[[${icons}]]*/ false;
+        const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
+
+        mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'strict',
+            theme: 'default',
+            mindmap: {
+                useMaxWidth: false
+            }
+        });
+
+        await mermaid.run({querySelector: '.mermaid'});
+
+        if (iconsEnabled) {
+            addCherryTreeIcons();
         }
-    });
+
+        function addCherryTreeIcons() {
+            const iconDataElements = document.querySelectorAll(
+                '#mermaid-icon-data [data-node-class]'
+            );
+
+            iconDataElements.forEach(iconData => {
+                const nodeClass = iconData.dataset.nodeClass;
+                const iconName = iconData.dataset.iconName;
+                const nodeElement = document.querySelector(
+                    '.mermaid .' + CSS.escape(nodeClass)
+                );
+
+                if (!nodeElement || !iconName) {
+                    return;
+                }
+
+                const label = nodeElement.querySelector('.nodeLabel');
+                if (!label || label.querySelector('.mermaid-node-icon')) {
+                    return;
+                }
+
+                label.classList.add('mermaid-node-label-with-icon');
+
+                const image = document.createElement('img');
+                image.className = 'mermaid-node-icon';
+                image.src = iconBaseUrl
+                    + encodeURIComponent(iconName)
+                    + '.png';
+                image.alt = '';
+                image.setAttribute('aria-hidden', 'true');
+                image.dataset.iconName = iconName;
+
+                label.prepend(image);
+            });
+        }
+    })();
 </script>
 
 </body>
