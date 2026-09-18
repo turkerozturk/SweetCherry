@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${rootNodeName} + ' - Quick Mind Map'">
+        Quick Mind Map
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}">
+
+    <style>
+        html, body {
+            min-height: 100%;
+        }
+
+        .mind-map-panel {
+            min-height: calc(100vh - 8rem);
+            overflow: auto;
+        }
+
+        .mermaid {
+            min-width: max-content;
+            text-align: center;
+        }
+
+        .mermaid svg {
+            max-width: none !important;
+            height: auto;
+        }
+    </style>
+
+    <!--
+      Yalnız controller'ın doğruladığı #RRGGBB değerleri ve sayısal node ID'leri
+      kullanılarak üretilir.
+    -->
+    <style th:if="${colors}" th:text="${mermaidColorCss}"></style>
+</head>
+
+<body class="bg-light">
+
+<main class="container-fluid py-3">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
+
+        <span class="badge text-bg-secondary"
+              th:text="'Node ' + ${rootNodeId}">
+            Node
+        </span>
+
+        <span class="badge text-bg-light border"
+              th:text="'Level ' + ${maximumLevel}">
+            Level
+        </span>
+
+        <span th:if="${foldChat}"
+              class="badge text-bg-light border">
+            chat dalları kapalı
+        </span>
+
+        <span th:if="${colors}"
+              class="badge text-bg-light border">
+            renkler açık
+        </span>
+
+        <span th:if="${icons}"
+              class="badge text-bg-warning">
+            ikon sınıfları açık
+        </span>
+    </div>
+
+    <div class="card shadow-sm mind-map-panel">
+        <div class="card-body">
+            <!-- th:text kullanıldığı için node başlıkları HTML olarak çalıştırılmaz. -->
+            <pre class="mermaid" th:text="${mermaidDefinition}">
+mindmap
+  root((Quick mind map))
+            </pre>
+        </div>
+    </div>
+</main>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.js}"></script>
+
+<script th:src="@{/js/thirdparty/mermaid/mermaid.min.js}"></script>
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        securityLevel: 'strict',
+        theme: 'default',
+        mindmap: {
+            useMaxWidth: false
+        }
+    });
+</script>
+
+</body>
+</html>
