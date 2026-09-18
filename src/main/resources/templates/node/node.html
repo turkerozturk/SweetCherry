@@ -39,6 +39,18 @@
 
                 <th:block th:unless="${isRootNode}">
 
+                    <a class="btn btn-outline-primary"
+                       target="_blank"
+                       th:href="@{/quick-mind-map/{nodeId}(
+                           nodeId=${node.nodeId},
+                           level=3,
+                           icons=false,
+                           colors=true,
+                           foldChat=true
+                       )}">
+                        Quick mind map
+                    </a>
+
 
                     <th:block th:unless="${hasEmptyContent}">
 

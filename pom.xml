@@ -302,6 +302,9 @@
 			<version>6.5.2</version>
 		</dependency>
 
+
+
+
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
