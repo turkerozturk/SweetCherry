@@ -48,7 +48,7 @@ public class QuickMindMapController {
     public String showQuickMindMap(
             @PathVariable long nodeId,
             @RequestParam(defaultValue = "3") int level,
-            @RequestParam(defaultValue = "false") boolean icons,
+            @RequestParam(defaultValue = "true") boolean icons,
             @RequestParam(defaultValue = "true") boolean colors,
             @RequestParam(defaultValue = "true") boolean foldChat,
             Model model
@@ -69,8 +69,10 @@ public class QuickMindMapController {
         }
 
         Node rootDisplayNode = findDisplayNode(root);
+        long rootParentNodeId = findNavigableParentNodeId(root);
         Map<String, String> colorClasses = new LinkedHashMap<>();
         List<Map<String, String>> iconNodes = new ArrayList<>();
+        List<Map<String, String>> navigationNodes = new ArrayList<>();
         StringBuilder definition = new StringBuilder("mindmap\n");
 
         writeNodeRecursively(
@@ -83,11 +85,14 @@ public class QuickMindMapController {
                 foldChat,
                 new HashSet<>(),
                 colorClasses,
-                iconNodes
+                iconNodes,
+                navigationNodes,
+                rootParentNodeId
         );
 
         model.addAttribute("rootNodeId", nodeId);
         model.addAttribute("rootNodeName", nullToEmpty(rootDisplayNode.getName()));
+        model.addAttribute("rootParentNodeId", rootParentNodeId);
         model.addAttribute("maximumLevel", level);
         model.addAttribute("icons", icons);
         model.addAttribute("colors", colors);
@@ -95,6 +100,7 @@ public class QuickMindMapController {
         model.addAttribute("mermaidDefinition", definition.toString());
         model.addAttribute("mermaidColorCss", createColorCss(colorClasses));
         model.addAttribute("iconNodes", iconNodes);
+        model.addAttribute("navigationNodes", navigationNodes);
 
         return "quick-mind-map";
     }
@@ -109,7 +115,9 @@ public class QuickMindMapController {
             boolean foldChat,
             Set<Long> currentPath,
             Map<String, String> colorClasses,
-            List<Map<String, String>> iconNodes
+            List<Map<String, String>> iconNodes,
+            List<Map<String, String>> navigationNodes,
+            long rootParentNodeId
     ) {
         long treeNodeId = treeNode.getNodeId();
 
@@ -121,6 +129,12 @@ public class QuickMindMapController {
         try {
             Node displayNode = findDisplayNode(treeNode);
             String nodeClass = "ct-node-" + treeNodeId;
+
+            addNavigationNode(
+                    navigationNodes,
+                    nodeClass,
+                    currentLevel == 0 ? rootParentNodeId : treeNodeId
+            );
 
             definition.append(" ".repeat((currentLevel + 1) * INDENT_SIZE));
             definition.append("ctb_").append(treeNodeId);
@@ -187,7 +201,9 @@ public class QuickMindMapController {
                         foldChat,
                         currentPath,
                         colorClasses,
-                        iconNodes
+                        iconNodes,
+                        navigationNodes,
+                        rootParentNodeId
                 );
             }
         } finally {
@@ -219,6 +235,35 @@ public class QuickMindMapController {
         iconNode.put("nodeClass", nodeClass);
         iconNode.put("iconName", iconName);
         iconNodes.add(iconNode);
+    }
+
+    private void addNavigationNode(
+            List<Map<String, String>> navigationNodes,
+            String nodeClass,
+            long targetNodeId
+    ) {
+        Map<String, String> navigationNode = new LinkedHashMap<>();
+        navigationNode.put("nodeClass", nodeClass);
+        navigationNode.put("targetNodeId", Long.toString(targetNodeId));
+        navigationNodes.add(navigationNode);
+    }
+
+    /**
+     * Root düğüm alias olsa bile parent ilişkisi children tablosundaki
+     * alias kaydının father_id değerinden okunur. master_id yalnızca
+     * gösterilecek Node içeriğini belirler.
+     */
+    private long findNavigableParentNodeId(Children root) {
+        long rootNodeId = root.getNodeId();
+        long fatherId = root.getFatherId();
+
+        if (fatherId <= 0 || fatherId == rootNodeId) {
+            return rootNodeId;
+        }
+
+        return childrenRepository.findByNodeId(fatherId) != null
+                ? fatherId
+                : rootNodeId;
     }
 
     private Node findDisplayNode(Children children) {

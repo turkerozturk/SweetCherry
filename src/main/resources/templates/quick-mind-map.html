@@ -49,6 +49,15 @@
             flex: 0 0 16px;
             object-fit: contain;
         }
+
+        .mermaid .mermaid-node-navigation {
+            cursor: pointer;
+        }
+
+        /* Düğüm gezinmesi metnin rengini ve görünüşünü değiştirmez. */
+        .mermaid .mermaid-node-navigation .nodeLabel {
+            text-decoration: none !important;
+        }
     </style>
 
     <!--
@@ -90,6 +99,47 @@
         </span>
     </div>
 
+    <div class="card shadow-sm mb-3">
+        <div class="card-body py-2">
+            <form method="get"
+                  class="d-flex flex-wrap align-items-center gap-2"
+                  th:action="@{/quick-mind-map/{nodeId}(nodeId=${rootNodeId})}">
+
+                <label for="level" class="small mb-0">Level</label>
+                <input id="level"
+                       class="form-control form-control-sm"
+                       style="width: 5rem"
+                       type="number"
+                       name="level"
+                       min="0"
+                       step="1"
+                       th:value="${maximumLevel}">
+
+                <label for="icons" class="small mb-0 ms-1">İkon</label>
+                <select id="icons"
+                        class="form-select form-select-sm w-auto"
+                        name="icons">
+                    <option value="true" th:selected="${icons}">Göster</option>
+                    <option value="false" th:selected="${!icons}">Gizle</option>
+                </select>
+
+                <label for="colors" class="small mb-0 ms-1">Renk</label>
+                <select id="colors"
+                        class="form-select form-select-sm w-auto"
+                        name="colors">
+                    <option value="true" th:selected="${colors}">Göster</option>
+                    <option value="false" th:selected="${!colors}">Gizle</option>
+                </select>
+
+                <input type="hidden" name="foldChat" th:value="${foldChat}">
+
+                <button type="submit" class="btn btn-sm btn-primary">
+                    Uygula
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div class="card shadow-sm mind-map-panel">
         <div class="card-body">
             <!-- th:text kullanıldığı için node başlıkları HTML olarak çalıştırılmaz. -->
@@ -105,13 +155,23 @@ mindmap
               th:attr="data-node-class=${iconNode.nodeClass},
                        data-icon-name=${iconNode.iconName}"></span>
     </div>
+
+    <div id="mermaid-navigation-data" hidden>
+        <span th:each="navigationNode : ${navigationNodes}"
+              th:attr="data-node-class=${navigationNode.nodeClass},
+                       data-target-node-id=${navigationNode.targetNodeId}"></span>
+    </div>
 </main>
 
 <script th:src="@{/js/thirdparty/mermaid/mermaid.min.js}"></script>
 
 <script th:inline="javascript">
     (async () => {
-        const iconsEnabled = /*[[${icons}]]*/ false;
+        const iconsEnabled = /*[[${icons}]]*/ true;
+        const colorsEnabled = /*[[${colors}]]*/ true;
+        const foldChatEnabled = /*[[${foldChat}]]*/ true;
+        const maximumLevel = /*[[${maximumLevel}]]*/ 3;
+        const mapBaseUrl = /*[[@{/quick-mind-map/}]]*/ '/quick-mind-map/';
         const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
 
         mermaid.initialize({
@@ -128,6 +188,8 @@ mindmap
         if (iconsEnabled) {
             addCherryTreeIcons();
         }
+
+        addNodeNavigation();
 
         function addCherryTreeIcons() {
             const iconDataElements = document.querySelectorAll(
@@ -162,6 +224,57 @@ mindmap
                 image.dataset.iconName = iconName;
 
                 label.prepend(image);
+            });
+        }
+
+        function addNodeNavigation() {
+            const navigationDataElements = document.querySelectorAll(
+                '#mermaid-navigation-data [data-node-class]'
+            );
+
+            navigationDataElements.forEach(navigationData => {
+                const nodeClass = navigationData.dataset.nodeClass;
+                const targetNodeId = navigationData.dataset.targetNodeId;
+                const nodeElement = document.querySelector(
+                    '.mermaid .' + CSS.escape(nodeClass)
+                );
+
+                if (!nodeElement || !targetNodeId) {
+                    return;
+                }
+
+                const label = nodeElement.querySelector('.nodeLabel');
+                if (!label) {
+                    return;
+                }
+
+                label.classList.add('mermaid-node-navigation');
+                label.setAttribute('role', 'link');
+                label.setAttribute('tabindex', '0');
+
+                const openTargetMap = () => {
+                    const query = new URLSearchParams({
+                        level: String(maximumLevel),
+                        icons: String(iconsEnabled),
+                        colors: String(colorsEnabled),
+                        foldChat: String(foldChatEnabled)
+                    });
+
+                    window.location.assign(
+                        mapBaseUrl
+                        + encodeURIComponent(targetNodeId)
+                        + '?'
+                        + query.toString()
+                    );
+                };
+
+                label.addEventListener('click', openTargetMap);
+                label.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        openTargetMap();
+                    }
+                });
             });
         }
     })();
