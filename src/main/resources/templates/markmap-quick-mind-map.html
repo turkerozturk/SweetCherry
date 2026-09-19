@@ -38,6 +38,20 @@
             flex: 0 0 auto;
         }
 
+        .mind-map-controls .form-control,
+        .mind-map-controls .form-select,
+        .mind-map-controls .btn {
+            min-height: 31px;
+        }
+
+        .mind-map-level {
+            width: 4.75rem;
+        }
+
+        .mind-map-toggle {
+            width: 6.5rem;
+        }
+
         .mind-map-panel {
             position: relative;
             flex: 1 1 auto;
@@ -72,6 +86,15 @@
             font-weight: 700;
         }
 
+        .markmap-node-link,
+        .markmap-node-link:link,
+        .markmap-node-link:visited,
+        .markmap-node-link:hover,
+        .markmap-node-link:active {
+            color: inherit;
+            text-decoration: none;
+        }
+
         .markmap-node-icon {
             display: inline-block;
             flex: 0 0 16px;
@@ -92,23 +115,48 @@
         <span class="badge text-bg-secondary"
               th:text="'Node ' + ${rootNodeId}">Node</span>
 
-        <span class="badge text-bg-light border"
-              th:text="'Level ' + ${maximumLevel}">Level</span>
-
         <span th:if="${foldChat}"
               class="badge text-bg-light border">
             chat dalları başlangıçta kapalı
         </span>
 
-        <span th:if="${colors}"
-              class="badge text-bg-light border">
-            renkler açık
-        </span>
+        <form class="d-flex flex-wrap align-items-center gap-1 ms-md-auto mind-map-controls"
+              method="get"
+              th:action="@{/markmap-quick-mind-map/{nodeId}(nodeId=${rootNodeId})}">
 
-        <span th:if="${icons}"
-              class="badge text-bg-warning">
-            ikon adları açık
-        </span>
+            <input type="hidden"
+                   name="foldChat"
+                   th:value="${foldChat}">
+
+            <label for="level" class="small mb-0 ms-1">Seviye</label>
+            <input id="level"
+                   class="form-control form-control-sm mind-map-level"
+                   type="number"
+                   name="level"
+                   min="0"
+                   step="1"
+                   th:value="${maximumLevel}">
+
+            <label for="icons" class="small mb-0 ms-1">İkon</label>
+            <select id="icons"
+                    class="form-select form-select-sm mind-map-toggle"
+                    name="icons">
+                <option value="true" th:selected="${icons}">Göster</option>
+                <option value="false" th:selected="${!icons}">Gizle</option>
+            </select>
+
+            <label for="colors" class="small mb-0 ms-1">Renk</label>
+            <select id="colors"
+                    class="form-select form-select-sm mind-map-toggle"
+                    name="colors">
+                <option value="true" th:selected="${colors}">Göster</option>
+                <option value="false" th:selected="${!colors}">Gizle</option>
+            </select>
+
+            <button type="submit" class="btn btn-sm btn-primary">
+                Uygula
+            </button>
+        </form>
     </div>
 
     <div class="card shadow-sm mind-map-panel">
@@ -131,8 +179,13 @@
         'use strict';
 
         const dataJson = /*[[${markmapDataJson}]]*/ '{}';
+        const rootNodeId = /*[[${rootNodeId}]]*/ 0;
+        const rootParentNodeId = /*[[${rootParentNodeId}]]*/ rootNodeId;
+        const maximumLevel = /*[[${maximumLevel}]]*/ 3;
         const colorsEnabled = /*[[${colors}]]*/ true;
-        const iconsEnabled = /*[[${icons}]]*/ false;
+        const iconsEnabled = /*[[${icons}]]*/ true;
+        const foldChatEnabled = /*[[${foldChat}]]*/ true;
+        const mapBaseUrl = /*[[@{/markmap-quick-mind-map/}]]*/ '/markmap-quick-mind-map/';
         const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
         const data = JSON.parse(dataJson);
 
@@ -179,11 +232,16 @@
             // başlık önce metne çevrilerek script/HTML çalıştırması engellenir.
             const safeTitle = escapeHtml(node.content || '');
             const titleClasses = isBold
-                ? 'markmap-node-title is-bold'
-                : 'markmap-node-title';
+                ? 'markmap-node-link markmap-node-title is-bold'
+                : 'markmap-node-link markmap-node-title';
             const colorStyle = colorsEnabled && color
                 ? ' style="color:' + color + '"'
-                : '';
+                : ' style="color:inherit"';
+            const currentNodeId = Number(node.payload?.nodeId);
+            const navigationNodeId = currentNodeId === Number(rootNodeId)
+                ? rootParentNodeId
+                : currentNodeId;
+            const nodeUrl = createNodeUrl(navigationNodeId);
 
             let iconHtml = '';
 
@@ -205,15 +263,37 @@
             node.content =
                 '<span class="markmap-node-label">'
                 + iconHtml
-                + '<span class="'
+                + '<a class="'
                 + titleClasses
+                + '" href="'
+                + escapeHtmlAttribute(nodeUrl)
                 + '"'
                 + colorStyle
                 + '>'
                 + safeTitle
-                + '</span></span>';
+                + '</a></span>';
 
             (node.children || []).forEach(prepareLabels);
+        }
+
+        function createNodeUrl(nodeId) {
+            const safeNodeId = Number(nodeId);
+
+            if (!Number.isSafeInteger(safeNodeId) || safeNodeId <= 0) {
+                return '#';
+            }
+
+            const url = new URL(
+                mapBaseUrl + encodeURIComponent(String(safeNodeId)),
+                window.location.origin
+            );
+
+            url.searchParams.set('level', String(maximumLevel));
+            url.searchParams.set('icons', String(iconsEnabled));
+            url.searchParams.set('colors', String(colorsEnabled));
+            url.searchParams.set('foldChat', String(foldChatEnabled));
+
+            return url.pathname + url.search;
         }
 
         function normalizeColor(value) {

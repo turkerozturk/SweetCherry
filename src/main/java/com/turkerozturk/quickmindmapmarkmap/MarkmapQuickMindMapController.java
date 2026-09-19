@@ -41,7 +41,7 @@ public class MarkmapQuickMindMapController {
 
     /**
      * Örnek:
-     * /markmap-quick-mind-map/2573?level=3&icons=false&colors=true&foldChat=true
+     * /markmap-quick-mind-map/2573?level=3&icons=true&colors=true&foldChat=true
      *
      * level=0 yalnızca kökü, level=1 kökü ve doğrudan çocuklarını gösterir.
      */
@@ -49,7 +49,7 @@ public class MarkmapQuickMindMapController {
     public String showMarkmapQuickMindMap(
             @PathVariable long nodeId,
             @RequestParam(defaultValue = "3") int level,
-            @RequestParam(defaultValue = "false") boolean icons,
+            @RequestParam(defaultValue = "true") boolean icons,
             @RequestParam(defaultValue = "true") boolean colors,
             @RequestParam(defaultValue = "true") boolean foldChat,
             Model model
@@ -70,6 +70,8 @@ public class MarkmapQuickMindMapController {
         }
 
         Node rootDisplayNode = findDisplayNode(root);
+        long rootParentNodeId = findNavigableParentNodeId(root, nodeId);
+
         ObjectNode markmapRoot = createNodeRecursively(
                 root,
                 0,
@@ -104,9 +106,34 @@ public class MarkmapQuickMindMapController {
         model.addAttribute("icons", icons);
         model.addAttribute("colors", colors);
         model.addAttribute("foldChat", foldChat);
+        model.addAttribute("rootParentNodeId", rootParentNodeId);
         model.addAttribute("markmapDataJson", markmapDataJson);
 
         return "markmap-quick-mind-map";
+    }
+
+    /**
+     * Parent ilişkisi Node içeriğinden değil Children ağacından alınır.
+     * Bu nedenle master içeriğini gösteren alias düğümlerde de ağaçtaki gerçek
+     * üst düğüme gidilir. Geçerli bir parent yoksa kökün kendisi döndürülür.
+     */
+    private long findNavigableParentNodeId(
+            Children root,
+            long rootNodeId
+    ) {
+        Long fatherId = root.getFatherId();
+
+        if (fatherId == null
+                || fatherId <= 0
+                || fatherId == rootNodeId) {
+            return rootNodeId;
+        }
+
+        Children parent = childrenRepository.findByNodeId(fatherId);
+
+        return parent == null
+                ? rootNodeId
+                : fatherId;
     }
 
     private ObjectNode createNodeRecursively(
