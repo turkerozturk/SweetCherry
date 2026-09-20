@@ -35,6 +35,8 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 	<dependencies>
 
@@ -388,6 +390,10 @@
 	</dependencies>
 
 	<build>
+
+		<!-- this setting makes the compiled filename independent of version information. -->
+		<finalName>${project.artifactId}</finalName>
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -423,6 +429,9 @@
 						<!-- Add other binary file extensions if needed -->
 					</nonFilteredFileExtensions>
 				</configuration>
+				<!-- yapay zeka, asagiaki bloga gerek olmadigini soyledigi icin comment ettim. -->
+				<!-- Zaten bu islem yapiliyormus, tekrar yapmaya gerek yokmus. -->
+				<!--
 				<executions>
 					<execution>
 						<id>copy-resources</id>
@@ -440,6 +449,7 @@
 						</configuration>
 					</execution>
 				</executions>
+				-->
 			</plugin>
 			<!-- https://mvnrepository.com/artifact/io.github.git-commit-id/git-commit-id-maven-plugin -->
 			<plugin>
