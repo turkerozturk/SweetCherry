@@ -21,13 +21,19 @@
 package com.turkerozturk.helpers.highlighter.pygments;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.util.Properties;
-
+@Component
 public class CodeHighLighter {
 
+    private static volatile boolean syntaxHighlightingEnabled = false;
+
+    @Value("${myapp.syntax-highlighting.enabled:false}")
+    public void setSyntaxHighlightingEnabled(boolean enabled) {
+        CodeHighLighter.syntaxHighlightingEnabled = enabled;
+    }
 
     /**
      * Bu metod Jython kutuphanesi sayesinde Pygments kutuphanesini kullanarak yuzlerce kodlama dilini highlight
@@ -41,6 +47,10 @@ public class CodeHighLighter {
      * @return
      */
     public static String highlightLanguage(String languageName, String code) {
+
+        if (!syntaxHighlightingEnabled) {
+            return StringEscapeUtils.escapeHtml4(code);
+        }
 
        // https://stackoverflow.com/questions/65797711/spring-boot-app-with-jython-on-raspberry-pi
        // Properties props = new Properties();
@@ -73,6 +83,10 @@ public class CodeHighLighter {
 
 
     public static String mappedhighlightLanguage(String languageName, String code) {
+        if (!syntaxHighlightingEnabled) {
+            return StringEscapeUtils.escapeHtml4(code);
+        }
+
         // duz veya zengin metin olmayan tum icerikler syntax sutununda yazan dile gore highlight edilir.
         // https://pygments.org/docs/lexers/#pygments.lexers.shell.MSDOSSessionLexer
         // adresinde hangi lexer hangi turleri renklendirebiliyor yaziyor.

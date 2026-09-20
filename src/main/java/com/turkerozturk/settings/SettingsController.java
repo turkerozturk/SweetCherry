@@ -43,6 +43,9 @@ public class SettingsController {
     @Value("${myapp.debug:}")
     Boolean debug;
 
+    @Value("${myapp.syntax-highlighting.enabled:false}")
+    Boolean syntaxHighlightingEnabled;
+
     @Autowired
     AstronomyService astronomyService;
 
@@ -96,6 +99,7 @@ public class SettingsController {
 
         model.addAttribute("openWebBrowserOnStartup", openWebBrowserOnStartup);
         model.addAttribute("debug", debug);
+        model.addAttribute("syntaxHighlightingEnabled", syntaxHighlightingEnabled);
 
         model.addAttribute("httpPort", httpPort);
         model.addAttribute("httpsPort", httpsPort);
