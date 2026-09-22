@@ -183,7 +183,29 @@
                         <div class="accordion-body">
 
 
+                            <a class="btn btn-outline-primary"
+                               target="_blank"
+                               th:href="@{/quick-mind-map/{nodeId}(
+                               nodeId=${node.nodeId},
+                               level=3,
+                               icons=true,
+                               colors=true,
+                               foldChat=true
+                               )}">
+                                    Quick mind map
+                                </a>
 
+                                <a class="btn btn-outline-primary"
+                                   target="_blank"
+                                   th:href="@{/markmap-quick-mind-map/{nodeId}(
+                                   nodeId=${node.nodeId},
+                                   level=3,
+                                   icons=true,
+                                   colors=true,
+                                   foldChat=true
+                                   )}">
+                                    Markmap quick mind map
+                                </a>
 
                                 <a type="submit" th:href="${'/export-node-to-pdf/' + node.nodeId}" class="btn btn-warning btn-sm">
                                     <img th:src="@{/img/icons/ct_file.svg}"/>

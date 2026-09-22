@@ -103,6 +103,21 @@
             object-fit: contain;
             vertical-align: middle;
         }
+
+        .markmap-node-icon.is-placeholder {
+            opacity: .3;
+        }
+
+        .markmap-content-link,
+        .markmap-content-link:link,
+        .markmap-content-link:visited,
+        .markmap-content-link:hover,
+        .markmap-content-link:active {
+            display: inline-flex;
+            flex: 0 0 16px;
+            color: inherit;
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -186,7 +201,9 @@
         const iconsEnabled = /*[[${icons}]]*/ true;
         const foldChatEnabled = /*[[${foldChat}]]*/ true;
         const mapBaseUrl = /*[[@{/markmap-quick-mind-map/}]]*/ '/markmap-quick-mind-map/';
+        const contentBaseUrl = /*[[@{/quick-node-content/}]]*/ '/quick-node-content/';
         const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
+        const zeroIconUrl = /*[[@{/img/icons/zero.svg}]]*/ '/img/icons/zero.svg';
         const data = JSON.parse(dataJson);
 
         prepareLabels(data);
@@ -244,20 +261,35 @@
             const nodeUrl = createNodeUrl(navigationNodeId);
 
             let iconHtml = '';
+            const hasVisibleNodeIcon = iconsEnabled && iconName;
 
-            if (iconsEnabled && iconName) {
-                const safeIconName = String(iconName);
-                const iconUrl = iconBaseUrl
-                    + encodeURIComponent(safeIconName)
-                    + '.png';
+            {
+                const safeIconName = iconName
+                    ? String(iconName)
+                    : 'zero';
+                const iconUrl = hasVisibleNodeIcon
+                    ? iconBaseUrl
+                        + encodeURIComponent(safeIconName)
+                        + '.png'
+                    : zeroIconUrl;
+                const iconClasses = hasVisibleNodeIcon
+                    ? 'markmap-node-icon'
+                    : 'markmap-node-icon is-placeholder';
+                const contentUrl = createContentUrl(node.payload?.nodeId);
 
                 iconHtml =
-                    '<img class="markmap-node-icon" src="'
+                    '<a class="markmap-content-link" href="'
+                    + escapeHtmlAttribute(contentUrl)
+                    + '" target="_blank" rel="noopener"'
+                    + ' title="Düğüm içeriğini yeni sekmede aç">'
+                    + '<img class="'
+                    + iconClasses
+                    + '" src="'
                     + escapeHtmlAttribute(iconUrl)
-                    + '" alt="" aria-hidden="true"'
+                    + '" alt="İçeriği aç"'
                     + ' data-icon-name="'
                     + escapeHtmlAttribute(safeIconName)
-                    + '">';
+                    + '"></a>';
             }
 
             node.content =
@@ -294,6 +326,17 @@
             url.searchParams.set('foldChat', String(foldChatEnabled));
 
             return url.pathname + url.search;
+        }
+
+        function createContentUrl(nodeId) {
+            const safeNodeId = Number(nodeId);
+
+            if (!Number.isSafeInteger(safeNodeId) || safeNodeId <= 0) {
+                return '#';
+            }
+
+            return contentBaseUrl
+                + encodeURIComponent(String(safeNodeId));
         }
 
         function normalizeColor(value) {

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${node.name} + ' - İçerik'">Düğüm içeriği</title>
+
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/css/syntaxhighlighter.css}">
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .quick-content-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(255, 255, 255, .96);
+            backdrop-filter: blur(4px);
+        }
+
+        .quick-content-title {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .quick-node-content,
+        .rendered-node-content,
+        .plain-node-content {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .plain-node-content {
+            margin: 0;
+            white-space: pre-wrap;
+            font: inherit;
+        }
+
+        .quick-node-content img {
+            max-width: 100% !important;
+            height: auto !important;
+            cursor: zoom-in;
+        }
+
+        .quick-node-content table {
+            display: block;
+            width: max-content;
+            max-width: 100%;
+            overflow-x: auto;
+            border-collapse: collapse;
+        }
+
+        .quick-node-content pre,
+        .quick-node-content code,
+        .quick-node-content .codebox,
+        .quick-node-content [class*="codebox"],
+        .quick-node-content [class*="code-box"] {
+            max-width: 100%;
+        }
+
+        .quick-node-content pre,
+        .quick-node-content .codebox,
+        .quick-node-content [class*="codebox"],
+        .quick-node-content [class*="code-box"] {
+            overflow: auto;
+        }
+
+        .quick-node-content iframe,
+        .quick-node-content video,
+        .quick-node-content object,
+        .quick-node-content embed,
+        .quick-node-content svg {
+            max-width: 100% !important;
+        }
+
+        @media (max-width: 575.98px) {
+            .quick-content-shell {
+                padding-right: .6rem;
+                padding-left: .6rem;
+            }
+
+            .quick-content-header {
+                margin-right: -.6rem;
+                margin-left: -.6rem;
+                padding-right: .6rem !important;
+                padding-left: .6rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+<main class="container-fluid quick-content-shell pb-4">
+    <header class="quick-content-header d-flex flex-wrap align-items-center gap-2 py-2 border-bottom mb-3">
+        <h1 class="h5 mb-0 me-auto quick-content-title"
+            th:text="${node.name}">Düğüm</h1>
+
+        <span class="badge text-bg-secondary"
+              th:text="'Node ' + ${requestedNodeId}">Node</span>
+
+        <span th:if="${isAlias}"
+              class="badge text-bg-warning"
+              th:text="'Alias → ' + ${contentNodeId}">Alias</span>
+
+        <a class="btn btn-sm btn-outline-secondary"
+           target="_blank"
+           rel="noopener"
+           th:href="@{/nodes/{nodeId}(nodeId=${requestedNodeId})}">
+            Tam sayfa
+        </a>
+
+        <button type="button"
+                class="btn btn-sm btn-outline-secondary"
+                onclick="window.close()">
+            Kapat
+        </button>
+    </header>
+
+    <article class="card shadow-sm">
+        <div class="card-body quick-node-content">
+            <div th:if="${hasEmptyContent}"
+                 class="text-secondary text-center py-4">
+                Bu düğümün içeriği boş.
+            </div>
+
+            <th:block th:unless="${hasEmptyContent}">
+                <pre th:if="${node.syntax == null or node.syntax eq 'plain-text'}"
+                     class="plain-node-content"
+                     th:text="${node.txt}">İçerik</pre>
+
+                <div th:if="${node.syntax eq 'custom-colors'}"
+                     class="rendered-node-content"
+                     th:utext="${node.txtAsHtml}">İçerik</div>
+
+                <pre th:unless="${node.syntax == null
+                                  or node.syntax eq 'plain-text'
+                                  or node.syntax eq 'custom-colors'}"
+                     class="highlight rendered-node-content"
+                     th:utext="${node.txtAsHtml}">İçerik</pre>
+            </th:block>
+        </div>
+    </article>
+</main>
+
+<script>
+    (() => {
+        'use strict';
+
+        document.querySelectorAll('.quick-node-content img').forEach(image => {
+            image.title = image.title || 'Gerçek boyutta yeni sekmede aç';
+            image.tabIndex = 0;
+
+            const openImage = () => {
+                const source = image.currentSrc || image.src;
+                if (source) {
+                    window.open(source, '_blank', 'noopener');
+                }
+            };
+
+            image.addEventListener('click', event => {
+                event.preventDefault();
+                openImage();
+            });
+
+            image.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openImage();
+                }
+            });
+        });
+    })();
+</script>
+</body>
+</html>
