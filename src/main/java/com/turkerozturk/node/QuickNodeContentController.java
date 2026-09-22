@@ -1,10 +1,7 @@
-package com.turkerozturk.quickmindmap;
+package com.turkerozturk.node;
 
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
-import com.turkerozturk.node.Node;
-import com.turkerozturk.node.NodeContentParserService;
-import com.turkerozturk.node.NodeRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
