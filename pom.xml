@@ -471,7 +471,13 @@
 					</execution>
 				</executions>
 				<configuration>
-					<dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
+					<!--
+						A real Git clone keeps .git in the project root. GitHub source ZIP
+						archives do not contain .git; that must not prevent a source build.
+					-->
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<failOnNoGitDirectory>false</failOnNoGitDirectory>
+					<failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
 					<generateGitPropertiesFile>true</generateGitPropertiesFile>
 					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
 				</configuration>

@@ -30,13 +30,15 @@ import java.util.Map;
 @RestController
 public class CommitInfoController {
 
-    @Value("${git.commit.message.short}")
+    // GitHub source ZIP archives do not contain .git or generated git.properties.
+    // Defaults keep the application runnable while a real Git clone still shows commit data.
+    @Value("${git.commit.message.short:Not available (source archive build)}")
     private String commitMessage;
 
-    @Value("${git.branch}")
+    @Value("${git.branch:Not available (source archive build)}")
     private String branch;
 
-    @Value("${git.commit.id}")
+    @Value("${git.commit.id:Not available (source archive build)}")
     private String commitId;
 
     @RequestMapping("/commitId")
