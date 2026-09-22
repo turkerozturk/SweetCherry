@@ -384,10 +384,7 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.5.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-		</dependency>
+
 
 
 	</dependencies>
@@ -466,12 +463,6 @@
 							<goal>revision</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>validate-the-git-infos</id>
-						<goals>
-							<goal>validateRevision</goal>
-						</goals>
-					</execution>
 				</executions>
 				<configuration>
 					<!--
@@ -485,60 +476,106 @@
 					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
 				</configuration>
 			</plugin>
-			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/license-maven-plugin -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>2.4.0</version>
-				<executions>
-					<execution>
-						<id>download-licenses</id>
-						<goals>
-							<goal>download-licenses</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>list-dependencies</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>list</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<outputFile>${project.build.directory}/dependency-list.txt</outputFile>
-				</configuration>
-			</plugin>
-			<!-- https://mvnrepository.com/artifact/org.asciidoctor/asciidoctor-maven-plugin -->
-			<plugin>
-				<!--
-				https://github.com/asciidoctor/asciidoctor-maven-plugin
-				 https://github.com/asciidoctor/asciidoctor-maven-examples
-				 src/docs/asciidoc/ klasoru icindeki *.adoc dosyalarini html olarak
-				 mvn generate-resources komutu ile target/generated-docs klasorunde olusturur. bkz. node 6750 -->
-				<groupId>org.asciidoctor</groupId>
-				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>asciidoc-to-html</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>process-asciidoc</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			<!--
+				DIKKATE AL: license, dependency report ve Asciidoctor eklentileri silinmedi.
+				Normal package islemini yavaslatmamalari icin asagidaki Maven profillerine tasindilar.
+			-->
 		</plugins>
 	</build>
 
+	<profiles>
+		<!--
+			Bagimlilik lisanslarini normal kullanici derlemesinde indirme.
+			Gerektiginde: mvnw.cmd -Plicenses -DskipTests verify
+			Linux/macOS:  sh ./mvnw -Plicenses -DskipTests verify
+		-->
+		<profile>
+			<id>licenses</id>
+			<build>
+				<plugins>
+					<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/license-maven-plugin -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>license-maven-plugin</artifactId>
+						<version>2.4.0</version>
+						<executions>
+							<execution>
+								<id>download-licenses</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>download-licenses</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!--
+			Bagimlilik listesini target/dependency-list.txt olarak olusturur.
+			Gerektiginde: mvnw.cmd -Preports compile
+			Linux/macOS:  sh ./mvnw -Preports compile
+		-->
+		<profile>
+			<id>reports</id>
+			<build>
+				<plugins>
+					<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.2.0</version>
+						<executions>
+							<execution>
+								<id>list-dependencies</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>list</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<outputFile>${project.build.directory}/dependency-list.txt</outputFile>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!--
+			Asciidoctor belgeleri bu projede daha once kullanildi ve ileride tekrar kullanilacak.
+			Normal package sirasinda kaynak klasoru aranmasin diye istege bagli profile tasindi.
+			Gerektiginde: mvnw.cmd -Pdocumentation generate-resources
+			Linux/macOS:  sh ./mvnw -Pdocumentation generate-resources
+		-->
+		<profile>
+			<id>documentation</id>
+			<build>
+				<plugins>
+					<!-- https://mvnrepository.com/artifact/org.asciidoctor/asciidoctor-maven-plugin -->
+					<plugin>
+						<!--
+						https://github.com/asciidoctor/asciidoctor-maven-plugin
+						 https://github.com/asciidoctor/asciidoctor-maven-examples
+						 src/docs/asciidoc/ klasoru icindeki *.adoc dosyalarini html olarak
+						 mvn generate-resources komutu ile target/generated-docs klasorunde olusturur. bkz. node 6750 -->
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctor-maven-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<id>asciidoc-to-html</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>process-asciidoc</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
