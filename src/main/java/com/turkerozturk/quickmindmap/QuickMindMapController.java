@@ -133,7 +133,8 @@ public class QuickMindMapController {
             addNavigationNode(
                     navigationNodes,
                     nodeClass,
-                    currentLevel == 0 ? rootParentNodeId : treeNodeId
+                    currentLevel == 0 ? rootParentNodeId : treeNodeId,
+                    treeNodeId
             );
 
             definition.append(" ".repeat((currentLevel + 1) * INDENT_SIZE));
@@ -240,11 +241,13 @@ public class QuickMindMapController {
     private void addNavigationNode(
             List<Map<String, String>> navigationNodes,
             String nodeClass,
-            long targetNodeId
+            long targetNodeId,
+            long contentNodeId
     ) {
         Map<String, String> navigationNode = new LinkedHashMap<>();
         navigationNode.put("nodeClass", nodeClass);
         navigationNode.put("targetNodeId", Long.toString(targetNodeId));
+        navigationNode.put("contentNodeId", Long.toString(contentNodeId));
         navigationNodes.add(navigationNode);
     }
 

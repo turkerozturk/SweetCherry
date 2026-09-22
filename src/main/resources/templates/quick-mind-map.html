@@ -44,10 +44,26 @@
         }
 
         .mermaid-node-icon {
+            display: block;
             width: 16px;
             height: 16px;
             flex: 0 0 16px;
             object-fit: contain;
+        }
+
+        .mermaid-node-icon.is-placeholder {
+            opacity: .3;
+        }
+
+        .mermaid-content-link,
+        .mermaid-content-link:link,
+        .mermaid-content-link:visited,
+        .mermaid-content-link:hover,
+        .mermaid-content-link:active {
+            display: inline-flex;
+            flex: 0 0 16px;
+            color: inherit;
+            text-decoration: none;
         }
 
         .mermaid .mermaid-node-navigation {
@@ -159,7 +175,8 @@ mindmap
     <div id="mermaid-navigation-data" hidden>
         <span th:each="navigationNode : ${navigationNodes}"
               th:attr="data-node-class=${navigationNode.nodeClass},
-                       data-target-node-id=${navigationNode.targetNodeId}"></span>
+                       data-target-node-id=${navigationNode.targetNodeId},
+                       data-content-node-id=${navigationNode.contentNodeId}"></span>
     </div>
 </main>
 
@@ -172,7 +189,9 @@ mindmap
         const foldChatEnabled = /*[[${foldChat}]]*/ true;
         const maximumLevel = /*[[${maximumLevel}]]*/ 3;
         const mapBaseUrl = /*[[@{/quick-mind-map/}]]*/ '/quick-mind-map/';
+        const contentBaseUrl = /*[[@{/quick-node-content/}]]*/ '/quick-node-content/';
         const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
+        const zeroIconUrl = /*[[@{/img/icons/zero.svg}]]*/ '/img/icons/zero.svg';
 
         mermaid.initialize({
             startOnLoad: false,
@@ -185,45 +204,60 @@ mindmap
 
         await mermaid.run({querySelector: '.mermaid'});
 
-        if (iconsEnabled) {
-            addCherryTreeIcons();
-        }
-
+        addContentLinks();
         addNodeNavigation();
 
-        function addCherryTreeIcons() {
-            const iconDataElements = document.querySelectorAll(
-                '#mermaid-icon-data [data-node-class]'
-            );
+        function addContentLinks() {
+            const iconsByNodeClass = new Map();
+            document.querySelectorAll('#mermaid-icon-data [data-node-class]')
+                .forEach(iconData => {
+                    iconsByNodeClass.set(
+                        iconData.dataset.nodeClass,
+                        iconData.dataset.iconName
+                    );
+                });
 
-            iconDataElements.forEach(iconData => {
-                const nodeClass = iconData.dataset.nodeClass;
-                const iconName = iconData.dataset.iconName;
+            document.querySelectorAll(
+                '#mermaid-navigation-data [data-node-class]'
+            ).forEach(navigationData => {
+                const nodeClass = navigationData.dataset.nodeClass;
+                const contentNodeId = navigationData.dataset.contentNodeId;
+                const iconName = iconsByNodeClass.get(nodeClass);
                 const nodeElement = document.querySelector(
                     '.mermaid .' + CSS.escape(nodeClass)
                 );
 
-                if (!nodeElement || !iconName) {
+                if (!nodeElement || !contentNodeId) {
                     return;
                 }
 
                 const label = nodeElement.querySelector('.nodeLabel');
-                if (!label || label.querySelector('.mermaid-node-icon')) {
+                if (!label || label.querySelector('.mermaid-content-link')) {
                     return;
                 }
 
                 label.classList.add('mermaid-node-label-with-icon');
 
-                const image = document.createElement('img');
-                image.className = 'mermaid-node-icon';
-                image.src = iconBaseUrl
-                    + encodeURIComponent(iconName)
-                    + '.png';
-                image.alt = '';
-                image.setAttribute('aria-hidden', 'true');
-                image.dataset.iconName = iconName;
+                const hasVisibleNodeIcon = iconsEnabled && Boolean(iconName);
+                const link = document.createElement('a');
+                link.className = 'mermaid-content-link';
+                link.href = contentBaseUrl + encodeURIComponent(contentNodeId);
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.title = 'Düğüm içeriğini yeni sekmede aç';
 
-                label.prepend(image);
+                const image = document.createElement('img');
+                image.className = hasVisibleNodeIcon
+                    ? 'mermaid-node-icon'
+                    : 'mermaid-node-icon is-placeholder';
+                image.src = hasVisibleNodeIcon
+                    ? iconBaseUrl + encodeURIComponent(iconName) + '.png'
+                    : zeroIconUrl;
+                image.alt = 'İçeriği aç';
+                image.dataset.iconName = iconName || 'zero';
+
+                link.append(image);
+                label.prepend(link);
             });
         }
 
@@ -252,7 +286,11 @@ mindmap
                 label.setAttribute('role', 'link');
                 label.setAttribute('tabindex', '0');
 
-                const openTargetMap = () => {
+                const openTargetMap = event => {
+                    if (event?.target?.closest('.mermaid-content-link')) {
+                        return;
+                    }
+
                     const query = new URLSearchParams({
                         level: String(maximumLevel),
                         icons: String(iconsEnabled),
@@ -270,9 +308,13 @@ mindmap
 
                 label.addEventListener('click', openTargetMap);
                 label.addEventListener('keydown', event => {
+                    if (event.target.closest('.mermaid-content-link')) {
+                        return;
+                    }
+
                     if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
-                        openTargetMap();
+                        openTargetMap(event);
                     }
                 });
             });

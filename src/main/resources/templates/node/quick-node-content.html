@@ -6,10 +6,8 @@
 
     <title th:text="${node.name} + ' - İçerik'">Düğüm içeriği</title>
 
-    <link rel="stylesheet"
-          th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}">
-    <link rel="stylesheet"
-          th:href="@{/css/syntaxhighlighter.css}">
+    <div th:replace="~{common/meta :: headerCssLibraries}"></div>
+
 
     <style>
         *,

@@ -190,7 +190,7 @@
 <script th:src="@{/js/thirdparty/markmap/markmap-view.min.js}"></script>
 
 <script th:inline="javascript">
-    (() => {
+    (async () => {
         'use strict';
 
         const dataJson = /*[[${markmapDataJson}]]*/ '{}';
@@ -204,12 +204,14 @@
         const contentBaseUrl = /*[[@{/quick-node-content/}]]*/ '/quick-node-content/';
         const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
         const zeroIconUrl = /*[[@{/img/icons/zero.svg}]]*/ '/img/icons/zero.svg';
+        const viewScaleStorageKey = 'sweetCherry.markmap.viewScale';
+        const defaultViewScale = 1;
         const data = JSON.parse(dataJson);
 
         prepareLabels(data);
 
         const options = {
-            autoFit: true,
+            autoFit: false,
             duration: 300,
             fitRatio: 0.92,
             maxInitialScale: 1.5,
@@ -228,17 +230,89 @@
         }
 
         const {Markmap} = window.markmap;
-        const markmap = Markmap.create('#markmap', options, data);
+        const markmap = new Markmap('#markmap', options);
+        await markmap.setData(data);
 
-        // Fontların ve Bootstrap'in yerleşmesi tamamlandıktan sonra haritayı
-        // görünür alana yeniden oturtur.
+        // Bütün ağacı ekrana sığdırmak yerine kökü okunabilir ölçekte solda
+        // açar. Aynı sekmedeki sonraki haritalarda son zoom seviyesi korunur.
         window.addEventListener('load', () => {
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    markmap.fit();
+                    placeRootAtReadableScale(readSavedScale());
+                    rememberScaleAfterInteraction();
                 });
             });
         });
+
+        function placeRootAtReadableScale(scale) {
+            const svgElement = markmap.svg.node();
+            const viewport = svgElement.getBoundingClientRect();
+            const rootRect = markmap.state.data?.state?.rect;
+
+            if (!rootRect || viewport.width <= 0 || viewport.height <= 0) {
+                return;
+            }
+
+            const safeScale = clampScale(scale);
+            const leftPadding = 28;
+            const rootCenterY = rootRect.y + rootRect.height / 2;
+            const transform = d3.zoomIdentity
+                .translate(
+                    leftPadding - rootRect.x * safeScale,
+                    viewport.height / 2 - rootCenterY * safeScale
+                )
+                .scale(safeScale);
+
+            markmap.svg.call(markmap.zoom.transform, transform);
+        }
+
+        function rememberScaleAfterInteraction() {
+            const svgElement = markmap.svg.node();
+            let saveTimer;
+
+            const scheduleSave = () => {
+                window.clearTimeout(saveTimer);
+                saveTimer = window.setTimeout(() => {
+                    saveCurrentScale(svgElement);
+                }, 120);
+            };
+
+            svgElement.addEventListener('wheel', scheduleSave, {passive: true});
+            svgElement.addEventListener('pointerup', scheduleSave);
+            svgElement.addEventListener('touchend', scheduleSave, {passive: true});
+            window.addEventListener(
+                'pagehide',
+                () => saveCurrentScale(svgElement)
+            );
+        }
+
+        function saveCurrentScale(svgElement) {
+            try {
+                const transform = d3.zoomTransform(svgElement);
+                sessionStorage.setItem(
+                    viewScaleStorageKey,
+                    String(clampScale(transform.k))
+                );
+            } catch (error) {
+                // Depolama kapalıysa harita varsayılan ölçekle çalışmaya devam eder.
+            }
+        }
+
+        function readSavedScale() {
+            try {
+                return clampScale(
+                    Number(sessionStorage.getItem(viewScaleStorageKey))
+                );
+            } catch (error) {
+                return defaultViewScale;
+            }
+        }
+
+        function clampScale(value) {
+            return Number.isFinite(value) && value > 0
+                ? Math.min(4, Math.max(.25, value))
+                : defaultViewScale;
+        }
 
         function prepareLabels(node) {
             const iconName = node.payload?.iconName;
