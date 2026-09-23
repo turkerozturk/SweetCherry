@@ -1,0 +1,7 @@
+name=Demo Database
+security-role=ADMIN
+datasource.url=jdbc:sqlite:CTBDATA/demo.ctb
+datasource.driver-class-name=org.sqlite.JDBC
+# datasource.username=admin
+# datasource.password=admin
+datasource.init-mode=always
