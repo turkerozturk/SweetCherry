@@ -19,6 +19,7 @@
                 <dd><a href="/actuator/info">Info</a></dd>
                 <dt>🌈"health"</dt>
                 <dd><a href="/actuator/health">Health</a></dd>
+                <th:block th:if="${operationsEnabled}">
                 <dt>🌈"mappings"</dt>
                 <dd><a href="/actuator/mappings">Mappings</a></dd>
                 <dt>🌈"beans"</dt>
@@ -31,10 +32,11 @@
                 <dd><a href="/swagger-ui/index.html">Swagger UI</a></dd>
 
                 <dt>🌈"shutdown"</dt>
-                <dd><form method="POST" action="/actuator/shutdown">
+                <dd><form method="POST" action="/actuator/shutdown" th:action="@{/actuator/shutdown}">
                     <input type="submit" />
                 </form>
                 </dd>
+				</th:block>
 
 
 

@@ -19,5 +19,5 @@ echo "Durdurmak için bu terminalde Ctrl+C tuşlarına basın."
 exec java -jar target/SweetCherry.jar \
   --server.port=8443 \
   --server.http.port=8080 \
-  --myapp.openWebBrowserOnStartup=true
-
+  --myapp.openWebBrowserOnStartup=true \
+  "$@"

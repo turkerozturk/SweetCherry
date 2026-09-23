@@ -18,9 +18,8 @@ if not exist "target\SweetCherry.jar" (
 echo SweetCherry baslatiliyor...
 echo Tarayici adresi: http://localhost:8080
 echo Durdurmak icin bu pencerede Ctrl+C tuslarina basin.
-java -jar "target\SweetCherry.jar" --server.port=8443 --server.http.port=8080 --myapp.openWebBrowserOnStartup=true
+java -jar "target\SweetCherry.jar" --server.port=8443 --server.http.port=8080 --myapp.openWebBrowserOnStartup=true %*
 
 echo.
 echo SweetCherry durdu.
 pause
-

@@ -1,0 +1,8 @@
+# Deneme amacli scheduled task'lari etkinlestirir.
+# Calistirma ornegi:
+# java -jar target/SweetCherry.jar --spring.profiles.active=experiments
+
+myapp:
+  scheduling:
+    enabled: true
+

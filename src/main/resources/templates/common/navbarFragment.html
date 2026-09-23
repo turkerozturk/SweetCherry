@@ -113,7 +113,7 @@
                                     <span href="" th:text="#{root.settings}"></span>
                                 </a>
                             </li>
-                            <li>
+                            <li th:if="${operationsEnabled}">
                                 <a class="dropdown-item" href="/dashboardold"
                                    th:title="#{root.informationBoard.description}"
                                 >
@@ -366,9 +366,8 @@
                         <ul class="dropdown-menu">
                             <li sec:authorize="isAuthenticated()">
                                 <th:block sec:authorize="hasRole('ADMIN')">
-                                    <a class="dropdown-item" href="/shutdownContext"
-
-                                    >
+                                    <form method="POST" action="/shutdownContext" th:action="@{/shutdownContext}">
+                                    <button class="dropdown-item" type="submit">
                                         <i class="fa-solid fa-power-off"></i>
                                         <span
                                                 th:text="#{navbar.shutDownApp}"
@@ -377,7 +376,8 @@
 
                                         </span>
 
-                                    </a>
+                                    </button>
+                                    </form>
                                 </th:block>
                             </li>
                         </ul>

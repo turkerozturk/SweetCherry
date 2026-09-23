@@ -53,6 +53,14 @@ spring:
   cache:
     type: simple
 
+# Swagger/OpenAPI kutuphanesi JAR icinde tutulur fakat normal kullanici calismasinda kapali olur.
+# Gerektiginde --spring.profiles.active=operations ile application-operations.yml tarafindan acilir.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 # https://www.baeldung.com/multitenancy-with-spring-data-jpa
 # Artik Multitenancy den dolayi veritabanlarinin baglanti bilgileri allTenants isimli olusturdugumuz klasorde duruyor.
 # asagidaki degisken hic atanmamis null olsa bile varsayilan degerini kod icerisinde tenant_1 olarak ayarladik.
@@ -139,6 +147,10 @@ myapp:
   debug: false
   syntax-highlighting:
     enabled: false
+  operations:
+    enabled: false
+  scheduling:
+    enabled: false
   exportingFolderName: exportedFiles
   login: # default values are inside my class
     admin:
@@ -151,26 +163,28 @@ myapp:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ACTUATOR
 # (DEVOPS larin gozlem yapmasi icin yazagi url ler)
-# health, info vs. diye de tek tek yazmak mumkun, hepsi icin wildcard * kullanilir
-# <severurl>/actuator/health varsayilanda aciktir. Digerleri * ile acilmis oldu.
+# health ve info normal calismada aciktir. Digerleri operations profilinde * ile acilir.
+# <severurl>/actuator/health
+# <severurl>/actuator/info
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,info"
   endpoint:
     shutdown:
-      enabled: true
+      enabled: false
   info:
     env:
       enabled: true
 
 info:
   app:
-    name: Not determined yet. Maybe CherrySpring.
-    version: Alfa
+    name: SweetCherry
+    version: "@project.version@"
 
-
-endpoints:
-  shutdown:
-    enabled: true
+# DIKKATE AL: Asagidaki eski "endpoints.shutdown" yazimi Spring Boot 1.x donemindendi.
+# Guncel ayar management.endpoint.shutdown.enabled degiskenidir ve operations profilinde bulunur.
+# endpoints:
+#   shutdown:
+#     enabled: true

@@ -21,12 +21,13 @@
 package com.turkerozturk.schedule;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @Configuration
+@ConditionalOnProperty(name = "myapp.scheduling.enabled", havingValue = "true")
 public class SchedulingConfig {
 
 
 }
-

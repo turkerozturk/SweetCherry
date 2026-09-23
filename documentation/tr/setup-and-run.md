@@ -224,3 +224,4 @@ JDK 17+ kurun, terminali/Komut İstemi'ni kapatıp yeniden açın ve `java -vers
 - Üretim ortamı kullanıcı/şifre yönetimi
 - macOS üzerinde doğrulanmış kurulum testi
 
+Geliştirme/operasyon profilleri, scheduled task denemeleri ve uzak veritabanı sürücüleri için [isteğe bağlı özellikler](optional-features.md) belgesine bakın.

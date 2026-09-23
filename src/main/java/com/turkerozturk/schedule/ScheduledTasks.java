@@ -22,12 +22,14 @@ package com.turkerozturk.schedule;
 
 import com.turkerozturk.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@ConditionalOnProperty(name = "myapp.scheduling.enabled", havingValue = "true")
 public class ScheduledTasks {
 
     @Autowired

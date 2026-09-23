@@ -105,7 +105,7 @@ public class SweetCherry implements CommandLineRunner {
      */
     public static Boolean openWebBrowserOnStartup;
 
-    @Value("${myapp.openWebBrowserOnStartup}")
+    @Value("${myapp.openWebBrowserOnStartup:true}")
     public void setOpenWebBrowserOnStartup(Boolean openWebBrowserOnStartup) {
         this.openWebBrowserOnStartup = openWebBrowserOnStartup != null ? openWebBrowserOnStartup : false;
     }
@@ -172,7 +172,7 @@ public class SweetCherry implements CommandLineRunner {
 
     // To run the Spring Boot HTTPS Application also through a HTTP Port use the two methods below:
 
-    @Value("${server.http.port}")
+    @Value("${server.http.port:8080}")
     private int httpPort;
 
     private Connector connector() {

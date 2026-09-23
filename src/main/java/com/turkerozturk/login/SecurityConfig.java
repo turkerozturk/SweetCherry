@@ -77,8 +77,12 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/img/**", "/about", "/main", "/features", "/static/css/**", "/webjars/**")
+                        .requestMatchers("/img/**", "/about", "/main", "/features", "/static/css/**", "/webjars/**",
+                                "/sw.js", "/workbox-*.js",
+                                "/actuator/health", "/actuator/info")
                         .permitAll()
+                        .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**")
+                        .hasRole("ADMIN")
                         .anyRequest()
                         .authenticated()
                 )

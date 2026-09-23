@@ -27,6 +27,7 @@ import com.turkerozturk.multipledatabases.MultitenantConfiguration;
 import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.multipledatabases.TenantService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -37,6 +38,9 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalControllerAdvice {
+
+    @Value("${myapp.operations.enabled:false}")
+    private boolean operationsEnabled;
 
     @Autowired
     private CommonsSunCalc commonsSunCalc;
@@ -89,6 +93,11 @@ public class GlobalControllerAdvice {
     @ModelAttribute("ALL_TENANTS_FOLDER")
     public String getAllTenantsFolderName() {
         return MultitenantConfiguration.PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES;
+    }
+
+    @ModelAttribute("operationsEnabled")
+    public boolean isOperationsEnabled() {
+        return operationsEnabled;
     }
 
 }

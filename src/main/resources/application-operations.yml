@@ -1,0 +1,28 @@
+# Gelismis operasyon ve inceleme araclari.
+# Calistirma ornegi:
+# java -jar target/SweetCherry.jar --spring.profiles.active=operations
+# Birden fazla profil:
+# --spring.profiles.active=operations,experiments
+
+myapp:
+  operations:
+    enabled: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+

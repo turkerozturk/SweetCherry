@@ -37,7 +37,7 @@ import java.util.Map;
 @Controller
 public class SettingsController {
 
-    @Value("${myapp.openWebBrowserOnStartup:}")
+    @Value("${myapp.openWebBrowserOnStartup:true}")
     Boolean openWebBrowserOnStartup;
 
     @Value("${myapp.debug:}")
@@ -49,10 +49,10 @@ public class SettingsController {
     @Autowired
     AstronomyService astronomyService;
 
-    @Value("${server.http.port:}")
+    @Value("${server.http.port:8080}")
     private int httpPort;
 
-    @Value("${server.port:}")
+    @Value("${server.port:443}")
     private int httpsPort;
 
 

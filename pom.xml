@@ -154,6 +154,7 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
+		<!-- DIKKATE AL: CherryTree CTB icin zorunlu degildir; uzak veritabanlarina export ozelligi icin tutulur. -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
@@ -161,6 +162,7 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<!-- DIKKATE AL: CherryTree CTB icin zorunlu degildir; uzak veritabanlarina export ozelligi icin tutulur. -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -456,14 +458,6 @@
 				<groupId>io.github.git-commit-id</groupId>
 				<artifactId>git-commit-id-maven-plugin</artifactId>
 				<version>8.0.2</version>
-				<executions>
-					<execution>
-						<id>get-the-git-infos</id>
-						<goals>
-							<goal>revision</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 					<!--
 						A real Git clone keeps .git in the project root. GitHub source ZIP
