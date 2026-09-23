@@ -25,7 +25,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@IdClass(Anchor.class)     // <--this is the extra annotation to add
+@IdClass(AnchorId.class)
 @Table(name = "image")
 public class Anchor implements Serializable {
 
@@ -109,4 +109,3 @@ public class Anchor implements Serializable {
         this.time = time;
     }
 }
-

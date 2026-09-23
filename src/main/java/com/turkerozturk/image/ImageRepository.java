@@ -27,7 +27,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface ImageRepository extends JpaRepository<Image, Long> {
+public interface ImageRepository extends JpaRepository<Image, ImageId> {
     List<Image> findAllByNodeId(Long nodeId);
 
     @Query("SELECT i FROM Image i WHERE i.nodeId = :nodeId AND i.png IS NOT NULL AND i.fileName = ''")

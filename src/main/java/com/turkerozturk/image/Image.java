@@ -27,7 +27,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@IdClass(Image.class)     // <--this is the extra annotation to add
+@IdClass(ImageId.class)
 @Table(name = "image")
 public class Image implements Serializable {
 
