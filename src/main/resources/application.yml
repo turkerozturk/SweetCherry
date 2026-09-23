@@ -38,8 +38,10 @@ spring:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     properties:
       hibernate:
+        boot:
+          allow_jdbc_metadata_access: false # Hibernate 6 icin JDBC metadata erisimini kapatir; tenant secilmeden acilabilsin.
         temp:
-          use_jdbc_metadata_defaults: false #https://www.baeldung.com/spring-data-jpa-run-app-without-db
+          use_jdbc_metadata_defaults: false # DIKKATE AL: Eski Hibernate ayari; geriye donuk hatirlatma icin tutuluyor.
     hibernate:
       ddl-auto: none #https://www.baeldung.com/spring-data-jpa-run-app-without-db
   properties:
