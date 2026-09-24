@@ -74,6 +74,10 @@ springdoc:
 # https://www.youtube.com/watch?v=B4FxG2Diio0
 # SSL HTTPS
 server:
+  # Varsayilan hesaplar gelistirme/yerel kullanim icindir. Bu nedenle iki HTTP connector da
+  # varsayilan olarak yalnizca bu bilgisayardan erisilebilir. Uzak erisim bilincli olarak
+  # yapilandirilacaksa guvenli kimlik bilgileri ve HTTPS ile birlikte degistirilmelidir.
+  address: 127.0.0.1
   port: 443
  # ssl:
  #   certificate: "classpath:ssl-self-signed-certificate/certificate.crt"

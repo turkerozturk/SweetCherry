@@ -12,15 +12,13 @@
 	<artifactId>SweetCherry</artifactId>
 	<version>0.5.0</version>
 	<name>SweetCherry</name>
-	<description>SweetCherry</description>
-	<url>https://github.com/turkerozturk/springtopiccalendar</url>
+	<description>A web companion and viewer for CherryTree CTB note databases</description>
+	<url>https://github.com/turkerozturk/SweetCherry</url>
 
 	<developers>
 		<developer>
 			<id>turkerozturk</id>
 			<name>Turker Ozturk</name>
-			<email>mail@example.com</email>
-			<organization>Sirket ya da Organizasyon ismi</organization>
 			<organizationUrl>https://github.com/turkerozturk</organizationUrl>
 		</developer>
 	</developers>
@@ -490,6 +488,7 @@
 								<mkdir dir="${project.basedir}/release/SweetCherry/CTBDATA"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/allTenants"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/exportedFiles"/>
+								<mkdir dir="${project.basedir}/release/SweetCherry/documentation/tr"/>
 
 								<copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
 									  tofile="${project.basedir}/release/SweetCherry/${project.build.finalName}.${project.packaging}"
@@ -512,6 +511,18 @@
 										<include name="run.bat"/>
 										<include name="run.sh"/>
 										<include name="run.command"/>
+									</fileset>
+								</copy>
+								<copy todir="${project.basedir}/release/SweetCherry" overwrite="true">
+									<fileset dir="${project.basedir}">
+										<include name="LICENSE"/>
+										<include name="README.md"/>
+										<include name="CHANGELOG.md"/>
+									</fileset>
+								</copy>
+								<copy todir="${project.basedir}/release/SweetCherry/documentation/tr" overwrite="true">
+									<fileset dir="${project.basedir}/documentation/tr">
+										<include name="*.md"/>
 									</fileset>
 								</copy>
 								<chmod file="${project.basedir}/release/SweetCherry/run.sh" perm="755" osfamily="unix"/>

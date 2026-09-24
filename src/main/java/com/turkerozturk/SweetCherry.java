@@ -175,10 +175,14 @@ public class SweetCherry implements CommandLineRunner {
     @Value("${server.http.port:8080}")
     private int httpPort;
 
+    @Value("${server.address:127.0.0.1}")
+    private String serverAddress;
+
     private Connector connector() {
 
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
         connector.setPort(httpPort);
+        connector.setProperty("address", serverAddress);
         connector.setSecure(false);
         connector.setScheme("http");
         return connector;

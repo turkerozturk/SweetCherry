@@ -104,6 +104,9 @@ Derleme başarılı olduğunda Maven'ın ara çıktısı `target/SweetCherry.jar
 release/
 └── SweetCherry/
     ├── SweetCherry.jar
+    ├── LICENSE
+    ├── README.md
+    ├── CHANGELOG.md
     ├── run.bat
     ├── run.sh
     ├── run.command
@@ -113,6 +116,8 @@ release/
     └── allTenants/
         └── demo.txt
 ```
+
+Türkçe belgeler ayrıca `release/SweetCherry/documentation/tr` altında paketlenir.
 
 `SweetCherry.jar` ve çalıştırma scriptleri her derlemede güncellenir. `demo.ctb` ve `demo.txt` yalnızca hedefte yoksa kopyalanır; `release/SweetCherry` altında kullanıcı tarafından değiştirilmiş demo dosyalarının üzerine yazılmaz.
 
@@ -146,6 +151,8 @@ SweetCherry açık kaldığı sürece komut penceresi/terminal de açık kalmal�
 
 - Tarayıcı adresi: **`http://localhost:8080`**
 - Dahili ikinci HTTP bağlantı noktası: `8443`
+
+İki bağlantı noktası da varsayılan olarak yalnızca `127.0.0.1`/`localhost` üzerinde dinler. Böylece yerleşik deneme hesapları kullanılırken SweetCherry aynı ağdaki diğer bilgisayarlara kendiliğinden açılmaz. İnternet/LAN erişimi, HTTPS ve üretim tipi kullanıcı yönetimi bu yerel başlangıç paketinin kapsamı dışındadır.
 
 Mevcut kaynak ayarındaki ana port `443` olduğundan scriptler, Linux/macOS'ta yönetici yetkisi gerektirmemesi ve çakışma riskini azaltması için onu `8443` olarak değiştirerek başlatır. SSL yapılandırılmadığı için bu yerel başlangıç senaryosunda adres `http://` ile açılır; `https://` kullanmayın.
 
@@ -261,7 +268,7 @@ JDK 17+ kurun, terminali/Komut İstemi'ni kapatıp yeniden açın ve `java -vers
 
 ## Şimdilik kapsam dışında kalanlar
 
-- Release paketi ve otomatik güncelleme
+- Otomatik güncelleme
 - Uygulamayı internete açma, HTTPS ve ters vekil yapılandırması
 - CherrySync ve uzak MySQL/PostgreSQL veri kaynakları
 - Üretim ortamı kullanıcı/şifre yönetimi
