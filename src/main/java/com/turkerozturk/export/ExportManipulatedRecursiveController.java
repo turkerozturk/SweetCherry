@@ -37,6 +37,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.*;
@@ -300,7 +301,9 @@ public class ExportManipulatedRecursiveController {
 
     //https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
     @PostMapping("/expo/{node_id}")
-    public String export1(@PathVariable("node_id") Integer nodeId, RedirectAttributes redirectAttributes) {
+    public String export1(@PathVariable("node_id") Integer nodeId,
+                          @RequestParam(defaultValue = "true") boolean includeDescendants,
+                          RedirectAttributes redirectAttributes) {
 
         logger.info("export contoroller " + nodeId);
 
@@ -334,7 +337,9 @@ public class ExportManipulatedRecursiveController {
 
                 setMainNode(true); // bilgi "it is necessary" to set it.
 
-                List<Children> childrens = childrenService.findAllSubChildren(nodeId);
+                List<Children> childrens = includeDescendants
+                        ? childrenService.findAllSubChildren(nodeId)
+                        : List.of(childrenService.findById(nodeId));
                 exportedNodeCount = childrens.size();
                 for (Children children : childrens) {
                     boolean isRegulardNode = children.getMasterId() == null || children.getMasterId() == 0;
@@ -372,7 +377,8 @@ public class ExportManipulatedRecursiveController {
         //model.addAttribute("contentText", "export başarılı.");
 
         redirectAttributes.addFlashAttribute("contentText",
-                "Export successful. Exported node count: " + exportedNodeCount);
+                "Export successful. Exported node count: " + exportedNodeCount
+                        + (includeDescendants ? " (selected node and descendants)." : " (selected node only)."));
         return "redirect:/export-result";
     }
 

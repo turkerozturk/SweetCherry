@@ -41,14 +41,16 @@ export_Demo Database_26.ctb__20260924155026.old
 
 Bu export da `POST` ve sonuç sayfasına yönlendirme kullanır; tarayıcının geri/ileri hareketi yeni bir CTB veya `.old` dosyası oluşturmamalıdır.
 
-## Mevcut iki export seçeneğinin özeti
+## Dört export seçeneğinin özeti
 
-| Seçenek | Hedef | Güncel kapsam | Var olan hedef |
+| Seçenek | Hedef | Kapsam | Var olan hedef |
 |---|---|---|---|
-| CTB Koleksiyona Aktar | `exportedFiles/exportednodes.ctb` | Seçilen düğüm ve alt düğümleri | Yeni kimliklerle aynı koleksiyona eklenir |
-| CTB Ayrı Aktar | `exportedFiles/export_<tenant>_<nodeId>.ctb` | Seçilen düğüm ve alt düğümleri | Önce tarih-saatli `.old` dosyasına taşınır |
+| Yalnız Düğümü Koleksiyona Aktar | `exportedFiles/exportednodes.ctb` | Yalnız görüntülenen düğüm | Yeni kimlikle aynı koleksiyona eklenir |
+| Düğüm ve Alt Ağacı Koleksiyona Aktar | `exportedFiles/exportednodes.ctb` | Görüntülenen düğüm ve bütün alt düğümleri | Yeni kimliklerle aynı koleksiyona eklenir |
+| Yalnız Düğümü Ayrı CTB'ye Aktar | `exportedFiles/export_<tenant>_<nodeId>.ctb` | Yalnız görüntülenen düğüm | Önceki hedef tarih-saatli `.old` dosyasına taşınır |
+| Düğüm ve Alt Ağacı Ayrı CTB'ye Aktar | `exportedFiles/export_<tenant>_<nodeId>.ctb` | Görüntülenen düğüm ve bütün alt düğümleri | Önceki hedef tarih-saatli `.old` dosyasına taşınır |
 
-Şimdilik iki seçenek de yalnızca seçili tek düğüm yerine onun alt ağacını aktarır. Yalnız seçilen düğümü aktarma seçeneklerinin ayrıca eklenmesi TODO listesindedir.
+Dört seçenek de hem masaüstü hem mobil düğüm görünümünde bulunur.
 
 ## Düğüm kimlikleri neden değişir?
 
@@ -91,7 +93,6 @@ Bağlantı tanım dosyalarını `allTenants` klasörüne yüklemek için SweetCh
 ## TODO ve sağlamlaştırma notları
 
 - Aynı kaynak düğümün daha önce export edilip edilmediğini belirleyen isteğe bağlı yinelenen kayıt kontrolü tasarla.
-- Her iki hedef için “yalnız seçili düğüm” ve “seçili düğüm + alt düğümler” seçeneklerini arayüzde açıkça ayır.
 - Mevcut alt düğüm hiyerarşisi davranışını otomatik testle sabitle.
 - Kimlik üretimini, ilişkileri koruyan açık bir eski-yeni ID eşleme tablosuyla yeniden tasarla.
 - Alias/shared node, node bağlantısı ve anchor referanslarını aynı eski-yeni ID eşleme tablosuyla güvenilir biçimde dönüştür.

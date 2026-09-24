@@ -208,6 +208,8 @@ Birden fazla CTB kullanacaksanız her biri için ayrı bir metin dosyası ekleyi
 
 Oturum zaman aşımına uğrarsa veya çıkış yaparsanız yeniden giriş yapın. Veri kaynağı seçimi oturuma bağlı olduğundan listeden CTB'yi tekrar seçmeniz gerekebilir.
 
+Veritabanı gerektiren bir sayfaya veri kaynağı seçmeden gidilirse SweetCherry kullanıcıyı ana veri kaynağı seçim ekranına yönlendirir. Bu davranış boş tenant ile JPA bağlantısı açılmaya çalışılmasını ve teknik hata sayfası gösterilmesini önler.
+
 Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları gibi yöneticiye ayrılmış ekranları gösterebilir. Ancak CTB üzerinde düğüm silme işleminin uygulanabilmesi ayrıca ilgili dosyada `custom.isWritable=true` olmasına bağlıdır. Özgün not arşiviniz üzerinde bu seçeneği kullanmadan önce mutlaka yedek alın.
 
 ## Çalışırken oluşan dosya ve klasörler

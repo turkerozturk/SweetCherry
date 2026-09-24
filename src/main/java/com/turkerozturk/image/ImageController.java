@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.image;
 
+import com.turkerozturk.multipledatabases.RequiresTenant;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -61,6 +62,7 @@ public class ImageController {
     }
 
     @GetMapping("/attachments")
+    @RequiresTenant
     public String getAllAttachments(Model model,
                                     @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
         List<Image> images = imageService.getAttachedFiles();

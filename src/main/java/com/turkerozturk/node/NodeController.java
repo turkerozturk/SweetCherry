@@ -26,6 +26,7 @@ import com.turkerozturk.children.NaviNode;
 import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
 import com.turkerozturk.helpers.highlighter.pygments.LexerEnum;
 import com.turkerozturk.multipledatabases.TenantContext;
+import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.filter.FormSearch;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -96,6 +97,7 @@ public class NodeController {
      */
     @Deprecated(since = "1", forRemoval = false)
     @GetMapping("/nodesadvanced")
+    @RequiresTenant
     public void getAllNodesAdvancedAsHtml(Model model) {
 
         getAllNodesAdvancedAsHtml(model,
@@ -144,6 +146,7 @@ public class NodeController {
      * @return
      */
     @RequestMapping(value = "/nodesadvancedwithbinding", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequiresTenant
     public String postForm(@Valid FormSearch formSearch, BindingResult bindingResult, Model model,
                            @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
 

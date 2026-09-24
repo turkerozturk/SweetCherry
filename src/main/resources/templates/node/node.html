@@ -73,17 +73,37 @@
 
                         <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
                               method="post" class="d-inline">
+                            <input type="hidden" name="includeDescendants" value="false"/>
                             <button type="submit" class="btn btn-warning">
                                 <img th:src="@{/img/icons/ct_file.svg}"/>
-                                <span th:text="#{exportnodes.exportToCollection}">CTB export to collection</span>
+                                <span th:text="#{exportnodes.collectionSingle}">Selected node to collection</span>
+                            </button>
+                        </form>
+
+                        <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="includeDescendants" value="true"/>
+                            <button type="submit" class="btn btn-warning">
+                                <img th:src="@{/img/icons/ct_file.svg}"/>
+                                <span th:text="#{exportnodes.collectionBranch}">Node and descendants to collection</span>
                             </button>
                         </form>
 
                         <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
                               method="post" class="d-inline">
+                            <input type="hidden" name="includeDescendants" value="false"/>
                             <button type="submit" class="btn btn-warning">
                                 <img th:src="@{/img/icons/ct_file.svg}"/>
-                                <span th:text="#{exportnodes.untouchedIds}">CTB export separately</span>
+                                <span th:text="#{exportnodes.separateSingle}">Selected node to separate CTB</span>
+                            </button>
+                        </form>
+
+                        <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="includeDescendants" value="true"/>
+                            <button type="submit" class="btn btn-warning">
+                                <img th:src="@{/img/icons/ct_file.svg}"/>
+                                <span th:text="#{exportnodes.separateBranch}">Node and descendants to separate CTB</span>
                             </button>
                         </form>
 

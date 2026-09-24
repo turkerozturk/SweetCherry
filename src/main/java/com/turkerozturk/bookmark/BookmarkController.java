@@ -23,6 +23,7 @@ package com.turkerozturk.bookmark;
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenService;
 import com.turkerozturk.node.NodeService;
+import com.turkerozturk.multipledatabases.RequiresTenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +44,7 @@ public class BookmarkController {
     private ChildrenService childrenService;
 
     @GetMapping("/bookmarks")
+    @RequiresTenant
     public String getAllChildrenAsHtml(Model model,
                                        @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
         List<Bookmark> bookmarks = bookmarkService.getBookmarks();

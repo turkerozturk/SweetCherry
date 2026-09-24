@@ -20,6 +20,8 @@
  */
 package com.turkerozturk.dashboard;
 
+import com.turkerozturk.multipledatabases.RequiresTenant;
+
 //import com.turkerozturk.sunandmoon.MoonTime4j;
 //import com.turkerozturk.helpers.CommonsSunCalc;
 
@@ -252,6 +254,7 @@ public class DashBoardController {
      bilgi The main purpose of this software starts here.
      **/
     @GetMapping("/cherrytemplatetasks")
+    @RequiresTenant
     public String checkNodeWithNameCherryTemplateTasks(Model model) {
         CustomListsNodeStatus customListsNodeStatus = null;
 

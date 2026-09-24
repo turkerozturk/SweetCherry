@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.*;
@@ -260,7 +261,9 @@ public class ExportRecursiveController {
 
     //https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
     @PostMapping("/exportWithSubNodes/{node_id}")
-    public String export1(@PathVariable("node_id") Integer nodeId, RedirectAttributes redirectAttributes) {
+    public String export1(@PathVariable("node_id") Integer nodeId,
+                          @RequestParam(defaultValue = "true") boolean includeDescendants,
+                          RedirectAttributes redirectAttributes) {
 
         logger.info("export contorller " + nodeId);
 
@@ -299,8 +302,11 @@ public class ExportRecursiveController {
 
                 createTablesIfNotExist(conn);
 
+                isMainNode = true;
 
-                List<Children> childrens = childrenService.findAllSubChildren(nodeId);
+                List<Children> childrens = includeDescendants
+                        ? childrenService.findAllSubChildren(nodeId)
+                        : List.of(childrenService.findById(nodeId));
                 exportedNodeCount = childrens.size();
                 for (Children children : childrens) {
                     boolean isRegulardNode = children.getMasterId() == null || children.getMasterId() == 0;
@@ -329,7 +335,8 @@ public class ExportRecursiveController {
 
         logger.info("export şu dosya yoluna yapıldı dbFilePath: " + dbFilePath);
         redirectAttributes.addFlashAttribute("contentText",
-                "Export successful. Exported node count: " + exportedNodeCount + ". File: " + dbFileName);
+                "Export successful. Exported node count: " + exportedNodeCount + ". File: " + dbFileName
+                        + (includeDescendants ? " (selected node and descendants)." : " (selected node only)."));
         return "redirect:/export-result";
     }
 
