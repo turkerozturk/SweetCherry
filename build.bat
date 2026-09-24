@@ -20,6 +20,7 @@ if errorlevel 1 goto builderror
 
 echo.
 echo DERLEME TAMAMLANDI: target\SweetCherry.jar
+echo CALISTIRILABILIR KLASOR: release\
 if /i not "%~1"=="--no-pause" pause
 exit /b 0
 
@@ -42,4 +43,3 @@ echo HATA: Derleme tamamlanamadi. Yukaridaki Maven hata mesajini inceleyin.
 :error
 if /i not "%~1"=="--no-pause" pause
 exit /b 1
-

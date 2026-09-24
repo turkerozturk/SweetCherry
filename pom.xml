@@ -470,6 +470,47 @@
 				</configuration>
 			</plugin>
 			<!--
+				Normal package isleminin sonunda calistirilabilir dosyalari release klasorunde toplar.
+				SweetCherry.jar her derlemede yenilenir. Demo CTB ve tenant ayari ise kullanici
+				tarafindan degistirilmis olabilecegi icin release klasorunde zaten varsa korunur.
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>prepare-release-directory</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target xmlns:unless="ant:unless">
+								<mkdir dir="${project.basedir}/release/CTBDATA"/>
+								<mkdir dir="${project.basedir}/release/allTenants"/>
+
+								<copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
+									  tofile="${project.basedir}/release/${project.build.finalName}.${project.packaging}"
+									  overwrite="true"/>
+
+								<available file="${project.basedir}/release/CTBDATA/demo.ctb"
+										   property="release.demo.ctb.exists"/>
+								<copy file="${project.basedir}/external/CTBDATA/demo.ctb"
+									  tofile="${project.basedir}/release/CTBDATA/demo.ctb"
+									  unless:set="release.demo.ctb.exists"/>
+
+								<available file="${project.basedir}/release/allTenants/demo.txt"
+										   property="release.demo.tenant.exists"/>
+								<copy file="${project.basedir}/external/allTenants/demo.txt"
+									  tofile="${project.basedir}/release/allTenants/demo.txt"
+									  unless:set="release.demo.tenant.exists"/>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!--
 				DIKKATE AL: license, dependency report ve Asciidoctor eklentileri silinmedi.
 				Normal package islemini yavaslatmamalari icin asagidaki Maven profillerine tasindilar.
 			-->

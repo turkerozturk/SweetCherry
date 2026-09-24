@@ -31,4 +31,4 @@ if ! sh ./mvnw -DskipTests package; then
 fi
 
 echo "DERLEME TAMAMLANDI: target/SweetCherry.jar"
-
+echo "ÇALIŞTIRILABİLİR KLASÖR: release/"

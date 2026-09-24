@@ -98,7 +98,27 @@ Yalnızca derlemek için:
 | Windows | `build.bat` |
 | Linux/macOS | `sh ./build.sh` |
 
-Derleme başarılı olduğunda çalıştırılabilir dosya `target/SweetCherry.jar` olur.
+Derleme başarılı olduğunda çalıştırılabilir dosya `target/SweetCherry.jar` olur. Ayrıca Maven, doğrudan çalıştırılabilecek aşağıdaki klasör yapısını hazırlar:
+
+```text
+release/
+├── SweetCherry.jar
+├── CTBDATA/
+│   └── demo.ctb
+└── allTenants/
+    └── demo.txt
+```
+
+`SweetCherry.jar` her derlemede güncellenir. `demo.ctb` ve `demo.txt` yalnızca hedefte yoksa kopyalanır; `release` altında kullanıcı tarafından değiştirilmiş demo dosyalarının üzerine yazılmaz.
+
+Hazır demo ile denemek için terminalde `release` klasörüne geçip uygulamayı bu klasörü çalışma dizini yaparak başlatın:
+
+```bash
+cd release
+java -jar SweetCherry.jar --server.port=8443 --server.http.port=8080 --myapp.openWebBrowserOnStartup=true
+```
+
+Giriş yaptıktan sonra veri kaynağı listesinde **Demo Database** görünür. Bunun nedeni `allTenants/demo.txt` içindeki `jdbc:sqlite:CTBDATA/demo.ctb` göreli yolunun `release` klasöründen çözülmesidir.
 
 Daha sonraki çalıştırmalarda yeniden derlemek gerekmez:
 
@@ -181,6 +201,16 @@ Birden fazla CTB kullanacaksanız her biri için ayrı bir metin dosyası ekleyi
 Oturum zaman aşımına uğrarsa veya çıkış yaparsanız yeniden giriş yapın. Veri kaynağı seçimi oturuma bağlı olduğundan listeden CTB'yi tekrar seçmeniz gerekebilir.
 
 Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları gibi yöneticiye ayrılmış ekranları gösterebilir. Ancak CTB üzerinde düğüm silme işleminin uygulanabilmesi ayrıca ilgili dosyada `custom.isWritable=true` olmasına bağlıdır. Özgün not arşiviniz üzerinde bu seçeneği kullanmadan önce mutlaka yedek alın.
+
+## Çalışırken oluşan dosya ve klasörler
+
+Bu yollar SweetCherry'nin **çalıştırıldığı klasöre** göre oluşur:
+
+- `myapp.log`: Uygulama ilk çalıştırıldığında oluşturulur ve uygulama loglarını içerir. Sorun bildirirken konsol çıktısıyla birlikte incelenebilir.
+- `allTenants/`: Yoksa ilk açılışta boş olarak oluşturulur. CTB bağlantı tanımlarının bulunduğu metin dosyaları buraya konur.
+- `exportedFiles/`: İlgili dışa aktarma işlemi kullanıldığında oluşturulur. Düğümleri CTB olarak dışa aktaran akış `exportedFiles/exportednodes.ctb` dosyasını kullanır.
+
+Not: Kaynak kodda bulunan bazı eski/alternatif dışa aktarma akışları `exportednodes.ctb` dosyasını doğrudan çalışma klasöründe oluşturabilir. Bu bölüm ileride dışa aktarma ekranları topluca gözden geçirilirken sadeleştirilecektir.
 
 ## Sık karşılaşılan sorunlar
 
