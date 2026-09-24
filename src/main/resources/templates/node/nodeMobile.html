@@ -212,10 +212,13 @@
                                     <span th:text="#{search.downloadAsPdf}">PDF</span>
                                 </a>
 
-                                <a type="submit" th:href="${'/expo/' + node.nodeId}" class="btn btn-warning btn-sm">
-                                    <img th:src="@{/img/icons/ct_file.svg}"/>
-                                    <span th:text="#{exportnodes.exportToCollection}">exportnodes.ctb</span>
-                                </a>
+                                <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
+                                      method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <img th:src="@{/img/icons/ct_file.svg}"/>
+                                        <span th:text="#{exportnodes.exportToCollection}">exportnodes.ctb</span>
+                                    </button>
+                                </form>
 
                                 <a type="submit" th:href="${'/exportWithSubNodes/' + node.nodeId}" class="btn btn-warning btn-sm">
                                     <img th:src="@{/img/icons/ct_file.svg}"/>

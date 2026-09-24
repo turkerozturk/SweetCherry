@@ -25,6 +25,7 @@ import com.turkerozturk.children.ChildrenService;
 import com.turkerozturk.children.NaviNode;
 import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
 import com.turkerozturk.helpers.highlighter.pygments.LexerEnum;
+import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.node.filter.FormSearch;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -308,6 +309,13 @@ public class NodeController {
         */
         
         String dataSourceMessage = null;
+
+        if (!TenantContext.hasCurrentTenant()) {
+            dataSourceMessage = messageSource.getMessage("selectdatasource.please_select_a_datasource",
+                    null, locale);
+            model.addAttribute("dataSourceMessage", dataSourceMessage);
+            return "selectdatasource";
+        }
 
         try {
             final long rootNodeId = 0;

@@ -36,7 +36,7 @@ public class FileDeleteController {
     @Value("${myapp.exportingFolderName}")
     private String exportingFolderName;
 
-    @GetMapping("/{filename:.+}")
+    @PostMapping("/{filename:.+}")
     public ResponseEntity<String> deleteFile(@PathVariable String filename) {
         String filePath = applicationPath + File.separator + exportingFolderName + File.separator + filename;
         File file = new File(filePath);
@@ -52,4 +52,3 @@ public class FileDeleteController {
         }
     }
 }
-

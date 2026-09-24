@@ -71,10 +71,13 @@
                             <span th:text="#{search.downloadAsPdf}">PDF</span>
                         </a>
 
-                        <a type="submit" th:href="${'/expo/' + node.nodeId}" class="btn btn-warning">
-                            <img th:src="@{/img/icons/ct_file.svg}"/>
-                            <span th:text="CTB">CTB</span>
-                        </a>
+                        <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
+                              method="post" class="d-inline">
+                            <button type="submit" class="btn btn-warning">
+                                <img th:src="@{/img/icons/ct_file.svg}"/>
+                                <span th:text="CTB">CTB</span>
+                            </button>
+                        </form>
 
 
 

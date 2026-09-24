@@ -33,6 +33,15 @@ public class TenantContext {
         CURRENT_TENANT.set(tenant);
     }
 
+    public static boolean hasCurrentTenant() {
+        String tenant = CURRENT_TENANT.get();
+        return tenant != null && !tenant.isBlank();
+    }
+
+    public static void clear() {
+        CURRENT_TENANT.remove();
+    }
+
 /*
    // not tested whether it is working or not:
     public static void setDefaultTenant() {

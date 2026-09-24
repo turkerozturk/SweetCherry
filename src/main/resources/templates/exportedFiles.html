@@ -29,25 +29,16 @@
                 <a th:href="@{'/download/' + ${file.name}}" class="btn btn-success">
                     <i class="fas fa-download"></i> Download
                 </a>
-                <a href="#" th:data-filename="${file.name}" class="btn btn-danger delete-button">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </a>
+                <form th:action="@{'/delete/' + ${file.name}}" method="post" class="d-inline"
+                      th:onsubmit="|return confirm('Are you sure you want to delete ${file.name}?');|">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </form>
             </td>
         </tr>
         </tbody>
     </table>
-
-    <!-- Silme Onayı için JavaScript ve Bootstrap Modal -->
-    <script>
-        document.querySelectorAll('.delete-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const fileName = this.getAttribute('data-filename');
-                if (confirm('Are you sure you want to delete ' + fileName + '?')) {
-                    window.location.href = '/delete/' + fileName;
-                }
-            });
-        });
-    </script>
 
 </section>
 </body>

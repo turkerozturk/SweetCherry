@@ -31,10 +31,13 @@ import com.turkerozturk.node.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -53,6 +56,12 @@ public class ExportManipulatedRecursiveController {
 
     @Autowired
     ChildrenService childrenService;
+
+    @Value("${user.dir}")
+    private String applicationPath;
+
+    @Value("${myapp.exportingFolderName}")
+    private String exportingFolderName;
 
     private long newRootNodeId;
 
@@ -290,18 +299,28 @@ public class ExportManipulatedRecursiveController {
 
 
     //https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
-    @GetMapping("/expo/{node_id}")
-    public String export1(@PathVariable("node_id") Integer nodeId, Model model) {
+    @PostMapping("/expo/{node_id}")
+    public String export1(@PathVariable("node_id") Integer nodeId, RedirectAttributes redirectAttributes) {
 
         logger.info("export contoroller " + nodeId);
 
 
         // bilgi basla
-        String dbFilePath = "exportedFiles" + File.separator + "exportednodes.ctb";
+        Path exportDirectory = Path.of(applicationPath, exportingFolderName);
+        String dbFilePath = exportDirectory.resolve("exportednodes.ctb").toString();
+        int exportedNodeCount = 0;
         if (Files.exists(Path.of(dbFilePath))) {
             logger.info("db file exits: " + dbFilePath);
         } else {
             logger.info("db file not exits: " + dbFilePath);
+        }
+
+        try {
+            Files.createDirectories(exportDirectory);
+        } catch (IOException e) {
+            logger.error("Could not create export directory: " + exportDirectory, e);
+            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            return "redirect:/export-result";
         }
 
         String sqliteUrl = "jdbc:sqlite:" + dbFilePath;
@@ -316,6 +335,7 @@ public class ExportManipulatedRecursiveController {
                 setMainNode(true); // bilgi "it is necessary" to set it.
 
                 List<Children> childrens = childrenService.findAllSubChildren(nodeId);
+                exportedNodeCount = childrens.size();
                 for (Children children : childrens) {
                     boolean isRegulardNode = children.getMasterId() == null || children.getMasterId() == 0;
                     if(isRegulardNode) {
@@ -335,15 +355,15 @@ public class ExportManipulatedRecursiveController {
 
 
 
-                model.addAttribute("contentText", "Export successful. Exported node count: " + childrens.size());
             }
         } catch (SQLException e) {
             logger.error("Error during export", e);
-            model.addAttribute("contentText", "Export failed.");
+            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            return "redirect:/export-result";
         } catch (IOException e) {
             logger.error("Error during export", e);
-            model.addAttribute("contentText", "Export failed.");
-            throw new RuntimeException(e);
+            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            return "redirect:/export-result";
         }
 
 
@@ -351,6 +371,16 @@ public class ExportManipulatedRecursiveController {
 
         //model.addAttribute("contentText", "export başarılı.");
 
+        redirectAttributes.addFlashAttribute("contentText",
+                "Export successful. Exported node count: " + exportedNodeCount);
+        return "redirect:/export-result";
+    }
+
+    @GetMapping("/export-result")
+    public String exportResult(Model model) {
+        if (!model.containsAttribute("contentText")) {
+            model.addAttribute("contentText", "No export operation was performed.");
+        }
         return "expo";
     }
 

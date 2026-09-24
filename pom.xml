@@ -489,6 +489,7 @@
 							<target xmlns:unless="ant:unless">
 								<mkdir dir="${project.basedir}/release/SweetCherry/CTBDATA"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/allTenants"/>
+								<mkdir dir="${project.basedir}/release/SweetCherry/exportedFiles"/>
 
 								<copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
 									  tofile="${project.basedir}/release/SweetCherry/${project.build.finalName}.${project.packaging}"

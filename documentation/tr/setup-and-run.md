@@ -107,6 +107,7 @@ release/
     ├── run.bat
     ├── run.sh
     ├── run.command
+    ├── exportedFiles/
     ├── CTBDATA/
     │   └── demo.ctb
     └── allTenants/
@@ -122,7 +123,7 @@ cd release/SweetCherry
 java -jar SweetCherry.jar --server.port=8443 --server.http.port=8080 --myapp.openWebBrowserOnStartup=true
 ```
 
-Giriş yaptıktan sonra veri kaynağı listesinde **Demo Database** görünür. Bunun nedeni `allTenants/demo.txt` içindeki `jdbc:sqlite:CTBDATA/demo.ctb` göreli yolunun `release` klasöründen çözülmesidir.
+Giriş yaptıktan sonra veri kaynağı listesinde **Demo Database** görünür. Bunun nedeni `allTenants/demo.txt` içindeki `jdbc:sqlite:CTBDATA/demo.ctb` göreli yolunun `release/SweetCherry` klasöründen çözülmesidir.
 
 Daha sonraki çalıştırmalarda yeniden derlemek gerekmez:
 
@@ -168,6 +169,7 @@ release/
 └── SweetCherry/
     ├── allTenants/
     ├── CTBDATA/
+    ├── exportedFiles/
     ├── SweetCherry.jar
     └── run.bat, run.sh, run.command
 ```
@@ -217,6 +219,8 @@ Bu yollar SweetCherry'nin **çalıştırıldığı klasöre** göre oluşur:
 - `exportedFiles/`: İlgili dışa aktarma işlemi kullanıldığında oluşturulur. Düğümleri CTB olarak dışa aktaran akış `exportedFiles/exportednodes.ctb` dosyasını kullanır.
 
 Not: Kaynak kodda bulunan bazı eski/alternatif dışa aktarma akışları `exportednodes.ctb` dosyasını doğrudan çalışma klasöründe oluşturabilir. Bu bölüm ileride dışa aktarma ekranları topluca gözden geçirilirken sadeleştirilecektir.
+
+CTB koleksiyon export işleminin kullanımı, kimlik üretme davranışı ve bilinen geliştirme maddeleri için [CTB koleksiyonuna dışa aktarma](ctb-export.md) belgesine bakın.
 
 ## Sık karşılaşılan sorunlar
 

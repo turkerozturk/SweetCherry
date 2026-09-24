@@ -49,12 +49,14 @@ class TenantFilter implements Filter {
         // logger.info("Tenant Name: " + tenantName);
         if (tenantName != null) {
             TenantContext.setCurrentTenant(tenantName); //
+        } else {
+            TenantContext.clear();
         }
 
         try {
             chain.doFilter(request, response);
         } finally {
-            TenantContext.setCurrentTenant("");
+            TenantContext.clear();
         }
     }
 
