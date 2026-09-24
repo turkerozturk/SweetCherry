@@ -220,10 +220,13 @@
                                     </button>
                                 </form>
 
-                                <a type="submit" th:href="${'/exportWithSubNodes/' + node.nodeId}" class="btn btn-warning btn-sm">
-                                    <img th:src="@{/img/icons/ct_file.svg}"/>
-                                    <span th:text="#{exportnodes.untouchedIds}">CTB export separately</span>
-                                </a>
+                                <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
+                                      method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <img th:src="@{/img/icons/ct_file.svg}"/>
+                                        <span th:text="#{exportnodes.untouchedIds}">CTB export separately</span>
+                                    </button>
+                                </form>
 
                                 <a type="submit" th:href="${'/nodes/delete/' + node.nodeId}" class="btn btn-danger btn-sm">
                                     <img th:src="@{/img/icons/ct_file.svg}"/>

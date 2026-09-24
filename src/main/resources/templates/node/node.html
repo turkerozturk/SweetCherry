@@ -75,7 +75,15 @@
                               method="post" class="d-inline">
                             <button type="submit" class="btn btn-warning">
                                 <img th:src="@{/img/icons/ct_file.svg}"/>
-                                <span th:text="CTB">CTB</span>
+                                <span th:text="#{exportnodes.exportToCollection}">CTB export to collection</span>
+                            </button>
+                        </form>
+
+                        <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
+                              method="post" class="d-inline">
+                            <button type="submit" class="btn btn-warning">
+                                <img th:src="@{/img/icons/ct_file.svg}"/>
+                                <span th:text="#{exportnodes.untouchedIds}">CTB export separately</span>
                             </button>
                         </form>
 

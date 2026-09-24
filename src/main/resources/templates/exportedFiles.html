@@ -29,8 +29,8 @@
                 <a th:href="@{'/download/' + ${file.name}}" class="btn btn-success">
                     <i class="fas fa-download"></i> Download
                 </a>
-                <form th:action="@{'/delete/' + ${file.name}}" method="post" class="d-inline"
-                      th:onsubmit="|return confirm('Are you sure you want to delete ${file.name}?');|">
+                <form th:action="@{'/delete/' + ${file.name}}" method="post"
+                      class="d-inline delete-form" th:attr="data-filename=${file.name}">
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-trash-alt"></i> Delete
                     </button>
@@ -39,6 +39,17 @@
         </tr>
         </tbody>
     </table>
+
+    <script>
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', event => {
+                const fileName = form.dataset.filename;
+                if (!confirm('Are you sure you want to delete ' + fileName + '?')) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 
 </section>
 </body>

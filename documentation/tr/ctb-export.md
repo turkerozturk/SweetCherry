@@ -1,6 +1,6 @@
-# CTB koleksiyonuna dışa aktarma
+# CTB dışa aktarma
 
-Bu belge SweetCherry'de görüntülenen CherryTree notlarının ortak bir CTB dosyasına aktarılmasını, mevcut davranışı ve ileride ele alınacak konuları açıklar.
+Bu belge SweetCherry'de görüntülenen CherryTree notlarının ortak bir koleksiyon CTB'sine veya ayrı bir CTB dosyasına aktarılmasını, mevcut davranışı ve ileride ele alınacak konuları açıklar.
 
 ## Terimler
 
@@ -17,6 +17,39 @@ Bir not sayfasındaki **CTB Koleksiyona Aktar** düğmesi, seçilen düğümü `
 - Seçilen düğümün alt düğümleri varsa mevcut controller bunları da bulup aynı export işlemine dahil eder ve ilişkilerini yeni kimliklere göre kurar.
 - Export işlemi artık `POST` isteğidir. Başarılı işlemden sonra sonuç sayfasına yönlendirme yapıldığı için tarayıcının geri/ileri veya yenile hareketi export'u kendiliğinden tekrarlamaz.
 
+## Ayrı CTB dosyasına aktarma
+
+**CTB Ayrı Aktar** düğmesi, seçilen düğüm ve alt düğümleri için bağımsız bir CTB dosyası oluşturur. Bu seçenek hem masaüstü hem mobil düğüm görünümünde bulunur. Dosya adı şu biçimdedir:
+
+```text
+export_<tenant adı>_<nodeId>.ctb
+```
+
+Örnek:
+
+```text
+export_Demo Database_40.ctb
+```
+
+Aynı tenant ve düğüm için dosya zaten varsa mevcut dosyanın üzerine doğrudan yazılmaz. Önce tarih-saat bilgisi eklenerek `.old` uzantılı bir geçmiş kopyasına dönüştürülür, ardından yeni CTB oluşturulur:
+
+```text
+export_Demo Database_26.ctb
+export_Demo Database_26.ctb__20260924155002.old
+export_Demo Database_26.ctb__20260924155026.old
+```
+
+Bu export da `POST` ve sonuç sayfasına yönlendirme kullanır; tarayıcının geri/ileri hareketi yeni bir CTB veya `.old` dosyası oluşturmamalıdır.
+
+## Mevcut iki export seçeneğinin özeti
+
+| Seçenek | Hedef | Güncel kapsam | Var olan hedef |
+|---|---|---|---|
+| CTB Koleksiyona Aktar | `exportedFiles/exportednodes.ctb` | Seçilen düğüm ve alt düğümleri | Yeni kimliklerle aynı koleksiyona eklenir |
+| CTB Ayrı Aktar | `exportedFiles/export_<tenant>_<nodeId>.ctb` | Seçilen düğüm ve alt düğümleri | Önce tarih-saatli `.old` dosyasına taşınır |
+
+Şimdilik iki seçenek de yalnızca seçili tek düğüm yerine onun alt ağacını aktarır. Yalnız seçilen düğümü aktarma seçeneklerinin ayrıca eklenmesi TODO listesindedir.
+
 ## Düğüm kimlikleri neden değişir?
 
 Kaynak CTB'deki `node_id` değerleri hedefte aynen korunmaz. Güncel algoritma:
@@ -29,13 +62,25 @@ Bu nedenle kimlikler arasındaki boşluklar rastgele değildir; kaynak düğüml
 
 ## Dosyayı indirme ve silme
 
-`/exportedFiles` sayfası oluşturulan CTB dosyalarını listeler.
+`/exportedFiles` sayfası oluşturulan ortak ve ayrı CTB dosyaları ile `.old` geçmiş kopyalarını listeler.
 
-- **Download**, `exportednodes.ctb` dosyasını bilgisayarda seçilen konuma indirir. Dosya CherryTree Desktop ile açılabilir.
+- **Download**, seçilen CTB veya `.old` dosyasını bilgisayarda seçilen konuma indirir.
 - **Delete**, kullanıcı onayından sonra dosyayı siler. Silme işlemi veri değiştirdiği için `POST` isteği kullanır.
 - Dosya silindikten sonra yeni bir düğüm export edilirse boş bir `exportednodes.ctb` yeniden oluşturulur.
 
 Silmeden veya CherryTree ile düzenlemeden önce gerekli dosyaların yedeğini alın.
+
+## Alias, link ve anchor sınırlaması
+
+Normal düğümler ve alt düğüm hiyerarşisi mevcut denemelerde hedef CTB'ye yazılmaktadır. Ancak kaynak veritabanındaki **alias/shared node**, başka bir node'a verilen bağlantı veya anchor gibi yapılarda saklanan `node_id` referanslarının tamamı henüz yeni hedef kimliklere güvenilir biçimde çevrilmemektedir.
+
+Bu durumda:
+
+- DB Browser for SQLite ile bakıldığında düğüm kayıtları hedef CTB içinde görülebilir.
+- CherryTree Desktop ağacı hatalı referansa kadar gösterebilir ve ardından yedekten geri dönmeyi önerebilir.
+- SweetCherry tarafından oluşturulan dosya için CherryTree'nin kendi otomatik yedeği bulunmayabilir; geri yükleme sorusuna **Hayır** denmesi dosyanın boş veya donmuş görünmesine yol açabilir.
+
+Bu nedenle alias/link/anchor içeren dalların export'u şimdilik deneysel kabul edilmelidir. Özgün CTB dosyası değiştirilmez, fakat üretilen export dosyasının CherryTree ile sorunsuz açılacağı garanti edilmez. Sorun içerik kayıtlarının tamamen kaybolmasından çok, referans kimliklerinin hedef veritabanına doğru çevrilememesidir.
 
 ## SweetCherry içinde veri kaynağı olarak açma
 
@@ -46,8 +91,10 @@ Bağlantı tanım dosyalarını `allTenants` klasörüne yüklemek için SweetCh
 ## TODO ve sağlamlaştırma notları
 
 - Aynı kaynak düğümün daha önce export edilip edilmediğini belirleyen isteğe bağlı yinelenen kayıt kontrolü tasarla.
-- Tek düğüm ve dal export seçeneklerini arayüzde açıkça ayır; mevcut alt düğüm davranışını otomatik testle sabitle.
+- Her iki hedef için “yalnız seçili düğüm” ve “seçili düğüm + alt düğümler” seçeneklerini arayüzde açıkça ayır.
+- Mevcut alt düğüm hiyerarşisi davranışını otomatik testle sabitle.
 - Kimlik üretimini, ilişkileri koruyan açık bir eski-yeni ID eşleme tablosuyla yeniden tasarla.
+- Alias/shared node, node bağlantısı ve anchor referanslarını aynı eski-yeni ID eşleme tablosuyla güvenilir biçimde dönüştür.
 - Bir dalın tamamını tek transaction içinde yaz; yarım kalan export sonucunda eksik CTB oluşmasını engelle.
 - Controller içindeki export durumunu istek başına yerel hale getir; eşzamanlı iki export isteğinin birbirini etkilemesini engelle.
 - Export sırasında hedef CTB'nin SweetCherry veya CherryTree tarafından açık olması durumunu algıla ya da kullanıcıyı daha belirgin uyar.

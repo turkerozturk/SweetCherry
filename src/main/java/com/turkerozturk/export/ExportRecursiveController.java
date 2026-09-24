@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -259,8 +259,8 @@ public class ExportRecursiveController {
 
 
     //https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
-    @GetMapping("/exportWithSubNodes/{node_id}")
-    public String export1(@PathVariable("node_id") Integer nodeId, Model model) throws IOException {
+    @PostMapping("/exportWithSubNodes/{node_id}")
+    public String export1(@PathVariable("node_id") Integer nodeId, RedirectAttributes redirectAttributes) {
 
         logger.info("export contorller " + nodeId);
 
@@ -272,25 +272,26 @@ public class ExportRecursiveController {
 
         String dbFilePath = directoryPath + File.separator + dbFileName;
 
-        if (Files.exists(Path.of(dbFilePath))) {
-            logger.info("db file exits: " + dbFilePath);
-            // Tarih formatını belirleme
-            LocalDateTime currentDateTime = LocalDateTime.now();
-
-            // Tarih ve saati "yyyyMMddHHmmss" formatında alacak şekilde formatlama
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-            String formattedDateTime = currentDateTime.format(formatter);
-
-            // Yeni dosya adını oluşturma
-            Path newFilePath = Path.of(dbFilePath + "__" + formattedDateTime + ".old");
-            // Dosyayı taşıma (yeniden adlandırma)
-            Files.move(Path.of(dbFilePath), newFilePath, StandardCopyOption.REPLACE_EXISTING);
-            logger.info("eski dosya şu dosya yoluna tşşındı newFilePath: " + newFilePath);
-
-        } else {
-            logger.info("db file not exits: " + dbFilePath);
+        try {
+            Files.createDirectories(Path.of(directoryPath));
+            if (Files.exists(Path.of(dbFilePath))) {
+                logger.info("db file exits: " + dbFilePath);
+                LocalDateTime currentDateTime = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+                String formattedDateTime = currentDateTime.format(formatter);
+                Path newFilePath = Path.of(dbFilePath + "__" + formattedDateTime + ".old");
+                Files.move(Path.of(dbFilePath), newFilePath, StandardCopyOption.REPLACE_EXISTING);
+                logger.info("Old export file moved to: " + newFilePath);
+            } else {
+                logger.info("db file not exits: " + dbFilePath);
+            }
+        } catch (IOException e) {
+            logger.error("Error while preparing separate CTB export", e);
+            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            return "redirect:/export-result";
         }
 
+        int exportedNodeCount = 0;
         String sqliteUrl = "jdbc:sqlite:" + dbFilePath;
         try (Connection conn = DriverManager.getConnection(sqliteUrl)) {
             if (conn != null) {
@@ -300,6 +301,7 @@ public class ExportRecursiveController {
 
 
                 List<Children> childrens = childrenService.findAllSubChildren(nodeId);
+                exportedNodeCount = childrens.size();
                 for (Children children : childrens) {
                     boolean isRegulardNode = children.getMasterId() == null || children.getMasterId() == 0;
                     if(isRegulardNode) {
@@ -311,23 +313,24 @@ public class ExportRecursiveController {
 
                 }
 
-                model.addAttribute("contentText", "Export successful. Exported node count: " + childrens.size());
             }
         } catch (SQLException e) {
             logger.error("Error during export", e);
-            model.addAttribute("contentText", "Export failed.");
+            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            return "redirect:/export-result";
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error("Error during export", e);
+            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            return "redirect:/export-result";
         }
 
 
         // bilgi bitti
 
-        model.addAttribute("contentText", "export başarılı.");
         logger.info("export şu dosya yoluna yapıldı dbFilePath: " + dbFilePath);
-
-
-        return "expo";
+        redirectAttributes.addFlashAttribute("contentText",
+                "Export successful. Exported node count: " + exportedNodeCount + ". File: " + dbFileName);
+        return "redirect:/export-result";
     }
 
 
