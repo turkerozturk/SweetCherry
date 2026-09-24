@@ -25,8 +25,6 @@ import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenService;
 import com.turkerozturk.codebox.CodeBox;
 import com.turkerozturk.grid.Grid;
-import com.turkerozturk.helpers.ApplicationUtils;
-import com.turkerozturk.helpers.TargetFilePathHelper;
 import com.turkerozturk.image.Image;
 import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.node.Node;
@@ -35,15 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -52,7 +47,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * node_leri korur. Bir dugumu altindaki tum dugumlerle birlikte veritabaniAdi + dugumId seklinde ayri bir dosyaya kaydeder.
@@ -80,20 +74,7 @@ public class ExportRecursiveController {
 
         Statement stmt = conn.createStatement();
 
-        // bilgi hem jar hem de jar degilken schema dosyasini problemsiz bulmasi icin logic ve kod:
-        String schema = null;
-        if (ApplicationUtils.isRunningFromJar()) {
-            logger.info("Running from JAR");
-            schema = loadFileContent("schema-sqlite.sql");
-        } else {
-            logger.info("Running from IDE or exploded JAR");
-            String dbSchemaFilePath = TargetFilePathHelper
-                    .getTargetPathWirhoutStatic("schemas" + File.separator + "schema-sqlite.sql");
-            logger.info("SCHEMA " + dbSchemaFilePath);
-            schema = readFileToString(dbSchemaFilePath);
-        }
-
-        stmt.executeUpdate(schema);
+        stmt.executeUpdate(SqliteSchemaLoader.load());
     }
 
     /**
@@ -351,25 +332,5 @@ public class ExportRecursiveController {
 
 
 
-
-    public static String readFileToString(String filePath) throws IOException {
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(filePath);
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        }
-    }
-
-    public String loadFileContent(String filePath) throws IOException {
-        Resource resource = new ClassPathResource(filePath);
-        logger.info("is resource present: " + resource.exists());
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-            return reader.lines().collect(Collectors.joining(System.lineSeparator()));
-        }
-    }
 
 }
