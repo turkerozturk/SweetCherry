@@ -13,32 +13,32 @@ for /f "tokens=1,2 delims=." %%A in ("%JAVA_VERSION%") do (
 if not defined JAVA_MAJOR goto badversion
 if %JAVA_MAJOR% LSS 17 goto oldjava
 
-echo Java bulundu: %JAVA_VERSION%
-echo SweetCherry derleniyor. Ilk derleme internet hizina gore birkac dakika surebilir...
+echo Java found: %JAVA_VERSION%
+echo Building SweetCherry. The first build may take a few minutes depending on your internet connection...
 call mvnw.cmd -DskipTests package
 if errorlevel 1 goto builderror
 
 echo.
-echo DERLEME TAMAMLANDI: target\SweetCherry.jar
-echo CALISTIRILABILIR KLASOR: release\
+echo BUILD COMPLETED: target\SweetCherry.jar
+echo RUNNABLE DIRECTORY: release\SweetCherry\
 if /i not "%~1"=="--no-pause" pause
 exit /b 0
 
 :nojava
-echo HATA: Java bulunamadi. JDK 17 veya daha yeni bir JDK kurun.
-echo Ayrintilar: documentation\tr\setup-and-run.md
+echo ERROR: Java was not found. Install JDK 17 or a newer JDK.
+echo Details: documentation\tr\setup-and-run.md
 goto error
 
 :badversion
-echo HATA: Java surumu okunamadi. "java -version" komutunu kontrol edin.
+echo ERROR: The Java version could not be read. Check the "java -version" command.
 goto error
 
 :oldjava
-echo HATA: Java %JAVA_VERSION% bulundu; SweetCherry icin JDK 17 veya daha yenisi gerekir.
+echo ERROR: Java %JAVA_VERSION% was found; SweetCherry requires JDK 17 or newer.
 goto error
 
 :builderror
-echo HATA: Derleme tamamlanamadi. Yukaridaki Maven hata mesajini inceleyin.
+echo ERROR: The build could not be completed. Review the Maven error above.
 
 :error
 if /i not "%~1"=="--no-pause" pause

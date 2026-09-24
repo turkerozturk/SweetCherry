@@ -8,4 +8,4 @@ if errorlevel 1 (
   exit /b 1
 )
 
-call run.bat %*
+call "release\SweetCherry\run.bat" %*

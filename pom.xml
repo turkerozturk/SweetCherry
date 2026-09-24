@@ -470,7 +470,7 @@
 				</configuration>
 			</plugin>
 			<!--
-				Normal package isleminin sonunda calistirilabilir dosyalari release klasorunde toplar.
+				Normal package isleminin sonunda calistirilabilir dosyalari release/SweetCherry klasorunde toplar.
 				SweetCherry.jar her derlemede yenilenir. Demo CTB ve tenant ayari ise kullanici
 				tarafindan degistirilmis olabilecegi icin release klasorunde zaten varsa korunur.
 			-->
@@ -487,24 +487,34 @@
 						</goals>
 						<configuration>
 							<target xmlns:unless="ant:unless">
-								<mkdir dir="${project.basedir}/release/CTBDATA"/>
-								<mkdir dir="${project.basedir}/release/allTenants"/>
+								<mkdir dir="${project.basedir}/release/SweetCherry/CTBDATA"/>
+								<mkdir dir="${project.basedir}/release/SweetCherry/allTenants"/>
 
 								<copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-									  tofile="${project.basedir}/release/${project.build.finalName}.${project.packaging}"
+									  tofile="${project.basedir}/release/SweetCherry/${project.build.finalName}.${project.packaging}"
 									  overwrite="true"/>
 
-								<available file="${project.basedir}/release/CTBDATA/demo.ctb"
+								<available file="${project.basedir}/release/SweetCherry/CTBDATA/demo.ctb"
 										   property="release.demo.ctb.exists"/>
 								<copy file="${project.basedir}/external/CTBDATA/demo.ctb"
-									  tofile="${project.basedir}/release/CTBDATA/demo.ctb"
+									  tofile="${project.basedir}/release/SweetCherry/CTBDATA/demo.ctb"
 									  unless:set="release.demo.ctb.exists"/>
 
-								<available file="${project.basedir}/release/allTenants/demo.txt"
+								<available file="${project.basedir}/release/SweetCherry/allTenants/demo.txt"
 										   property="release.demo.tenant.exists"/>
 								<copy file="${project.basedir}/external/allTenants/demo.txt"
-									  tofile="${project.basedir}/release/allTenants/demo.txt"
+									  tofile="${project.basedir}/release/SweetCherry/allTenants/demo.txt"
 									  unless:set="release.demo.tenant.exists"/>
+
+								<copy todir="${project.basedir}/release/SweetCherry" overwrite="true">
+									<fileset dir="${project.basedir}/external">
+										<include name="run.bat"/>
+										<include name="run.sh"/>
+										<include name="run.command"/>
+									</fileset>
+								</copy>
+								<chmod file="${project.basedir}/release/SweetCherry/run.sh" perm="755" osfamily="unix"/>
+								<chmod file="${project.basedir}/release/SweetCherry/run.command" perm="755" osfamily="unix"/>
 							</target>
 						</configuration>
 					</execution>

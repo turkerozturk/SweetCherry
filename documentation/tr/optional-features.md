@@ -12,7 +12,8 @@ Normal çalışmada yalnızca aşağıdaki Actuator uçları sunulur:
 Swagger, ayrıntılı Actuator uçları ve kapatma uçları normal çalışmada kapalıdır. Açmak için:
 
 ```bash
-java -jar target/SweetCherry.jar \
+cd release/SweetCherry
+java -jar SweetCherry.jar \
   --server.port=8443 \
   --server.http.port=8080 \
   --spring.profiles.active=operations
@@ -21,7 +22,7 @@ java -jar target/SweetCherry.jar \
 Windows tek satır örneği:
 
 ```bat
-run.bat --spring.profiles.active=operations
+release\SweetCherry\run.bat --spring.profiles.active=operations
 ```
 
 Operations profilinde:
@@ -45,13 +46,13 @@ Eski `/dashboardold` sayfası geliştirme ve hatırlatma amacıyla projede tutul
 `ScheduledTasks` ve scheduling yapılandırması normal çalışmada oluşturulmaz. Denemeleri yeniden açmak için:
 
 ```bat
-run.bat --spring.profiles.active=experiments
+release\SweetCherry\run.bat --spring.profiles.active=experiments
 ```
 
 Operations ile birlikte:
 
 ```bat
-run.bat --spring.profiles.active=operations,experiments
+release\SweetCherry\run.bat --spring.profiles.active=operations,experiments
 ```
 
 Mevcut scheduled task'lar örnek amaçlıdır: biri her dakika log yazar, diğeri günde bir kez e-posta deneme mesajını loglar. Gerçek e-posta gönderme satırı halen yorumdadır.

@@ -56,7 +56,7 @@ Klasör yolunda boşluk bulunması desteklenir.
 Çıkarılan proje klasöründeki `first-run.bat` dosyasına çift tıklayın. Script:
 
 1. Java 17+ bulunduğunu denetler.
-2. Maven Wrapper ile `target/SweetCherry.jar` dosyasını derler.
+2. Maven Wrapper ile JAR dosyasını derler ve `release/SweetCherry` dağıtım klasörünü hazırlar.
 3. SweetCherry'yi başlatır.
 4. Varsayılan tarayıcıda `http://localhost:8080` adresini açar.
 
@@ -70,14 +70,14 @@ Proje klasöründe terminal açıp çalıştırın:
 sh ./first-run.sh
 ```
 
-Dosya yöneticisinden çift tıklama davranışı masaüstü ortamına göre değiştiği için terminal komutu daha güvenilirdir. İsterseniz bir kez `chmod +x first-run.sh build.sh run.sh` çalıştırdıktan sonra `./first-run.sh` da kullanabilirsiniz.
+Dosya yöneticisinden çift tıklama davranışı masaüstü ortamına göre değiştiği için terminal komutu daha güvenilirdir. İsterseniz bir kez `chmod +x first-run.sh build.sh` çalıştırdıktan sonra `./first-run.sh` da kullanabilirsiniz.
 
 ### macOS
 
 Finder'da `first-run.command` dosyasına çift tıklayın. macOS dosyayı ilk seferde engellerse Terminal'de proje klasörüne geçip şunları çalıştırın:
 
 ```bash
-chmod +x first-run.command run.command
+chmod +x first-run.command
 ./first-run.command
 ```
 
@@ -98,23 +98,27 @@ Yalnızca derlemek için:
 | Windows | `build.bat` |
 | Linux/macOS | `sh ./build.sh` |
 
-Derleme başarılı olduğunda çalıştırılabilir dosya `target/SweetCherry.jar` olur. Ayrıca Maven, doğrudan çalıştırılabilecek aşağıdaki klasör yapısını hazırlar:
+Derleme başarılı olduğunda Maven'ın ara çıktısı `target/SweetCherry.jar` olur. Ayrıca Maven, son kullanıcıya yönelik aşağıdaki çalıştırılabilir klasör yapısını hazırlar:
 
 ```text
 release/
-├── SweetCherry.jar
-├── CTBDATA/
-│   └── demo.ctb
-└── allTenants/
-    └── demo.txt
+└── SweetCherry/
+    ├── SweetCherry.jar
+    ├── run.bat
+    ├── run.sh
+    ├── run.command
+    ├── CTBDATA/
+    │   └── demo.ctb
+    └── allTenants/
+        └── demo.txt
 ```
 
-`SweetCherry.jar` her derlemede güncellenir. `demo.ctb` ve `demo.txt` yalnızca hedefte yoksa kopyalanır; `release` altında kullanıcı tarafından değiştirilmiş demo dosyalarının üzerine yazılmaz.
+`SweetCherry.jar` ve çalıştırma scriptleri her derlemede güncellenir. `demo.ctb` ve `demo.txt` yalnızca hedefte yoksa kopyalanır; `release/SweetCherry` altında kullanıcı tarafından değiştirilmiş demo dosyalarının üzerine yazılmaz.
 
-Hazır demo ile denemek için terminalde `release` klasörüne geçip uygulamayı bu klasörü çalışma dizini yaparak başlatın:
+Hazır demo ile denemek için terminalde `release/SweetCherry` klasörüne geçip uygulamayı bu klasörü çalışma dizini yaparak başlatın:
 
 ```bash
-cd release
+cd release/SweetCherry
 java -jar SweetCherry.jar --server.port=8443 --server.http.port=8080 --myapp.openWebBrowserOnStartup=true
 ```
 
@@ -124,14 +128,15 @@ Daha sonraki çalıştırmalarda yeniden derlemek gerekmez:
 
 | Sistem | Komut veya dosya |
 |---|---|
-| Windows | `run.bat` |
-| Linux | `sh ./run.sh` |
-| macOS | `run.command` veya `sh ./run.sh` |
+| Windows | `release/SweetCherry/run.bat` |
+| Linux | `sh ./release/SweetCherry/run.sh` |
+| macOS | `release/SweetCherry/run.command` veya `sh ./release/SweetCherry/run.sh` |
 
 Script kullanmadan eşdeğer komut:
 
 ```bash
-java -jar target/SweetCherry.jar --server.port=8443 --server.http.port=8080
+cd release/SweetCherry
+java -jar SweetCherry.jar --server.port=8443 --server.http.port=8080
 ```
 
 SweetCherry açık kaldığı sürece komut penceresi/terminal de açık kalmalıdır. Uygulamayı durdurmak için `Ctrl+C` kullanın.
@@ -156,17 +161,18 @@ Giriş ekranında iki yerleşik hesap vardır:
 
 ## CTB dosyasını SweetCherry'ye tanıtma
 
-SweetCherry, **çalıştırıldığı klasördeki** `allTenants` dizinini kullanır. Verilen scriptler uygulamayı proje kökünden çalıştırdığı için beklenen konum şöyledir:
+SweetCherry, **çalıştırıldığı klasördeki** `allTenants` dizinini kullanır. Dağıtım scriptleri uygulamayı kendi klasörlerinden çalıştırdığı için beklenen konum şöyledir:
 
 ```text
-SweetCherry-main/
-├── allTenants/
-├── target/
-│   └── SweetCherry.jar
-└── run.bat, run.sh, ...
+release/
+└── SweetCherry/
+    ├── allTenants/
+    ├── CTBDATA/
+    ├── SweetCherry.jar
+    └── run.bat, run.sh, run.command
 ```
 
-`allTenants` klasörü yoksa uygulama ilk açılışta otomatik oluşturur. Uygulamayı bir kez başlatıp durdurabilir veya klasörü kendiniz oluşturabilirsiniz.
+`allTenants` klasörü yoksa uygulama ilk açılışta otomatik oluşturur. Derleme sırasında örnek `demo.txt` de bu klasöre yalnızca henüz yoksa kopyalanır.
 
 Her CTB dosyası için `allTenants` içinde ayrı bir düz metin dosyası oluşturun. Dosya adı ve uzantısı uygulama açısından önemli değildir; açıklık için örneğin `mydatabase.txt` kullanabilirsiniz:
 
@@ -229,7 +235,8 @@ JDK 17+ kurun, terminali/Komut İstemi'ni kapatıp yeniden açın ve `java -vers
 - 8080 ya da 8443 portunu başka bir uygulama kullanıyorsa komut satırında boş iki port seçebilirsiniz. Örneğin:
 
   ```bash
-  java -jar target/SweetCherry.jar --server.port=18443 --server.http.port=18080
+  cd release/SweetCherry
+  java -jar SweetCherry.jar --server.port=18443 --server.http.port=18080
   ```
 
   Bu durumda tarayıcıdan `http://localhost:18080` adresini açın.
