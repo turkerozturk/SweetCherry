@@ -21,7 +21,6 @@
 package com.turkerozturk.shutdown;
 
 import org.springframework.beans.BeansException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@ConditionalOnProperty(name = "myapp.operations.enabled", havingValue = "true")
 public class ShutdownController implements ApplicationContextAware {
 
     private ApplicationContext context;

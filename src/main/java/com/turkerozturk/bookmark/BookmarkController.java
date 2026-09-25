@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Controller
 public class BookmarkController {
@@ -49,22 +50,27 @@ public class BookmarkController {
                                        @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
         List<Bookmark> bookmarks = bookmarkService.getBookmarks();
 
-        if (!bookmarks.isEmpty()) {
-            // BASLA shared node correction
-            for (Bookmark bookmark : bookmarks) {
-
-                if (bookmark.getNode() != null) {
-                    bookmark.getNode().setBreadcrumbs(nodeService.addBreadcrumbs(bookmark.getNode().getNodeId()));
-                } else {
-                    Children child = childrenService.findById(bookmark.getNodeId());
-                    bookmark.setNode(nodeService.findById(child.getMasterId()));
-                    bookmark.getNode().setBreadcrumbs(nodeService.addBreadcrumbs(child.getMasterId()));
-                }
+        List<Bookmark> available = new ArrayList<>();
+        List<Long> missing = new ArrayList<>();
+        for (Bookmark bookmark : bookmarks) {
+            Children child = childrenService.findById(bookmark.getNodeId());
+            if (child == null) {
+                missing.add(bookmark.getNodeId());
+                continue;
             }
-            // BASLA shared node correction
-
-            model.addAttribute("bookmarks", bookmarks);
+            long realId = child.getMasterId() != null && child.getMasterId() != 0
+                    ? child.getMasterId() : child.getNodeId();
+            var node = nodeService.findById(realId);
+            if (node == null) {
+                missing.add(bookmark.getNodeId());
+                continue;
+            }
+            node.setBreadcrumbs(nodeService.addBreadcrumbs(realId));
+            bookmark.setNode(node);
+            available.add(bookmark);
         }
+        model.addAttribute("bookmarks", available);
+        model.addAttribute("missingBookmarkIds", missing);
 
         model.addAttribute("viewMode", viewMode);
         if ("mobile".equals(viewMode)) {

@@ -63,82 +63,32 @@ public class ChildrenService {
      * @return
      */
     public List<NaviNode> getNaviNodesByFatherId(long fatherId) {
+        List<Children> rows = new ArrayList<>(childrenRepository.findByFatherId(fatherId));
+        rows.sort(Comparator.comparingLong(Children::getSequence));
 
-        // BASLA shared node correction
-        List<Children> rawChildren = childrenRepository.findByFatherId(fatherId);
-        List<Children> children = new ArrayList<>();
+        List<Long> displayIds = rows.stream()
+                .map(row -> row.getMasterId() != null && row.getMasterId() != 0
+                        ? row.getMasterId() : row.getNodeId())
+                .distinct().toList();
+        Map<Long, Node> displayNodes = nodeRepository.findByNodeIdIn(displayIds).stream()
+                .collect(Collectors.toMap(Node::getNodeId, Function.identity()));
 
-        for (Children child : rawChildren) {
-            if(child.getMasterId() == null || child.getMasterId() == 0) {
-                // normal
-                children.add(child);
-            } else {
-                Children masterChild = findById(child.getMasterId());
-                children.add(masterChild);
+        List<NaviNode> result = new ArrayList<>();
+        for (int i = 0; i < rows.size(); i++) {
+            Children row = rows.get(i);
+            boolean shared = row.getMasterId() != null && row.getMasterId() != 0;
+            Node display = displayNodes.get(shared ? row.getMasterId() : row.getNodeId());
+            if (display == null) {
+                continue; // A broken reference must not prevent the rest of the tree from rendering.
             }
+            Long previous = i > 0 ? rows.get(i - 1).getNodeId() : null;
+            Long next = i + 1 < rows.size() ? rows.get(i + 1).getNodeId() : null;
+            result.add(new NaviNode(row.getNodeId(), display.getName(), display.getNodeIcon(),
+                    !shared && !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
+                    display.getTitleColorAsHtmlHex(), display.isReadOnly(), display.isBoldnessBit(),
+                    (int) row.getSequence(), previous, next));
         }
-        // BITTI shared node correction
-
-        // Children listesini sequence sutununa gore sirala
-        children.sort(Comparator.comparing(Children::getSequence));
-
-        List<Long> nodeIds = children.stream().map(Children::getNodeId).collect(Collectors.toList());
-
-        // String concatenatedIds = String.join(", ", nodeIds.stream().map(Object::toString).toArray(String[]::new));
-        // System.out.println(concatenatedIds);
-
-        List<Node> nodes = nodeRepository.findByNodeIdIn(nodeIds);
-
-
-        // BASLA if the node has sub nodes
-        List<NaviNode> naviNodes = new ArrayList<>();
-
-        for (int i = 0; i < nodes.size(); i++) {
-            Node node = nodes.get(i);
-            List<Children> childrenOfNode = childrenRepository.findByFatherId(node.getNodeId());
-            if(childrenOfNode.size() > 0) {
-                node.setHasChildren(true);
-            }
-
-            // İlgili Node için Children kaydını bul
-            Children correspondingChild = children.stream()
-                    .filter(child -> child.getNodeId() == node.getNodeId())
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Corresponding child not found for nodeId: " + node.getNodeId()));
-
-            // Prev ve Next Sibling Node Id'leri bul
-            Long prevSiblingNodeId = (i > 0) ? children.get(i - 1).getNodeId() : null;
-            Long nextSiblingNodeId = (i < nodes.size() - 1) ? children.get(i + 1).getNodeId() : null;
-
-
-            NaviNode naviNode = new NaviNode(node.getNodeId(),
-                    node.getName(),
-                    node.getNodeIcon(),
-                    node.isHasChildren(),
-                    node.getTitleColorAsHtmlHex(),
-                    node.isReadOnly(),
-                    node.isBoldnessBit(),
-                    (int) correspondingChild.getSequence(), // BURAYA children tablosundaki sequence alanında yazan değeri kaydediyoruz.
-                    prevSiblingNodeId,  // Önceki kardeş düğümün nodeId'si
-                    nextSiblingNodeId   // Sonraki kardeş düğümün nodeId'si
-
-            );
-            naviNodes.add(naviNode);
-
-
-        }
-        // BITTI if the node has sub nodes
-
-        // Node listesini nodeIds sirasina gore yeniden duzenle
-        Map<Long, NaviNode> naviNodeMap = naviNodes.stream()
-                .collect(Collectors.toMap(NaviNode::nodeId, Function.identity()));
-
-        List<NaviNode> sortedNaviNodes = nodeIds.stream()
-                .map(naviNodeMap::get)
-                .collect(Collectors.toList());
-
-
-        return  sortedNaviNodes;
+        return result;
     }
 
     /**

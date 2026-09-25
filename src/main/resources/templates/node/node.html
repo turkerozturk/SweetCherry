@@ -35,6 +35,12 @@
 
             <hr/>
 
+            <p th:if="${isSharedNode}" class="alert alert-info">
+                <span th:text="#{node.sharedReference}">Shared reference</span>
+                <strong th:text="${requestedNodeId}">55</strong>
+                → <a th:href="@{/nodes/{nodeId}(nodeId=${masterNodeId})}" th:text="${masterNodeId}">10</a>
+            </p>
+
             <th:block th:unless="${isRootNode}">
 
                 <th:block th:unless="${isRootNode}">

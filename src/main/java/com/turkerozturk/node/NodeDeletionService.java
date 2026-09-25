@@ -85,6 +85,7 @@ public class NodeDeletionService {
         // A shared node is only a reference. Deleting it must never delete its master.
         if (isShared(selected)) {
             ensureNoChildren(selected.getNodeId());
+            deleteRow("bookmark", selected.getNodeId());
             deleteRow("children", selected.getNodeId());
             logger.info("Deleted shared node {} (master {}).", nodeId, selected.getMasterId());
             return;
@@ -119,6 +120,7 @@ public class NodeDeletionService {
         }
 
         for (long sharedId : sharedIds) {
+            deleteRow("bookmark", sharedId);
             deleteRow("children", sharedId);
         }
         // findAllSubChildren lists parents before descendants; delete in reverse order.

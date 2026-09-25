@@ -43,9 +43,10 @@ class NodeDeletionServiceTest {
         when(children.findByNodeId(20L)).thenReturn(alias);
         when(children.findByFatherId(20L)).thenReturn(List.of());
         deletion.deleteNodeWithSubNodes(20);
+        verify(manager).createNativeQuery("DELETE FROM bookmark WHERE node_id = :nodeId");
         verify(manager).createNativeQuery("DELETE FROM children WHERE node_id = :nodeId");
-        verify(query).setParameter("nodeId", 20L);
-        verify(manager, times(1)).createNativeQuery(anyString());
+        verify(query, times(2)).setParameter("nodeId", 20L);
+        verify(manager, times(2)).createNativeQuery(anyString());
         verifyNoInteractions(nodes, tree);
     }
 
@@ -60,6 +61,7 @@ class NodeDeletionServiceTest {
         when(nodes.existsById(10L)).thenReturn(true);
         deletion.deleteNodeWithSubNodes(10);
         var order = inOrder(manager);
+        order.verify(manager).createNativeQuery("DELETE FROM bookmark WHERE node_id = :nodeId");
         order.verify(manager).createNativeQuery("DELETE FROM children WHERE node_id = :nodeId");
         order.verify(manager).createNativeQuery("DELETE FROM bookmark WHERE node_id = :nodeId");
         order.verify(manager).createNativeQuery("DELETE FROM codebox WHERE node_id = :nodeId");

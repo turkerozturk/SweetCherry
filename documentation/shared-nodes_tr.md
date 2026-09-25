@@ -28,3 +28,13 @@ arşivi yerine CTB dosyasının bir kopyasını kullanın. Bu açıklama CherryT
 veritabanı düzenini ve SweetCherry'nin bu düzen üzerindeki silme kurallarını
 anlatır; dosyanın `node`/`children` tablolarında sıra dışı kayıtlar varsa
 uygulama silmeyi reddeder.
+
+## Release öncesi kullanım notu
+
+Silme özelliği henüz gerçek not arşivleri için önerilmiyor. Şimdilik yalnızca
+ayrı bir demo/kopya CTB üzerinde deneyin; diğer `allTenants/*.txt` tanımlarında
+`custom.isWritable=false` kullanın veya ayarı hiç eklemeyin. Paylaşılan düğüme
+ait ağaç bağlantısının URL'si kendi `children.node_id` değerini korumalıdır;
+silme onayında bu kimliği ve gerçek düğümün kimliğini ayrı ayrı kontrol edin.
+Eski sürümlerde silinmiş düğümlerin geride bıraktığı bookmark kayıtları okuma
+sayfasında ayrıca bildirilir, otomatik olarak veritabanından temizlenmez.

@@ -39,14 +39,17 @@ import org.springframework.context.MessageSource;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.LinkedHashMap;
 
 @Controller
 public class NodeController {
@@ -402,10 +405,17 @@ public class NodeController {
 
 
         Children nodeInChildrenTable = childrenService.findById(nodeId);
+        if (nodeInChildrenTable == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
 
         boolean isRealNode = nodeInChildrenTable.getMasterId() == null
                 || nodeInChildrenTable.getMasterId() == 0; // bilgi eski dblerde null var, yenilerde 0 var.
+        model.addAttribute("isSharedNode", !isRealNode);
+        if (!isRealNode) {
+            model.addAttribute("masterNodeId", nodeInChildrenTable.getMasterId());
+        }
         if(isRealNode) {
 
 
@@ -520,9 +530,22 @@ public class NodeController {
 
         } else { // bilgi Gercek dugum degil, shared node.
             Node node = nodeService.findById(nodeInChildrenTable.getMasterId());
+            if (node == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            }
             node.setMasterNode(false);
 
-            node.setBreadcrumbs(nodeService.addBreadcrumbs(nodeInChildrenTable.getMasterId())); // shared node nin yolu.
+            long parentNodeId = nodeInChildrenTable.getFatherId();
+            Node parent = parentNodeId == 0 ? null : nodeService.findById(parentNodeId);
+            if (parentNodeId != 0 && parent == null) {
+                parentNodeId = 0;
+            }
+            node.setFatherNode(parent);
+
+            LinkedHashMap<Long, String> breadcrumbs = parentNodeId == 0
+                    ? new LinkedHashMap<>() : nodeService.addBreadcrumbs(parentNodeId);
+            breadcrumbs.put(nodeId, node.getName());
+            node.setBreadcrumbs(breadcrumbs);
 
             node.setTxtAsHtml("<a href=\"/nodes/" + nodeInChildrenTable.getMasterId() + "\">Gerçek node için tıklayınız: " + nodeInChildrenTable.getMasterId() + "</a>");
 
@@ -530,8 +553,21 @@ public class NodeController {
 
 
 
-            long parentNodeId = nodeInChildrenTable.getFatherId();
             model.addAttribute("parentNodeId", parentNodeId);
+
+            List<NaviNode> siblings = childrenService.getNaviNodesByFatherId(parentNodeId);
+            model.addAttribute("siblingNaviNodes", siblings);
+            for (int i = 0; i < siblings.size(); i++) {
+                if (siblings.get(i).nodeId() == nodeId) {
+                    if (i > 0) {
+                        model.addAttribute("prevSiblingNaviNode", siblings.get(i - 1));
+                    }
+                    if (i + 1 < siblings.size()) {
+                        model.addAttribute("nextSiblingNaviNode", siblings.get(i + 1));
+                    }
+                    break;
+                }
+            }
 
 
 

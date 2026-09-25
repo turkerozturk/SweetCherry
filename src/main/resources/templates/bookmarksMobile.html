@@ -14,6 +14,11 @@
 <body>
 <section layout:fragment="content">
 
+    <p th:if="${!#lists.isEmpty(missingBookmarkIds)}" class="alert alert-warning">
+        <span th:text="#{bookmarks.missingNodes}">Bookmarks for missing nodes:</span>
+        <span th:text="${missingBookmarkIds}">IDs</span>
+    </p>
+
     <th:block th:unless="${bookmarks}">
 
         <p><b>ADIM:</b> CherryTree programını kullanarak bir düğüm seçin ve menüden yer işaretlerine ekleyin.</p>>
