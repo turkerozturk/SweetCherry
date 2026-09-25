@@ -5,3 +5,4 @@ datasource.driver-class-name=org.sqlite.JDBC
 # datasource.username=admin
 # datasource.password=admin
 datasource.init-mode=always
+custom.isWritable=true

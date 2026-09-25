@@ -78,6 +78,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/nodes/delete/**", "/upload-form", "/upload-database", "/reload-datasources", "/delete/**")
+                        .hasRole("ADMIN")
                         .requestMatchers("/img/**", "/about", "/main", "/features", "/static/css/**", "/webjars/**",
                                 "/sw.js", "/workbox-*.js",
                                 "/actuator/health", "/actuator/info")

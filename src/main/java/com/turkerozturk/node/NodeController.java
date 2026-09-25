@@ -65,6 +65,9 @@ public class NodeController {
     private NodeContentParserService nodeContentParserService;
 
     @Autowired
+    private NodeDeletionService nodeDeletionService;
+
+    @Autowired
     Filtered filtered;
 
     @Value("${myapp.debug}")
@@ -390,8 +393,11 @@ public class NodeController {
 
 
     @GetMapping("/nodes/{nodeId}")
+    @RequiresTenant
     public String getNodeAsHtml(@PathVariable long nodeId, Model model, HttpServletRequest request,
                                 @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+
+        model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
 
 
         Children nodeInChildrenTable = childrenService.findById(nodeId);

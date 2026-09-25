@@ -418,7 +418,8 @@
 
 
                                 <li>
-                                    <a class="dropdown-item" href="/logout">
+                                    <form th:action="@{/logout}" method="post">
+                                    <button type="submit" class="dropdown-item">
                                         <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>
                                         <span
                                                 th:text="#{navbar.logout}"
@@ -427,7 +428,8 @@
                                         &nbsp;
                                         <span
                                         sec:authentication="name"></span>
-                                    </a>
+                                    </button>
+                                    </form>
                                 </li>
 
                             </th:block>

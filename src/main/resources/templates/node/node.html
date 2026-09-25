@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layout}">
 <head>
 
@@ -64,8 +64,6 @@
                     </a>
 
 
-                    <th:block th:unless="${hasEmptyContent}">
-
                         <a type="submit" th:href="${'/export-node-to-pdf/' + node.nodeId}" class="btn btn-warning">
                             <img th:src="@{/img/icons/ct_file.svg}"/>
                             <span th:text="#{search.downloadAsPdf}">PDF</span>
@@ -112,6 +110,12 @@
 
 
 
+                        <a th:if="${canDeleteNode}" sec:authorize="hasRole('ADMIN')"
+                           th:href="@{/nodes/delete/{nodeId}(nodeId=${node.nodeId})}" class="btn btn-danger">
+                            <span th:text="#{node.delete}">Delete Node</span>
+                        </a>
+
+                    <th:block th:unless="${hasEmptyContent}">
                         <div th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></div>
 
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
 <head>
 
@@ -248,9 +248,9 @@
                                     </button>
                                 </form>
 
-                                <a type="submit" th:href="${'/nodes/delete/' + node.nodeId}" class="btn btn-danger btn-sm">
+                                <a th:if="${canDeleteNode}" th:href="@{/nodes/delete/{nodeId}(nodeId=${node.nodeId})}" class="btn btn-danger btn-sm" sec:authorize="hasRole('ADMIN')">
                                     <img th:src="@{/img/icons/ct_file.svg}"/>
-                                    <span th:text="Delete">Delete Node</span>
+                                    <span th:text="#{node.delete}">Delete Node</span>
                                 </a>
 
 

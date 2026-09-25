@@ -22,22 +22,23 @@ package com.turkerozturk.node;
 
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import com.turkerozturk.multipledatabases.RequiresTenant;
+import org.springframework.security.access.AccessDeniedException;
 
 
 
 
 @Controller
 public class NodeDeletionController {
-
-    private static final Logger logger = LoggerFactory.getLogger(NodeDeletionController.class);
 
     @Autowired
     private NodeService nodeService;
@@ -47,29 +48,33 @@ public class NodeDeletionController {
 
 
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequiresTenant
     @GetMapping("/nodes/delete/{nodeId}")
-    public String getNodeAsHtml(@PathVariable long nodeId, Model model,
-                                @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
-
-     //   Node node = nodeService.findById(nodeId);
-    //    model.addAttribute("deletedNodeId", node.getNodeId());
-    //    model.addAttribute("deletedNodeName", node.getName());
-
-      //  Node fatherNode = node.getFatherNode();
-
-
-        //String message =
-        nodeDeletionService.deleteNodeWithSubNodes(nodeId);
-
-
-      //  model.addAttribute("fatherNodeId", fatherNode.getNodeId());
-      //  model.addAttribute("fatherNodeName", fatherNode.getName());
-
-
-
-
-
+    public String confirmDeletion(@PathVariable long nodeId, Model model) {
+        if (!nodeDeletionService.isCurrentTenantWritable()) {
+            throw new AccessDeniedException("The selected CTB is read-only.");
+        }
+        Node node = nodeService.findById(nodeId);
+        if (node == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        model.addAttribute("node", node);
         return "node/nodeDelete";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequiresTenant
+    @PostMapping("/nodes/delete/{nodeId}")
+    public String deleteNode(@PathVariable long nodeId) {
+        if (!nodeDeletionService.isCurrentTenantWritable()) {
+            throw new AccessDeniedException("The selected CTB is read-only.");
+        }
+        if (nodeService.findById(nodeId) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        nodeDeletionService.deleteNodeWithSubNodes(nodeId);
+        return "redirect:/";
     }
 
 

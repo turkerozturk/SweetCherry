@@ -43,6 +43,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collections;
+import org.springframework.security.access.AccessDeniedException;
 
 @Service
 @Transactional
@@ -74,6 +76,13 @@ public class NodeDeletionService {
     @Autowired
     private BookmarkRepository bookmarkRepository;
 
+    public boolean isCurrentTenantWritable() {
+        String tenant = TenantContext.getCurrentTenant();
+        Map<String, String> properties = tenant == null ? Collections.emptyMap() :
+                customPropertiesHolder.getCustomProperties(tenant);
+        return properties != null && Boolean.parseBoolean(properties.get("custom.isWritable"));
+    }
+
     /**
      * TODO refactor this method with CASCADE
      * FOR ONE NODE, deletes all node related data from all tables
@@ -83,37 +92,67 @@ public class NodeDeletionService {
 
         Node node = nodeRepository.findById(nodeId);
 
+        if (node == null ) {
 
-        if (node != null ) {
+            // Eğer Node = null ise, o halde frontend'de ağaç yapısında görülen Node aslında shared Node'dir.
+            // Dolayısıyla nodeId aslında children tablosundaki node_id'de yazılı olan shared nodeye ait olan kayıttır.
+            Children children = childrenRepository.findByNodeId(nodeId);
+            if (children != null) {
+                childrenRepository.deleteByNodeId(nodeId);
+            }
+        } else {
+
+            Bookmark bookmark = node.getBookmark();
+            if(bookmark != null) {
+                bookmarkRepository.deleteByNodeId(nodeId);
+            }
+
+            List<CodeBox> codeBoxes = codeBoxRepository.findByIdNodeId((int) nodeId);
+            if(codeBoxes != null) {
+                codeBoxRepository.deleteByIdNodeId(nodeId);
+            }
+
+            Set<Image> images = node.getImages();
+            if (images != null) {
+                imageRepository.deleteByNodeId(nodeId);
+            }
+
+            List<Grid> grids = gridRepository.findByIdNodeId((int) nodeId);
+            if(grids != null) {
+                gridRepository.deleteByIdNodeId(nodeId);
+            }
+
+            Children children = childrenRepository.findByNodeId(nodeId);
+            if(children != null) {
+                childrenRepository.deleteByNodeId(nodeId);
+            }
+
             nodeRepository.deleteByNodeId(nodeId);
+
+
+            logger.info(String.format("The node with id number %s is deleted.", nodeId));
         }
 
-        Children children = childrenRepository.findByNodeId(nodeId);
-        if(children != null) {
-            childrenRepository.deleteByNodeId(nodeId);
-        }
 
-        Bookmark bookmark = node.getBookmark();
-        if(bookmark != null) {
-            bookmarkRepository.deleteByNodeId(nodeId);
-        }
 
-        List<CodeBox> codeBoxes = codeBoxRepository.findByIdNodeId((int) nodeId);
-        if(codeBoxes != null) {
-            codeBoxRepository.deleteByIdNodeId(nodeId);
-        }
 
-        Set<Image> images = node.getImages();
-        if (images != null) {
-            imageRepository.deleteByNodeId(nodeId);
-        }
+            // Shared Node denen şey aslında children tablosunda bir kayıt. Bağlı olduğu gerçek Node onun master_id'si.
+            // Gerçek node silineceği zaman, orphan kayıt kalmaması için ona bağlı shared nodeler de silinmelidir.
+            List<Children> sharedNodes = childrenRepository.findByMasterId(nodeId);
+            if(sharedNodes != null) {
+                for(Children sharedNode : sharedNodes) {
+                    childrenRepository.deleteByNodeId(sharedNode.getNodeId());
+                    logger.info(String.format("The shared node with id number %s is deleted.", sharedNode.getNodeId()));
+                }
 
-        List<Grid> grids = gridRepository.findByIdNodeId((int) nodeId);
-        if(grids != null) {
-            gridRepository.deleteByIdNodeId(nodeId);
-        }
+            }
 
-        logger.info(String.format("The node with id number %s is deleted.", nodeId));
+
+
+
+
+
+
 
 
     }
@@ -125,31 +164,16 @@ public class NodeDeletionService {
      */
     public void deleteNodeWithSubNodes(long nodeId) {
 
-        //logger.info("getCurrentTenant: " + TenantContext.getCurrentTenant());
-
-        Map<String, String> customProperties = customPropertiesHolder.getCustomProperties(TenantContext.getCurrentTenant());
-
-        if(customProperties.containsKey("custom.isWritable")) {
-            String isWritableAsString = customProperties.get("custom.isWritable");
-            //logger.info("isWritable: " + isWritableAsString + " (" + tenantName + ")");
-            boolean isWritable = isWritableAsString.equals("true");
-
-
-            // bilgi CTB yi ayar dosyasinda writable olarak belirlemissek, delete islemi yapabiliriz.
-            if(isWritable) {
-
-                List<Children> childrens = childrenService.findAllSubChildren(nodeId);
-                for(Children children: childrens) {
-
-                    deleteNode(children.getNodeId());
-                }
-                logger.info(String.format("The node with id number %s and all its subNodes are deleted.", nodeId));
-
-            }
-
+        if (!isCurrentTenantWritable()) {
+            throw new AccessDeniedException("The selected CTB is read-only. Enable custom.isWritable in its tenant definition to delete nodes.");
         }
 
-
+        List<Children> children = childrenService.findAllSubChildren(nodeId);
+        // Delete descendants before their parent to preserve the tree's references.
+        for (int i = children.size() - 1; i >= 0; i--) {
+            deleteNode(children.get(i).getNodeId());
+        }
+        logger.info("The node with id number % and all its subNodes are deleted.", nodeId);
     }
 
 
