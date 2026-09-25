@@ -9,11 +9,12 @@
 <section layout:fragment="content">
 
     <h1 th:text="#{node.delete.title}">Delete node</h1>
-    <p th:text="#{node.delete.warning}">This will permanently delete the selected node and its descendants.</p>
+    <p th:if="${!sharedNode}" th:text="#{node.delete.warning}">This will permanently delete the selected node and its descendants.</p>
+    <p th:if="${sharedNode}" th:text="#{node.delete.sharedWarning}">Only this shared reference will be removed. Its original node remains.</p>
     <p><strong th:text="${node.name}">Node</strong></p>
-    <form th:action="@{/nodes/delete/{nodeId}(nodeId=${node.nodeId})}" method="post">
+    <form th:action="@{/nodes/delete/{nodeId}(nodeId=${selectedNodeId})}" method="post">
         <button type="submit" class="btn btn-danger" th:text="#{node.delete.confirm}">Confirm deletion</button>
-        <a th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId})}" class="btn btn-secondary" th:text="#{node.delete.cancel}">Cancel</a>
+        <a th:href="@{/nodes/{nodeId}(nodeId=${selectedNodeId})}" class="btn btn-secondary" th:text="#{node.delete.cancel}">Cancel</a>
     </form>
 
 

@@ -20,61 +20,49 @@
  */
 package com.turkerozturk.node;
 
-
-import com.turkerozturk.bookmark.Bookmark;
-import com.turkerozturk.bookmark.BookmarkRepository;
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.children.ChildrenService;
-import com.turkerozturk.codebox.CodeBox;
-import com.turkerozturk.codebox.CodeBoxRepository;
-import com.turkerozturk.grid.Grid;
-import com.turkerozturk.grid.GridRepository;
-import com.turkerozturk.image.Image;
-import com.turkerozturk.image.ImageRepository;
 import com.turkerozturk.multipledatabases.CustomPropertiesHolder;
 import com.turkerozturk.multipledatabases.TenantContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collections;
-import org.springframework.security.access.AccessDeniedException;
 
 @Service
-@Transactional
 public class NodeDeletionService {
-
     private static final Logger logger = LoggerFactory.getLogger(NodeDeletionService.class);
 
-    @Autowired
-    private CustomPropertiesHolder customPropertiesHolder;
+    private final CustomPropertiesHolder customPropertiesHolder;
+    private final NodeRepository nodeRepository;
+    private final ChildrenRepository childrenRepository;
+    private final ChildrenService childrenService;
 
-    @Autowired
-    private NodeRepository nodeRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    @Autowired
-    private ChildrenService childrenService;
-
-    @Autowired
-    private ChildrenRepository childrenRepository;
-
-    @Autowired
-    private GridRepository gridRepository;
-
-    @Autowired
-    private CodeBoxRepository codeBoxRepository;
-
-    @Autowired
-    private ImageRepository imageRepository;
-
-    @Autowired
-    private BookmarkRepository bookmarkRepository;
+    public NodeDeletionService(CustomPropertiesHolder customPropertiesHolder,
+                               NodeRepository nodeRepository,
+                               ChildrenRepository childrenRepository,
+                               ChildrenService childrenService) {
+        this.customPropertiesHolder = customPropertiesHolder;
+        this.nodeRepository = nodeRepository;
+        this.childrenRepository = childrenRepository;
+        this.childrenService = childrenService;
+    }
 
     public boolean isCurrentTenantWritable() {
         String tenant = TenantContext.getCurrentTenant();
@@ -83,98 +71,86 @@ public class NodeDeletionService {
         return properties != null && Boolean.parseBoolean(properties.get("custom.isWritable"));
     }
 
-    /**
-     * TODO refactor this method with CASCADE
-     * FOR ONE NODE, deletes all node related data from all tables
-     * @param nodeId
-     */
-    private void deleteNode(long nodeId) {
-
-        Node node = nodeRepository.findById(nodeId);
-
-        if (node == null ) {
-
-            // Eğer Node = null ise, o halde frontend'de ağaç yapısında görülen Node aslında shared Node'dir.
-            // Dolayısıyla nodeId aslında children tablosundaki node_id'de yazılı olan shared nodeye ait olan kayıttır.
-            Children children = childrenRepository.findByNodeId(nodeId);
-            if (children != null) {
-                childrenRepository.deleteByNodeId(nodeId);
-            }
-        } else {
-
-            Bookmark bookmark = node.getBookmark();
-            if(bookmark != null) {
-                bookmarkRepository.deleteByNodeId(nodeId);
-            }
-
-            List<CodeBox> codeBoxes = codeBoxRepository.findByIdNodeId((int) nodeId);
-            if(codeBoxes != null) {
-                codeBoxRepository.deleteByIdNodeId(nodeId);
-            }
-
-            Set<Image> images = node.getImages();
-            if (images != null) {
-                imageRepository.deleteByNodeId(nodeId);
-            }
-
-            List<Grid> grids = gridRepository.findByIdNodeId((int) nodeId);
-            if(grids != null) {
-                gridRepository.deleteByIdNodeId(nodeId);
-            }
-
-            Children children = childrenRepository.findByNodeId(nodeId);
-            if(children != null) {
-                childrenRepository.deleteByNodeId(nodeId);
-            }
-
-            nodeRepository.deleteByNodeId(nodeId);
-
-
-            logger.info(String.format("The node with id number %s is deleted.", nodeId));
-        }
-
-
-
-
-            // Shared Node denen şey aslında children tablosunda bir kayıt. Bağlı olduğu gerçek Node onun master_id'si.
-            // Gerçek node silineceği zaman, orphan kayıt kalmaması için ona bağlı shared nodeler de silinmelidir.
-            List<Children> sharedNodes = childrenRepository.findByMasterId(nodeId);
-            if(sharedNodes != null) {
-                for(Children sharedNode : sharedNodes) {
-                    childrenRepository.deleteByNodeId(sharedNode.getNodeId());
-                    logger.info(String.format("The shared node with id number %s is deleted.", sharedNode.getNodeId()));
-                }
-
-            }
-
-
-
-
-
-
-
-
-
-    }
-
-
-    /**
-     * DELETES all data of a given nodeId and its tree of subNodes if they exist.
-     * @param nodeId
-     */
+    /** A shared node has a children row but no node row. */
+    @Transactional
     public void deleteNodeWithSubNodes(long nodeId) {
-
         if (!isCurrentTenantWritable()) {
-            throw new AccessDeniedException("The selected CTB is read-only. Enable custom.isWritable in its tenant definition to delete nodes.");
+            throw new AccessDeniedException("The selected CTB is read-only.");
+        }
+        Children selected = childrenRepository.findByNodeId(nodeId);
+        if (selected == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found");
         }
 
-        List<Children> children = childrenService.findAllSubChildren(nodeId);
-        // Delete descendants before their parent to preserve the tree's references.
-        for (int i = children.size() - 1; i >= 0; i--) {
-            deleteNode(children.get(i).getNodeId());
+        // A shared node is only a reference. Deleting it must never delete its master.
+        if (isShared(selected)) {
+            ensureNoChildren(selected.getNodeId());
+            deleteRow("children", selected.getNodeId());
+            logger.info("Deleted shared node {} (master {}).", nodeId, selected.getMasterId());
+            return;
         }
-        logger.info("The node with id number % and all its subNodes are deleted.", nodeId);
+
+        List<Children> subtree = childrenService.findAllSubChildren(nodeId);
+        List<Long> realIds = new ArrayList<>();
+        Set<Long> sharedIds = new HashSet<>();
+        for (Children entry : subtree) {
+            if (isShared(entry)) {
+                sharedIds.add(entry.getNodeId());
+            } else {
+                realIds.add(entry.getNodeId());
+            }
+        }
+
+        // References to deleted real nodes may live outside the selected subtree.
+        // Validate first: a shared node with children needs an explicit migration policy.
+        for (long realId : realIds) {
+            for (Children alias : childrenRepository.findByMasterId(realId)) {
+                sharedIds.add(alias.getNodeId());
+            }
+        }
+        for (long sharedId : sharedIds) {
+            ensureNoChildren(sharedId);
+        }
+        for (long realId : realIds) {
+            if (!nodeRepository.existsById(realId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "A real node is missing from the node table: " + realId);
+            }
+        }
+
+        for (long sharedId : sharedIds) {
+            deleteRow("children", sharedId);
+        }
+        // findAllSubChildren lists parents before descendants; delete in reverse order.
+        for (int i = realIds.size() - 1; i >= 0; i--) {
+            long realId = realIds.get(i);
+            deleteRow("bookmark", realId);
+            deleteRow("codebox", realId);
+            deleteRow("image", realId);
+            deleteRow("grid", realId);
+            deleteRow("children", realId);
+            deleteRow("node", realId);
+        }
+        logger.info("Deleted node {} and its subtree ({} real nodes, {} shared references).",
+                nodeId, realIds.size(), sharedIds.size());
     }
 
+    private static boolean isShared(Children entry) {
+        return entry.getMasterId() != null && entry.getMasterId() != 0;
+    }
 
+    private void ensureNoChildren(long nodeId) {
+        if (!childrenRepository.findByFatherId(nodeId).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Shared node " + nodeId + " has child rows; deletion was cancelled to avoid orphan nodes.");
+        }
+    }
+
+    // Native bulk deletes avoid keeping a managed Node with a now-deleted Bookmark reference.
+    // The table name is supplied only by the fixed calls above; the node id is bound.
+    private void deleteRow(String table, long nodeId) {
+        entityManager.createNativeQuery("DELETE FROM " + table + " WHERE node_id = :nodeId")
+                .setParameter("nodeId", nodeId)
+                .executeUpdate();
+    }
 }

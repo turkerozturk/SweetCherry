@@ -33,6 +33,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import org.springframework.security.access.AccessDeniedException;
+import com.turkerozturk.children.Children;
+import com.turkerozturk.children.ChildrenRepository;
 
 
 
@@ -46,20 +48,30 @@ public class NodeDeletionController {
     @Autowired
     private NodeDeletionService nodeDeletionService;
 
+    @Autowired
+    private ChildrenRepository childrenRepository;
+
 
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequiresTenant
     @GetMapping("/nodes/delete/{nodeId}")
     public String confirmDeletion(@PathVariable long nodeId, Model model) {
-        if (!nodeDeletionService.isCurrentTenantWritable()) {
-            throw new AccessDeniedException("The selected CTB is read-only.");
+        Children selected = childrenRepository.findByNodeId(nodeId);
+        if (selected == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        Node node = nodeService.findById(nodeId);
+        if (!nodeDeletionService.isCurrentTenantWritable()) {
+            return "redirect:/nodes/" + nodeId;
+        }
+        boolean shared = selected.getMasterId() != null && selected.getMasterId() != 0;
+        Node node = nodeService.findById(shared ? selected.getMasterId() : nodeId);
         if (node == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         model.addAttribute("node", node);
+        model.addAttribute("selectedNodeId", nodeId);
+        model.addAttribute("sharedNode", shared);
         return "node/nodeDelete";
     }
 
@@ -70,7 +82,7 @@ public class NodeDeletionController {
         if (!nodeDeletionService.isCurrentTenantWritable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
-        if (nodeService.findById(nodeId) == null) {
+        if (childrenRepository.findByNodeId(nodeId) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         nodeDeletionService.deleteNodeWithSubNodes(nodeId);

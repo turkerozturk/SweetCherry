@@ -248,7 +248,7 @@
                                     </button>
                                 </form>
 
-                                <a th:if="${canDeleteNode}" th:href="@{/nodes/delete/{nodeId}(nodeId=${node.nodeId})}" class="btn btn-danger btn-sm" sec:authorize="hasRole('ADMIN')">
+                                <a th:if="${canDeleteNode}" th:href="@{/nodes/delete/{nodeId}(nodeId=${requestedNodeId})}" class="btn btn-danger btn-sm" sec:authorize="hasRole('ADMIN')">
                                     <img th:src="@{/img/icons/ct_file.svg}"/>
                                     <span th:text="#{node.delete}">Delete Node</span>
                                 </a>

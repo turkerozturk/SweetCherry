@@ -398,6 +398,7 @@ public class NodeController {
                                 @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
 
         model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
+        model.addAttribute("requestedNodeId", nodeId);
 
 
         Children nodeInChildrenTable = childrenService.findById(nodeId);
