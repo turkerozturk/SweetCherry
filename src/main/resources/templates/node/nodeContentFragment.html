@@ -24,8 +24,8 @@
                             th:text="${node.syntax}"/> -->
                     </p>
                     <div th:if="${node.syntax eq 'plain-text'}"
-                         th:utext="${#strings.replace(node.txt, newlinechar, '&lt;br /&gt;')}"
-                         class="nodetextformatting">icerik
+                         th:text="${node.txt}"
+                         class="nodetextformatting" style="white-space: pre-wrap; overflow-wrap: anywhere;">icerik
                     </div>
                     <div th:if="${node.syntax eq 'custom-colors'}"
                          th:utext="${node.txtAsHtml}">
