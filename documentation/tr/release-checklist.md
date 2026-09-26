@@ -86,9 +86,16 @@ sha256sum SweetCherry-0.5.0.zip
 
 ## Yayımı engellemeyen fakat izlenecek işler
 
+- `exportedFiles` listesindeki her CTB için `CTBDATA` klasörüne uygun göreli yol içeren tenant `.txt` tanımı üretip indirme düğmesi eklemek. Aynı ada sahip mevcut tanımları değiştirmemeli.
+- Dışa aktarılan dosya silindikten sonra başarı mesajından listeye geri dönme bağlantısı veya liste içinde sonuç gösterme akışı.
 - Aynı adlı tenant yapılandırmasını güvenle değiştirme veya silme: aktif bağlantıyı kapatma, açık onay, yedek ve yeniden yükleme akışı. İlk sürümde dosya elle düzenlenir; yükleme mevcut dosyayı değiştirmez.
+- HTML/PDF içeriği, grid ve XML işleyicilerinin güvenilmeyen CTB verisine karşı güvenlik incelemesi ve örnek kötü amaçlı CTB testleri.
 - Export parser'ında alias/shared node/link/anchor kimlik eşleme çalışması.
 - macOS gerçek cihaz testi.
 - PortableApps.com Format paketi.
 - Otomatik güncelleme.
 - Uzak erişim için ayrı güvenli dağıtım profili.
+
+## İnternetten erişim için ayrı kabul kontrolü
+
+İlk dağıtım yerel kullanım içindir. Dinamiik DNS ve Proxy üzerinden uzaktan erişim sağlamak, giriş ekranının ve seçilen CTB içeriğinin internete açılması anlamına gelir. Uzak erişim önerilmeden önce ayar dosyaları, ağ cihazları arasındaki ağ geçidi, port yönlendirmeleri, proxy başlıkları, oturum çerezi, giriş denemelerine karşı koruma ve CTB içeriğinden HTML üreten yollar ayrıca incelenmelidir. Yalnızca TLS sertifikasının çalışması bu kontrolün yerine geçmez.

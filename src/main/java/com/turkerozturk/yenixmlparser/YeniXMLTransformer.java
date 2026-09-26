@@ -46,6 +46,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.*;
 
 public class YeniXMLTransformer {
@@ -411,16 +412,25 @@ public class YeniXMLTransformer {
         toElement = newDocument.createElement(A_TAG);
 
 
-        String raw[] = rawUri.split(" ");
+        String[] raw = rawUri == null ? new String[0] : rawUri.split(" ", 3);
+        if (raw.length < 2) {
+            return toElement;
+        }
         String uriType = raw[0];
         String uri = raw[1];
         CherryUriType cherryUriType = null;
-        switch (CherryUriType.from(uriType)) {
+        CherryUriType linkType = CherryUriType.from(uriType);
+        if (linkType == null) {
+            return toElement;
+        }
+        switch (linkType) {
             case EXTERNAL:
                 cherryUriType = CherryUriType.EXTERNAL; // ⧉
-                toElement.setAttribute(REL_ATTR, "noreferrer noopener");
-                toElement.setAttribute(TARGET_ATTR, "_blank");
-                toElement.setAttribute(HREF_ATTR, uri);
+                if (safeExternalHref(uri)) {
+                    toElement.setAttribute(REL_ATTR, "noreferrer noopener");
+                    toElement.setAttribute(TARGET_ATTR, "_blank");
+                    toElement.setAttribute(HREF_ATTR, uri);
+                }
                 toElement.setAttribute(CLASS_ATTR, "link-external");
 
                 break;
@@ -453,6 +463,20 @@ public class YeniXMLTransformer {
         }
         toElement.setAttribute(DATA_TYPE_ATTR, "cherrylink-" + cherryUriType);
         return toElement;
+    }
+
+    static boolean safeExternalHref(String value) {
+        if (value == null || value.indexOf('\\') >= 0 || value.chars().anyMatch(Character::isISOControl)) {
+            return false;
+        }
+        try {
+            URI parsed = URI.create(value);
+            String scheme = parsed.getScheme();
+            return ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))
+                    && parsed.getHost() != null && parsed.getUserInfo() == null;
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
     }
 
 
