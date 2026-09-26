@@ -40,6 +40,7 @@ sh ./release/SweetCherry/run.sh
 - [ ] `release/SweetCherry` temiz bir klasöre kopyalanarak çalıştırılmış.
 - [ ] Java bulunamadığında script anlaşılır hata veriyor.
 - [ ] Giriş, Demo Database seçimi ve en az bir normal düğüm görüntüleme denenmiş.
+- [ ] İlk açılışta `login-credentials.properties` üretilmiş; yeniden başlatınca aynı parolalar çalışmış ve kişisel parola dosyası ZIP'e eklenmemiş.
 - [ ] Dört CTB export seçeneği ve download/delete akışı denenmiş.
 - [ ] `user` hesabının yönetici uçlarına erişemediği doğrulanmış.
 - [ ] Normal profilde yalnızca `health` ve `info`; operations profilinde beklenen Actuator/Swagger uçları doğrulanmış.
@@ -65,7 +66,7 @@ sha256sum SweetCherry-0.5.0.zip
 
 - SweetCherry'nin CherryTree yerine geçmediği ve CTB dosyalarıyla çalıştığı.
 - Java 17+ gereksinimi.
-- Varsayılan tarayıcı adresi ve yerleşik deneme hesapları.
+- Varsayılan tarayıcı adresi, yerleşik hesap adları ve ilk açılışta parola dosyasının konumu.
 - Önemli CTB dosyaları için işlem öncesinde yedek önerisi.
 - Alias/link/anchor içeren exportların deneysel olduğu.
 - macOS akışının gerçek cihazda henüz doğrulanmadığı (doğrulanana kadar).

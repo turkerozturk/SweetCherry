@@ -28,8 +28,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Properties;
 
 @Configuration
 @EnableWebSecurity
@@ -41,24 +45,28 @@ public class SecurityConfig {
     @Value("${myapp.login.user.name:user}")
     String loginUserName;
 
-    @Value("${myapp.login.user.password:password}")
+    @Value("${myapp.login.user.password:}")
     String loginUserPassword;
 
     @Value("${myapp.login.admin.name:admin}")
     String loginAdminName;
 
-    @Value("${myapp.login.admin.password:adminPassword}")
+    @Value("${myapp.login.admin.password:}")
     String loginAdminPassword;
 
     @Bean
-    InMemoryUserDetailsManager users() {
+    InMemoryUserDetailsManager users() throws IOException {
+        Properties local = LocalLoginCredentials.load(Path.of("login-credentials.properties"));
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return new InMemoryUserDetailsManager(
                 User.withUsername(loginUserName)
-                        .password("{noop}" + loginUserPassword)
+                        .password("{bcrypt}" + encoder.encode(loginUserPassword.isBlank()
+                                ? local.getProperty("user.password") : loginUserPassword))
                         .roles("USER")
                         .build(),
                 User.withUsername(loginAdminName)
-                        .password("{noop}" + loginAdminPassword)
+                        .password("{bcrypt}" + encoder.encode(loginAdminPassword.isBlank()
+                                ? local.getProperty("admin.password") : loginAdminPassword))
                         .roles("ADMIN")
                         .build()
         );

@@ -46,10 +46,7 @@ public class ViewController {
         cookie.setMaxAge(7 * 24 * 60 * 60); // 1 week
         response.addCookie(cookie);
 
-        String referer = request.getHeader("referer");
-        logger.info("REFERER: " + referer);
-        return "redirect:" + referer;
+        return "redirect:" + SafeRefererRedirect.target(request);
 
     }
 }
-

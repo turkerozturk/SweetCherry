@@ -158,13 +158,11 @@ myapp:
   scheduling:
     enabled: false
   exportingFolderName: exportedFiles
-  login: # default values are inside my class
+  login:
     admin:
       name: admin
-      password: adminPassword
     user:
       name: user
-      password: password
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ACTUATOR

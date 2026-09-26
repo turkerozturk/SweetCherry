@@ -25,11 +25,10 @@ import com.turkerozturk.multipledatabases.MultitenantConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Locale;
 
 @Service
 public class StorageService {
@@ -42,12 +41,21 @@ public class StorageService {
         }
 
         String fileName = file.getOriginalFilename();
-
-        Path targetFileFullPath = Path.of(Paths.get(".").toAbsolutePath().normalize().toString()
-                + File.separator + MultitenantConfiguration.PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES
-                + File.separator + fileName);
-
-        Files.copy(file.getInputStream(), targetFileFullPath);
+        if (fileName == null || fileName.length() > 120
+                || !fileName.toLowerCase(Locale.ROOT).endsWith(".txt")
+                || !fileName.matches("[\\p{L}\\p{N} _.-]+")
+                || fileName.startsWith(".") || fileName.contains("..")) {
+            throw new IOException("Yalnızca geçerli adlı .txt veri kaynağı dosyaları yüklenebilir");
+        }
+        Path directory = Path.of(MultitenantConfiguration.PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES)
+                .toAbsolutePath().normalize();
+        Path targetFileFullPath = directory.resolve(fileName).normalize();
+        if (!targetFileFullPath.startsWith(directory)) {
+            throw new IOException("Geçersiz dosya yolu");
+        }
+        try (var input = file.getInputStream()) {
+            Files.copy(input, targetFileFullPath);
+        }
 
         return "upload process completed";
     }

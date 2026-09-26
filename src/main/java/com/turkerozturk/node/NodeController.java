@@ -25,6 +25,7 @@ import com.turkerozturk.children.ChildrenService;
 import com.turkerozturk.children.NaviNode;
 import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
 import com.turkerozturk.helpers.highlighter.pygments.LexerEnum;
+import com.turkerozturk.global.SafeRefererRedirect;
 import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.filter.FormSearch;
@@ -289,11 +290,8 @@ public class NodeController {
 
         // bilgi dil degisikligi durumunda bu metoda yonleniyor. Geldigi sayfayi ogrenip geri yonlendiriyoruz oraya.
         // BASLA dil degisikligi yonlendirmesi
-        String referrer = request.getHeader("referer");
         if (lang != null) {
-          //  return "Language parameter is present: " + lang;
-          //  logger.info("REFERER: " + referrer);
-            return "redirect:" + referrer;
+            return "redirect:" + SafeRefererRedirect.target(request);
         } else {
           //  return "Language parameter is not present";
         }

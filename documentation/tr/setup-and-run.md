@@ -152,20 +152,20 @@ SweetCherry açık kaldığı sürece komut penceresi/terminal de açık kalmal�
 - Tarayıcı adresi: **`http://localhost:8080`**
 - Dahili ikinci HTTP bağlantı noktası: `8443`
 
-İki bağlantı noktası da varsayılan olarak yalnızca `127.0.0.1`/`localhost` üzerinde dinler. Böylece yerleşik deneme hesapları kullanılırken SweetCherry aynı ağdaki diğer bilgisayarlara kendiliğinden açılmaz. İnternet/LAN erişimi, HTTPS ve üretim tipi kullanıcı yönetimi bu yerel başlangıç paketinin kapsamı dışındadır.
+İki bağlantı noktası da varsayılan olarak yalnızca `127.0.0.1`/`localhost` üzerinde dinler. İnternet/LAN erişimi, HTTPS ve üretim tipi kullanıcı yönetimi bu yerel başlangıç paketinin kapsamı dışındadır.
 
 Mevcut kaynak ayarındaki ana port `443` olduğundan scriptler, Linux/macOS'ta yönetici yetkisi gerektirmemesi ve çakışma riskini azaltması için onu `8443` olarak değiştirerek başlatır. SSL yapılandırılmadığı için bu yerel başlangıç senaryosunda adres `http://` ile açılır; `https://` kullanmayın.
 
 ## Giriş yapma
 
-Giriş ekranında iki yerleşik hesap vardır:
+Giriş ekranında iki yerleşik hesap vardır. Uygulama ilk açıldığında, **çalışma klasöründe** `login-credentials.properties` oluşturur; parolaları bu dosyadan okuyun:
 
-| Yetki | Kullanıcı adı | Şifre |
+| Yetki | Kullanıcı adı | Şifre dosyasındaki anahtar |
 |---|---|---|
-| Yönetici | `admin` | `adminPassword` |
-| Normal kullanıcı | `user` | `password` |
+| Yönetici | `admin` | `admin.password` |
+| Normal kullanıcı | `user` | `user.password` |
 
-İlk denemede yönetici hesabıyla giriş yapabilirsiniz. Bu bilgiler `src/main/resources/application.yml` içinde tanımlıdır ve derlemeden sonra JAR'ın içinde bulunur. Bunlar yalnızca yerel geliştirme/deneme varsayılanlarıdır; uygulamayı başka cihazların erişimine açmadan önce değiştirilmelidir.
+Dağıtım scriptleri çalışma klasörü olarak `release/SweetCherry` kullanır. Bu dosya kişisel parolaları düz metin olarak içerir: paylaşmayın, ZIP paketine veya Git'e eklemeyin. Dosyayı silmek sonraki açılışta yeni parolalar üretir. Dilerseniz parolaları dışarıdaki `application.yml` içinde `myapp.login.admin.password` ve `myapp.login.user.password` ile açıkça belirleyebilirsiniz; bu ayarlar dosyadaki ilgili paroladan önceliklidir.
 
 ## CTB dosyasını SweetCherry'ye tanıtma
 
