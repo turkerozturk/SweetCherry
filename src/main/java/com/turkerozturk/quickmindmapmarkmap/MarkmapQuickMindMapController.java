@@ -9,6 +9,8 @@ import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.helpers.NodeIcon;
 import com.turkerozturk.node.Node;
 import com.turkerozturk.node.NodeRepository;
+import com.turkerozturk.multipledatabases.RequiresTenant;
+import com.turkerozturk.multipledatabases.TenantContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +25,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @Controller
+@RequiresTenant
 public class MarkmapQuickMindMapController {
 
     private final ChildrenRepository childrenRepository;
@@ -37,6 +40,47 @@ public class MarkmapQuickMindMapController {
         this.childrenRepository = childrenRepository;
         this.nodeRepository = nodeRepository;
         this.objectMapper = objectMapper;
+    }
+
+    @GetMapping("/markmap-quick-mind-map/all")
+    public String showAllRoots(
+            @RequestParam(defaultValue = "3") int level,
+            @RequestParam(defaultValue = "true") boolean icons,
+            @RequestParam(defaultValue = "true") boolean colors,
+            @RequestParam(defaultValue = "true") boolean foldChat,
+            Model model
+    ) {
+        if (level < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "level değeri negatif olamaz.");
+        }
+        String tenantName = TenantContext.getCurrentTenant();
+        ObjectNode root = objectMapper.createObjectNode();
+        root.put("content", tenantName);
+        root.putObject("payload").put("nodeId", 0);
+        ArrayNode branches = root.putArray("children");
+        if (level > 0) {
+            for (Children child : childrenRepository.findByFatherIdOrderBySequenceAsc(0)) {
+                ObjectNode branch = createNodeRecursively(child, 1, level, icons, colors,
+                        foldChat, new HashSet<>());
+                if (branch != null) {
+                    branches.add(branch);
+                }
+            }
+        }
+        try {
+            model.addAttribute("markmapDataJson", objectMapper.writeValueAsString(root));
+        } catch (JsonProcessingException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Markmap verisi JSON biçimine dönüştürülemedi.", exception);
+        }
+        model.addAttribute("rootNodeId", 0L);
+        model.addAttribute("rootNodeName", tenantName);
+        model.addAttribute("rootParentNodeId", 0L);
+        model.addAttribute("maximumLevel", level);
+        model.addAttribute("icons", icons);
+        model.addAttribute("colors", colors);
+        model.addAttribute("foldChat", foldChat);
+        return "markmap-quick-mind-map";
     }
 
     /**
@@ -123,8 +167,11 @@ public class MarkmapQuickMindMapController {
     ) {
         Long fatherId = root.getFatherId();
 
+        if (fatherId != null && fatherId == 0) {
+            return 0;
+        }
         if (fatherId == null
-                || fatherId <= 0
+                || fatherId < 0
                 || fatherId == rootNodeId) {
             return rootNodeId;
         }

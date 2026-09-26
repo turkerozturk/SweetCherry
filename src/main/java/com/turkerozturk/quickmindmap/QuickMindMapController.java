@@ -5,6 +5,8 @@ import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.helpers.NodeIcon;
 import com.turkerozturk.node.Node;
 import com.turkerozturk.node.NodeRepository;
+import com.turkerozturk.multipledatabases.RequiresTenant;
+import com.turkerozturk.multipledatabases.TenantContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Controller
+@RequiresTenant
 public class QuickMindMapController {
 
     private static final int DEFAULT_LEVEL = 3;
@@ -36,6 +39,48 @@ public class QuickMindMapController {
     ) {
         this.childrenRepository = childrenRepository;
         this.nodeRepository = nodeRepository;
+    }
+
+    @GetMapping("/quick-mind-map/all")
+    public String showAllRoots(
+            @RequestParam(defaultValue = "3") int level,
+            @RequestParam(defaultValue = "true") boolean icons,
+            @RequestParam(defaultValue = "true") boolean colors,
+            @RequestParam(defaultValue = "true") boolean foldChat,
+            Model model
+    ) {
+        if (level < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "level değeri negatif olamaz.");
+        }
+
+        String tenantName = TenantContext.getCurrentTenant();
+        Map<String, String> colorClasses = new LinkedHashMap<>();
+        List<Map<String, String>> iconNodes = new ArrayList<>();
+        List<Map<String, String>> navigationNodes = new ArrayList<>();
+        StringBuilder definition = new StringBuilder("mindmap\n  ctb_0((\"")
+                .append(escapeMermaidLabel(tenantName))
+                .append("\"))\n  :::ct-node-0\n");
+        addNavigationNode(navigationNodes, "ct-node-0", 0, 0);
+
+        if (level > 0) {
+            for (Children root : childrenRepository.findByFatherIdOrderBySequenceAsc(0)) {
+                writeNodeRecursively(definition, root, 1, level, icons, colors, foldChat,
+                        new HashSet<>(), colorClasses, iconNodes, navigationNodes, 0);
+            }
+        }
+
+        model.addAttribute("rootNodeId", 0L);
+        model.addAttribute("rootNodeName", tenantName);
+        model.addAttribute("rootParentNodeId", 0L);
+        model.addAttribute("maximumLevel", level);
+        model.addAttribute("icons", icons);
+        model.addAttribute("colors", colors);
+        model.addAttribute("foldChat", foldChat);
+        model.addAttribute("mermaidDefinition", definition.toString());
+        model.addAttribute("mermaidColorCss", createColorCss(colorClasses));
+        model.addAttribute("iconNodes", iconNodes);
+        model.addAttribute("navigationNodes", navigationNodes);
+        return "quick-mind-map";
     }
 
     /**
@@ -260,13 +305,14 @@ public class QuickMindMapController {
         long rootNodeId = root.getNodeId();
         long fatherId = root.getFatherId();
 
-        if (fatherId <= 0 || fatherId == rootNodeId) {
+        if (fatherId == 0) {
+            return 0;
+        }
+        if (fatherId < 0 || fatherId == rootNodeId) {
             return rootNodeId;
         }
 
-        return childrenRepository.findByNodeId(fatherId) != null
-                ? fatherId
-                : rootNodeId;
+        return childrenRepository.findByNodeId(fatherId) != null ? fatherId : rootNodeId;
     }
 
     private Node findDisplayNode(Children children) {

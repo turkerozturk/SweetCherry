@@ -57,6 +57,7 @@ public class UploadController {
                 "# datasource.username=admin\n" +
                 "# datasource.password=admin\n" +
                 "datasource.init-mode=always\n" +
+                "custom.isWritable=false\n" +
                 "# https://www.baeldung.com/multitenancy-with-spring-data-jpa";
 
 
@@ -81,10 +82,16 @@ public class UploadController {
         try {
             String uploadImage = storageService.uploadImageToFileSystem(file);
             model.addAttribute("message", "Dosya başarılı bir şekilde yüklendi: " + uploadImage);
+            model.addAttribute("uploadSucceeded", true);
         } catch (IOException e) {
             model.addAttribute("message", "Dosya yükleme sırasında bir hata oluştu: " + e.getMessage());
         }
         return "upload";
+    }
+
+    @GetMapping("/upload-database")
+    public String uploadDatabaseGet() {
+        return "redirect:/upload-form";
     }
 
 

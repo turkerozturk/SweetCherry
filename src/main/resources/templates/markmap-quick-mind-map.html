@@ -128,7 +128,10 @@
         <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
 
         <span class="badge text-bg-secondary"
-              th:text="'Node ' + ${rootNodeId}">Node</span>
+              th:text="${rootNodeId == 0 ? 'Tüm üst düğümler' : 'Node ' + rootNodeId}">Node</span>
+
+        <a class="btn btn-sm btn-outline-primary" th:if="${rootNodeId != 0}"
+           th:href="@{/markmap-quick-mind-map/all(level=${maximumLevel},icons=${icons},colors=${colors},foldChat=${foldChat})}">Tüm düğümler</a>
 
         <span th:if="${foldChat}"
               class="badge text-bg-light border">
@@ -137,7 +140,7 @@
 
         <form class="d-flex flex-wrap align-items-center gap-1 ms-md-auto mind-map-controls"
               method="get"
-              th:action="@{/markmap-quick-mind-map/{nodeId}(nodeId=${rootNodeId})}">
+              th:action="@{/markmap-quick-mind-map/{nodeId}(nodeId=${rootNodeId == 0 ? 'all' : rootNodeId})}">
 
             <input type="hidden"
                    name="foldChat"
@@ -337,7 +340,7 @@
             let iconHtml = '';
             const hasVisibleNodeIcon = iconsEnabled && iconName;
 
-            {
+            if (currentNodeId > 0) {
                 const safeIconName = iconName
                     ? String(iconName)
                     : 'zero';
@@ -385,12 +388,12 @@
         function createNodeUrl(nodeId) {
             const safeNodeId = Number(nodeId);
 
-            if (!Number.isSafeInteger(safeNodeId) || safeNodeId <= 0) {
+            if (!Number.isSafeInteger(safeNodeId) || safeNodeId < 0) {
                 return '#';
             }
 
             const url = new URL(
-                mapBaseUrl + encodeURIComponent(String(safeNodeId)),
+                mapBaseUrl + (safeNodeId === 0 ? 'all' : encodeURIComponent(String(safeNodeId))),
                 window.location.origin
             );
 

@@ -90,9 +90,12 @@
         <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
 
         <span class="badge text-bg-secondary"
-              th:text="'Node ' + ${rootNodeId}">
+              th:text="${rootNodeId == 0 ? 'Tüm üst düğümler' : 'Node ' + rootNodeId}">
             Node
         </span>
+
+        <a class="btn btn-sm btn-outline-primary" th:if="${rootNodeId != 0}"
+           th:href="@{/quick-mind-map/all(level=${maximumLevel},icons=${icons},colors=${colors},foldChat=${foldChat})}">Tüm düğümler</a>
 
         <span class="badge text-bg-light border"
               th:text="'Level ' + ${maximumLevel}">
@@ -119,7 +122,7 @@
         <div class="card-body py-2">
             <form method="get"
                   class="d-flex flex-wrap align-items-center gap-2"
-                  th:action="@{/quick-mind-map/{nodeId}(nodeId=${rootNodeId})}">
+                  th:action="@{/quick-mind-map/{nodeId}(nodeId=${rootNodeId == 0 ? 'all' : rootNodeId})}">
 
                 <label for="level" class="small mb-0">Level</label>
                 <input id="level"
@@ -227,7 +230,7 @@ mindmap
                     '.mermaid .' + CSS.escape(nodeClass)
                 );
 
-                if (!nodeElement || !contentNodeId) {
+                if (!nodeElement || !contentNodeId || contentNodeId === '0') {
                     return;
                 }
 
@@ -300,7 +303,7 @@ mindmap
 
                     window.location.assign(
                         mapBaseUrl
-                        + encodeURIComponent(targetNodeId)
+                        + (targetNodeId === '0' ? 'all' : encodeURIComponent(targetNodeId))
                         + '?'
                         + query.toString()
                     );

@@ -26,8 +26,11 @@
 
             <form method="post" th:action="@{/upload-database}" enctype="multipart/form-data">
                 <label for="file">Dosya Seç:</label>
-                <input type="file" id="file" name="dosya"/>
-                <button type="submit">Yükle</button>
+                <input type="file" id="file" name="dosya" accept=".txt"/>
+                <button class="btn btn-primary" type="submit" th:title="#{selectdatasource.upload}">
+                    <i class="fas fa-upload"></i>
+                    <span th:text="#{selectdatasource.upload}">Yükle</span>
+                </button>
             </form>
 
             <div th:if="${message}" class="row">
@@ -50,20 +53,6 @@
                   th:text="${ALL_TENANTS_FOLDER}"
             ></span>
             <br/>
-
-            <th:block sec:authorize="hasRole('ADMIN')">
-
-
-                <a href="/upload-form"
-                   id="uploadButton"
-                   class="btn btn-primary"
-                   th:title="#{selectdatasource.upload}"
-                >
-                    <i class="fas fa-upload"></i>
-                    <span th:text="#{selectdatasource.upload}"></span>
-                </a>
-            </th:block>
-
 
         </div>
 

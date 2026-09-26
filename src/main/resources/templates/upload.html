@@ -17,6 +17,13 @@
     <p th:text="${message}"></p>
 </div>
 
+<form th:if="${uploadSucceeded}" th:action="@{/reload-datasources}" method="post">
+    <button class="btn btn-primary" type="submit" title="Veri Kaynaklarını Yeniden Yükle">
+        <i class="fa-solid fa-rotate"></i>
+        <span>Yeniden Yükle</span>
+    </button>
+</form>
+
 </section>
 </body>
 </html>

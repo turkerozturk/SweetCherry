@@ -183,7 +183,7 @@ release/
 
 `allTenants` klasörü yoksa uygulama ilk açılışta otomatik oluşturur. Derleme sırasında örnek `demo.txt` de bu klasöre yalnızca henüz yoksa kopyalanır.
 
-Her CTB dosyası için `allTenants` içinde ayrı bir düz metin dosyası oluşturun. Dosya adı ve uzantısı uygulama açısından önemli değildir; açıklık için örneğin `mydatabase.txt` kullanabilirsiniz:
+Her CTB dosyası için `allTenants` içinde ayrı bir düz metin dosyası oluşturun. Arayüzden dosya yüklemek için dosya adının `.txt` uzantılı olması gerekir; örneğin `mydatabase.txt` kullanabilirsiniz:
 
 ```properties
 name=My Database
@@ -191,6 +191,7 @@ security-role=ADMIN
 datasource.url=jdbc:sqlite:C:/Users/kullanici/Documents/CTB/mydatabase.ctb
 datasource.driver-class-name=org.sqlite.JDBC
 datasource.init-mode=always
+custom.isWritable=false
 ```
 
 Dikkat edilmesi gerekenler:
@@ -205,6 +206,10 @@ Dikkat edilmesi gerekenler:
 - Silme/yazma özelliğini ayrıca etkinleştiren ayar `custom.isWritable=true` değeridir. İlk denemede ve özgün CTB dosyanızda **bu satırı eklemeyin**; böylece SweetCherry'nin düğüm silme servisi yazılabilir sayılmaz.
 
 Birden fazla CTB kullanacaksanız her biri için ayrı bir metin dosyası ekleyin.
+
+Yükleme formundan `.txt` dosyasını ekledikten sonra sonuç ekranındaki **Yeniden Yükle** düğmesine basın. Bu işlem yeni bağlantıyı veri kaynağı listesine ekler; CTB dosyasının kendisi `datasource.url` satırında belirtilen konumda bulunmalıdır.
+
+Bir CTB seçiliyken Mermaid için `/quick-mind-map/all`, Markmap için `/markmap-quick-mind-map/all` adresi `children.father_id=0` olan bütün üst düzey düğümleri veri kaynağı adının altında gösterir. Bir üst düzey düğümün harita köküne tıklamak da bu toplu görünüme çıkar.
 
 ## Veri kaynağını yükleme ve not ağacını görüntüleme
 
