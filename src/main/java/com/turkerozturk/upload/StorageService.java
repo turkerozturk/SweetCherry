@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.Locale;
 
 @Service
@@ -55,6 +56,8 @@ public class StorageService {
         }
         try (var input = file.getInputStream()) {
             Files.copy(input, targetFileFullPath);
+        } catch (FileAlreadyExistsException exception) {
+            throw new IOException("Bu adda bir veri kaynağı dosyası zaten var: " + fileName, exception);
         }
 
         return "upload process completed";

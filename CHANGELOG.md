@@ -12,6 +12,7 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 - Normal kullanımdan ayrılmış `operations` ve `experiments` profilleri.
 - Türkçe kurulum, isteğe bağlı özellikler, CTB export ve yayım hazırlık belgeleri.
 - Windows ve Linux üzerinde Java 17 ile test/paketleme yapan CI iş akışı.
+- Seçilen CTB'nin bütün üst düğümlerini tek haritada gösteren Mermaid ve Markmap görünümleri.
 
 ### Changed
 
@@ -26,10 +27,12 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 - İlk girişte service-worker dosyasına yönlenme ve tenant seçilmeden veri tabanı gerektiren sayfalardaki teknik hatalar giderildi.
 - CTB export işlemleri `POST/Redirect/GET` akışına geçirildi; tarayıcı geri/ileri hareketinin export'u tekrarlaması önlendi.
 - Export klasörünün ilk işlemden önce oluşturulması ve export dosyalarının güvenli silme onayı düzeltildi.
+- Export dosyası indirme ve silme işlemleri dışa aktarma klasörüyle sınırlandı; mevcut tenant dosyasının üzerine yükleme yapılırken anlaşılır hata veriliyor.
 - Image ve Anchor birleşik kimlik eşlemeleri ayrı kimlik sınıflarıyla düzeltildi.
 
 ### Known limitations
 
 - Alias/shared node, node bağlantısı ve anchor referansları içeren exportlar deneysel durumdadır.
 - macOS scriptleri hazırlanmıştır fakat henüz gerçek bir Mac üzerinde doğrulanmamıştır.
-- Yerleşik hesaplar yalnızca yerel deneme amaçlıdır; uzak erişim için üretim tipi kimlik yönetimi sağlanmamaktadır.
+- Yerel hesap parolaları ilk açılışta üretilir; uzak erişim için üretim tipi kimlik yönetimi sağlanmamaktadır.
+- Aynı adlı tenant yapılandırmasının arayüzden değiştirilmesi veya silinmesi henüz desteklenmez.

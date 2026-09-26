@@ -31,6 +31,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 
 @Controller
 public class ExportedFilesController {
@@ -56,7 +58,9 @@ public class ExportedFilesController {
             directory.mkdirs();
         }
 
-        File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".ctb") || name.toLowerCase().endsWith(".old"));
+        File[] files = directory.listFiles((dir, name) ->
+                (name.toLowerCase().endsWith(".ctb") || name.toLowerCase().endsWith(".old"))
+                        && Files.isRegularFile(dir.toPath().resolve(name), LinkOption.NOFOLLOW_LINKS));
 
         List<FileInfo> fileInfos = new ArrayList<>();
         if (files != null) {

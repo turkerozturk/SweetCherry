@@ -86,6 +86,7 @@ sha256sum SweetCherry-0.5.0.zip
 
 ## Yayımı engellemeyen fakat izlenecek işler
 
+- Aynı adlı tenant yapılandırmasını güvenle değiştirme veya silme: aktif bağlantıyı kapatma, açık onay, yedek ve yeniden yükleme akışı. İlk sürümde dosya elle düzenlenir; yükleme mevcut dosyayı değiştirmez.
 - Export parser'ında alias/shared node/link/anchor kimlik eşleme çalışması.
 - macOS gerçek cihaz testi.
 - PortableApps.com Format paketi.

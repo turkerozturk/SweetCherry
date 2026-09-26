@@ -24,7 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/delete")
@@ -38,17 +41,20 @@ public class FileDeleteController {
 
     @PostMapping("/{filename:.+}")
     public ResponseEntity<String> deleteFile(@PathVariable String filename) {
-        String filePath = applicationPath + File.separator + exportingFolderName + File.separator + filename;
-        File file = new File(filePath);
-
-        if (file.exists() && file.isFile()) {
-            if (file.delete()) {
-                return ResponseEntity.ok("File deleted successfully");
-            } else {
-                return ResponseEntity.status(500).body("Failed to delete file");
-            }
-        } else {
+        final Path file;
+        try {
+            file = ExportedFilePaths.resolve(applicationPath, exportingFolderName, filename);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body("Invalid export filename");
+        }
+        if (!Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS)) {
             return ResponseEntity.notFound().build();
+        }
+        try {
+            Files.delete(file);
+            return ResponseEntity.ok("File deleted successfully");
+        } catch (IOException exception) {
+            return ResponseEntity.status(500).body("Failed to delete file");
         }
     }
 }

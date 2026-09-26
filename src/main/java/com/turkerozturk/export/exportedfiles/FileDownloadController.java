@@ -32,7 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 
 @RestController
 @RequestMapping("/download")
@@ -47,7 +48,10 @@ public class FileDownloadController {
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get(applicationPath).resolve(exportingFolderName).resolve(filename).normalize();
+            Path filePath = ExportedFilePaths.resolve(applicationPath, exportingFolderName, filename);
+            if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS)) {
+                return ResponseEntity.notFound().build();
+            }
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists() && resource.isReadable()) {
@@ -58,7 +62,7 @@ public class FileDownloadController {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }

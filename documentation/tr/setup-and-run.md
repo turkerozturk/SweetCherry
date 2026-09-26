@@ -209,6 +209,8 @@ Birden fazla CTB kullanacaksanız her biri için ayrı bir metin dosyası ekleyi
 
 Yükleme formundan `.txt` dosyasını ekledikten sonra sonuç ekranındaki **Yeniden Yükle** düğmesine basın. Bu işlem yeni bağlantıyı veri kaynağı listesine ekler; CTB dosyasının kendisi `datasource.url` satırında belirtilen konumda bulunmalıdır.
 
+Aynı adlı `.txt` dosyası ikinci kez yüklenirse mevcut dosya korunur ve hata gösterilir. Şimdilik değişiklik için `allTenants` içindeki dosyayı uygulama dışından düzenleyin, ardından veri kaynaklarını yeniden yükleyin. Bir dosyayı kaldırmadan önce o CTB bağlantısını kapatın; CTB dosyasının kendisini yedekleyin. Arayüzden güvenli değiştirme ve silme akışı henüz yoktur.
+
 Bir CTB seçiliyken Mermaid için `/quick-mind-map/all`, Markmap için `/markmap-quick-mind-map/all` adresi `children.father_id=0` olan bütün üst düzey düğümleri veri kaynağı adının altında gösterir. Bir üst düzey düğümün harita köküne tıklamak da bu toplu görünüme çıkar.
 
 ## Veri kaynağını yükleme ve not ağacını görüntüleme
