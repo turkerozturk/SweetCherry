@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Controller
@@ -53,8 +54,13 @@ public class DatabaseSwitchController {
      */
     @PostMapping("/setTenant")
     public String setTenant(@RequestParam("tenant") String tenant, HttpServletRequest request) {
+        if (!tenantService.getAllTenants().containsKey(tenant)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, "Bilinmeyen veri kaynağı");
+        }
         HttpSession session = request.getSession(); // chatgpt onerdi.
         session.setAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT, tenant); // Bu sayede
+        session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN, UUID.randomUUID().toString());
 
         //databaseSessionManager.unbindSession(); // bunu kullanmadim, bulmusken kaybetmemek icin comment ettim. gerek yok.
         TenantContext.setCurrentTenant(tenant); // bu sadece bu metod icinde ise yaradi o yuzden yukaridaki gibi session degiskenine atama yaptik ki butun programda ise yarasin, veritabaninin degismisini kullnabilelim diye.

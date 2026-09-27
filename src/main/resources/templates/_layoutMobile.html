@@ -53,6 +53,8 @@
 
         <section layout:fragment="pageSpecificJsScripts"></section>
 
+        <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
+
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 var loader = document.getElementById("loader");
@@ -77,4 +79,3 @@
     </body>
 
 </html>
-

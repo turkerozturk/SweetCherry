@@ -13,16 +13,34 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        if (!(handler instanceof HandlerMethod handlerMethod) || !requiresTenant(handlerMethod)) {
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;
         }
-
-        if (TenantContext.hasCurrentTenant()) {
+        boolean protectedPost = "POST".equalsIgnoreCase(request.getMethod())
+                && (request.getRequestURI().startsWith(request.getContextPath() + "/nodes/delete/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/expo/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/exportWithSubNodes/")
+                || request.getRequestURI().equals(request.getContextPath() + "/mindmap-export"));
+        String pageToken = request.getParameter("_tenantView");
+        boolean markedNavigation = pageToken != null;
+        if (!requiresTenant(handlerMethod) && !protectedPost && !markedNavigation) {
             return true;
         }
-
-        response.sendRedirect(request.getContextPath() + "/");
-        return false;
+        if (!TenantContext.hasCurrentTenant()) {
+            response.sendRedirect(request.getContextPath() + "/");
+            return false;
+        }
+        if (protectedPost || markedNavigation) {
+            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            String expected = session == null ? null : (String) session.getAttribute(
+                    TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
+            if (expected == null || !expected.equals(pageToken)) {
+                response.sendError(HttpServletResponse.SC_CONFLICT,
+                        "Veri kaynağı değişti. Sayfayı yeniden açıp işlemi tekrar deneyin.");
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean requiresTenant(HandlerMethod handlerMethod) {

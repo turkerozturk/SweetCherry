@@ -154,6 +154,8 @@ SweetCherry açık kaldığı sürece komut penceresi/terminal de açık kalmal�
 
 İki bağlantı noktası da varsayılan olarak yalnızca `127.0.0.1`/`localhost` üzerinde dinler. İnternet/LAN erişimi, HTTPS ve üretim tipi kullanıcı yönetimi bu yerel başlangıç paketinin kapsamı dışındadır.
 
+Oturum sona erdiğinde sonraki istekte yeniden giriş ekranı açılır; girişten sonra CTB tekrar seçilir. Önceden açık sekmeler, başka bir CTB seçildikten sonra eski içerik olarak işaretlenir. Eski sekmedeki silme ve CTB export formları yeni seçilen CTB'ye uygulanmaz. CTB değiştirdikten sonra eski sekmeleri kapatıp yenilerini açın.
+
 Mevcut kaynak ayarındaki ana port `443` olduğundan scriptler, Linux/macOS'ta yönetici yetkisi gerektirmemesi ve çakışma riskini azaltması için onu `8443` olarak değiştirerek başlatır. SSL yapılandırılmadığı için bu yerel başlangıç senaryosunda adres `http://` ile açılır; `https://` kullanmayın.
 
 ## Giriş yapma

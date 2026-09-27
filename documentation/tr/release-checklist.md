@@ -43,6 +43,8 @@ sh ./release/SweetCherry/run.sh
 - [ ] İlk açılışta `login-credentials.properties` üretilmiş; yeniden başlatınca aynı parolalar çalışmış ve kişisel parola dosyası ZIP'e eklenmemiş.
 - [ ] Dört CTB export seçeneği ve download/delete akışı denenmiş.
 - [ ] `user` hesabının yönetici uçlarına erişemediği doğrulanmış.
+- [ ] CTB değiştirildikten sonra eski sekmenin düğüm bağlantısı ve silme/export formu yeni CTB üzerinde çalışmamış.
+- [ ] Oturum süresi dolunca giriş ekranında açıklama görülmüş; yeniden girişten sonra CTB seçimi istenmiş.
 - [ ] Normal profilde yalnızca `health` ve `info`; operations profilinde beklenen Actuator/Swagger uçları doğrulanmış.
 - [ ] Uygulamanın varsayılan olarak yalnızca `127.0.0.1` üzerinde dinlediği doğrulanmış.
 - [ ] `myapp.log`, `allTenants`, `CTBDATA` ve `exportedFiles` yollarının paket klasörü altında kaldığı doğrulanmış.
@@ -95,6 +97,7 @@ sha256sum SweetCherry-0.5.0.zip
 - PortableApps.com Format paketi.
 - Otomatik güncelleme.
 - Uzak erişim için ayrı güvenli dağıtım profili.
+- Proxy ağ yolu doğrulandıktan sonra giriş denemelerini gerçek istemciyi yanlış engellemeyecek biçimde sınırlamak.
 
 ## İnternetten erişim için ayrı kabul kontrolü
 

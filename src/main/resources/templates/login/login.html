@@ -83,6 +83,10 @@ https://getbootstrap.com/docs/4.0/examples/sign-in/
 
     <h1 class="h3 mb-3 font-weight-normal" th:text="#{login.sign_in_to_your_account}">Please sign in</h1>
 
+    <p th:if="${expired}" class="alert alert-info" role="status">
+        Oturumunuz sona erdi. Yeniden giriş yaptıktan sonra CTB dosyanızı seçin.
+    </p>
+
     <label class="sr-only"
            for="username"
            th:text="#{login.username}"

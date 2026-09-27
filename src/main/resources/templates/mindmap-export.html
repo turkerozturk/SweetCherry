@@ -25,6 +25,7 @@
                 <div class="card-body">
                     <form th:action="@{/mindmap-export}"
                           method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
 
                         <input type="hidden"
                                th:if="${_csrf != null}"

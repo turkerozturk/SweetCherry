@@ -44,8 +44,9 @@ class TenantFilter implements Filter {
 
         // String tenantName = req.getHeader("X-TenantID"); // security ve jwt gerektiren ornek. Denemedim.
         // TenantContext.setCurrentTenant(tenantName);
-        HttpSession session = req.getSession(); // chatgpt onerdi, session degiskeninde tutmayi. Yoksa setCurrentTenant diger metodlarca anlasilmiyor ve database degismiyor.
-        String tenantName = (String) session.getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT);
+        HttpSession session = req.getSession(false);
+        String tenantName = session == null ? null
+                : (String) session.getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT);
         // logger.info("Tenant Name: " + tenantName);
         if (tenantName != null) {
             TenantContext.setCurrentTenant(tenantName); //

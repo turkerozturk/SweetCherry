@@ -49,6 +49,7 @@ public class DataSourceCloseController {
         String tenantName = (String) session.getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT);
         TenantContext.setCurrentTenant(null);
         session.setAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT, null);
+        session.removeAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
         logger.info(String.format("Data Source closed. Session variable %s is cleared.", TenantContext.SESSION_VARIABLE__CURRENT_TENANT));
 
         return "redirect:/";  // Ana sayfaya yonlendir

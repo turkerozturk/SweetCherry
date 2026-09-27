@@ -23,6 +23,7 @@ package com.turkerozturk.multipledatabases;
 public class TenantContext {
 
     public static final String SESSION_VARIABLE__CURRENT_TENANT = "CURRENT_TENANT";
+    public static final String SESSION_VARIABLE__TENANT_VIEW_TOKEN = "CURRENT_TENANT_VIEW_TOKEN";
     private static final ThreadLocal<String> CURRENT_TENANT = new ThreadLocal<>();
 
     public static String getCurrentTenant() {

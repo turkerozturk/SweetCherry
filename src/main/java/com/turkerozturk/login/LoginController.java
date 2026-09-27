@@ -21,13 +21,16 @@
 package com.turkerozturk.login;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class LoginController {
     @GetMapping("/login")
-    public String login(HttpServletRequest request) {
+    public String login(@RequestParam(value = "expired", required = false) String expired, Model model) {
+        model.addAttribute("expired", expired != null);
         return "login/login";
     }
 }

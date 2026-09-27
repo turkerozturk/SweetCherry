@@ -31,6 +31,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import jakarta.servlet.http.Cookie;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -97,8 +98,17 @@ public class SecurityConfig {
                         .anyRequest()
                         .authenticated()
                 )
+                .sessionManagement(session -> session.invalidSessionStrategy((request, response) -> {
+                    Cookie expiredCookie = new Cookie("JSESSIONID", "");
+                    expiredCookie.setPath(request.getContextPath().isEmpty() ? "/" : request.getContextPath());
+                    expiredCookie.setMaxAge(0);
+                    expiredCookie.setHttpOnly(true);
+                    response.addCookie(expiredCookie);
+                    response.sendRedirect(request.getContextPath() + "/login?expired");
+                }))
                 .logout(a -> a
                         .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .clearAuthentication(true)
                         .logoutSuccessHandler(logoutSuccessHandler())
                         .permitAll()

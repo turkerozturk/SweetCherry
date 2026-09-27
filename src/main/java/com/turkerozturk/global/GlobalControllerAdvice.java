@@ -90,6 +90,13 @@ public class GlobalControllerAdvice {
         return TenantContext.getCurrentTenant();
     }
 
+    @ModelAttribute("tenantViewToken")
+    public String getTenantViewToken(jakarta.servlet.http.HttpServletRequest request) {
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        return session == null ? null : (String) session.getAttribute(
+                TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
+    }
+
     @ModelAttribute("ALL_TENANTS_FOLDER")
     public String getAllTenantsFolderName() {
         return MultitenantConfiguration.PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES;

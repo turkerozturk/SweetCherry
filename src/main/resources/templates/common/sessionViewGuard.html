@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="sessionViewGuard" th:if="${tenantViewToken != null}">
+    <script th:inline="javascript">
+        (() => {
+            const pageView = /*[[${tenantViewToken}]]*/ '';
+            const checkUrl = /*[[@{/session-view}]]*/ '/session-view';
+            const homeUrl = /*[[@{/}]]*/ '/';
+            let blocked = false;
+
+            // Bağlantılar eski sekmeden açılırsa sunucu da eski CTB işaretini görsün.
+            document.querySelectorAll('a[href]').forEach(link => {
+                if (link.getAttribute('href').startsWith('#')) return;
+                const url = new URL(link.href, window.location.href);
+                if (url.origin !== window.location.origin || !(
+                    url.pathname.startsWith('/nodes/')
+                    || url.pathname.startsWith('/quick-node-content/')
+                    || url.pathname.startsWith('/quick-mind-map/')
+                    || url.pathname.startsWith('/markmap-quick-mind-map/')
+                    || url.pathname.startsWith('/export-node-to-pdf/')
+                    || url.pathname === '/mindmap-export'
+                    || url.pathname === '/bookmarks')) return;
+                url.searchParams.set('_tenantView', pageView);
+                link.href = url.pathname + url.search + url.hash;
+            });
+
+            async function checkSessionView() {
+                if (blocked) return;
+                try {
+                    const response = await fetch(checkUrl, {credentials: 'same-origin', cache: 'no-store'});
+                    if (!response.ok || response.redirected) {
+                        block('Oturum sona erdi. Yeniden giriş yapın.', homeUrl);
+                        return;
+                    }
+                    const current = await response.json();
+                    if (current.view !== pageView) {
+                        block('Başka bir CTB seçildi. Bu sekmedeki sayfa artık güncel değil.', homeUrl);
+                    }
+                } catch (_) {
+                    // Geçici ağ hatası eski sayfadan işlem yapılmasına izin vermesin.
+                    block('Bağlantı doğrulanamadı. Sayfayı yeniden açın.', homeUrl);
+                }
+            }
+
+            function block(message, url) {
+                blocked = true;
+                const overlay = document.createElement('div');
+                overlay.setAttribute('role', 'alert');
+                overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#fff;'
+                    + 'display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center';
+                const box = document.createElement('div');
+                const text = document.createElement('p');
+                text.textContent = message;
+                const link = document.createElement('a');
+                link.href = url;
+                link.textContent = 'Ana sayfaya git';
+                box.append(text, link);
+                overlay.append(box);
+                document.body.append(overlay);
+            }
+
+            window.addEventListener('focus', checkSessionView);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) checkSessionView();
+            });
+            checkSessionView();
+        })();
+    </script>
+</th:block>
+</body>
+</html>

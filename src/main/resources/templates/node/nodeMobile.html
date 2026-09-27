@@ -220,6 +220,7 @@
 
                                 <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
                                       method="post" class="d-inline">
+                            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                                     <input type="hidden" name="includeDescendants" value="false"/>
                                     <button type="submit" class="btn btn-warning btn-sm">
                                         <img th:src="@{/img/icons/ct_file.svg}"/>
@@ -229,6 +230,7 @@
 
                                 <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
                                       method="post" class="d-inline">
+                            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                                     <input type="hidden" name="includeDescendants" value="true"/>
                                     <button type="submit" class="btn btn-warning btn-sm">
                                         <img th:src="@{/img/icons/ct_file.svg}"/>
@@ -238,6 +240,7 @@
 
                                 <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
                                       method="post" class="d-inline">
+                            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                                     <input type="hidden" name="includeDescendants" value="false"/>
                                     <button type="submit" class="btn btn-warning btn-sm">
                                         <img th:src="@{/img/icons/ct_file.svg}"/>
@@ -247,6 +250,7 @@
 
                                 <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
                                       method="post" class="d-inline">
+                            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                                     <input type="hidden" name="includeDescendants" value="true"/>
                                     <button type="submit" class="btn btn-warning btn-sm">
                                         <img th:src="@{/img/icons/ct_file.svg}"/>
