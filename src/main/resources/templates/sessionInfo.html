@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
 <head>
-    <title>Session Info</title>
+    <title>Oturum bilgisi</title>
 
 
 </head>
@@ -11,27 +11,29 @@
 
 
 
-    <h1>Session Parameters</h1>
+    <h1>Oturum bilgisi</h1>
+    <p class="text-muted">Oturumun boşta kalma sınırı ve zamanları.</p>
+    <p class="alert alert-warning" th:if="${debug}">Geliştirme görünümü açık: bu sayfa oturum ve çerez değerlerini içerir. Ekran görüntüsü veya sayfa kaynağını paylaşmayın.</p>
 
 
     <table class="table">
         <tr>
-            <th>Attribute</th>
-            <th>Value</th>
+            <th>Bilgi</th>
+            <th>Değer</th>
         </tr>
         <tr>
-            <td>Session Max Inactive Interval</td>
+            <td>Boşta kalma sınırı (saniye)</td>
             <td th:text="${sessionMaxInactiveInterval}"></td>
         </tr>
         <tr>
-            <td>Session Creation Time</td>
+            <td>Oturum oluşturulma zamanı</td>
             <td th:text="${#dates.format(sessionCreationTime, 'dd-MM-yyyy HH:mm:ss')}"></td>
         </tr>
         <tr>
-            <td>Session Last Accessed Time</td>
+            <td>Son erişim zamanı</td>
             <td th:text="${#dates.format(sessionLastAccessedTime, 'dd-MM-yyyy HH:mm:ss')}"></td>
         </tr>
-        <tr>
+        <tr th:if="${debug}">
             <td>Session ID</td>
             <td th:text="${sessionId}"></td>
         </tr>
@@ -39,16 +41,16 @@
     </table>
 
 
-    <h1>Session Attributes</h1>
-    <table class="table">
+    <h2 th:if="${debug}">Session Attributes</h2>
+    <table class="table table-striped" th:if="${debug}">
         <tr th:each="entry : ${sessionAttributes}">
             <td th:text="'Session Attribute: ' + ${entry.key}"></td>
             <td th:text="${entry.value}"></td>
         </tr>
     </table>
 
-    <h1>Cookies</h1>
-    <table class="table">
+    <h2 th:if="${debug}">Cookies</h2>
+    <table class="table table-striped" th:if="${debug}">
         <tr>
             <th>Cookie Name</th>
             <th>Cookie Value</th>
@@ -59,8 +61,8 @@
         </tr>
     </table>
 
-    <h1>ServletContext Parameters</h1>
-    <table class="table">
+    <h2 th:if="${debug}">ServletContext Parameters</h2>
+    <table class="table table-striped" th:if="${debug}">
         <tr>
             <th>Parameter</th>
             <th>Value</th>
@@ -72,8 +74,8 @@
     </table>
 
 
-    <h1>ServletContext Attributes</h1>
-    <table class="table">
+    <h2 th:if="${debug}">ServletContext Attributes</h2>
+    <table class="table table-striped" th:if="${debug}">
         <tr>
             <th>Attribute</th>
             <th>Value</th>
@@ -84,24 +86,24 @@
         </tr>
     </table>
 
-    <h1>SessionStorage Information</h1>
-    <table id="sessionStorageTable" class="table">
+    <h2 th:if="${debug}">SessionStorage Information</h2>
+    <table id="sessionStorageTable" class="table table-striped" th:if="${debug}">
         <tr>
             <th>Key</th>
             <th>Value</th>
         </tr>
     </table>
 
-    <h1>localStorage Information</h1>
-    <table id="localStorageTable" class="table">
+    <h2 th:if="${debug}">localStorage Information</h2>
+    <table id="localStorageTable" class="table table-striped" th:if="${debug}">
         <tr>
             <th>Key</th>
             <th>Value</th>
         </tr>
     </table>
 
-    <h1>IndexedDB Information</h1>
-    <table id="indexedDBTable" class="table">
+    <h2 th:if="${debug}">IndexedDB Information</h2>
+    <table id="indexedDBTable" class="table table-striped" th:if="${debug}">
         <tr>
             <th>Key</th>
             <th>Value</th>
@@ -109,7 +111,7 @@
     </table>
 
 
-    <script>
+    <script th:if="${debug}">
         function displaySessionStorage() {
             let sessionStorageTable = document.getElementById('sessionStorageTable');
 
@@ -121,15 +123,15 @@
                 let cellKey = row.insertCell(0);
                 let cellValue = row.insertCell(1);
 
-                cellKey.innerHTML = key;
-                cellValue.innerHTML = value;
+                cellKey.textContent = key;
+                cellValue.textContent = value;
             }
         }
 
-        window.onload = displaySessionStorage;
+        window.addEventListener('load', displaySessionStorage);
     </script>
 
-    <script>
+    <script th:if="${debug}">
         function displayStorage(storage, tableId) {
             let storageTable = document.getElementById(tableId);
 
@@ -141,18 +143,18 @@
                 let cellKey = row.insertCell(0);
                 let cellValue = row.insertCell(1);
 
-                cellKey.innerHTML = key;
-                cellValue.innerHTML = value;
+                cellKey.textContent = key;
+                cellValue.textContent = value;
             }
         }
 
-        window.onload = function() {
+        window.addEventListener('load', function() {
             displayStorage(sessionStorage, 'sessionStorageTable');
             displayStorage(localStorage, 'localStorageTable');
-        };
+        });
     </script>
 
-    <script>
+    <script th:if="${debug}">
         function displayIndexedDB() {
             let indexedDBTable = document.getElementById('indexedDBTable');
 
@@ -177,8 +179,8 @@
                         let cellKey = row.insertCell(0);
                         let cellValue = row.insertCell(1);
 
-                        cellKey.innerHTML = cursor.key;
-                        cellValue.innerHTML = JSON.stringify(cursor.value);
+                        cellKey.textContent = cursor.key;
+                        cellValue.textContent = JSON.stringify(cursor.value);
 
                         cursor.continue();
                     }
@@ -190,9 +192,9 @@
             };
         }
 
-        window.onload = function() {
+        window.addEventListener('load', function() {
             displayIndexedDB();
-        };
+        });
     </script>
 
 

@@ -24,9 +24,10 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Enumeration;
@@ -37,16 +38,31 @@ import java.util.Map;
 public class SessionInfoController {
 
 
-    @GetMapping("/sessionInfo")
-    public String getNodeAsHtml(Model model, HttpServletRequest request,
-                                @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+    private final boolean debug;
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpSession session = req.getSession();
+    public SessionInfoController(@Value("${myapp.debug:false}") boolean debug) {
+        this.debug = debug;
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/sessionInfo")
+    public String getNodeAsHtml(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "redirect:/login";
+        }
 
         int sessionMaxInactiveInterval = session.getMaxInactiveInterval();
         long sessionCreationTime = session.getCreationTime();
         long sessionLastAccessedTime = session.getLastAccessedTime();
+        model.addAttribute("sessionMaxInactiveInterval", sessionMaxInactiveInterval);
+        model.addAttribute("sessionCreationTime", sessionCreationTime);
+        model.addAttribute("sessionLastAccessedTime", sessionLastAccessedTime);
+        model.addAttribute("debug", debug);
+        if (!debug) {
+            return "sessionInfo";
+        }
+
         String sessionId = session.getId();
         Map<String, Object> sessionAttributes = new HashMap<>();
         Enumeration<String> attributeNames = session.getAttributeNames();
@@ -56,9 +72,6 @@ public class SessionInfoController {
             sessionAttributes.put(attributeName, attributeValue);
         }
 
-        model.addAttribute("sessionMaxInactiveInterval", sessionMaxInactiveInterval);
-        model.addAttribute("sessionCreationTime", sessionCreationTime);
-        model.addAttribute("sessionLastAccessedTime", sessionLastAccessedTime);
         model.addAttribute("sessionId", sessionId);
         model.addAttribute("sessionAttributes", sessionAttributes);
 
