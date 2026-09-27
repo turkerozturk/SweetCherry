@@ -230,6 +230,8 @@ Veritabanı gerektiren bir sayfaya veri kaynağı seçmeden gidilirse SweetCherr
 
 Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları gibi yöneticiye ayrılmış ekranları gösterebilir. Ancak CTB üzerinde düğüm silme işleminin uygulanabilmesi ayrıca ilgili dosyada `custom.isWritable=true` olmasına bağlıdır. Özgün not arşiviniz üzerinde bu seçeneği kullanmadan önce mutlaka yedek alın.
 
+`custom.isWritable=true` ile yönetici gerçek düğümün adını, başlık kalınlığını, seçili başlık rengini, simgesini ve CherryTree içerik salt okunur bayrağını da düzenleyebilir. Shared düğüm özellikleri düzenlenmez; not içeriği SweetCherry üzerinden düzenlenmez. CTB üzerinde yazma işlemlerinden önce bir kopyasını saklayın.
+
 ## Çalışırken oluşan dosya ve klasörler
 
 Bu yollar SweetCherry'nin **çalıştırıldığı klasöre** göre oluşur:

@@ -120,6 +120,10 @@
 
 
 
+                        <a th:if="${canDeleteNode and !isSharedNode}" sec:authorize="hasRole('ADMIN')"
+                           th:href="@{/nodes/properties/{nodeId}(nodeId=${requestedNodeId})}" class="btn btn-outline-primary">
+                            Düğüm özelliklerini düzenle
+                        </a>
                         <a th:if="${canDeleteNode}" sec:authorize="hasRole('ADMIN')"
                            th:href="@{/nodes/delete/{nodeId}(nodeId=${requestedNodeId})}" class="btn btn-danger">
                             <span th:text="#{node.delete}">Delete Node</span>

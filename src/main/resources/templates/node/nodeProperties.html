@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layoutMobile}">
+<head><title>Düğüm özellikleri</title></head>
+<body>
+<section layout:fragment="content" class="container py-3">
+    <h1>Düğüm özellikleri</h1>
+    <form th:action="@{/nodes/properties/{nodeId}(nodeId=${node.nodeId})}" method="post">
+        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+        <div class="mb-3">
+            <label for="nodeName" class="form-label">Düğüm adı</label>
+            <input id="nodeName" class="form-control" name="name" type="text" required maxlength="255"
+                   th:value="${node.name}"/>
+        </div>
+        <div class="form-check mb-3">
+            <input id="bold" class="form-check-input" type="checkbox" name="bold" value="true" th:checked="${bold}"/>
+            <label class="form-check-label" for="bold">Başlık kalın</label>
+        </div>
+        <fieldset class="mb-3">
+            <legend class="fs-5">Başlık rengi</legend>
+            <label th:if="${originalColor != null}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
+                <input type="radio" name="color" value="KEEP" th:checked="${selectedColor == 'KEEP'}"/>
+                <span th:style="|background-color: ${originalColor}; width: 1.5rem; height: 1.5rem; border: 1px solid #666; display: inline-block;|" aria-hidden="true"></span>
+                <span th:text="|Mevcut: ${originalColor}|">Mevcut renk</span>
+            </label>
+            <label th:each="item : ${colors}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
+                <input type="radio" name="color" th:value="${item.name()}"
+                       th:checked="${selectedColor == item.name()}"/>
+                <span th:if="${item.name() != 'NONE'}" th:style="|background-color: ${item.hex()}; width: 1.5rem; height: 1.5rem; border: 1px solid #666; display: inline-block;|" aria-hidden="true"></span>
+                <span th:text="${item.name() == 'NONE' ? 'Renk yok' : item.hex()}">Renk</span>
+            </label>
+        </fieldset>
+        <div class="mb-3">
+            <label for="nodeIcon" class="form-label">Simge</label>
+            <select id="nodeIcon" name="icon" class="form-select">
+                <option th:each="item : ${icons}" th:value="${item.name()}"
+                        th:selected="${selectedIconId == item.iconIdIn16bit}"
+                        th:text="${item.name() == 'OTHER' ? 'Varsayılan (belirtilmemiş)' : item.iconNameForHuman}">Simge</option>
+            </select>
+            <small class="form-text">Varsayılan simge seçilirse kod düğümlerinde dilin simgesi gösterilebilir.</small>
+        </div>
+        <div class="form-check mb-3">
+            <input id="contentReadOnly" class="form-check-input" type="checkbox" name="contentReadOnly"
+                   value="true" th:checked="${contentReadOnly}"/>
+            <label class="form-check-label" for="contentReadOnly">CherryTree içerik salt okunur bayrağı</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId})}">İptal</a>
+    </form>
+</section>
+</body>
+</html>
