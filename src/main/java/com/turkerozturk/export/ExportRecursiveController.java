@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -258,6 +259,12 @@ public class ExportRecursiveController {
 
 
 
+
+    // security: bu metodu ekleme sebebi, URL elle yazilirsa hata mesaji goruntulenmeden node content sayfasina yonlendirmek.
+    @GetMapping("/exportWithSubNodes/{node_id}")
+    public String exportPage(@PathVariable("node_id") Integer nodeId) {
+        return "redirect:/nodes/" + nodeId;
+    }
 
     //https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
     @PostMapping("/exportWithSubNodes/{node_id}")

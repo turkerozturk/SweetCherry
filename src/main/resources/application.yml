@@ -83,6 +83,9 @@ server:
  #   certificate: "classpath:ssl-self-signed-certificate/certificate.crt"
  #   certificate-private-key: "classpath:ssl-self-signed-certificate/private.key"
   shutdown: graceful
+  servlet:
+    session:
+      timeout: 30m
   http:
     port: 8080
   error:

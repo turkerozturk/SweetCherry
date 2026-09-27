@@ -224,6 +224,8 @@ Bir CTB seçiliyken Mermaid için `/quick-mind-map/all`, Markmap için `/markmap
 
 Oturum zaman aşımına uğrarsa veya çıkış yaparsanız yeniden giriş yapın. Veri kaynağı seçimi oturuma bağlı olduğundan listeden CTB'yi tekrar seçmeniz gerekebilir.
 
+Boşta kalan oturumun süresi varsayılan olarak 30 dakikadır. `application.yml` dosyasındaki `server.servlet.session.timeout` değerini, örneğin `15m` olarak değiştirebilirsiniz. Paketlenmiş JAR'ı çalıştırırken `--server.servlet.session.timeout=15m` parametresi de kullanılabilir. Süre dolduğunda tarayıcıda açık olan sayfa, yeniden bir işlem yapılıncaya kadar ekranda kalabilir; yeniden girişten sonra CTB'yi tekrar seçin.
+
 Veritabanı gerektiren bir sayfaya veri kaynağı seçmeden gidilirse SweetCherry kullanıcıyı ana veri kaynağı seçim ekranına yönlendirir. Bu davranış boş tenant ile JPA bağlantısı açılmaya çalışılmasını ve teknik hata sayfası gösterilmesini önler.
 
 Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları gibi yöneticiye ayrılmış ekranları gösterebilir. Ancak CTB üzerinde düğüm silme işleminin uygulanabilmesi ayrıca ilgili dosyada `custom.isWritable=true` olmasına bağlıdır. Özgün not arşiviniz üzerinde bu seçeneği kullanmadan önce mutlaka yedek alın.

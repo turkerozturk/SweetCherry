@@ -27,16 +27,29 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 public class ShutdownController implements ApplicationContextAware {
 
     private ApplicationContext context;
+    private final AtomicBoolean stopping = new AtomicBoolean();
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/shutdownContext")
-    public void shutdownContext() {
-        ((ConfigurableApplicationContext) context).close();
+    public String shutdownContext() {
+        if (stopping.compareAndSet(false, true)) {
+            Thread shutdownThread = new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                ((ConfigurableApplicationContext) context).close();
+            }, "sweetcherry-shutdown");
+            shutdownThread.start();
+        }
+        return "SweetCherry kapanıyor. Bu sekmeyi kapatabilirsiniz.";
     }
 
     @Override
