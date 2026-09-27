@@ -69,12 +69,13 @@
                     </th:block>
 
 
-                    <span th:unless="${node}"
+                    <a th:unless="${node}" th:href="@{/markmap-quick-mind-map/all}"
+                       target="_blank" rel="noopener noreferrer" title="Tüm düğümleri Markmap ile aç"
                           th:text="${'Database: ' + currentTenantName}"
                           style="color: white; font-weight: bold;"
                     >
                         Data source Name
-                    </span>
+                    </a>
 
                 </th:block>
 

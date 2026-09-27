@@ -22,6 +22,17 @@
         </a>
     </li>
 
+    <li th:if="${currentTenantName}"><div class="dropdown-divider"></div></li>
+    <li th:if="${currentTenantName}">
+        <a class="dropdown-item" th:href="@{/quick-mind-map/all}" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-project-diagram"></i> Mermaid mind map (tüm düğümler)
+        </a>
+    </li>
+    <li th:if="${currentTenantName}">
+        <a class="dropdown-item" th:href="@{/markmap-quick-mind-map/all}" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-project-diagram"></i> Markmap mind map (tüm düğümler)
+        </a>
+    </li>
 
 </div>
 </body>
