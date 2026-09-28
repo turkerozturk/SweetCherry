@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layoutMobile}">
+<head><title>Düğüm içeriğini düzenle</title></head>
+<body>
+<section layout:fragment="content" class="container py-3">
+    <h1>Düğüm içeriğini düzenle</h1>
+    <p><strong th:text="${node.name}">Düğüm adı</strong>
+        <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>
+    <p class="text-muted">Bu alan düz metindir. Satır sonları ve kod metni olduğu gibi kaydedilir.</p>
+    <form th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
+        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+        <label for="nodeText" class="form-label">İçerik</label>
+        <textarea id="nodeText" name="text" class="form-control font-monospace" rows="20"
+                  spellcheck="false" th:text="${node.txt}"></textarea>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId})}">İptal</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>

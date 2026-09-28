@@ -93,6 +93,7 @@ sha256sum SweetCherry-0.5.0.zip
 - Aynı adlı tenant yapılandırmasını güvenle değiştirme veya silme: aktif bağlantıyı kapatma, açık onay, yedek ve yeniden yükleme akışı. İlk sürümde dosya elle düzenlenir; yükleme mevcut dosyayı değiştirmez.
 - HTML/PDF içeriği, grid ve XML işleyicilerinin güvenilmeyen CTB verisine karşı güvenlik incelemesi ve örnek kötü amaçlı CTB testleri.
 - Export parser'ında alias/shared node/link/anchor kimlik eşleme çalışması.
+- `plain-text` içindeki `{sweet-cherry}` işaretiyle açılan ayrı HTML gösterim ve zengin metin düzenleyici tasarımı. Bu işaret uygulanmadan önce güvenilmeyen HTML'nin arındırılması ve CherryTree ile uyumluluk ayrıca incelenmeli.
 - macOS gerçek cihaz testi.
 - PortableApps.com Format paketi.
 - Otomatik güncelleme.

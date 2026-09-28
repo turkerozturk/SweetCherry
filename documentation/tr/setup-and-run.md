@@ -230,7 +230,9 @@ Veritabanı gerektiren bir sayfaya veri kaynağı seçmeden gidilirse SweetCherr
 
 Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları gibi yöneticiye ayrılmış ekranları gösterebilir. Ancak CTB üzerinde düğüm silme işleminin uygulanabilmesi ayrıca ilgili dosyada `custom.isWritable=true` olmasına bağlıdır. Özgün not arşiviniz üzerinde bu seçeneği kullanmadan önce mutlaka yedek alın.
 
-`custom.isWritable=true` ile yönetici gerçek düğümün adını, başlık kalınlığını, seçili başlık rengini, simgesini ve CherryTree içerik salt okunur bayrağını da düzenleyebilir. Shared düğüm özellikleri düzenlenmez; not içeriği SweetCherry üzerinden düzenlenmez. CTB üzerinde yazma işlemlerinden önce bir kopyasını saklayın.
+`custom.isWritable=true` ile yönetici gerçek düğümün adını, başlık kalınlığını, seçili başlık rengini, simgesini ve CherryTree içerik salt okunur bayrağını da düzenleyebilir. Shared düğüm özellikleri düzenlenmez. CTB üzerinde yazma işlemlerinden önce bir kopyasını saklayın.
+
+Yönetici, içerik salt okunur değilse gerçek düğümün `plain-text` veya kod dili sözdizimli düz metin içeriğini de düzenleyebilir. `node.syntax=custom-colors` CherryTree'nin XML tabanlı zengin metnidir ve bu editörde düzenlenmez. Diğer sözdizimleri metni düz olarak saklar; görüntülenirken kod renklendirmesi uygulanabilir. Aynı CTB dosyasını CherryTree'de açıkken SweetCherry üzerinden değiştirmeyin.
 
 CTB'deki `node.is_ro` alanında simge kimliği ve içerik salt okunur bayrağı birlikte saklanır: `is_ro = (simge_kimliği << 1) | salt_okunur_biti`. En düşük bit `1` ise içerik salt okunurdur; simge belirtilmemiş ve salt okunur değilse alan `0` olur. Bu, tenant ayarındaki `custom.isWritable` izninden ayrı bir özelliktir.
 

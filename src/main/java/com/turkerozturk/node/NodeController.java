@@ -416,6 +416,7 @@ public class NodeController {
         boolean isRealNode = nodeInChildrenTable.getMasterId() == null
                 || nodeInChildrenTable.getMasterId() == 0; // bilgi eski dblerde null var, yenilerde 0 var.
         model.addAttribute("isSharedNode", !isRealNode);
+        model.addAttribute("canEditNodeContent", false);
         if (!isRealNode) {
             model.addAttribute("masterNodeId", nodeInChildrenTable.getMasterId());
         }
@@ -424,6 +425,9 @@ public class NodeController {
 
 
             Node node = nodeService.findById(nodeId);
+            model.addAttribute("canEditNodeContent", node != null && node.getSyntax() != null
+                    && !"custom-colors".equals(node.getSyntax())
+                    && !node.isReadOnly());
             node.setMasterNode(true);
             nodeService.prepareFatherNode(node);
            // System.out.println("FATHERR: " + node.getFatherNode().getName());

@@ -19,6 +19,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
         boolean protectedPost = "POST".equalsIgnoreCase(request.getMethod())
                 && (request.getRequestURI().startsWith(request.getContextPath() + "/nodes/delete/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/properties/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/content/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/expo/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/exportWithSubNodes/")
                 || request.getRequestURI().equals(request.getContextPath() + "/mindmap-export"));
