@@ -232,6 +232,8 @@ Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları
 
 `custom.isWritable=true` ile yönetici gerçek düğümün adını, başlık kalınlığını, seçili başlık rengini, simgesini ve CherryTree içerik salt okunur bayrağını da düzenleyebilir. Shared düğüm özellikleri düzenlenmez; not içeriği SweetCherry üzerinden düzenlenmez. CTB üzerinde yazma işlemlerinden önce bir kopyasını saklayın.
 
+CTB'deki `node.is_ro` alanında simge kimliği ve içerik salt okunur bayrağı birlikte saklanır: `is_ro = (simge_kimliği << 1) | salt_okunur_biti`. En düşük bit `1` ise içerik salt okunurdur; simge belirtilmemiş ve salt okunur değilse alan `0` olur. Bu, tenant ayarındaki `custom.isWritable` izninden ayrı bir özelliktir.
+
 ## Çalışırken oluşan dosya ve klasörler
 
 Bu yollar SweetCherry'nin **çalıştırıldığı klasöre** göre oluşur:

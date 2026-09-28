@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class NodePropertiesServiceTest {
     @AfterEach void clear() { TenantContext.clear(); }
 
-    @Test void savesOnlySelectedBitsAndKeepsRichTextAndUnknownIconBits() {
+    @Test void savesSelectedBitsAndClearsIconAndReadOnly() {
         TenantContext.setCurrentTenant("test");
         CustomPropertiesHolder settings = new CustomPropertiesHolder();
         settings.addCustomProperties("test", Map.of("custom.isWritable", "true"));
@@ -35,7 +35,7 @@ class NodePropertiesServiceTest {
         when(children.findByNodeId(12L)).thenReturn(real);
         Node node = new Node();
         node.setIsRichText(1L | (0x3584E4L << 3));
-        node.setIsReadOnly16bit(0x8001L | NodeIcon.CT_HOME.getIconIdIn16bit());
+        node.setIsReadOnly16bit(1L | NodeIcon.CT_HOME.getIconIdIn16bit());
         when(nodes.findById(12L)).thenReturn(node);
         EntityManager entityManager = mock(EntityManager.class);
         Query query = mock(Query.class);
@@ -47,7 +47,7 @@ class NodePropertiesServiceTest {
         service.update(12L, "Yeni isim", true, TitleColor.RED, NodeIcon.OTHER, false);
 
         verify(query).setParameter("rich", (0xE01B24L << 3) | 3L);
-        verify(query).setParameter("icon", 1L);
+        verify(query).setParameter("icon", 0L);
         verify(query).setParameter("name", "Yeni isim");
         verify(query).executeUpdate();
     }
@@ -91,6 +91,6 @@ class NodePropertiesServiceTest {
         service.update(12L, "Name", false, null, NodeIcon.CT_HOME, true);
 
         verify(query).setParameter("rich", (0x123456L << 3) | 1L);
-        verify(query).setParameter("icon", 0x8000L | NodeIcon.CT_HOME.getIconIdIn16bit());
+        verify(query).setParameter("icon", 29L);
     }
 }
