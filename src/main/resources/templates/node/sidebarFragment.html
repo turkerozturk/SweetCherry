@@ -51,6 +51,10 @@
 
                     <th:block th:if="${node}">
 
+                        <th:block th:if="${node.isReadOnly == true}">
+                            <img th:src="@{/img/icons/ct_locked.svg}"/>
+                        </th:block>
+
                         <a href="/nodes/0">
                         <span th:title="#{tree.goToParentNode}"
                               style="color: white; font-weight: bold;"
@@ -88,7 +92,10 @@
 
             <th:block th:if="${childNodes}">
                 <th:block th:if="${parentNodeId}">
-                    <h4><img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
+                    <h4><th:block th:if="${node.isReadOnly == true}">
+                        <img th:src="@{/img/icons/ct_locked.svg}"/>
+                        </th:block>
+                        <img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
                              th:alt="${'/img/icons/' + node.nodeIcon.iconName}"
                              th:title="${'Content rendered as: ' + node.syntax}"
                              class="iconcss"/>
@@ -112,6 +119,10 @@
                                 <i th:class="${childNode.hasChildren ? 'fas fa-caret-right childiconcssfas' : 'fas fa-square childiconcssfas'}"
                                    th:style="${childNode.hasChildren ? '' : 'visibility: hidden;'}"
                                 ></i>
+
+                                <th:block th:if="${childNode.isReadOnly == true}">
+                                    <img th:src="@{/img/icons/ct_locked.svg}"/>
+                                </th:block>
 
                                 <img th:src="@{/img/icons/__${childNode.nodeIcon.iconName}__.svg}"
                                      th:alt="${'/img/icons/' + childNode.nodeIcon.iconName}" class="childiconcss"/>

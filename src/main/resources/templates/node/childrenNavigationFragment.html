@@ -33,6 +33,10 @@
                            th:style="${childNode.hasChildren ? '' : 'visibility: hidden;'}"
                         ></i>
 
+                        <th:block th:if="${childNode.isReadOnly == true}">
+                            <img th:src="@{/img/icons/ct_locked.svg}"/>
+                        </th:block>
+
                         <img th:src="@{/img/icons/__${childNode.nodeIcon.iconName}__.svg}"
                              th:alt="${'/img/icons/' + childNode.nodeIcon.iconName}" class="childiconcss"/>
 

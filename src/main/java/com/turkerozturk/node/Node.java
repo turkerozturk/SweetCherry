@@ -167,6 +167,7 @@ public class Node {
     @PostLoad
     private void doAfterInitialization() {
         parseNodeIconAndReadOnlyFlag();
+      //  System.out.println("NODE READONLY MI " + isReadOnly);
         parseNodeTitleColorAndBoldnessAndTextType();
         parseIsMasterNode();
 
@@ -180,8 +181,8 @@ public class Node {
         int dbField16bits = (int) this.getIsReadOnly16bit();
 
         IconIdAndIsReadOnly iconIdAndIsReadOnly = BitOperation.processSixteenBitData(dbField16bits);
-        this.setReadOnly(iconIdAndIsReadOnly.isReadOnly());
-
+       // this.setReadOnly(iconIdAndIsReadOnly.isReadOnly());
+        isReadOnly = iconIdAndIsReadOnly.isReadOnly();
         // ustteki helper metod ile hem readonly degiskenden ayirdik hem de donusum yaptik raw icon id ye.
         int iconIdIn16bit = iconIdAndIsReadOnly.iconId();
         if (iconIdIn16bit != 0) {

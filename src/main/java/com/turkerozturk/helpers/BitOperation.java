@@ -24,13 +24,35 @@ import com.turkerozturk.IconIdAndIsReadOnly;
 
 public class BitOperation {
 
+    /**
+     * veritabaninda node.is_ro alaninda iki degisken degeri vardir.
+     * Bu metod gelen bitisik degeri alip onlari parse eder.
+     * @param sixteenBitAsInt
+     * @return
+     */
     public static IconIdAndIsReadOnly processSixteenBitData(int sixteenBitAsInt) {
-        // En sagdaki biti ile AND islemi yaparak boolean degeri bulma
-        boolean isReadOnly = (sixteenBitAsInt & 0x8000) != 0;
 
-        // En sagdaki biti temizleyerek diger 15 biti elde etme ve bir saga kaydirma
+        boolean isReadOnly = (sixteenBitAsInt & 1) == 1;
+
+        // En dusuk biti temizleyerek diger 15 biti elde etme ve bir saga kaydirma
         int remainingFifteenBitsAsInt = (sixteenBitAsInt & 0x7FFF) >> 1;
 
         return new IconIdAndIsReadOnly(remainingFifteenBitsAsInt, isReadOnly);
     }
+
+    /**
+     * veritabaninda node.is_ro alaninda iki degisken degeri vardir.
+     * Bu metod iki degiskeni alip veritabanina bitisik olarak yazilacak hale getirir.
+     * @param iconIdAndIsReadOnly
+     * @return
+     */
+    public static long concatIconIdAndIsReadOnly(IconIdAndIsReadOnly iconIdAndIsReadOnly) {
+
+        int iconIdInPlaceAsInt = (iconIdAndIsReadOnly.iconId() << 1);
+
+        int isReadOnlyBitInPlaceAsInt =  iconIdAndIsReadOnly.isReadOnly() ? 1 : 0;
+
+        return iconIdInPlaceAsInt + isReadOnlyBitInPlaceAsInt;
+    }
+
 }

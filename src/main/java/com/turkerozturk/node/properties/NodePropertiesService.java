@@ -1,7 +1,9 @@
 package com.turkerozturk.node.properties;
 
+import com.turkerozturk.IconIdAndIsReadOnly;
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
+import com.turkerozturk.helpers.BitOperation;
 import com.turkerozturk.helpers.NodeIcon;
 import com.turkerozturk.multipledatabases.CustomPropertiesHolder;
 import com.turkerozturk.multipledatabases.TenantContext;
@@ -21,8 +23,8 @@ import java.util.Map;
 public class NodePropertiesService {
     private static final long COLOR_MASK = 0xFFFFFFL << 3;
     private static final long BOLD_MASK = 1L << 1;
-    private static final long ICON_MASK = 0x7FFEL;
-    private static final long READ_ONLY_MASK = 0x8000L;
+   // private static final long ICON_MASK = 0x7FFEL;
+   // private static final long READ_ONLY_MASK = 0x8000L;
 
     private final NodeRepository nodes;
     private final ChildrenRepository children;
@@ -65,13 +67,16 @@ public class NodePropertiesService {
         Node node = realNode(nodeId);
         long richText = (node.getIsRichText() & ~(color == null ? BOLD_MASK : COLOR_MASK | BOLD_MASK))
                 | (color == null ? 0 : (long) color.rgb() << 3) | (bold ? BOLD_MASK : 0);
-        long iconAndLock = (node.getIsReadOnly16bit() & ~(ICON_MASK | READ_ONLY_MASK))
-                | icon.getIconIdIn16bit() | (contentReadOnly ? READ_ONLY_MASK : 0);
+//        long iconAndLock = (node.getIsReadOnly16bit() & ~(ICON_MASK | READ_ONLY_MASK))
+//                | icon.getIconIdIn16bit() | (contentReadOnly ? READ_ONLY_MASK : 0);
+
+        IconIdAndIsReadOnly iconIdAndIsReadOnly = new IconIdAndIsReadOnly(icon.getIconId(), contentReadOnly);
+        long concatIconIdAndIsReadOnly = BitOperation.concatIconIdAndIsReadOnly(iconIdAndIsReadOnly);
         // Explicit columns avoid merging the entity's bookmark/children relationships.
         entityManager.createNativeQuery("UPDATE node SET name = :name, is_richtxt = :rich, is_ro = :icon WHERE node_id = :id")
                 .setParameter("name", name)
                 .setParameter("rich", richText)
-                .setParameter("icon", iconAndLock)
+                .setParameter("icon", concatIconIdAndIsReadOnly)
                 .setParameter("id", nodeId)
                 .executeUpdate();
     }

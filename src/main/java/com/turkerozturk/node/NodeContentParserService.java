@@ -74,7 +74,7 @@ public class NodeContentParserService {
     @Autowired
     AnchorService anchorService;
 
-    @Value("${myapp.debug}")
+    @Value("${myapp.debug:false}")
     private Boolean myappIsDebugEnabled;
 
     public Node parseNodeContent(Node node, HttpServletRequest request) {

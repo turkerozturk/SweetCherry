@@ -40,7 +40,7 @@ public class SettingsController {
     @Value("${myapp.openWebBrowserOnStartup:true}")
     Boolean openWebBrowserOnStartup;
 
-    @Value("${myapp.debug:}")
+    @Value("${myapp.debug:false}")
     Boolean debug;
 
     @Value("${myapp.syntax-highlighting.enabled:false}")

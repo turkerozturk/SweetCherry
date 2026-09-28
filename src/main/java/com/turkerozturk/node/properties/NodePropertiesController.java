@@ -1,5 +1,7 @@
 package com.turkerozturk.node.properties;
 
+import com.turkerozturk.IconIdAndIsReadOnly;
+import com.turkerozturk.helpers.BitOperation;
 import com.turkerozturk.helpers.NodeIcon;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.Node;
@@ -31,10 +33,14 @@ public class NodePropertiesController {
         TitleColor selected = TitleColor.fromBits(node.getIsRichText());
         model.addAttribute("selectedColor", selected == null ? "KEEP" : selected.name());
         model.addAttribute("originalColor", selected == null ? String.format("#%06X", (node.getIsRichText() >>> 3) & 0xFFFFFF) : null);
-        model.addAttribute("icons", NodeIcon.values());
-        model.addAttribute("selectedIconId", (int) (node.getIsReadOnly16bit() & 0x7FFE));
         model.addAttribute("bold", (node.getIsRichText() & 2L) != 0);
-        model.addAttribute("contentReadOnly", (node.getIsReadOnly16bit() & 0x8000L) != 0);
+
+        model.addAttribute("icons", NodeIcon.values());
+        IconIdAndIsReadOnly iconIdAndIsReadOnly = BitOperation.processSixteenBitData((int) node.getIsReadOnly16bit());
+        model.addAttribute("selectedIconId", (int) (node.getIsReadOnly16bit() & 0x7FFE));
+        boolean g = (node.getIsReadOnly16bit() & 1L) != 0;
+        model.addAttribute("contentReadOnly", g);
+        //model.addAttribute("contentReadOnly", (node.getIsReadOnly16bit() & 0x8000L) != 0);
         return "node/nodeProperties";
     }
 

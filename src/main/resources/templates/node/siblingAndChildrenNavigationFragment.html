@@ -56,6 +56,10 @@
                                        th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
                                     ></i>
 
+                                    <th:block th:if="${siblingNaviNode.isReadOnly == true}">
+                                        <img th:src="@{/img/icons/ct_locked.svg}"/>
+                                    </th:block>
+
                                     <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
                                          th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
 
@@ -70,6 +74,10 @@
                                     <i th:class="${siblingNaviNode.hasChildren ? 'fas fa-caret-down childiconcssfas' : 'fas fa-square childiconcssfas'}"
                                        th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
                                     ></i>
+
+                                    <th:block th:if="${siblingNaviNode.isReadOnly == true}">
+                                        <img th:src="@{/img/icons/ct_locked.svg}"/>
+                                    </th:block>
 
                                     <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
                                          th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
@@ -89,6 +97,10 @@
                                 <i th:class="${siblingNaviNode.hasChildren ? 'fas fa-caret-down childiconcssfas' : 'fas fa-square childiconcssfas'}"
                                        th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
                                 ></i>
+
+                                <th:block th:if="${siblingNaviNode.isReadOnly == true}">
+                                    <img th:src="@{/img/icons/ct_locked.svg}"/>
+                                </th:block>
 
                                 <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
                                      th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>

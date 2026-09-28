@@ -74,7 +74,7 @@ public class NodeController {
     @Autowired
     Filtered filtered;
 
-    @Value("${myapp.debug}")
+    @Value("${myapp.debug:false}")
     private Boolean myappIsDebugEnabled;
 
     @GetMapping("/nodes")
@@ -366,14 +366,19 @@ public class NodeController {
         }
 
         List<NaviNode> siblingNaviNodes = childrenService.getNaviNodesByFatherId(0);
-        for (NaviNode siblingNode : siblingNaviNodes) {
-            logger.info(
-                    siblingNode.sequence() + ", sibling: " +
-                            siblingNode.nodeId() + ", " +
-                            siblingNode.name() + ", prev: " +
-                            siblingNode.prevSiblingNodeId() + ", next: " +
-                            siblingNode.nextSiblingNodeId()
-            );
+
+        if(myappIsDebugEnabled) {
+            logger.info("DEBUG siblingNaviNodes:");
+            for (NaviNode siblingNode : siblingNaviNodes) {
+                logger.info(
+                        siblingNode.sequence() + ", sibling: " +
+                                siblingNode.nodeId() + ", " +
+                                siblingNode.name() + ", prev: " +
+                                siblingNode.prevSiblingNodeId() + ", next: " +
+                                siblingNode.nextSiblingNodeId() + ", readonly: " +
+                                siblingNode.isReadOnly()
+                );
+            }
         }
         model.addAttribute("siblingNaviNodes", siblingNaviNodes);
 
