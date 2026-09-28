@@ -194,6 +194,8 @@ datasource.url=jdbc:sqlite:C:/Users/kullanici/Documents/CTB/mydatabase.ctb
 datasource.driver-class-name=org.sqlite.JDBC
 datasource.init-mode=always
 custom.isWritable=false
+custom.newNodeName=New Node
+custom.newNodeTags=
 ```
 
 Dikkat edilmesi gerekenler:
@@ -231,6 +233,8 @@ Veritabanı gerektiren bir sayfaya veri kaynağı seçmeden gidilirse SweetCherr
 Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları gibi yöneticiye ayrılmış ekranları gösterebilir. Ancak CTB üzerinde düğüm silme işleminin uygulanabilmesi ayrıca ilgili dosyada `custom.isWritable=true` olmasına bağlıdır. Özgün not arşiviniz üzerinde bu seçeneği kullanmadan önce mutlaka yedek alın.
 
 `custom.isWritable=true` ile yönetici gerçek düğümün adını, başlık kalınlığını, seçili başlık rengini, simgesini ve CherryTree içerik salt okunur bayrağını da düzenleyebilir. Shared düğüm özellikleri düzenlenmez. CTB üzerinde yazma işlemlerinden önce bir kopyasını saklayın.
+
+Yönetici, yazılabilir CTB'deki gerçek bir düğümün altına **Altdüğüm Ekle** ile doğrudan boş bir `plain-text` düğüm ekleyebilir. Başlangıç adı `New node`, etiketleri boştur. İsterseniz ilgili tenant dosyasına `custom.newNodeName=Başlıksız` ve `custom.newNodeTags=etiket1 etiket2` ekleyin. `custom.newNodeName=` ve `custom.newNodeTags=` boş değerleri de kabul edilir; satırlar yoksa varsayılanlar kullanılır. Yeni düğüm en son kardeşin arkasına eklenir ve sayfası açılır. Shared düğümün altına düğüm eklenmez.
 
 Yönetici, içerik salt okunur değilse gerçek düğümün `plain-text` veya kod dili sözdizimli düz metin içeriğini de düzenleyebilir. `node.syntax=custom-colors` CherryTree'nin XML tabanlı zengin metnidir ve bu editörde düzenlenmez. Diğer sözdizimleri metni düz olarak saklar; görüntülenirken kod renklendirmesi uygulanabilir. Aynı CTB dosyasını CherryTree'de açıkken SweetCherry üzerinden değiştirmeyin.
 

@@ -6,3 +6,5 @@ datasource.driver-class-name=org.sqlite.JDBC
 # datasource.password=admin
 datasource.init-mode=always
 custom.isWritable=true
+custom.newNodeName=New Node
+custom.newNodeTags=

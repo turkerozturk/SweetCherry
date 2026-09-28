@@ -132,6 +132,11 @@
                            th:href="@{/nodes/delete/{nodeId}(nodeId=${requestedNodeId})}" class="btn btn-danger">
                             <span th:text="#{node.delete}">Delete Node</span>
                         </a>
+                        <form th:if="${canDeleteNode and !isSharedNode}" sec:authorize="hasRole('ADMIN')"
+                              th:action="@{/nodes/children/{nodeId}(nodeId=${requestedNodeId})}" method="post" style="display: inline-block">
+                            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                            <button type="submit" class="btn btn-outline-primary">Altdüğüm Ekle</button>
+                        </form>
 
                     <th:block th:unless="${hasEmptyContent}">
                         <div th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></div>
