@@ -86,7 +86,8 @@ public class SecurityConfig {
     //  Spring Security 6: Personalize Your Login Experience
     // https://www.baeldung.com/spring-deprecated-websecurityconfigureradapter
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, LoginAttemptLimiter limiter) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, LoginAttemptLimiter limiter,
+                                           LoginClientAddressResolver clientAddress) throws Exception {
 
         SimpleUrlAuthenticationFailureHandler failure =
                 new SimpleUrlAuthenticationFailureHandler("/login?error");
@@ -101,7 +102,7 @@ public class SecurityConfig {
                                             FilterChain chain) throws ServletException, IOException {
                 if ("POST".equals(request.getMethod())
                         && (request.getContextPath() + "/login").equals(request.getRequestURI())
-                        && limiter.blocked(request.getParameter("username"), request.getRemoteAddr(),
+                        && limiter.blocked(request.getParameter("username"), clientAddress.resolve(request),
                                 loginUserName, loginAdminName)) {
                     response.sendError(429, "Too many login attempts. Try again in 15 minutes.");
                     return;
@@ -114,12 +115,12 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler((request, response, authentication) -> {
-                            limiter.succeeded(authentication.getName(), request.getRemoteAddr(),
+                            limiter.succeeded(authentication.getName(), clientAddress.resolve(request),
                                     loginUserName, loginAdminName);
                             success.onAuthenticationSuccess(request, response, authentication);
                         })
                         .failureHandler((request, response, exception) -> {
-                            limiter.failed(request.getParameter("username"), request.getRemoteAddr(),
+                            limiter.failed(request.getParameter("username"), clientAddress.resolve(request),
                                     loginUserName, loginAdminName);
                             failure.onAuthenticationFailure(request, response, exception);
                         })

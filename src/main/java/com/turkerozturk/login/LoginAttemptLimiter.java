@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/** Limits failed logins by account and direct peer without trusting client supplied proxy headers. */
+/** Limits failed logins by account and a separately verified client address. */
 @Component
 public class LoginAttemptLimiter {
     private static final Logger logger = LoggerFactory.getLogger(LoginAttemptLimiter.class);
@@ -44,10 +44,10 @@ public class LoginAttemptLimiter {
                         ? new Attempt(1, now.plus(WINDOW))
                         : new Attempt(previous.count() + 1, previous.expiresAt()));
         String account = accountLabel(username, userName, adminName);
-        logger.warn("Login failed: account={}, peer={}, attempts={}/{}",
+        logger.warn("Login failed: account={}, clientIp={}, attempts={}/{}",
                 account, peer, current.count(), MAX_FAILURES);
         if (current.count() == MAX_FAILURES) {
-            logger.warn("Login temporarily blocked: account={}, peer={}, until={}",
+            logger.warn("Login temporarily blocked: account={}, clientIp={}, until={}",
                     account, peer, current.expiresAt());
         }
         if (operations.incrementAndGet() % 128 == 0) {
@@ -59,7 +59,7 @@ public class LoginAttemptLimiter {
     /** Clears the successful account's failed attempts for this peer. */
     public void succeeded(String username, String peer, String userName, String adminName) {
         attempts.remove(key(username, peer, userName, adminName));
-        logger.info("Login succeeded: account={}, peer={}",
+        logger.info("Login succeeded: account={}, clientIp={}",
                 accountLabel(username, userName, adminName), peer);
     }
 

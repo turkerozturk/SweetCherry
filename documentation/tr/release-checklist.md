@@ -98,7 +98,7 @@ sha256sum SweetCherry-0.5.0.zip
 - PortableApps.com Format paketi.
 - Otomatik güncelleme.
 - Uzak erişim için ayrı güvenli dağıtım profili.
-- Giriş denemesi sınırını güvenilir proxy üzerinden doğrulanan gerçek istemci adresiyle ilişkilendirmek; çoklu kullanıcı ve yeniden başlatma davranışını değerlendirmek.
+- Giriş sınırının çoklu kullanıcı, proxy yeniden başlatma ve uygulama yeniden başlatma davranışını değerlendirmek; sınırın uygulama belleğinde tutulduğunu ve yeniden başlatılınca sıfırlandığını belgelemek.
 
 ## İnternetten erişim için ayrı kabul kontrolü
 
@@ -108,5 +108,29 @@ sha256sum SweetCherry-0.5.0.zip
 - [ ] SweetCherry host güvenlik duvarı yalnızca gereken LAN istemcilerine ve proxy hostuna izin veriyor; `server.address: 0.0.0.0` tek başına bir erişim kuralı değildir.
 - [ ] Tarayıcı–proxy bağlantısı HTTPS; proxy–SweetCherry arasındaki HTTP trafiği güvenilir LAN/VPN içindedir.
 - [ ] Oturum çerezi, proxy başlıkları, yönlendirme ve HTTPS davranışı aynı alan adı üzerinden doğrulandı. HTTP üzerinden localhost/LAN erişimi istendiğinde `Secure` çerezinin etkisi ayrıca kararlaştırıldı.
-- [ ] Giriş denemesi sınırı, gerçek istemciyi ve kullanıcıyı yanlış engelleme olasılığıyla birlikte denendi. İlk aşamadaki sınır doğrudan bağlantı IP'sini kullanır: proxy arkasında aynı hesap için tüm uzak kullanıcılar ortak sınırı paylaşır.
+- [ ] Giriş denemesi sınırı gerçek istemciyi yanlış engellemiyor; farklı WAN istemcileri, doğrudan LAN ve localhost ayrı ayrı denendi.
 - [ ] CTB içeriğinden HTML üreten yollar, dosya yükleme/dışa aktarma uçları, kullanıcı rolleri ve aktif operasyon profili ayrı ayrı gözden geçirildi.
+
+### Giriş sınırı için güvenilir proxy adresi
+
+Varsayılan davranış TCP bağlantısının IP adresini kullanır. Caddy arkasında bütün WAN istemcileri aynı proxy IP'sinden görünür. Caddy'ye gelen istemci adresini tek başlıkta iletmek için ilgili site bloğuna örneklerdeki IP adreslerini sizinkilerle değiştirerek şunu koyun: 
+
+```caddyfile
+xyz.duckdns.org {
+    reverse_proxy 192.168.0.5:8080 {
+        header_up X-SweetCherry-Client-IP {remote_host}
+    }
+}
+```
+
+SweetCherry'nin JAR dışındaki `application.yml` dosyasında, **uygulamanın doğrudan bağlantıda gördüğü Caddy IP'sini** belirtin:
+
+```yaml
+myapp:
+  login:
+    trusted-proxy-address: 192.168.0.2
+```
+
+Mevcut `myapp.login` bölümüne yalnızca `trusted-proxy-address` satırını ekleyin; diğer kullanıcı adlarını silmeyin. Caddy yapılandırmasını doğrulayıp yeniden yükledikten ve SweetCherry'yi yeniden başlattıktan sonra logdaki `clientIp` değerini kontrol edin. Proxy dışındaki isteklerde başlık yok sayılır. Güvenilir proxy eşleşse bile başlık eksik, birden fazla veya geçersizse doğrudan proxy IP'si kullanılır. Bu ayar yalnızca giriş sınırı ve giriş logları içindir; tüm uygulamada proxy başlıklarına güvenme ayarı değildir.
+
+Docker ağ kipine göre `{remote_host}` gerçek WAN istemcisi yerine bir ağ geçidi adresi olabilir. Farklı dış ağlardan denemelerde aynı `clientIp` görülürse güven sınırını genişletmeyin; önce Caddy'nin gelen bağlantıda gördüğü adresi ve Docker ağ yolunu inceleyin. Uygulama yeniden başlatılırsa 15 dakikalık sayaçlar bellekte oldukları için sıfırlanır.

@@ -163,6 +163,9 @@ myapp:
     enabled: false
   exportingFolderName: exportedFiles
   login:
+    # Set only when a trusted reverse proxy overwrites X-SweetCherry-Client-IP.
+    # Empty means use the direct TCP peer for login limits and security logs.
+    trusted-proxy-address: ""
     admin:
       name: admin
     user:
