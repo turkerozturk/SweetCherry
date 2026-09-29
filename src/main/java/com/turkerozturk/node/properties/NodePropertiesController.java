@@ -3,6 +3,7 @@ package com.turkerozturk.node.properties;
 import com.turkerozturk.IconIdAndIsReadOnly;
 import com.turkerozturk.helpers.BitOperation;
 import com.turkerozturk.helpers.NodeIcon;
+import com.turkerozturk.helpers.highlighter.CodeHighLighter;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.Node;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequiresTenant
@@ -40,6 +44,16 @@ public class NodePropertiesController {
         model.addAttribute("selectedIconId", (int) (node.getIsReadOnly16bit() & 0x7FFE));
         boolean g = (node.getIsReadOnly16bit() & 1L) != 0;
         model.addAttribute("contentReadOnly", g);
+        boolean richText = "custom-colors".equals(node.getSyntax()) || (node.getIsRichText() & 1L) != 0;
+        model.addAttribute("nodeType", richText ? NodeType.RICH_TEXT
+                : "plain-text".equals(node.getSyntax()) ? NodeType.PLAIN_TEXT : NodeType.CODE);
+        model.addAttribute("syntaxLocked", richText || g);
+        List<String> syntaxOptions = new ArrayList<>(CodeHighLighter.supportedSyntaxes());
+        if (!richText && node.getSyntax() != null && !"plain-text".equals(node.getSyntax())
+                && !syntaxOptions.contains(node.getSyntax())) {
+            syntaxOptions.add(0, node.getSyntax()); // Preserve an unsupported legacy syntax on other edits.
+        }
+        model.addAttribute("syntaxOptions", syntaxOptions);
         //model.addAttribute("contentReadOnly", (node.getIsReadOnly16bit() & 0x8000L) != 0);
         return "node/nodeProperties";
     }
@@ -48,14 +62,16 @@ public class NodePropertiesController {
     public String save(@PathVariable long nodeId, @RequestParam String name,
                        @RequestParam(defaultValue = "false") boolean bold,
                        @RequestParam String color, @RequestParam NodeIcon icon,
-                       @RequestParam(defaultValue = "false") boolean contentReadOnly) {
+                       @RequestParam(defaultValue = "false") boolean contentReadOnly,
+                       @RequestParam(required = false) NodeType nodeType,
+                       @RequestParam(required = false) String codeSyntax) {
         TitleColor selected;
         try {
             selected = "KEEP".equals(color) ? null : TitleColor.valueOf(color);
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid title color");
         }
-        service.update(nodeId, name, bold, selected, icon, contentReadOnly);
+        service.update(nodeId, name, bold, selected, icon, contentReadOnly, nodeType, codeSyntax);
         return "redirect:/nodes/" + nodeId;
     }
 }

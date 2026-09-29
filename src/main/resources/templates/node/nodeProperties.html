@@ -44,9 +44,56 @@
                    value="true" th:checked="${contentReadOnly}"/>
             <label class="form-check-label" for="contentReadOnly">CherryTree içerik salt okunur bayrağı</label>
         </div>
+        <fieldset class="mb-3">
+            <legend class="fs-5">Düğüm tipi</legend>
+            <div class="form-check">
+                <input id="typeRichText" class="form-check-input" type="radio" name="nodeType" value="RICH_TEXT"
+                       th:checked="${nodeType.name() == 'RICH_TEXT'}" disabled/>
+                <label class="form-check-label" for="typeRichText">Rich Text (şimdilik değiştirilemez)</label>
+            </div>
+            <div class="form-check">
+                <input id="typePlainText" class="form-check-input" type="radio" name="nodeType" value="PLAIN_TEXT"
+                       th:checked="${nodeType.name() == 'PLAIN_TEXT'}" th:disabled="${syntaxLocked}"/>
+                <label class="form-check-label" for="typePlainText">Plain Text</label>
+            </div>
+            <div class="form-check">
+                <input id="typeCode" class="form-check-input" type="radio" name="nodeType" value="CODE"
+                       th:checked="${nodeType.name() == 'CODE'}" th:disabled="${syntaxLocked}"/>
+                <label class="form-check-label" for="typeCode">Automatic Syntax Highlighting</label>
+            </div>
+            <label for="codeSyntax" class="form-label mt-2">Kod dili</label>
+            <select id="codeSyntax" name="codeSyntax" class="form-select" required
+                    th:attr="data-locked=${syntaxLocked}"
+                    th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}">
+                <option value="" th:selected="${nodeType.name() != 'CODE'}">Dil seçin</option>
+                <option th:each="item : ${syntaxOptions}" th:value="${item}"
+                        th:selected="${node.syntax == item}" th:text="${item}">java</option>
+            </select>
+            <small th:if="${syntaxLocked}" class="form-text">
+                Rich Text veya içerik salt okunur durumundayken düğüm tipi değiştirilemez.
+            </small>
+        </fieldset>
         <button type="submit" class="btn btn-primary">Kaydet</button>
         <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId})}">İptal</a>
     </form>
+</section>
+<section layout:fragment="pageSpecificJsScripts">
+    <script>
+        (() => {
+            const codeRadio = document.getElementById('typeCode');
+            const codeSyntax = document.getElementById('codeSyntax');
+            if (!codeRadio || !codeSyntax) return;
+
+            /** Activates the language list only for editable code nodes. */
+            function syncLanguageList() {
+                codeSyntax.disabled = codeSyntax.dataset.locked === 'true' || !codeRadio.checked;
+            }
+
+            document.querySelectorAll('input[name="nodeType"]').forEach(radio =>
+                radio.addEventListener('change', syncLanguageList));
+            syncLanguageList();
+        })();
+    </script>
 </section>
 </body>
 </html>

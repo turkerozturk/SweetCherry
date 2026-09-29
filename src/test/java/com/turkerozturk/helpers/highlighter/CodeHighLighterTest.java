@@ -50,4 +50,12 @@ class CodeHighLighterTest {
         assertThat(document.getElementsByTagName("script").getLength()).isZero();
         assertThat(document.getElementsByTagName("code").item(0).getTextContent()).isEqualTo(original);
     }
+
+    @Test void syntaxPickerOnlyOffersBundledGrammarsAndKnownAliases() {
+        assertThat(CodeHighLighter.supportedSyntaxes()).contains("java", "sh", "dosbatch", "python3")
+                .doesNotContain("custom-colors", "plain-text", "plaintext");
+        assertThat(CodeHighLighter.supportsCodeSyntax("java")).isTrue();
+        assertThat(CodeHighLighter.supportsCodeSyntax("dosbatch")).isTrue();
+        assertThat(CodeHighLighter.supportsCodeSyntax("<script>")).isFalse();
+    }
 }

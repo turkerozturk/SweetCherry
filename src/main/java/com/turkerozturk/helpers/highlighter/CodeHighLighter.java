@@ -12,8 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Component
 public class CodeHighLighter {
@@ -41,6 +43,19 @@ public class CodeHighLighter {
         String name = syntax.toLowerCase(Locale.ROOT);
         name = ALIASES.getOrDefault(name, name);
         return LANGUAGES.contains(name) ? name : null;
+    }
+
+    /** Lists CTB syntax values that can be selected for a code node. */
+    public static List<String> supportedSyntaxes() {
+        return Stream.concat(LANGUAGES.stream(), ALIASES.keySet().stream())
+                .filter(name -> !name.equals("plaintext") && !name.equals("plain-text"))
+                .distinct().sorted().toList();
+    }
+
+    /** Accepts only a bundled language or a CherryTree alias mapped to one. */
+    public static boolean supportsCodeSyntax(String syntax) {
+        return syntax != null && !syntax.equals("plain-text") && !syntax.equals("custom-colors")
+                && languageFor(syntax) != null;
     }
 
     /** Renders escaped code inside controlled markup; the browser adds colors only when enabled. */
