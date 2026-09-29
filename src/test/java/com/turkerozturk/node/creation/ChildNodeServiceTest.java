@@ -68,4 +68,30 @@ class ChildNodeServiceTest {
         when(properties.realNode(10L)).thenThrow(new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND));
         assertThatThrownBy(() -> service.create(10L)).isInstanceOf(ResponseStatusException.class);
     }
+
+    @Test void createsTopLevelNodeWithoutLookingForRealParent() {
+        TenantContext.setCurrentTenant("demo");
+        CustomPropertiesHolder settings = new CustomPropertiesHolder();
+        NodePropertiesService properties = mock(NodePropertiesService.class);
+        when(properties.writable()).thenReturn(true);
+        EntityManager manager = mock(EntityManager.class);
+        Query ids = mock(Query.class), sequence = mock(Query.class), nodeInsert = mock(Query.class), childInsert = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(ids, sequence, nodeInsert, childInsert);
+        for (Query query : new Query[]{ids, sequence, nodeInsert, childInsert}) {
+            when(query.setParameter(anyString(), any())).thenReturn(query);
+        }
+        when(ids.getSingleResult()).thenReturn(57L);
+        when(sequence.getSingleResult()).thenReturn(6L);
+        ChildNodeService service = new ChildNodeService(properties, settings);
+        ReflectionTestUtils.setField(service, "entityManager", manager);
+
+        assertThat(service.createTopLevel()).isEqualTo(57L);
+
+        verify(properties, never()).realNode(anyLong());
+        verify(sequence).setParameter("parent", 0L);
+        verify(nodeInsert).setParameter("name", "New node");
+        verify(nodeInsert).setParameter("tags", "");
+        verify(childInsert).setParameter("parent", 0L);
+        verify(childInsert).setParameter("sequence", 6L);
+    }
 }

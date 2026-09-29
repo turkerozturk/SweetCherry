@@ -236,6 +236,8 @@ Yönetici hesabı veri kaynakları, ayarlar, bazı pano ve silme bağlantıları
 
 Yönetici, yazılabilir CTB'deki gerçek bir düğümün altına **Altdüğüm Ekle** ile doğrudan boş bir `plain-text` düğüm ekleyebilir. Başlangıç adı `New node`, etiketleri boştur. İsterseniz ilgili tenant dosyasına `custom.newNodeName=Başlıksız` ve `custom.newNodeTags=etiket1 etiket2` ekleyin. `custom.newNodeName=` ve `custom.newNodeTags=` boş değerleri de kabul edilir; satırlar yoksa varsayılanlar kullanılır. Yeni düğüm en son kardeşin arkasına eklenir ve sayfası açılır. Shared düğümün altına düğüm eklenmez.
 
+Ana sayfada veritabanı adının yanındaki **+** simgesi aynı varsayılanlarla üst düzey düğüm oluşturur (`children.father_id=0`). Bu işlem de yalnızca yönetici ve `custom.isWritable=true` olan veri kaynağı için kullanılabilir; işlemden sonra yeni düğümün sayfası açılır.
+
 Yönetici, içerik salt okunur değilse gerçek düğümün `plain-text` veya kod dili sözdizimli düz metin içeriğini de düzenleyebilir. `node.syntax=custom-colors` CherryTree'nin XML tabanlı zengin metnidir ve bu editörde düzenlenmez. Diğer sözdizimleri metni düz olarak saklar; görüntülenirken kod renklendirmesi uygulanabilir. Aynı CTB dosyasını CherryTree'de açıkken SweetCherry üzerinden değiştirmeyin.
 
 CTB'deki `node.is_ro` alanında simge kimliği ve içerik salt okunur bayrağı birlikte saklanır: `is_ro = (simge_kimliği << 1) | salt_okunur_biti`. En düşük bit `1` ise içerik salt okunurdur; simge belirtilmemiş ve salt okunur değilse alan `0` olur. Bu, tenant ayarındaki `custom.isWritable` izninden ayrı bir özelliktir.

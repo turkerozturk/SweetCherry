@@ -438,6 +438,13 @@
                 >
                         Data source Name
                 </span>
+                <form th:if="${canDeleteNode}" sec:authorize="hasRole('ADMIN')"
+                      th:action="@{/nodes/top-level}" method="post" class="d-inline ms-2">
+                    <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Add Node" aria-label="Add Node">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </button>
+                </form>
             </div>
             <!--/*--> BITTI etiketleri olan navigasyon <!--*/-->
 

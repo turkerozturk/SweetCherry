@@ -20,4 +20,9 @@ public class ChildNodeController {
     public String create(@PathVariable long parentId) {
         return "redirect:/nodes/" + service.create(parentId);
     }
+
+    @PostMapping("/nodes/top-level")
+    public String createTopLevel() {
+        return "redirect:/nodes/" + service.createTopLevel();
+    }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
 </head>
@@ -80,6 +80,13 @@
                     >
                         Data source Name
                     </a>
+                    <form th:if="${isRootNode == true and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')"
+                          th:action="@{/nodes/top-level}" method="post" class="d-inline">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <button type="submit" class="btn btn-sm btn-outline-light" title="Add Node" aria-label="Add Node">
+                            <i class="fas fa-plus" aria-hidden="true"></i>
+                        </button>
+                    </form>
 
                 </th:block>
 

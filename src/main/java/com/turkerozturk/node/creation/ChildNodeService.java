@@ -25,10 +25,21 @@ public class ChildNodeService {
 
     @Transactional
     public long create(long parentId) {
+        return createNode(parentId, false);
+    }
+
+    @Transactional
+    public long createTopLevel() {
+        return createNode(0, true);
+    }
+
+    private long createNode(long parentId, boolean topLevel) {
         if (!properties.writable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
-        properties.realNode(parentId); // Shared nodes cannot own children.
+        if (!topLevel) {
+            properties.realNode(parentId); // Shared nodes cannot own children.
+        }
         Map<String, String> defaults = settings.getCustomProperties(TenantContext.getCurrentTenant());
         String name = defaults == null ? "New node" : defaults.getOrDefault("custom.newNodeName", "New node");
         String tags = defaults == null ? "" : defaults.getOrDefault("custom.newNodeTags", "");

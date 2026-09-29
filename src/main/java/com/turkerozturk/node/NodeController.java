@@ -324,6 +324,8 @@ public class NodeController {
             return "selectdatasource";
         }
 
+        model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
+
         try {
             final long rootNodeId = 0;
             List<NaviNode> childNodes = childrenService.getNaviNodesByFatherId(rootNodeId);
