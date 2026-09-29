@@ -31,7 +31,15 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.web.filter.OncePerRequestFilter;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -78,12 +86,43 @@ public class SecurityConfig {
     //  Spring Security 6: Personalize Your Login Experience
     // https://www.baeldung.com/spring-deprecated-websecurityconfigureradapter
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, LoginAttemptLimiter limiter) throws Exception {
+
+        SimpleUrlAuthenticationFailureHandler failure =
+                new SimpleUrlAuthenticationFailureHandler("/login?error");
+        SavedRequestAwareAuthenticationSuccessHandler success =
+                new SavedRequestAwareAuthenticationSuccessHandler();
+        success.setDefaultTargetUrl("/");
+        success.setAlwaysUseDefaultTargetUrl(true);
+
+        OncePerRequestFilter loginGuard = new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                            FilterChain chain) throws ServletException, IOException {
+                if ("POST".equals(request.getMethod())
+                        && (request.getContextPath() + "/login").equals(request.getRequestURI())
+                        && limiter.blocked(request.getParameter("username"), request.getRemoteAddr(),
+                                loginUserName, loginAdminName)) {
+                    response.sendError(429, "Too many login attempts. Try again in 15 minutes.");
+                    return;
+                }
+                chain.doFilter(request, response);
+            }
+        };
 
         return http
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
+                        .successHandler((request, response, authentication) -> {
+                            limiter.succeeded(authentication.getName(), request.getRemoteAddr(),
+                                    loginUserName, loginAdminName);
+                            success.onAuthenticationSuccess(request, response, authentication);
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            limiter.failed(request.getParameter("username"), request.getRemoteAddr(),
+                                    loginUserName, loginAdminName);
+                            failure.onAuthenticationFailure(request, response, exception);
+                        })
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
@@ -113,6 +152,7 @@ public class SecurityConfig {
                         .logoutSuccessHandler(logoutSuccessHandler())
                         .permitAll()
                 )
+                .addFilterBefore(loginGuard, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

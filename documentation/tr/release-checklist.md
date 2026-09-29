@@ -98,8 +98,15 @@ sha256sum SweetCherry-0.5.0.zip
 - PortableApps.com Format paketi.
 - Otomatik güncelleme.
 - Uzak erişim için ayrı güvenli dağıtım profili.
-- Proxy ağ yolu doğrulandıktan sonra giriş denemelerini gerçek istemciyi yanlış engellemeyecek biçimde sınırlamak.
+- Giriş denemesi sınırını güvenilir proxy üzerinden doğrulanan gerçek istemci adresiyle ilişkilendirmek; çoklu kullanıcı ve yeniden başlatma davranışını değerlendirmek.
 
 ## İnternetten erişim için ayrı kabul kontrolü
 
-İlk dağıtım yerel kullanım içindir. Dinamiik DNS ve Proxy üzerinden uzaktan erişim sağlamak, giriş ekranının ve seçilen CTB içeriğinin internete açılması anlamına gelir. Uzak erişim önerilmeden önce ayar dosyaları, ağ cihazları arasındaki ağ geçidi, port yönlendirmeleri, proxy başlıkları, oturum çerezi, giriş denemelerine karşı koruma ve CTB içeriğinden HTML üreten yollar ayrıca incelenmelidir. Yalnızca TLS sertifikasının çalışması bu kontrolün yerine geçmez.
+İlk dağıtım yerel kullanım içindir. Dinamik DNS ve proxy üzerinden uzaktan erişim sağlamak, giriş ekranının ve seçilen CTB içeriğinin internete açılması anlamına gelir. Yalnızca TLS sertifikasının çalışması bu kontrolün yerine geçmez.
+
+- [ ] İnternet yönlendiricisinde yalnızca proxy için gereken portlar açık; SweetCherry'nin 8080 ve ikinci HTTP portu internete doğrudan yönlendirilmemiş.
+- [ ] SweetCherry host güvenlik duvarı yalnızca gereken LAN istemcilerine ve proxy hostuna izin veriyor; `server.address: 0.0.0.0` tek başına bir erişim kuralı değildir.
+- [ ] Tarayıcı–proxy bağlantısı HTTPS; proxy–SweetCherry arasındaki HTTP trafiği güvenilir LAN/VPN içindedir.
+- [ ] Oturum çerezi, proxy başlıkları, yönlendirme ve HTTPS davranışı aynı alan adı üzerinden doğrulandı. HTTP üzerinden localhost/LAN erişimi istendiğinde `Secure` çerezinin etkisi ayrıca kararlaştırıldı.
+- [ ] Giriş denemesi sınırı, gerçek istemciyi ve kullanıcıyı yanlış engelleme olasılığıyla birlikte denendi. İlk aşamadaki sınır doğrudan bağlantı IP'sini kullanır: proxy arkasında aynı hesap için tüm uzak kullanıcılar ortak sınırı paylaşır.
+- [ ] CTB içeriğinden HTML üreten yollar, dosya yükleme/dışa aktarma uçları, kullanıcı rolleri ve aktif operasyon profili ayrı ayrı gözden geçirildi.
