@@ -46,7 +46,7 @@ class NodePropertiesServiceTest {
 
         service.update(12L, "Yeni isim", true, TitleColor.RED, NodeIcon.OTHER, false);
 
-        verify(query).setParameter("rich", (0xE01B24L << 3) | 3L);
+        verify(query).setParameter("rich", (0xE01B24L << 3) | 7L);
         verify(query).setParameter("icon", 0L);
         verify(query).setParameter("name", "Yeni isim");
         verify(query).executeUpdate();
@@ -79,7 +79,7 @@ class NodePropertiesServiceTest {
         when(real.getMasterId()).thenReturn(0L);
         when(children.findByNodeId(12L)).thenReturn(real);
         Node node = new Node();
-        node.setIsRichText((0x123456L << 3) | 1L);
+        node.setIsRichText((0x123456L << 3) | 5L);
         when(nodes.findById(12L)).thenReturn(node);
         EntityManager entityManager = mock(EntityManager.class);
         Query query = mock(Query.class);
@@ -90,7 +90,31 @@ class NodePropertiesServiceTest {
 
         service.update(12L, "Name", false, null, NodeIcon.CT_HOME, true);
 
-        verify(query).setParameter("rich", (0x123456L << 3) | 1L);
+        verify(query).setParameter("rich", (0x123456L << 3) | 5L);
         verify(query).setParameter("icon", 29L);
+    }
+
+    @Test void choosingNoColorClearsItsMarkerOnPlainTextNode() {
+        TenantContext.setCurrentTenant("test");
+        CustomPropertiesHolder settings = new CustomPropertiesHolder();
+        settings.addCustomProperties("test", Map.of("custom.isWritable", "true"));
+        NodeRepository nodes = mock(NodeRepository.class);
+        ChildrenRepository children = mock(ChildrenRepository.class);
+        Children real = mock(Children.class);
+        when(real.getMasterId()).thenReturn(0L);
+        when(children.findByNodeId(12L)).thenReturn(real);
+        Node node = new Node();
+        node.setIsRichText(4L); // Old no-color marker must not survive the save.
+        when(nodes.findById(12L)).thenReturn(node);
+        EntityManager manager = mock(EntityManager.class);
+        Query query = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(query);
+        when(query.setParameter(anyString(), any())).thenReturn(query);
+        NodePropertiesService service = new NodePropertiesService(nodes, children, settings);
+        ReflectionTestUtils.setField(service, "entityManager", manager);
+
+        service.update(12L, "Name", false, TitleColor.NONE, NodeIcon.OTHER, false);
+
+        verify(query).setParameter("rich", 0L);
     }
 }

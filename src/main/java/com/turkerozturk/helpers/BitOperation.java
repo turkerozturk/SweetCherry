@@ -55,4 +55,22 @@ public class BitOperation {
         return iconIdInPlaceAsInt + isReadOnlyBitInPlaceAsInt;
     }
 
+    /**
+     * Encodes a node title's RGB color, bold flag, and rich text flag for node.is_richtxt.
+     * Bit 2 marks a selected color; zero color clears both the color and that marker.
+     * Bit 0 holds the rich text flag, while bit 1 holds the bold flag.
+     */
+    public static long concatNodeTitleColorAndBoldnessAndTextType(long color,
+                                                                   boolean bold,
+                                                                   boolean richText) {
+        if (color < 0 || color > 0xFFFFFFL) {
+            throw new IllegalArgumentException("Title color must be a 24-bit RGB value");
+        }
+        long colorBits = color << 3;
+        long colorPresentBit = color == 0 ? 0 : 1L << 2;
+        long boldBit = bold ? 1L << 1 : 0;
+        long richTextBit = richText ? 1L : 0;
+        return colorBits | colorPresentBit | boldBit | richTextBit;
+    }
+
 }

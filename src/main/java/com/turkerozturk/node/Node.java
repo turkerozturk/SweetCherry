@@ -227,6 +227,10 @@ public class Node {
 
     }
 
+    /**
+     * Decodes node.is_richtxt: bit 0 is rich text, bit 1 is bold, bit 2 marks
+     * an explicit title color, and the 24 RGB bits start at bit 3.
+     */
     public void parseNodeTitleColorAndBoldnessAndTextType() {
 
         this.titleColor = (isRichText >> 3) & 0xFFFFFF; // Foreground rengini al

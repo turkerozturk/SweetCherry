@@ -21,8 +21,6 @@ import java.util.Map;
 
 @Service
 public class NodePropertiesService {
-    private static final long COLOR_MASK = 0xFFFFFFL << 3;
-    private static final long BOLD_MASK = 1L << 1;
    // private static final long ICON_MASK = 0x7FFEL;
    // private static final long READ_ONLY_MASK = 0x8000L;
 
@@ -55,6 +53,10 @@ public class NodePropertiesService {
         return node;
     }
 
+    /**
+     * Updates editable title properties while preserving the node's content type
+     * and any title color outside the predefined palette when KEEP is selected.
+     */
     @Transactional
     public void update(long nodeId, String name, boolean bold, TitleColor color,
                        NodeIcon icon, boolean contentReadOnly) {
@@ -65,8 +67,11 @@ public class NodePropertiesService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid node properties");
         }
         Node node = realNode(nodeId);
-        long richText = (node.getIsRichText() & ~(color == null ? BOLD_MASK : COLOR_MASK | BOLD_MASK))
-                | (color == null ? 0 : (long) color.rgb() << 3) | (bold ? BOLD_MASK : 0);
+        // KEEP retains an existing color outside the predefined palette.
+        long titleColor = color == null ? (node.getIsRichText() >>> 3) & 0xFFFFFFL : color.rgb();
+        boolean richTextContent = (node.getIsRichText() & 1L) != 0;
+        long richText = BitOperation.concatNodeTitleColorAndBoldnessAndTextType(
+                titleColor, bold, richTextContent);
 //        long iconAndLock = (node.getIsReadOnly16bit() & ~(ICON_MASK | READ_ONLY_MASK))
 //                | icon.getIconIdIn16bit() | (contentReadOnly ? READ_ONLY_MASK : 0);
 
