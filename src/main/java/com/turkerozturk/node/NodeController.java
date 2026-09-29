@@ -23,15 +23,13 @@ package com.turkerozturk.node;
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenService;
 import com.turkerozturk.children.NaviNode;
-import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
-import com.turkerozturk.helpers.highlighter.pygments.LexerEnum;
+import com.turkerozturk.helpers.highlighter.CodeHighLighter;
 import com.turkerozturk.global.SafeRefererRedirect;
 import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.filter.FormSearch;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.python.core.PyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -473,7 +471,7 @@ public class NodeController {
 
             // for debugging content, colorize node.txt to xml if it is not plain-text
             if(!node.getSyntax().equals("plain-text")) {
-                String debugTxt = CodeHighLighter.highlightLanguage(LexerEnum.XML_LEXER.getLanguageString(), node.getTxt());
+                String debugTxt = CodeHighLighter.highlightLanguage("xml", node.getTxt());
                 model.addAttribute ( "debugTxt" , debugTxt ) ;
             }
 
@@ -601,26 +599,6 @@ public class NodeController {
 
     }
 
-
-    /**
-     *
-     * @param request
-     * @param pyException
-     * @param node
-     * @return
-     */
-    public static String getErrorContent(HttpServletRequest request, PyException pyException, Node node) {
-        StringBuilder errorContent = new StringBuilder();
-        errorContent.append("ERROR HIGHLIGHTING: ");
-        errorContent.append(node.getSyntax());
-        errorContent.append(" data structure.\n");
-        errorContent.append("\n"+ request.getRequestURL().toString());
-        errorContent.append("\nERROR MESSAGE\n");
-        errorContent.append(pyException.getMessage());
-        errorContent.append("\nCONTENT:\n");
-        errorContent.append(node.getTxt());
-        return errorContent.toString();
-    }
 
     @GetMapping("/findNodeIdsUntilFatherId")
     public ResponseEntity<List<Long>> findNodeIdsUntilFatherId(@RequestParam long startNodeId) {

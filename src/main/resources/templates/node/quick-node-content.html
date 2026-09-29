@@ -149,16 +149,18 @@
                      class="rendered-node-content"
                      th:utext="${node.txtAsHtml}">İçerik</div>
 
-                <pre th:unless="${node.syntax == null
+                <div th:unless="${node.syntax == null
                                   or node.syntax eq 'plain-text'
                                   or node.syntax eq 'custom-colors'}"
-                     class="highlight rendered-node-content"
-                     th:utext="${node.txtAsHtml}">İçerik</pre>
+                     class="rendered-node-content"
+                     th:utext="${node.txtAsHtml}">İçerik</div>
             </th:block>
         </div>
     </article>
 </main>
 
+<script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/highlight.min.js}"></script>
+<script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/cherry-highlight.js}"></script>
 <script>
     (() => {
         'use strict';

@@ -52,6 +52,9 @@
 <!-- javascript kutuphaneleri icin diger bir fragment -->
 <div th:fragment="footerJsLibraries" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
 
+    <script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/highlight.min.js}"></script>
+    <script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/cherry-highlight.js}"></script>
+
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
 
     <!--   <script type="text/javascript" th:src="@{/webjars/popper/popper.js}"></script> -->

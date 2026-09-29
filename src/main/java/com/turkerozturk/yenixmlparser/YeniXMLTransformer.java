@@ -22,11 +22,10 @@ package com.turkerozturk.yenixmlparser;
 
 import com.turkerozturk.anchor.Anchor;
 import com.turkerozturk.cherryxml.CherryUriType;
-import com.turkerozturk.cherryxml.CodeboxTxtXmlTransformer;
 import com.turkerozturk.cherryxml.GridTxtXmlTransformer;
 import com.turkerozturk.codebox.CodeBox;
 import com.turkerozturk.grid.Grid;
-import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
+import com.turkerozturk.helpers.highlighter.CodeHighLighter;
 import com.turkerozturk.image.Attachment;
 import com.turkerozturk.image.Image;
 import org.slf4j.Logger;
@@ -283,17 +282,19 @@ public class YeniXMLTransformer {
         toElement.setAttribute(HREF_ATTR, String.format("/codeboxes/%s/%s", nodeId, dataOffset));
         toElement.setTextContent("CODEBOX: " + codeBox.getSyntax());
 */
-        String s = CodeHighLighter.mappedhighlightLanguage(codeBox.getSyntax(), codeBox.getTxt());
-        Document document = CodeboxTxtXmlTransformer.parse(s);
         Element toElement = newDocument.createElement(DIV_TAG);
         toElement.setAttribute(DATA_TYPE_ATTR, "cherrycodebox");
-      // bu ise yaramadi gibi:  toElement.setAttribute("class", "highlight scrollable-div");
-
-        //toElement.setTextContent(codeBox.getTxt());
-
-        // Node importedNode = newDocument.importNode(document, true);
-        Node importedNode = newDocument.importNode(document.getDocumentElement(), true);
-        toElement.appendChild(importedNode);
+        Element pre = newDocument.createElement("pre");
+        pre.setAttribute("class", "highlight");
+        Element code = newDocument.createElement("code");
+        String language = CodeHighLighter.enabledLanguageFor(codeBox.getSyntax());
+        if (language != null) {
+            code.setAttribute("class", "cherry-highlight");
+            code.setAttribute("data-language", language);
+        }
+        code.setTextContent(codeBox.getTxt());
+        pre.appendChild(code);
+        toElement.appendChild(pre);
 
         return toElement;
     }

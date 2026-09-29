@@ -44,12 +44,12 @@ import com.turkerozturk.anchor.Anchor;
 import com.turkerozturk.codebox.CodeBox;
 import com.turkerozturk.grid.Grid;
 import com.turkerozturk.image.Image;
-import org.python.google.common.io.Files;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +69,7 @@ public class Test20240331Parser {
 
         try {
             String newXMLContent = parselleMain.parse(xmlContent, nodeId, cherryAnchorsMap, cherryImagesMap, cherryCodeBoxesMap, cherryGridsMap);
-            Files.write(newXMLContent.getBytes(), new File("testTransformedNodeTxt.xml"));
+            Files.writeString(Path.of("testTransformedNodeTxt.xml"), newXMLContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ParserConfigurationException e) {

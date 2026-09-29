@@ -23,7 +23,7 @@
 
     <div th:unless="${node.syntax eq 'plain-text' or node.syntax eq 'custom-colors'}"
          class="">
-        <pre class="highlight" th:utext="${node.txtAsHtml}">icerik</pre>
+        <div th:utext="${node.txtAsHtml}">icerik</div>
     </div>
 
 </div>

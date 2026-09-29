@@ -6,8 +6,6 @@
 
     <section layout:fragment="pageSpecificCssStyles">
 
-        <!-- for pygments syntax highlighter colorization -->
-        <link rel="stylesheet" th:href="@{/css/syntaxhighlighter.css}" />
 
     </section>
 
@@ -48,7 +46,7 @@
             <td th:text="${codebox.id.offset}"></td>
             <td th:text="${codebox.justification}"></td>
             <td>
-                <pre class="highlight" th:utext="${codeHighLighter.mappedhighlightLanguage(codebox.syntax, codebox.txt)}">icerik</pre>
+                <div th:utext="${codeHighLighter.mappedhighlightLanguage(codebox.syntax, codebox.txt)}">icerik</div>
             </td>
             <td th:text="${codebox.syntax}"></td>
             <td th:text="${codebox.width}"></td>

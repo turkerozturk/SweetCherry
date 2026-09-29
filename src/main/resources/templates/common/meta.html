@@ -22,6 +22,9 @@
 
     <link rel="stylesheet" th:href="@{/css/rootnodecontent.css}"/>
 
+    <link th:if="${syntaxHighlightingEnabled}" rel="stylesheet"
+          th:href="@{/css/thirdparty/highlightjs/default.min.css}"/>
+
 
     <style>
         .childiconcss {

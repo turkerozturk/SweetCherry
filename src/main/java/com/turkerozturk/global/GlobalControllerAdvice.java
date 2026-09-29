@@ -42,6 +42,9 @@ public class GlobalControllerAdvice {
     @Value("${myapp.operations.enabled:false}")
     private boolean operationsEnabled;
 
+    @Value("${myapp.syntax-highlighting.enabled:true}")
+    private boolean syntaxHighlightingEnabled;
+
     @Autowired
     private CommonsSunCalc commonsSunCalc;
 
@@ -105,6 +108,11 @@ public class GlobalControllerAdvice {
     @ModelAttribute("operationsEnabled")
     public boolean isOperationsEnabled() {
         return operationsEnabled;
+    }
+
+    @ModelAttribute("syntaxHighlightingEnabled")
+    public boolean isSyntaxHighlightingEnabled() {
+        return syntaxHighlightingEnabled;
     }
 
 }

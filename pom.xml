@@ -203,22 +203,6 @@
 			<version>1.17.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.python/jython-standalone -->
-		<dependency>
-			<groupId>org.python</groupId>
-			<artifactId>jython-standalone</artifactId>
-			<version>2.7.3</version>
-		</dependency>
-
-		<!-- https://pygments.org/docs/java/ -->
-		<!-- https://mvnrepository.com/artifact/org.pygments/pygments -->
-		<dependency>
-			<groupId>org.pygments</groupId>
-			<artifactId>pygments</artifactId>
-			<version>2.5.2</version>
-			<scope>runtime</scope>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -404,14 +388,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<!-- https://stackoverflow.com/questions/34144715/jython-module-not-found-when-packaged-with-spring-boot -->
 				<configuration>
-					<requiresUnpack>
-						<dependency>
-							<groupId>org.python</groupId>
-							<artifactId>jython-standalone</artifactId>
-						</dependency>
-					</requiresUnpack>
 					<!-- https://docs.spring.io/spring-boot/how-to/deployment/installing.html#howto.deployment.installing -->
 					<executable>true</executable>
 				</configuration>

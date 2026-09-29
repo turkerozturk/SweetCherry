@@ -26,19 +26,16 @@ import com.turkerozturk.codebox.CodeBox;
 import com.turkerozturk.codebox.CodeBoxService;
 import com.turkerozturk.grid.Grid;
 import com.turkerozturk.grid.GridService;
-import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
-import com.turkerozturk.helpers.highlighter.pygments.LexerEnum;
+import com.turkerozturk.helpers.highlighter.CodeHighLighter;
 import com.turkerozturk.image.Attachment;
 import com.turkerozturk.image.Image;
 import com.turkerozturk.image.ImageService;
 import com.turkerozturk.yenixmlparser.ExampleMap;
 import com.turkerozturk.yenixmlparser.YeniXMLTransformer;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.python.core.PyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,37 +78,10 @@ public class NodeContentParserService {
         //String parsedContent = null;
 
 
-        // duz veya zengin metin olmayan tum icerikler syntax sutununda yazan dile gore highlight edilir.
-        // https://pygments.org/docs/lexers/#pygments.lexers.shell.MSDOSSessionLexer
-        // adresinde hangi lexer hangi turleri renklendirebiliyor yaziyor.
-        // Ornek olarak BashLexer sunlardan fazlasini renklendirir: bash, sh, ksh, zsh, shell, openrc
-        if(!node.getSyntax().equals("plain-text") && !node.getSyntax().equals("custom-colors")) {
-            String mappedHighlighter;
-            try {
-                if (node.getSyntax().equals("sh")) {
-                    mappedHighlighter = "bash";
-                } else if (node.getSyntax().equals("dosbatch")) {
-                    mappedHighlighter = "msdossession";
-                } else if (node.getSyntax().equals("js")) {
-                    mappedHighlighter = "javascript";
-                } else if (node.getSyntax().equals("python")) {
-                    mappedHighlighter = "python2"; // eskide kaldigi icin python yerine python 2 demisler
-                } else if (node.getSyntax().equals("python3")) {
-                    mappedHighlighter = "python"; // aciklamasi pygment sitesinde var, 3 icin python diye degistirmisler
-                } else {
-                    mappedHighlighter = node.getSyntax();
-                }
-                String checkIfExist = LexerEnum.findClassNameByLanguageString(mappedHighlighter);
-                if(checkIfExist != null) {
-                    node.setTxtAsHtml(CodeHighLighter.highlightLanguage(mappedHighlighter, node.getTxt()));
-                } else {
-                    String parserNotFound = "PARSER NOT FOUND FOR: " + node.getSyntax() + "!!!\n\n\n";
-                    node.setTxtAsHtml(StringEscapeUtils.escapeHtml4(parserNotFound + node.getTxt()));
-                }
-            } catch (PyException pyException) {
-                node.setTxtAsHtml(StringEscapeUtils.escapeHtml4(NodeController.getErrorContent(request, pyException, node)));
-            }
-        } else if (node.getSyntax().equals("custom-colors")) {
+        // Unsupported code syntax remains readable escaped text.
+        if (!"plain-text".equals(node.getSyntax()) && !"custom-colors".equals(node.getSyntax())) {
+            node.setTxtAsHtml(CodeHighLighter.mappedhighlightLanguage(node.getSyntax(), node.getTxt()));
+        } else if ("custom-colors".equals(node.getSyntax())) {
 
             // BASLA Yeni OFFSETLI DENEMELER+
             Map<Integer, Anchor> cherryAnchorsMap = new HashMap<>();

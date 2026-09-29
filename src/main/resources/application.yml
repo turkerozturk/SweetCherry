@@ -155,7 +155,8 @@ myapp:
   openWebBrowserOnStartup: false
   debug: false
   syntax-highlighting:
-    enabled: false
+    # Client-side highlight.js for code nodes; plain text and PDF stay readable without JavaScript.
+    enabled: true
   operations:
     enabled: false
   scheduling:

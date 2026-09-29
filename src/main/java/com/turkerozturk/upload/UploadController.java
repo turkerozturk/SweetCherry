@@ -20,7 +20,7 @@
  */
 package com.turkerozturk.upload;
 
-import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
+import com.turkerozturk.helpers.highlighter.CodeHighLighter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

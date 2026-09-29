@@ -20,7 +20,7 @@
  */
 package com.turkerozturk.codebox;
 
-import com.turkerozturk.helpers.highlighter.pygments.CodeHighLighter;
+import com.turkerozturk.helpers.highlighter.CodeHighLighter;
 import com.turkerozturk.node.Node;
 import com.turkerozturk.node.NodeService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -242,6 +242,8 @@ Yönetici, içerik salt okunur değilse gerçek düğümün `plain-text` veya ko
 
 CTB'deki `node.is_ro` alanında simge kimliği ve içerik salt okunur bayrağı birlikte saklanır: `is_ro = (simge_kimliği << 1) | salt_okunur_biti`. En düşük bit `1` ise içerik salt okunurdur; simge belirtilmemiş ve salt okunur değilse alan `0` olur. Bu, tenant ayarındaki `custom.isWritable` izninden ayrı bir özelliktir.
 
+Kod düğümlerinin renkli gösterimi isteğe bağlıdır: `application.yml` içinde `myapp.syntax-highlighting.enabled=true` yapın. Bu ayar yalnızca `plain-text` ve `custom-colors` dışındaki syntax değerlerinde ve gömülü kod kutularında tarayıcıda highlight.js kullanır. JavaScript ve dil dosyaları uygulamayla gelir; internet bağlantısı gerekmez. Desteklenmeyen dil veya JavaScript kapalıysa kod düz metin olarak okunur. CherryTree syntax adlarının bir bölümü (örneğin `sh`, `dosbatch`, `js`, `python3`) desteklenen dile eşlenir. PDF dışa aktarımında tarayıcı JavaScript'i çalışmadığı için kod renklenmez. Eski Pygments/Jython bağımlılıkları yürütülebilir JAR'dan çıkarılmıştır.
+
 ## Çalışırken oluşan dosya ve klasörler
 
 Bu yollar SweetCherry'nin **çalıştırıldığı klasöre** göre oluşur:
