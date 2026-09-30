@@ -1,0 +1,26 @@
+.tree-workspace-page {height:100vh;height:100dvh;display:flex;flex-direction:column;margin:0;overflow:hidden}
+#workspace-header {flex:none}
+#tree-workspace {display:grid;grid-template-columns:var(--tree-width,300px) 8px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
+#workspace-tree-pane {overflow:auto;min-width:0;background:#f4f7fa;border-right:1px solid #d1d9e0;padding:.5rem}
+.workspace-database {display:block;font-weight:bold;margin-bottom:.5rem;white-space:nowrap;color:#111}
+#workspace-tree,#workspace-tree ul {list-style:none;margin:0;padding:0}
+#workspace-tree ul {padding-left:1.4rem}
+#workspace-tree li {white-space:nowrap}
+.workspace-tree-row {display:flex;align-items:center;width:max-content;min-width:100%;gap:.2rem;padding:2px 0}
+.workspace-tree-row a {color:#000;text-decoration:none;padding:2px 4px;border-radius:3px}
+.workspace-tree-row a[aria-current="page"] {background:#d9eaff;outline:1px solid #86b7fe}
+.workspace-fold {border:0;background:transparent;width:1.4rem;flex:0 0 1.4rem;padding:0;color:#333;text-align:center;cursor:pointer}
+.workspace-tree-row img {width:20px;height:20px;vertical-align:middle;margin-right:3px}
+#workspace-splitter {cursor:col-resize;background:#e2e7eb;touch-action:none}
+#workspace-splitter:hover,#workspace-splitter:focus {background:#8cb8e8;outline:0}
+#workspace-content {min-width:0;overflow:auto;padding:.65rem 1rem;background:white}
+.workspace-node h1 {font-size:1.4rem;margin:0 0 .2rem;overflow-wrap:anywhere}
+.workspace-breadcrumbs {font-size:.85rem;margin-bottom:.45rem}
+.workspace-toolbar {display:flex;flex-wrap:wrap;gap:.3rem;margin:.4rem 0 .8rem;align-items:center}
+.workspace-toolbar form {margin:0}
+.workspace-toolbar .btn {white-space:nowrap}
+.workspace-rendered {overflow-wrap:anywhere}
+.workspace-rendered img {max-width:100%;height:auto}
+.workspace-rendered pre {overflow:auto}
+#workspace-status {flex:none;display:flex;gap:1rem;padding:.3rem .65rem;background:#edf1f5;border-top:1px solid #d1d9e0;font-size:.8rem;white-space:nowrap;overflow:auto;min-height:1.9rem}
+.tree-workspace-page.resizing {user-select:none}

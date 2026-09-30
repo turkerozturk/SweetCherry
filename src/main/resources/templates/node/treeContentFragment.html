@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<section th:fragment="treeContent" class="workspace-node" th:attr="data-node-id=${requestedNodeId},data-node-title=${node != null ? node.name : currentTenantName}">
+    <th:block th:if="${isRootNode == true}">
+        <h1 th:text="${currentTenantName}">Database</h1>
+        <p th:text="#{tree.selectNode}">Select a node in the tree.</p>
+        <form th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post">
+            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+            <button class="btn btn-sm btn-outline-primary" type="submit"><i class="fas fa-plus"></i> <span th:text="#{tree.addRoot}">Add node</span></button>
+        </form>
+    </th:block>
+    <th:block th:if="${node != null}">
+        <h1 th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}" th:text="${node.name}">Node</h1>
+        <nav class="workspace-breadcrumbs" th:attr="aria-label=#{tree.path}">
+            <a th:href="@{/tree(nodeId=0)}" th:text="${currentTenantName}"></a>
+            <th:block th:each="entry : ${node.breadcrumbs}">
+                <span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}"></a>
+            </th:block>
+        </nav>
+        <p th:if="${isSharedNode == true}" class="alert alert-info py-1 my-1">
+            <span th:text="#{node.sharedReference}"></span> <span th:text="${requestedNodeId}"></span>
+            → <a th:href="@{/nodes/{id}(id=${masterNodeId})}" th:text="${masterNodeId}"></a>
+        </p>
+        <div class="workspace-toolbar">
+            <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" th:href="@{/quick-mind-map/{id}(id=${node.nodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.mermaid}"><i class="fas fa-project-diagram"></i> Mermaid</a>
+            <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" th:href="@{/markmap-quick-mind-map/{id}(id=${node.nodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.markmap}"><i class="fas fa-sitemap"></i> Markmap</a>
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{/export-node-to-pdf/{id}(id=${node.nodeId})}" th:title="#{search.downloadAsPdf}"><i class="fas fa-file-pdf"></i> PDF</a>
+            <div class="dropdown">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{tree.export}">Export</span></button>
+                <div class="dropdown-menu p-1">
+                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="false"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionSingle}"></button>
+                    </form>
+                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="true"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionBranch}"></button>
+                    </form>
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="false"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateSingle}"></button>
+                    </form>
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="true"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
+                    </form>
+                </div>
+            </div>
+            <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
+            <a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="#{tree.edit}"></span></a>
+            <form th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post">
+                <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                <button class="btn btn-sm btn-outline-primary" type="submit" th:title="#{tree.addChildTitle}"><i class="fas fa-plus"></i> <span th:text="#{tree.addChild}"></span></button>
+            </form>
+            <a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" th:title="#{node.meta.header}"><i class="fas fa-info-circle"></i> <span th:text="#{tree.info}"></span></button>
+        </div>
+        <div class="workspace-rendered"><th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block></div>
+        <th:block th:replace="~{node/offcanvasFragment :: offcanvasFragment}"></th:block>
+    </th:block>
+    <template data-workspace-status>
+        <th:block th:if="${node != null}">
+            <span><b th:text="#{tree.type}"></b>: <span th:text="${node.syntax}"></span></span>
+            <span><b th:text="#{tree.created}"></b>: <span th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></span></span>
+            <span><b th:text="#{tree.modified}"></b>: <span th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></span></span>
+            <span><b th:text="#{tree.children}"></b>: <span th:text="${childNodes != null ? #lists.size(childNodes) : 0}"></span></span>
+        </th:block>
+        <span th:if="${node == null}" th:text="${currentTenantName}"></span>
+    </template>
+</section>
+</body>
+</html>

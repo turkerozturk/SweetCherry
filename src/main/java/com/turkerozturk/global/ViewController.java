@@ -46,7 +46,11 @@ public class ViewController {
         cookie.setMaxAge(7 * 24 * 60 * 60); // 1 week
         response.addCookie(cookie);
 
-        return "redirect:" + SafeRefererRedirect.target(request);
+        String target = SafeRefererRedirect.target(request);
+        if (!"tree".equals(mode) && (target.equals("/tree") || target.startsWith("/tree?"))) {
+            target = "/";
+        }
+        return "redirect:" + target;
 
     }
 }

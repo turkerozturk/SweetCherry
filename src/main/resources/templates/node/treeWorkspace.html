@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{tree.workspace}">Full tree</title>
+    <th:block th:replace="~{common/meta :: headerMeta}"></th:block>
+    <th:block th:replace="~{common/meta :: headerCssLibraries}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/node/treeWorkspace.css}"/>
+</head>
+<body class="tree-workspace-page">
+<header id="workspace-header"><th:block th:replace="~{common/header :: header}"></th:block></header>
+<main id="tree-workspace" th:attr="data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse}">
+    <nav id="workspace-tree-pane" th:attr="aria-label=#{tree.workspace}">
+        <a class="workspace-database" th:href="@{/tree(nodeId=0,_tenantView=${tenantViewToken})}" th:text="${currentTenantName}">Database</a>
+        <ul id="workspace-tree"></ul>
+    </nav>
+    <div id="workspace-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-valuemin="160" aria-valuemax="700" aria-valuenow="300" th:attr="aria-label=#{tree.resize}"></div>
+    <article id="workspace-content" aria-live="polite"></article>
+</main>
+<footer id="workspace-status" role="status"></footer>
+<th:block th:replace="~{common/footer :: footerJsLibraries}"></th:block>
+<script th:src="@{/js/node/treeWorkspace.js}"></script>
+<th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
+</body>
+</html>

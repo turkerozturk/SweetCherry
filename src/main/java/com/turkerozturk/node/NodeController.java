@@ -322,6 +322,8 @@ public class NodeController {
             return "selectdatasource";
         }
 
+        if ("tree".equals(viewMode)) return "redirect:/tree";
+
         model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
 
         try {
@@ -416,10 +418,36 @@ public class NodeController {
     public record NavigationChild(long nodeId, String name, String iconName,
                                   boolean hasChildren, String titleColor, boolean readOnly, boolean bold) { }
 
+    /** Opens a persistent desktop tree with content loaded independently. */
+    @GetMapping("/tree")
+    @RequiresTenant
+    public String treeWorkspace(Model model, @RequestParam(defaultValue = "0") long nodeId) {
+        if (nodeId < 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        model.addAttribute("initialNodeId", nodeId);
+        model.addAttribute("viewMode", "tree");
+        return "node/treeWorkspace";
+    }
+
+    /** Reuses the normal node preparation and permissions for an AJAX content fragment. */
+    @GetMapping("/tree/content/{nodeId}")
+    @RequiresTenant
+    public String treeContent(@PathVariable long nodeId, Model model, HttpServletRequest request) {
+        if (nodeId == 0) {
+            model.addAttribute("isRootNode", true);
+            model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
+        } else {
+            getNodeAsHtml(nodeId, model, request, "desktop");
+            model.addAttribute("isRootNode", false);
+        }
+        return "node/treeContentFragment :: treeContent";
+    }
+
     @GetMapping("/nodes/{nodeId}")
     @RequiresTenant
     public String getNodeAsHtml(@PathVariable long nodeId, Model model, HttpServletRequest request,
                                 @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+
+        if ("tree".equals(viewMode)) return "redirect:/tree?nodeId=" + nodeId;
 
         model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
         model.addAttribute("requestedNodeId", nodeId);

@@ -35,6 +35,7 @@
             });
     }
 
+    document.addEventListener('sweetcherry:content-loaded', event => highlightCode(event.detail.root));
     highlightCode();
     document.addEventListener('htmx:afterSwap', event => highlightCode(event.detail.target));
 })();

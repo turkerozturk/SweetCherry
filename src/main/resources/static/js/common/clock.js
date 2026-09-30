@@ -15,6 +15,7 @@ function updateTime() {
     day = day < 10 ? "0" + day : day;
 
     var clockElement = document.getElementById('clock');
+    if (!clockElement) return;
     clockElement.innerHTML = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
 
 }
