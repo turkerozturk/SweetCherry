@@ -398,6 +398,24 @@ public class NodeController {
     
 
 
+    /** Returns one level of navigation while preserving shared-reference IDs. */
+    @GetMapping("/nodes/navigation/children")
+    @RequiresTenant
+    @ResponseBody
+    public List<NavigationChild> navigationChildren(@RequestParam long fatherId) {
+        if (fatherId < 0 || (fatherId != 0 && childrenService.findById(fatherId) == null)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return childrenService.getNaviNodesByFatherId(fatherId).stream()
+                .map(child -> new NavigationChild(child.nodeId(), child.name(),
+                        child.nodeIcon().getIconName(), child.hasChildren(),
+                        child.titleColorAsHtmlHex(), child.isReadOnly(), child.boldnessBit()))
+                .toList();
+    }
+
+    public record NavigationChild(long nodeId, String name, String iconName,
+                                  boolean hasChildren, String titleColor, boolean readOnly, boolean bold) { }
+
     @GetMapping("/nodes/{nodeId}")
     @RequiresTenant
     public String getNodeAsHtml(@PathVariable long nodeId, Model model, HttpServletRequest request,

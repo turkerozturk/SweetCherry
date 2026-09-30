@@ -43,7 +43,8 @@
 
 
             <!-- TODO sunun calisanini yap: th:attr="data-bs-title=${childNode.name}" data-bs-toggle="tooltip" -->
-            <li class="" th:each="siblingNaviNode : ${siblingNaviNodes}">
+            <li class="" th:each="siblingNaviNode : ${siblingNaviNodes}"
+                th:attr="data-navigation-id=${siblingNaviNode.nodeId},data-has-children=${siblingNaviNode.hasChildren}">
                 <th:block th:if="${siblingNaviNode != null}">
 
                         <a class="linkinternal" th:href="'/nodes/' + ${siblingNaviNode.nodeId}"

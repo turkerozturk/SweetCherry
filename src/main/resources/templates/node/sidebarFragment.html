@@ -95,69 +95,11 @@
 
         </div>
 
-        <div id="sideBarContent">
+        <div id="sideBarContent" th:attr="data-tenant-view=${tenantViewToken}">
 
-            <th:block th:if="${childNodes}">
-                <th:block th:if="${parentNodeId}">
-                    <h4><th:block th:if="${node.isReadOnly == true}">
-                        <img th:src="@{/img/icons/ct_locked.svg}"/>
-                        </th:block>
-                        <img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
-                             th:alt="${'/img/icons/' + node.nodeIcon.iconName}"
-                             th:title="${'Content rendered as: ' + node.syntax}"
-                             class="iconcss"/>
-                        <span th:text="${node.name}"
-                              id="nodeName"
-                              style="color: gray; font-weight: bold;"
-                        >Dugum Adi</span>
-
-                    </h4>
-                </th:block>
-
-                <ul class="sidebar-nav">
-
-
-                    <!-- TODO sunun calisanini yap: th:attr="data-bs-title=${childNode.name}" data-bs-toggle="tooltip" -->
-                    <li class="sidebar-item" th:each="childNode : ${childNodes}">
-                        <th:block th:if="${childNode != null}">
-                            <a class="sidebar-link" th:href="'/nodes/' + ${childNode.nodeId}"
-                               th:title="${childNode.name}">
-
-                                <i th:class="${childNode.hasChildren ? 'fas fa-caret-right childiconcssfas' : 'fas fa-square childiconcssfas'}"
-                                   th:style="${childNode.hasChildren ? '' : 'visibility: hidden;'}"
-                                ></i>
-
-                                <th:block th:if="${childNode.isReadOnly == true}">
-                                    <img th:src="@{/img/icons/ct_locked.svg}"/>
-                                </th:block>
-
-                                <img th:src="@{/img/icons/__${childNode.nodeIcon.iconName}__.svg}"
-                                     th:alt="${'/img/icons/' + childNode.nodeIcon.iconName}" class="childiconcss"/>
-
-                                <span th:text="${childNode.name}"
-                                      th:style="${'color:' + childNode.titleColorAsHtmlHex + ';'}"
-                                      th:class="${childNode.boldnessBit ? 'boldTitle' : ''}"></span>
-                            </a>
-                        </th:block>
-                        <th:block th:unless="${childNode}">
-                            <span style="color: white;">Child node is null</span>
-
-                        </th:block>
-
-
-                    </li>
-
-                </ul>
+            <th:block th:with="siblingNaviNodes=${isRootNode == true ? childNodes : siblingNaviNodes}">
+                <div th:replace="~{node/siblingAndChildrenNavigationFragment :: siblingAndChildrenNavigationFragment}"></div>
             </th:block>
-            <th:block th:unless="${childNodes}">
-                <div th:replace="~{node/nodeMetaDataFragment :: nodeMetaDataFragment}"></div>
-
-            </th:block>
-
-            <hr />
-
-            <div th:replace="~{node/siblingAndChildrenNavigationFragment :: siblingAndChildrenNavigationFragment}"></div>
-
 
         </div>
 

@@ -24,7 +24,8 @@
 
 
             <!-- TODO sunun calisanini yap: th:attr="data-bs-title=${childNode.name}" data-bs-toggle="tooltip" -->
-            <li class="" th:each="childNode : ${childNodes}">
+            <li class="" th:each="childNode : ${childNodes}"
+                th:attr="data-navigation-id=${childNode.nodeId},data-has-children=${childNode.hasChildren}">
                 <th:block th:if="${childNode != null}">
                     <a class="linkinternal" th:href="'/nodes/' + ${childNode.nodeId}"
                        th:title="${childNode.name}">
