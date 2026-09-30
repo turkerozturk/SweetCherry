@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<title th:text="${node != null ? node.name : currentTenantName}">SweetCherry</title>
+<th:block th:replace="~{common/meta :: headerMeta}"></th:block>
+<th:block th:replace="~{common/meta :: headerCssLibraries}"></th:block>
+<link rel="stylesheet" th:href="@{/css/node/node.css}"/>
+<link rel="stylesheet" th:href="@{/css/node/mobileReader.css}"/>
+</head>
+<body class="mobile-reader" th:attr="data-tenant-token=${tenantViewToken},data-selected-id=${requestedNodeId},data-load-error=#{tree.loadError},data-path-ids=${node != null ? #strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',') : ''}">
+<nav class="reader-controls" th:attr="aria-label=#{reader.navigation}">
+<button type="button" class="btn" data-bs-toggle="offcanvas" data-bs-target="#readerTree" th:title="#{reader.tree}" th:attr="aria-label=#{reader.tree}"><i class="fas fa-sitemap"></i></button>
+<a th:if="${prevSiblingNaviNode != null}" class="btn" th:href="@{/nodes/{id}(id=${prevSiblingNaviNode.nodeId})}" th:title="#{reader.previous}" th:attr="aria-label=#{reader.previous}"><i class="fas fa-arrow-left"></i></a>
+<a th:if="${parentNodeId != null and parentNodeId != 0}" class="btn" th:href="@{/nodes/{id}(id=${parentNodeId})}" th:title="#{tree.goToParentNode}" th:attr="aria-label=#{tree.goToParentNode}"><i class="fas fa-arrow-up"></i></a>
+<a th:if="${childNodes != null and !#lists.isEmpty(childNodes) and isSharedNode != true}" class="btn" th:href="@{/nodes/{id}(id=${childNodes[0].nodeId})}" th:title="#{reader.child}" th:attr="aria-label=#{reader.child}"><i class="fas fa-arrow-down"></i></a>
+<a th:if="${nextSiblingNaviNode != null}" class="btn" th:href="@{/nodes/{id}(id=${nextSiblingNaviNode.nodeId})}" th:title="#{reader.next}" th:attr="aria-label=#{reader.next}"><i class="fas fa-arrow-right"></i></a>
+<span class="reader-title" th:text="${node != null ? node.name : currentTenantName}"></span>
+<button type="button" class="btn" data-bs-toggle="offcanvas" data-bs-target="#readerActions" th:title="#{reader.actions}" th:attr="aria-label=#{reader.actions}"><i class="fas fa-ellipsis-v"></i></button>
+</nav>
+<main id="readerContent">
+<p th:if="${isSharedNode == true}" class="alert alert-info py-1"><span th:text="#{node.sharedReference}"></span> <span th:text="${requestedNodeId}"></span> → <a th:href="@{/nodes/{id}(id=${masterNodeId})}" th:text="${masterNodeId}"></a></p>
+<th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block>
+<p th:if="${node == null}" th:text="#{tree.selectNode}"></p>
+</main>
+<aside class="offcanvas offcanvas-start" tabindex="-1" id="readerTree" aria-labelledby="readerTreeTitle">
+<div class="offcanvas-header"><h2 id="readerTreeTitle" th:text="#{reader.tree}"></h2><button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:attr="aria-label=#{reader.close}"></button></div>
+<div class="offcanvas-body">
+<a th:href="@{/}" th:text="${currentTenantName}"></a>
+<ul id="readerTreeNodes" class="reader-tree"></ul>
+<button id="readerRetry" type="button" class="btn btn-outline-secondary" hidden th:text="#{reader.retry}"></button>
+</div></aside>
+<aside class="offcanvas offcanvas-end" tabindex="-1" id="readerActions" aria-labelledby="readerActionsTitle">
+<div class="offcanvas-header"><h2 id="readerActionsTitle" th:text="#{reader.actions}"></h2><button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:attr="aria-label=#{reader.close}"></button></div>
+<div class="offcanvas-body">
+<th:block th:replace="~{common/header :: header}"></th:block>
+<div th:if="${node != null}">
+        <div class="workspace-toolbar">
+            <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" th:href="@{/quick-mind-map/{id}(id=${node.nodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.mermaid}"><i class="fas fa-project-diagram"></i> Mermaid</a>
+            <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" th:href="@{/markmap-quick-mind-map/{id}(id=${node.nodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.markmap}"><i class="fas fa-sitemap"></i> Markmap</a>
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{/export-node-to-pdf/{id}(id=${node.nodeId})}" th:title="#{search.downloadAsPdf}"><i class="fas fa-file-pdf"></i> PDF</a>
+            <div class="dropdown">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{tree.export}">Export</span></button>
+                <div class="dropdown-menu p-1">
+                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="false"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionSingle}"></button>
+                    </form>
+                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="true"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionBranch}"></button>
+                    </form>
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="false"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateSingle}"></button>
+                    </form>
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="true"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
+                    </form>
+                </div>
+            </div>
+            <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
+            <a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="#{tree.edit}"></span></a>
+            <form th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post">
+                <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                <button class="btn btn-sm btn-outline-primary" type="submit" th:title="#{tree.addChildTitle}"><i class="fas fa-plus"></i> <span th:text="#{tree.addChild}"></span></button>
+            </form>
+            <a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
+        </div>
+<th:block th:replace="~{node/nodeMetaDataFragment :: nodeMetaDataFragment}"></th:block>
+</div>
+<form th:if="${node == null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/><button type="submit" class="btn btn-outline-primary" th:text="#{tree.addRoot}"></button>
+</form>
+</div></aside>
+<th:block th:replace="~{common/footer :: footerJsLibraries}"></th:block>
+<th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
+<script th:src="@{/js/node/mobileReader.js}"></script>
+</body></html>

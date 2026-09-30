@@ -1,0 +1,16 @@
+/* Reading content uses the existing node styles and renderer. */
+body.mobile-reader { margin: 0; padding: 0; }
+.reader-controls { display:flex; align-items:center; position:sticky; top:0; z-index:1020; background:#fff; border-bottom:1px solid #ddd; padding-top:env(safe-area-inset-top); }
+.reader-controls .btn { color:#222; flex:none; min-width:40px; min-height:44px; padding:.4rem; }
+.reader-title { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.9rem; }
+#readerContent { padding:.5rem; min-height:calc(100dvh - 44px); }
+.mobile-reader .offcanvas { --bs-offcanvas-width:100vw; }
+.mobile-reader .offcanvas-header h2 { font-size:1.1rem; margin:0; }
+.mobile-reader .workspace-toolbar { display:flex; gap:.5rem; flex-wrap:wrap; margin:1rem 0; }
+.reader-tree,.reader-tree ul { list-style:none; padding-left:1rem; }
+.reader-tree { padding-left:0; }
+.reader-tree li > div { display:flex; align-items:center; min-height:44px; }
+.reader-tree .reader-fold { width:40px; min-width:40px; border:0; background:transparent; min-height:44px; }
+.reader-tree a { color:#222; white-space:nowrap; }
+.reader-tree a[aria-current="page"] { background:#e0ecff; outline:2px solid #99bfff; }
+.reader-tree img { width:20px; height:20px; margin-right:.4rem; }

@@ -13,6 +13,8 @@
         </a>
     </li>
 
+    <li th:if="${currentTenantName}"><a class="dropdown-item" href="/changeView?mode=reader"><i class="fas fa-book-open"></i> <span th:text="#{reader.view}">Mobile reader</span><i th:if="${viewMode == 'reader'}" class="fas fa-check"></i></a></li>
+
     <li>
         <a class="dropdown-item" href="/changeView?mode=desktop">
             &nbsp;<i class="fas fa-regular fa-desktop"></i>

@@ -388,6 +388,7 @@ public class NodeController {
 
         model.addAttribute("viewMode", viewMode);
 
+        if ("reader".equals(viewMode)) return "node/mobileReader";
         if ("mobile".equals(viewMode)) {
             return "node/nodeMobile";
         } else {
@@ -634,6 +635,7 @@ public class NodeController {
 
         model.addAttribute("viewMode", viewMode);
 
+        if ("reader".equals(viewMode)) return "node/mobileReader";
         if ("mobile".equals(viewMode)) {
             return "node/nodeMobile";
         } else {
