@@ -8,31 +8,6 @@
     const pane = document.getElementById('workspace-tree-pane');
     const content = document.getElementById('workspace-content');
     const status = document.getElementById('workspace-status');
-    const scrollTopButton = document.getElementById('scrollToTopBtn');
-    /** Follow the reading pane's scroll position, rather than the non-scrolling window. */
-    function updateScrollTopButton() {
-        const reading = content.querySelector('.workspace-rendered');
-        scrollTopButton.hidden = !reading || reading.scrollTop <= 300;
-    }
-    content.addEventListener('scroll', updateScrollTopButton, true);
-    scrollTopButton.addEventListener('click', () => {
-        const reading = content.querySelector('.workspace-rendered');
-        reading?.scrollTo({top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
-    });
-    /** Open the original image in a separate tab, preserving the selected node and tree. */
-    function openContentImage(image) {
-        const source = image.currentSrc || image.src;
-        if (!source) return;
-        const target = new URL(source, location.origin);
-        if (['http:', 'https:', 'blob:'].includes(target.protocol) || /^data:image\//i.test(source)) {
-            window.open(source, '_blank', 'noopener,noreferrer');
-        }
-    }
-    content.addEventListener('keydown', event => {
-        if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('.workspace-rendered img')) {
-            event.preventDefault(); openContentImage(event.target);
-        }
-    });
     const splitter = document.getElementById('workspace-splitter');
     const storageKey = 'sweetcherry-tree:' + token;
     let state = {expanded: [], selected: 0, width: 300, top: 0, left: 0};
@@ -52,7 +27,6 @@
     /** Stops further actions when the session or selected database is no longer valid. */
     function stop(message) {
         stopped = true;
-        scrollTopButton.hidden = true;
         workspace.replaceChildren();
         const text = document.createElement('p');
         text.textContent = message;
@@ -158,11 +132,6 @@
             });
             content.replaceChildren(document.importNode(fragment, true));
             content.scrollTop = 0;
-            updateScrollTopButton();
-            content.querySelectorAll('.workspace-rendered img').forEach(image => {
-                image.tabIndex = 0;
-                image.title = image.title || workspace.dataset.imageTitle;
-            });
             const template = content.querySelector('template[data-workspace-status]');
             status.replaceChildren(template.content.cloneNode(true));
             state.selected = Number(id);
@@ -183,10 +152,6 @@
         } finally { if (active === controller) content.removeAttribute('aria-busy'); }
     }
     workspace.addEventListener('click', event => {
-        const contentImage = event.target.closest('.workspace-rendered img');
-        if (contentImage && event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
-            event.preventDefault(); openContentImage(contentImage); return;
-        }
         if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         const link = event.target.closest('a[href]');
         if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
