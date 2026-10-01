@@ -45,3 +45,13 @@ seçili düğüm ID'si ve CTB oturum belirteci korunur. Shared node için alias 
 Yeni mobil ve masaüstü görünümlerinde üst düzey veya alt düğüm eklemeden önce
 onay penceresi gösterilir. Vazgeçmek sunucuya oluşturma isteği göndermez.
 Bu onay bir arayüz kolaylığıdır; mevcut sunucu yetki ve CTB kontrolleri geçerlidir.
+
+## Görseller, tablolar ve kod blokları
+
+İçerikteki görseller ekrana sığdırılır. Fareyle üzerlerine gelince büyüteç imleci
+görünür; tıklama veya klavyede Enter/Space gerçek boyutlu kaynağı yeni sekmede
+açar. Telefonda görsele dokunarak açıp tarayıcının pinch zoom özelliği kullanılabilir.
+Görsel, tablo ve kod alanındaki kaydırma panel açma hareketi olarak yorumlanmaz.
+Tablolar, pre ve codebox blokları kendi alanlarında yatay kaydırılır.
+Bu kurallar yalnızca yeni mobil içerik alanına uygulanır; navigasyon ikonları,
+metadata ve eski görünümler değiştirilmez.

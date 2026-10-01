@@ -7,7 +7,7 @@
 <link rel="stylesheet" th:href="@{/css/node/node.css}"/>
 <link rel="stylesheet" th:href="@{/css/node/mobileReader.css}"/>
 </head>
-<body class="mobile-reader" th:attr="data-tenant-token=${tenantViewToken},data-selected-id=${requestedNodeId},data-load-error=#{tree.loadError},data-path-ids=${node != null ? #strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',') : ''}">
+<body class="mobile-reader" th:attr="data-tenant-token=${tenantViewToken},data-selected-id=${requestedNodeId},data-load-error=#{tree.loadError},data-image-title=#{tree.openImage},data-path-ids=${node != null ? #strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',') : ''}">
 <nav class="reader-controls" th:attr="aria-label=#{reader.navigation}">
 <button type="button" class="btn" data-bs-toggle="offcanvas" data-bs-target="#readerTree" th:title="#{reader.tree}" th:attr="aria-label=#{reader.tree}"><i class="fas fa-sitemap"></i></button>
 <a th:if="${prevSiblingNaviNode != null}" class="btn" th:href="@{/nodes/{id}(id=${prevSiblingNaviNode.nodeId})}" th:title="#{reader.previous}" th:attr="aria-label=#{reader.previous}"><i class="fas fa-arrow-left"></i></a>
@@ -82,5 +82,6 @@
 <th:block th:replace="~{common/footer :: footerJsLibraries}"></th:block>
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 <script th:src="@{/js/node/mobileReader.js}"></script>
+<script th:src="@{/js/node/mobileContent.js}"></script>
 <script th:src="@{/js/node/confirmNodeCreation.js}"></script>
 </body></html>

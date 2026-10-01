@@ -102,7 +102,7 @@
     function unzoomed() { return !window.visualViewport || Math.abs(window.visualViewport.scale - 1) < .02; }
     content.addEventListener('touchstart', event => {
         gesture = null;
-        if (event.touches.length !== 1 || !unzoomed() || event.target.closest('a,button,input,textarea,select,pre,code,table,video')) return;
+        if (event.touches.length !== 1 || !unzoomed() || event.target.closest('a,button,input,textarea,select,pre,code,table,video,img')) return;
         for (let el = event.target; el; el = el.parentElement) {
             if (el.scrollWidth > el.clientWidth + 2 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return;
             if (el === content) break;
