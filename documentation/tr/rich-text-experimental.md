@@ -103,3 +103,28 @@ bağımsız browse sayfaları değişmez. CTB yazma yoktur.
 
 `demo-node-53-table.xml` aynı proje CTB'sindeki 53 numaralı düğümün grid kaydından
 çıkarılmıştır. Bu yamada 10 test eklenir; önceki 77 üzerine toplam 87 beklenir.
+
+## Dördüncü aşama: yan yana önizleme
+
+Veritabanı seçildikten sonra admin olarak aşağıdaki yolu açın:
+
+`/nodes/richtext-preview/53`
+
+Doğrudan ziyaret, mevcut `_tenantView` token'ıyla aynı sayfaya yönlenir. Sonraki ziyaretlerde
+mevcut tenant interceptor'ı eski token'ı reddeder. Oturum/veritabanı yoksa ana sayfaya dönülür.
+Sayfa yalnızca `custom-colors` düğümleri içindir. Alias ID verilirse içerik master'dan okunur;
+geri dönüşte alias'ın ağaç ID'si korunur. Endpoint `@RequiresTenant` ve admin method security
+ile korunur. Yazma, export, kaydetme veya mevcut görünümü değiştirme işlemi yoktur.
+
+İki çıktı ayrı sandbox iframe içinde gösterilir. Script, form ve üst sayfaya gezinme izinleri
+verilmez. Bu paneller etkileşimli düğüm sayfası değil, görsel karşılaştırmadır. Parser'lardan
+biri hata üretirse diğeri gösterilmeye devam eder; ayrıntı uygulama loguna yazılır. Resimlerin
+eski panelde mevcut endpoint üzerinden, yeni panelde data URI üzerinden gelmesi mümkündür.
+
+Yeni yol tek read-only transaction içinde entity ve lazy koleksiyonları okur. Mevcut parser'ın
+bilinen thread-safety sorunları bu yamada düzeltilmez; karşılaştırma geliştirme amaçlıdır.
+Normal kullanımdaki renderer tercihi değişmez. İlk denemede 53 numaralı düğümde başlık/renk,
+boş satır, link metni, resim, ek dosya, anchor, tablo ve codebox sırası karşılaştırılmalıdır.
+Yeni parser'ın henüz desteklemediği biçimler önceki bölümlerde listelenmiştir.
+
+Bu yamada sekiz test eklenir; önceki 87 üzerine toplam 95 beklenir.

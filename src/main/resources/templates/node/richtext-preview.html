@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{richtext.preview.title}">Rich-text comparison</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: system-ui, sans-serif; background: #f4f5f7; color: #20242a; }
+        header { padding: .75rem 1rem; background: white; border-bottom: 1px solid #ddd; }
+        h1 { margin: .25rem 0; font-size: 1.2rem; overflow-wrap: anywhere; }
+        p { margin: .4rem 0; }
+        main { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; padding: .75rem; }
+        section { min-width: 0; background: white; border: 1px solid #ddd; border-radius: .4rem; overflow: hidden; }
+        h2 { padding: .6rem; margin: 0; font-size: 1rem; border-bottom: 1px solid #ddd; }
+        iframe { display: block; width: 100%; height: calc(100dvh - 210px); min-height: 350px; border: 0; }
+        .error { color: #a12626; padding: 1rem; }
+        @media (max-width: 800px) { main { grid-template-columns: 1fr; } iframe { height: 65dvh; } }
+    </style>
+</head>
+<body>
+<header>
+    <h1 th:text="${preview.name}">Node</h1>
+    <p th:text="#{richtext.preview.notice}">Experimental read-only comparison.</p>
+    <p><span th:text="#{richtext.preview.treeId}">Tree ID</span>: <span th:text="${preview.treeNodeId}"></span>
+       · <span th:text="#{richtext.preview.contentId}">Content ID</span>: <span th:text="${preview.contentNodeId}"></span></p>
+    <a th:href="@{/nodes/{id}(id=${preview.treeNodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.preview.back}">Back to node</a>
+</header>
+<main>
+    <section>
+        <h2 th:text="#{richtext.preview.legacy}">Existing parser</h2>
+        <p class="error" th:if="${preview.legacy.failed}" th:text="#{richtext.preview.failed}"></p>
+        <iframe th:unless="${preview.legacy.failed}" sandbox="" referrerpolicy="no-referrer"
+                th:title="#{richtext.preview.legacy}" th:srcdoc="${preview.legacy.html}"></iframe>
+    </section>
+    <section>
+        <h2 th:text="#{richtext.preview.experimental}">Experimental parser</h2>
+        <p class="error" th:if="${preview.experimental.failed}" th:text="#{richtext.preview.failed}"></p>
+        <iframe th:unless="${preview.experimental.failed}" sandbox="" referrerpolicy="no-referrer"
+                th:title="#{richtext.preview.experimental}" th:srcdoc="${preview.experimental.html}"></iframe>
+    </section>
+</main>
+</body>
+</html>
