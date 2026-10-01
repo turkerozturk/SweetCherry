@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node><rich_text>Bu düğümün amacı, Cherrytree yazılımının arkaplanda bir Node içeriğini depolarken kullanabileceği tüm element ve attribute çeşitlerinin belirlenmesi sırasında kullanılmaktır. Dışarı aktarmak için aşağıdaki yol izlenir:
+File -&gt; Export -&gt; Export to CherryTree -&gt; Selected Node Only -&gt; Single XML File (.ctd)
+Ardından bir metin editörü ile açılarak xml içeriği incelenir. Bize lazım olan kısım Node düğümünün kendisi hariç içinde kalan tüm kısımdır.
+</rich_text><rich_text scale="h1">Başlık1</rich_text><rich_text justification="right"></rich_text><rich_text>
+Bir Satır.
+Sonraki satır.
+	Başında tab karakteri olan satır.
+    Başında dört boşluk olan satır.
+Aşağıda iki adet boş satır.
+
+
+Aşağıda iki boşluk içeren bir adet boş satır.
+&#32;&#32;
+Aşağıda iki tab içeren bir adet boş satır.
+&#9;&#9;
+Bir kelimesinin metni </rich_text><rich_text foreground="#a5a51d1d2d2d">kırmızı</rich_text><rich_text> olan satır.
+Bir kelimesinin arkaplan rengi </rich_text><rich_text background="#1a1a5f5fb4b4">mavi</rich_text><rich_text> olan satır.
+Bir kelimesinin metni kırmızı, arkaplanı mavi olan satır.
+Üç kelimesinin arkaplanı </rich_text><rich_text background="#1a1a5f5fb4b4">mavi, </rich_text><rich_text background="#1a1a5f5fb4b4" foreground="#a5a51d1d2d2d">ikinci</rich_text><rich_text background="#1a1a5f5fb4b4"> kelimesinin</rich_text><rich_text> metni kırmızı olan satır.
+</rich_text><rich_text scale="h2">Başlık2</rich_text><rich_text justification="right"></rich_text><rich_text>
+</rich_text><rich_text scale="h3">Başlık3</rich_text><rich_text justification="right"></rich_text><rich_text>
+</rich_text><rich_text scale="h4">Başlık4</rich_text><rich_text justification="right"></rich_text><rich_text>
+</rich_text><rich_text scale="h5">Başlık5</rich_text><rich_text justification="right"></rich_text><rich_text>
+</rich_text><rich_text scale="h6">Başlık6</rich_text><rich_text justification="right"></rich_text><rich_text>
+</rich_text><rich_text weight="heavy">Kalın</rich_text><rich_text>
+</rich_text><rich_text style="italic">İtalik</rich_text><rich_text>
+</rich_text><rich_text strikethrough="true">Üstü Çizili</rich_text><rich_text>
+</rich_text><rich_text underline="single">Altı Çizili</rich_text><rich_text>
+</rich_text><rich_text strikethrough="true" underline="single" style="italic" background="#1a1a5f5fb4b4" foreground="#a5a51d1d2d2d" weight="heavy">Hepsi</rich_text><rich_text>
+</rich_text><rich_text scale="small">Small</rich_text><rich_text>
+</rich_text><rich_text scale="sup">Superscript</rich_text><rich_text>
+</rich_text><rich_text scale="sub">Subscript</rich_text><rich_text>
+</rich_text><rich_text family="monospace">Monospace</rich_text><rich_text>
+Bu yazı case değişikliği hemen mi YAPILIYOR yoksa attribute ile arkaplanda mı yapılıyor diye anlamak için.
+Bu düğümde liste biçimleri ile ilgili örnek bulunmamaktadır.
+</rich_text><rich_text justification="right">Bu satır sağa hizalı.</rich_text><rich_text>
+</rich_text><rich_text justification="left">Bu satır sola hizalı.</rich_text><rich_text>
+</rich_text><rich_text justification="center">Bu satır ortaya hizalı.</rich_text><rich_text>
+</rich_text><rich_text justification="fill">Bu satır iki yana yaslı.</rich_text><rich_text>
+</rich_text><rich_text justification="center" scale="h1">Metin biçimleriyle </rich_text><rich_text justification="center" strikethrough="true" underline="single" style="italic" scale="h1" background="#1a1a5f5fb4b4" foreground="#a5a51d1d2d2d" weight="heavy">birlikte bir link</rich_text><rich_text justification="center" family="monospace" strikethrough="true" underline="single" style="italic" scale="h1" background="#1a1a5f5fb4b4" foreground="#a5a51d1d2d2d" weight="heavy">:</rich_text><rich_text justification="center" family="monospace" strikethrough="true" underline="single" style="italic" scale="sup" background="#1a1a5f5fb4b4" foreground="#a5a51d1d2d2d" weight="heavy">  </rich_text><rich_text justification="center" family="monospace" strikethrough="true" underline="single" style="italic" link="webs http://www.google.com" scale="sup" background="#1a1a5f5fb4b4" foreground="#a5a51d1d2d2d" weight="heavy">Goo</rich_text><rich_text justification="center" strikethrough="true" underline="single" style="italic" link="webs http://www.google.com" scale="h1" background="#1a1a5f5fb4b4" foreground="#a5a51d1d2d2d" weight="heavy">gle</rich_text><rich_text justification="right"></rich_text><rich_text>
+Internette </rich_text><rich_text link="webs http://www.google.com">Google</rich_text><rich_text> sitesinde giden link.
+Bu programda bir </rich_text><rich_text link="node 25">Cherrytree Node</rich_text><rich_text> düğümüne giden link.
+Aşağıdaki boşluklar sayfa içi </rich_text><rich_text link="node 53 capalink">çapa link</rich_text><rich_text> denemesi için bilerek oluşturuldu:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sayfa içerisinde tıklandığında buradaki çapa linke gelinmesi için bir çapa link.
+Aşağıda 3 satır boş bırakıldı.
+
+
+
+Aşağıda birkaç özel karakter eklendi(yıldız, kalp, müzik notası).
+★♥♫
+Aşağıda gerçekte 1567 byte boyutunda kirazresmi.jpg isminde, insert image seçeneği ile eklenmiş bir resim var. Genişliği 2 pixel küçültüldü sihirbazdan 80'den 72'e, yüksekliğine dokunulmadı.
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+Aşağıda panoda yapıştırılarak eklenmiş bir resim var.
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+Aşağıda bir adet ekli dosya var pango-unicode-paper.pdf adında.
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+Aşağıda bir adet latex var, latex için sistemde gerekli kütüphaneler kurulu değilse üçgen sarı ünlem ikonu görüntülenir..
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+Aşağıda bir adet codebox var java lexerinde.
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+Aşağıda 3 satır 4 sütunlu bir adet tablo var.
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+Bu düğüm içeriğinin son satırı.</rich_text></node>
