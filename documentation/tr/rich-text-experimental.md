@@ -44,3 +44,26 @@ Bu açıklama mevcut deponun tamamı için hukuki uygunluk değerlendirmesi değ
 Sonraki aşama: metin konumları ile ayrı widget kayıtlarını birleştiren yerleşim modeli ve
 resim, ek dosya, anchor, codebox, table adaptörleri. Ardından XML semantik round-trip
 ve sınırlı düzenleme desteği düşünülebilir.
+
+## İkinci aşama: nesne yerleşimi
+
+`RichTextLayoutBuilder`, metin modeli ile nesne referanslarını birleştirir.
+Her nesne son buffer'da bir karakter konumu kaplar. Sıralanmış nesneler için metin konumu,
+`bufferOffset - öncekiNesneSayısı` olarak hesaplanır. Örneğin `ABC` metninde 1 konumundaki
+resim `A [resim] BC` yerleşimini verir. Metin parçası gerekirse bölünür; iki tarafta da
+attribute değerleri korunur. Unicode surrogate pair bölünmez. Boş parçalar kaybolmaz.
+
+`RichTextLayout` metin ve nesne slotlarını ayrı tutar. `CtbObjectReferences` mevcut
+image/anchor/codebox/grid entity'lerinden tür, node ID ve offset alır; binary içerikleri
+okumaz, servis veya browse sayfalarını değiştirmez. Aynı image kaydını hem `fromImage`
+hem `fromAnchor` üzerinden eklemeyin: bunlar alternatif adaptör girişleridir.
+
+Aynı final-buffer konumunda iki nesne, sınır dışı offset veya farklı düğümlerin
+nesnelerini birleştirme girişimi hata üretir. Çakışma durumunda kayıt sessizce ezilmez.
+Ardışık nesnelerin buffer offset'leri farklıdır; metin konumları aynı olabilir.
+
+Bu aşama nesnelerin HTML gösterimini henüz uygulamaz. Yerleşim modelini eski renderer'a
+bağlamaz ve CTB yazmaz. Sonraki adım her nesne türünün veri/HTML adaptörü ve bağlantı
+çözümlemesidir. Bu yamada dokuz test daha eklendi; önceki 68 test üzerine toplam 77 beklenir.
+53 numaralı düğümün 14 nesne konumu, metni kaybetmeden birleştirme testinde kullanılır.
+Bu test image tablosu kayıtlarının türlerini değil konumlarını sınar; tür ayrımı ayrı adaptör testindedir.
