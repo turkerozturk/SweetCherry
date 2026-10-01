@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<nav th:fragment="breadcrumbs" class="reader-breadcrumbs" th:attr="aria-label=#{tree.path}">
+<a th:href="@{/}" th:text="${currentTenantName}"></a>
+<th:block th:if="${node != null}"><th:block th:each="entry : ${node.breadcrumbs}">
+<span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}"></a>
+</th:block></th:block>
+</nav>
+<th:block th:fragment="contextNavigation">
+<div class="reader-parent" th:if="${node != null and parentNodeId != null and parentNodeId != 0}">
+<a th:href="@{/nodes/{id}(id=${parentNodeId})}"><i class="fas fa-level-up-alt" aria-hidden="true"></i> <span th:text="${node.fatherNode != null ? node.fatherNode.name : node.breadcrumbs.get(parentNodeId)}"></span></a>
+</div>
+<ul class="reader-context-list">
+<li th:each="item : ${siblingNaviNodes}">
+<a th:href="@{/nodes/{id}(id=${item.nodeId})}" th:attr="aria-current=${item.nodeId == requestedNodeId ? 'page' : null},data-reader-selected=${item.nodeId == requestedNodeId ? 'true' : null}">
+<img th:if="${item.isReadOnly}" th:src="@{/img/icons/ct_locked.svg}" alt=""/>
+<img th:src="@{/img/icons/{icon}.svg(icon=${item.nodeIcon.iconName})}" alt=""/>
+<span th:text="${item.name}" th:style="${item.titleColorAsHtmlHex != null ? 'color:' + item.titleColorAsHtmlHex : ''}" th:classappend="${item.boldnessBit ? 'boldTitle' : ''}"></span>
+</a>
+<ul th:if="${item.nodeId == requestedNodeId and isSharedNode != true and childNodes != null}">
+<li th:each="child : ${childNodes}"><a th:href="@{/nodes/{id}(id=${child.nodeId})}">
+<img th:if="${child.isReadOnly}" th:src="@{/img/icons/ct_locked.svg}" alt=""/>
+<img th:src="@{/img/icons/{icon}.svg(icon=${child.nodeIcon.iconName})}" alt=""/>
+<span th:text="${child.name}" th:style="${child.titleColorAsHtmlHex != null ? 'color:' + child.titleColorAsHtmlHex : ''}" th:classappend="${child.boldnessBit ? 'boldTitle' : ''}"></span>
+</a></li></ul>
+</li></ul>
+<th:block th:replace="~{node/readerContextNavigation :: breadcrumbs}"></th:block>
+</th:block>
+</body></html>

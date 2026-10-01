@@ -3,6 +3,33 @@
     const body = document.body, tree = document.getElementById('readerTreeNodes');
     const token = body.dataset.tenantToken;
     const key = 'sweetcherry:reader:' + token;
+    const drawer = document.getElementById('readerDrawer');
+    const drawerToggle = document.getElementById('readerDrawerToggle');
+    const controls = document.querySelector('.reader-controls');
+    const drawerKey = key + ':context-open';
+    /** Keep the drawer below the bar, including browser zoom and device orientation changes. */
+    function sizeDrawer() {
+        body.style.setProperty('--reader-bar-height', controls.getBoundingClientRect().height + 'px');
+    }
+    /** Bring the selected sibling near the top without scrolling the node content or page. */
+    function revealContextSelection() {
+        const selected = drawer.querySelector('[data-reader-selected="true"]');
+        if (selected) drawer.scrollTop += selected.getBoundingClientRect().top - drawer.getBoundingClientRect().top - 8;
+    }
+    function setDrawerOpen(value) {
+        drawer.hidden = !value;
+        drawerToggle.setAttribute('aria-expanded', String(value));
+        drawerToggle.querySelector('i').className = value ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        try { sessionStorage.setItem(drawerKey, String(value)); } catch (_) {}
+        if (value) requestAnimationFrame(revealContextSelection);
+    }
+    drawerToggle.addEventListener('click', () => setDrawerOpen(drawer.hidden));
+    let drawerOpen = false;
+    try { drawerOpen = sessionStorage.getItem(drawerKey) === 'true'; } catch (_) {}
+    sizeDrawer();
+    if (window.ResizeObserver) new ResizeObserver(sizeDrawer).observe(controls);
+    else window.addEventListener('resize', sizeDrawer);
+    setDrawerOpen(drawerOpen);
     let state = { open: [], scroll: 0 };
     try { state = { ...state, ...JSON.parse(sessionStorage.getItem(key) || '{}') }; } catch (_) {}
     const open = new Set(Array.isArray(state.open) ? state.open.map(String) : []);

@@ -5,7 +5,7 @@
     <th:block th:if="${isRootNode == true}">
         <h1 th:text="${currentTenantName}">Database</h1>
         <p th:text="#{tree.selectNode}">Select a node in the tree.</p>
-        <form th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post">
+        <form th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
             <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
             <button class="btn btn-sm btn-outline-primary" type="submit"><i class="fas fa-plus"></i> <span th:text="#{tree.addRoot}">Add node</span></button>
         </form>
@@ -54,7 +54,7 @@
             </div>
             <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
             <a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="#{tree.edit}"></span></a>
-            <form th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post">
+            <form th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
                 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                 <button class="btn btn-sm btn-outline-primary" type="submit" th:title="#{tree.addChildTitle}"><i class="fas fa-plus"></i> <span th:text="#{tree.addChild}"></span></button>
             </form>

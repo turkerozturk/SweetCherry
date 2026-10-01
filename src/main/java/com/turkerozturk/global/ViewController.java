@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.global;
 
+import org.springframework.web.util.UriComponentsBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,9 +49,22 @@ public class ViewController {
 
         String target = SafeRefererRedirect.target(request);
         if (!"tree".equals(mode) && (target.equals("/tree") || target.startsWith("/tree?"))) {
-            target = "/";
+            target = "reader".equals(mode) ? readerTarget(target) : "/";
         }
         return "redirect:" + target;
 
+    }
+    /** Preserve the selected tree node and its CTB token when entering the mobile reader. */
+    private String readerTarget(String target) {
+        var query = UriComponentsBuilder.fromUriString(target).build().getQueryParams();
+        String id = query.getFirst("nodeId");
+        if (id == null) return "/";
+        try {
+            if (!id.matches("[0-9]+") || Long.parseLong(id) < 0) return "/";
+        } catch (NumberFormatException exception) { return "/"; }
+        var destination = UriComponentsBuilder.fromPath("/nodes/" + Long.parseLong(id));
+        String token = query.getFirst("_tenantView");
+        if (token != null) destination.queryParam("_tenantView", token);
+        return destination.build().encode().toUriString();
     }
 }

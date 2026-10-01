@@ -29,3 +29,19 @@ Eski Mobil Görünüm ve masaüstü görünümleri kullanılmaya devam edilebili
 5. Admin ve user hesaplarında işlemleri; CTB değişimi ve oturum bitişinde eski sekmeyi deneyin.
 
 Tarayıcıya özgü zoom/gesture davranışları gerçek mobil cihazda kontrol edilmelidir.
+
+## Yakındaki düğümler çekmecesi
+
+Üst bardaki düğüm adına basınca barın altında parent, sibling ve seçili düğümün
+child listesini gösteren çekmece açılır. Parent'in siblingleri gösterilmez.
+En altta breadcrumbs bulunur; aynı yol metadata panelinde de gösterilir.
+Tekrar düğüm adına basınca çekmece kapanır. Otomatik açılma/kapanma yoktur.
+Açık/kapalı durumu CTB oturumuna göre aynı sekmede sayfa geçişleri boyunca korunur.
+Açıldığında seçili düğüm çekmece içinde yukarı kaydırılır; içerik sayfası kaydırılmaz.
+Tam ağaç paneli bağımsız çalışmaya devam eder.
+
+Yeni masaüstü ağaç görünümünden Mobil okuma görünümüne geçildiğinde URL'deki
+seçili düğüm ID'si ve CTB oturum belirteci korunur. Shared node için alias ID korunur.
+Yeni mobil ve masaüstü görünümlerinde üst düzey veya alt düğüm eklemeden önce
+onay penceresi gösterilir. Vazgeçmek sunucuya oluşturma isteği göndermez.
+Bu onay bir arayüz kolaylığıdır; mevcut sunucu yetki ve CTB kontrolleri geçerlidir.

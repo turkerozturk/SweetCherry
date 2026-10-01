@@ -14,3 +14,18 @@ body.mobile-reader { margin: 0; padding: 0; }
 .reader-tree a { color:#222; white-space:nowrap; }
 .reader-tree a[aria-current="page"] { background:#e0ecff; outline:2px solid #99bfff; }
 .reader-tree img { width:20px; height:20px; margin-right:.4rem; }
+/* A compact context drawer remains immediately below the unchanged navigation bar. */
+button.reader-title {border:0;background:transparent;color:#222;text-align:left;padding:.4rem;min-height:44px;display:flex;align-items:center;gap:.35rem}
+button.reader-title span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+button.reader-title i {flex:none;font-size:.7rem}
+button.reader-title:focus-visible {outline:2px solid #0d6efd;outline-offset:-2px}
+#readerDrawer {position:sticky;top:var(--reader-bar-height,44px);z-index:1019;background:#f6f8fa;border-bottom:1px solid #ccd4dc;max-height:min(45dvh,360px);overflow:auto;padding:.5rem;overscroll-behavior:contain}
+#readerDrawer[hidden] {display:none}
+#readerDrawer a,.reader-breadcrumbs a {color:#222}
+.reader-context-list,.reader-context-list ul {list-style:none;margin:0;padding:0}
+.reader-context-list ul {padding-left:1.5rem}
+.reader-context-list a {display:flex;align-items:center;gap:.3rem;min-height:36px;width:max-content;min-width:100%;white-space:nowrap;padding:.15rem .3rem}
+.reader-context-list a[aria-current="page"] {background:#ffeecc;outline:1px solid #ead39d}
+.reader-context-list img {width:20px;height:20px;max-width:20px;max-height:20px;object-fit:contain}
+.reader-parent {padding:.25rem .3rem;border-bottom:1px solid #dde3e9;margin-bottom:.3rem}
+.reader-breadcrumbs {font-size:.85rem;overflow-wrap:anywhere;padding:.5rem 0;border-top:1px solid #dde3e9;margin-top:.5rem}

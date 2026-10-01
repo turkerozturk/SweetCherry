@@ -14,9 +14,10 @@
 <a th:if="${parentNodeId != null and parentNodeId != 0}" class="btn" th:href="@{/nodes/{id}(id=${parentNodeId})}" th:title="#{tree.goToParentNode}" th:attr="aria-label=#{tree.goToParentNode}"><i class="fas fa-arrow-up"></i></a>
 <a th:if="${childNodes != null and !#lists.isEmpty(childNodes) and isSharedNode != true}" class="btn" th:href="@{/nodes/{id}(id=${childNodes[0].nodeId})}" th:title="#{reader.child}" th:attr="aria-label=#{reader.child}"><i class="fas fa-arrow-down"></i></a>
 <a th:if="${nextSiblingNaviNode != null}" class="btn" th:href="@{/nodes/{id}(id=${nextSiblingNaviNode.nodeId})}" th:title="#{reader.next}" th:attr="aria-label=#{reader.next}"><i class="fas fa-arrow-right"></i></a>
-<span class="reader-title" th:text="${node != null ? node.name : currentTenantName}"></span>
+<button type="button" id="readerDrawerToggle" class="reader-title" aria-expanded="false" aria-controls="readerDrawer" th:title="#{reader.contextNavigation}"><span th:text="${node != null ? node.name : currentTenantName}"></span> <i class="fas fa-chevron-down" aria-hidden="true"></i></button>
 <button type="button" class="btn" data-bs-toggle="offcanvas" data-bs-target="#readerActions" th:title="#{reader.actions}" th:attr="aria-label=#{reader.actions}"><i class="fas fa-ellipsis-v"></i></button>
 </nav>
+<nav id="readerDrawer" hidden th:attr="aria-label=#{reader.contextNavigation}"><th:block th:replace="~{node/readerContextNavigation :: contextNavigation}"></th:block></nav>
 <main id="readerContent">
 <p th:if="${isSharedNode == true}" class="alert alert-info py-1"><span th:text="#{node.sharedReference}"></span> <span th:text="${requestedNodeId}"></span> → <a th:href="@{/nodes/{id}(id=${masterNodeId})}" th:text="${masterNodeId}"></a></p>
 <th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block>
@@ -65,19 +66,21 @@
             </div>
             <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
             <a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="#{tree.edit}"></span></a>
-            <form th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post">
+            <form th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
                 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                 <button class="btn btn-sm btn-outline-primary" type="submit" th:title="#{tree.addChildTitle}"><i class="fas fa-plus"></i> <span th:text="#{tree.addChild}"></span></button>
             </form>
             <a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
         </div>
 <th:block th:replace="~{node/nodeMetaDataFragment :: nodeMetaDataFragment}"></th:block>
+<th:block th:replace="~{node/readerContextNavigation :: breadcrumbs}"></th:block>
 </div>
-<form th:if="${node == null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post">
+<form th:if="${node == null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/><button type="submit" class="btn btn-outline-primary" th:text="#{tree.addRoot}"></button>
 </form>
 </div></aside>
 <th:block th:replace="~{common/footer :: footerJsLibraries}"></th:block>
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 <script th:src="@{/js/node/mobileReader.js}"></script>
+<script th:src="@{/js/node/confirmNodeCreation.js}"></script>
 </body></html>
