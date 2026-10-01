@@ -24,3 +24,11 @@ Açık dallar, seçili düğüm, ağacın kaydırma konumu ve ayırıcı genişl
 4. Admin/writable, user ve readonly durumlarında düğmeleri ve sunucu izinlerini kontrol edin.
 5. İkinci sekmede başka CTB seçin; eski ağaçtan içerik veya değişiklik isteği kabul edilmesin.
 6. Desktop ve mobil görünüme dönün; mevcut görünümler kullanılabilsin.
+
+## İçerik alanı
+
+Düğüm adı, breadcrumbs ve işlem düğmeleri sabittir; yalnızca içerik bölmesi kayar.
+300 pikselden fazla aşağı kaydırınca görünen başa dönme düğmesi bu bölmeyi kaydırır.
+Görseller içerik genişliğine sığar; tıklama, Enter veya Space gerçek boyutlu kaynağı
+yeni sekmede açar. Tablo ve kod blokları kendi alanlarında yatay kaydırılabilir.
+Metadata ana ikonu 30 px, küçük ikonlar 16 px ile sınırlıdır.

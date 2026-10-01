@@ -11,6 +11,7 @@
         </form>
     </th:block>
     <th:block th:if="${node != null}">
+        <header class="workspace-node-header">
         <h1 th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}" th:text="${node.name}">Node</h1>
         <nav class="workspace-breadcrumbs" th:attr="aria-label=#{tree.path}">
             <a th:href="@{/tree(nodeId=0)}" th:text="${currentTenantName}"></a>
@@ -60,7 +61,8 @@
             <a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
             <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" th:title="#{node.meta.header}"><i class="fas fa-info-circle"></i> <span th:text="#{tree.info}"></span></button>
         </div>
-        <div class="workspace-rendered"><th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block></div>
+        </header>
+        <div class="workspace-rendered" tabindex="0" th:attr="aria-label=#{tree.content}"><th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block></div>
         <th:block th:replace="~{node/offcanvasFragment :: offcanvasFragment}"></th:block>
     </th:block>
     <template data-workspace-status>
