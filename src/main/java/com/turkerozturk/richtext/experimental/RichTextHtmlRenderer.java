@@ -7,7 +7,13 @@ import java.util.Map;
 public final class RichTextHtmlRenderer {
     /** Escapes content and applies only explicitly supported formatting; raw attributes never become HTML. */
     public String render(RichTextDocument document) {
-        var html = new StringBuilder("<div class=\"rich-text-preview\" style=\"white-space:pre-wrap;overflow-wrap:anywhere\">");
+        return "<div class=\"rich-text-preview\" style=\"white-space:pre-wrap;overflow-wrap:anywhere\">"
+                + renderContent(document) + "</div>";
+    }
+
+    /** Returns formatted inline text for composition with independently rendered object slots. */
+    public String renderContent(RichTextDocument document) {
+        var html = new StringBuilder();
         for (var run : document.runs()) {
             var attributes = run.attributes();
             var css = new StringBuilder();
@@ -34,7 +40,7 @@ public final class RichTextHtmlRenderer {
             html.append("<span style=\"").append(css).append("\">").append(escape(run.text())).append("</span>");
             if (href != null) html.append("</a>");
         }
-        return html.append("</div>").toString();
+        return html.toString();
     }
 
     /** Converts 8-bit or 16-bit RGB components to CSS without accepting arbitrary CSS input. */

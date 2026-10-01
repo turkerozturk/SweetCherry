@@ -67,3 +67,39 @@ bağlamaz ve CTB yazmaz. Sonraki adım her nesne türünün veri/HTML adaptörü
 çözümlemesidir. Bu yamada dokuz test daha eklendi; önceki 68 test üzerine toplam 77 beklenir.
 53 numaralı düğümün 14 nesne konumu, metni kaybetmeden birleştirme testinde kullanılır.
 Bu test image tablosu kayıtlarının türlerini değil konumlarını sınar; tür ayrımı ayrı adaptör testindedir.
+
+## Üçüncü aşama: nesne içerikleri ve HTML
+
+`EmbeddedContentAdapter` mevcut entity'lerden request-local veri kopyaları çıkarır.
+`EmbeddedContent` metin/codebox/table/anchor/attachment bilgileri ile PNG byte dizisini
+entity'lerden ayrı tutar. PNG dizisi girişte ve çıkışta kopyalanır. Dosya ve anchor
+kayıtlarını işlerken binary içerik yüklenmez. Layout referansları ile payload'lar aynı
+`EmbeddedObject` anahtarıyla eşleştirilmelidir.
+
+`RichTextObjectHtmlRenderer` metin slotları arasına nesne HTML'lerini yerleştirir:
+
+| Tür | İlk gösterim |
+| --- | --- |
+| Resim | PNG data URI, ekran genişliğiyle sınırlı görsel. |
+| Ek dosya | Kaçırılmış dosya adı; tenant-view token verilirse mevcut download yoluna bağlantı. |
+| Anchor | Kaçırılmış anchor adıyla HTML ID. |
+| Codebox | Kaçırılmış kod ve `data-language`, yatay kaydırma alanı. |
+| Tablo | Son storage satırı başlık; diğer satırlar gövde, yatay kaydırma alanı. |
+
+Token yoksa ek dosya bağlantısı etkin değildir. Renderer token'ı doğrulayan güvenlik
+katmanı değildir; mevcut endpoint/interceptor denetimleri yine gereklidir. Bu sınıflar
+henüz controller veya Spring bean olarak kullanılmaz. Resim verisi HTML'e gömüldüğü için
+preview boyutu artabilir. PNG imzası kontrolü tam resim doğrulaması değildir.
+
+Tablonun `col_widths` ve diğer kök attribute değerleri modelde saklanır; henüz yerleşime
+uygulanmaz. Codebox boyut/line-number/highlight ayarları henüz modellenmez. Resmin link ve
+justification değerleri saklanır fakat uygulanmaz. Latex eklerinin özel gösterimi, node ve
+anchor bağlantılarının çözümlenmesi, paragraf/list hizalama ve resim büyütme sonraki aşamalardır.
+Codebox bu aşamada renkli değil, düz ve kaçırılmış kod olarak gösterilir.
+
+Eksik payload veya tür uyuşmazlığı sessizce atlanmaz; hata üretir. Tablo XML'i güvenli
+DOM okuyucuyla parse edilir; beklenmeyen elementler reddedilir. Normal parser, PDF ve
+bağımsız browse sayfaları değişmez. CTB yazma yoktur.
+
+`demo-node-53-table.xml` aynı proje CTB'sindeki 53 numaralı düğümün grid kaydından
+çıkarılmıştır. Bu yamada 10 test eklenir; önceki 77 üzerine toplam 87 beklenir.
