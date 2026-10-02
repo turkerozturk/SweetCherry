@@ -14,8 +14,13 @@ final class PendingRichTextImages {
 
     /** Accepts PNG/JPEG only, limiting total encoded data, image count and decoded pixel dimensions. */
     static Map<String, byte[]> decode(String json) {
+        return decode(json, 9_000_000);
+    }
+
+    /** Enforces the current tenant limit on both uploaded data and the normalized PNG representation. */
+    static Map<String, byte[]> decode(String json, int limit) {
         try {
-            if (json == null || json.length() > 16_000_000) throw new IllegalArgumentException("Image upload too large");
+            if (json == null || json.length() > EmbeddedUploadPolicy.JSON_CHARACTERS) throw new IllegalArgumentException("Image upload too large");
             var root = new ObjectMapper().readTree(json);
             if (root == null || !root.isObject() || root.size() > 10) throw new IllegalArgumentException("Invalid image list");
             var result = new LinkedHashMap<String, byte[]>();
@@ -29,7 +34,7 @@ final class PendingRichTextImages {
                 if (!value.startsWith("data:image/png;base64,") && !value.startsWith("data:image/jpeg;base64,"))
                     throw new IllegalArgumentException("Only PNG/JPEG images are accepted");
                 byte[] bytes = Base64.getDecoder().decode(value.substring(value.indexOf(',') + 1));
-                if (bytes.length > 8_000_000) throw new IllegalArgumentException("Image upload too large");
+                if (bytes.length > limit) throw new IllegalArgumentException("Image upload too large");
                 try (var stream = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
                     var readers = ImageIO.getImageReaders(stream);
                     if (!readers.hasNext()) throw new IllegalArgumentException("Invalid image data");
@@ -44,7 +49,7 @@ final class PendingRichTextImages {
                         var output = new ByteArrayOutputStream();
                         if (!ImageIO.write(reader.read(0), "png", output)) throw new IllegalArgumentException("PNG encoding failed");
                         byte[] png = output.toByteArray(); total += png.length;
-                        if (total > 12_000_000) throw new IllegalArgumentException("Image upload too large");
+                        if (png.length > limit || total > EmbeddedUploadPolicy.TOTAL_BYTES) throw new IllegalArgumentException("Image upload too large");
                         result.put(field.getKey(), png);
                     } finally { reader.dispose(); }
                 }

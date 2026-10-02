@@ -9,7 +9,8 @@
     const count = value => Array.from(value).length;
     const sub = (value, start, end) => Array.from(value).slice(start, end).join('');
     let selection = [0, 0];
-    const pendingImages = {};
+    const pendingImages = {}, pendingFiles = {};
+    const uploadLimit = window.richEditorMaxFileBytes || 9000000;
     let readingImage = false;
     const plainClipboard = text => text.replace(/\uFFFC/g, '');
     const mode = document.getElementById('richVisualMode');
@@ -238,6 +239,8 @@
     /** Serializes the text model to CTB XML; the server validates and canonicalizes it again. */
     form.addEventListener('submit', event => {
         if (readingImage) { event.preventDefault(); return; }
+        const filesInput = document.getElementById('richFiles');
+        if (filesInput) filesInput.value = JSON.stringify(Object.fromEntries(runs.filter(run=>pendingFiles[run.attributes.__sweet_object]).map(run=>[run.attributes.__sweet_object,pendingFiles[run.attributes.__sweet_object]])));
         const imageInput = document.getElementById('richImages');
         if (imageInput) imageInput.value = JSON.stringify(Object.fromEntries(runs.filter(run=>pendingImages[run.attributes.__sweet_object]).map(run=>[run.attributes.__sweet_object,pendingImages[run.attributes.__sweet_object]])));
         const xml = document.implementation.createDocument(null, 'node');
@@ -257,10 +260,12 @@
         render(); focusEditor(); restoreSelection(); commitHistory();
     }
     /** Keeps file data local until Save and adds its protected slot to the shared undo/redo model. */
-    async function addImage(file) {
+    const addImage = file => addObject(file, false);
+    /** Adds images or attachments as protected slots; file content remains local until Save. */
+    async function addObject(file, attachment) {
         const status = document.getElementById('richImageStatus');
         if (readingImage) return;
-        if (!['image/png','image/jpeg'].includes(file.type) || file.size > 8000000) {
+        if ((!attachment && !['image/png','image/jpeg'].includes(file.type)) || file.size > uploadLimit || (attachment && (!file.name || file.name.length > 255))) {
             if (status) status.textContent = status.dataset.error; return;
         }
         const at = [...selection], source = JSON.stringify(runs);
@@ -271,8 +276,12 @@
             });
             // An asynchronous read must not replace text entered while the file was loading.
             if (source !== JSON.stringify(runs)) throw new Error('Editor changed');
-            if (Object.keys(pendingImages).length >= 10 || Object.values(pendingImages).reduce((n,value)=>n+value.length,0)+data.length > 15000000) throw new Error('Upload too large');
-            const key = 'new-image:' + crypto.randomUUID();
+            const activeKeys = runs.map(run=>run.attributes.__sweet_object);
+            const activeImages = Object.entries(pendingImages).filter(([key])=>activeKeys.includes(key));
+            const activeFiles = Object.entries(pendingFiles).filter(([key])=>activeKeys.includes(key));
+            if (activeImages.length + activeFiles.length >= 10 || activeImages.reduce((n,[,value])=>n+value.length,0)
+                + activeFiles.reduce((n,[,value])=>n+value.data.length,0)+data.length > 29000000) throw new Error('Upload too large');
+            const key = (attachment ? 'new-file:' : 'new-image:') + crypto.randomUUID();
             if (!replace(at[0],at[1],'\uFFFC')) return;
             let offset = 0;
             for (const run of runs) {
@@ -281,9 +290,10 @@
                 }
                 offset += count(run.text);
             }
-            pendingImages[key] = data;
+            if (attachment) pendingFiles[key] = {name:file.name,data:data.slice(data.indexOf(',')+1)};
+            else pendingImages[key] = data;
             window.richEditorObjects = window.richEditorObjects || {};
-            window.richEditorObjects[key] = {label:file.name || 'Image',imageUrl:data};
+            window.richEditorObjects[key] = attachment ? {label:'📎 ' + file.name} : {label:file.name || 'Image',imageUrl:data};
             previous = runs.map(run=>run.text).join(''); input.value=previous;
             selection=[at[0]+1,at[0]+1]; render(); focusEditor(); restoreSelection(); commitHistory();
             if (status) status.textContent='';
@@ -295,6 +305,12 @@
         imageButton.addEventListener('pointerdown',event=>event.preventDefault());
         imageButton.addEventListener('click',()=>{captureSelection();imageFile.click();});
         imageFile.addEventListener('change',()=>{if(imageFile.files[0])addImage(imageFile.files[0]);imageFile.value='';});
+    }
+    const fileButton=document.getElementById('richAddFile'),filePicker=document.getElementById('richFilePicker');
+    if (fileButton && filePicker) {
+        fileButton.addEventListener('pointerdown',event=>event.preventDefault());
+        fileButton.addEventListener('click',()=>{captureSelection();filePicker.click();});
+        filePicker.addEventListener('change',()=>{if(filePicker.files[0])addObject(filePicker.files[0],true);filePicker.value='';});
     }
     // Clipboard object slots are not transferable; copy only their surrounding text.
     for (const target of [input,preview]) {

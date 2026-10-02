@@ -22,9 +22,17 @@ class PendingRichTextImagesTest {
         }
     }
     @Test void rejectsInvalidShapeKeysAndOversizedRequests() {
-        for (String json : java.util.List.of("[]", "null", "{\"image:0\":\"x\"}", " ".repeat(16_000_001))) {
+        for (String json : java.util.List.of("[]", "null", "{\"image:0\":\"x\"}", " ".repeat(30_000_001))) {
             assertThatThrownBy(() -> PendingRichTextImages.decode(json)).isInstanceOf(IllegalArgumentException.class);
         }
         assertThat(PendingRichTextImages.decode("{}")).isEmpty();
+    }
+    @Test void enforcesTenantLimitForImageData() throws Exception {
+        var out = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(2, 2, java.awt.image.BufferedImage.TYPE_INT_RGB), "png", out);
+        String data = "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(out.toByteArray());
+        String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-image:test", data));
+        assertThatThrownBy(() -> PendingRichTextImages.decode(json, 1)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(PendingRichTextImages.decode(json, 10000)).hasSize(1);
     }
 }

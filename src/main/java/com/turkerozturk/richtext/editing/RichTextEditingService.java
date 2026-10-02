@@ -21,10 +21,11 @@ import com.turkerozturk.richtext.experimental.*;
 @Service
 public class RichTextEditingService {
     private final NodePropertiesService properties;
+    private final EmbeddedUploadPolicy uploads;
     @PersistenceContext private EntityManager entityManager;
-    public RichTextEditingService(NodePropertiesService properties) { this.properties = properties; }
+    public RichTextEditingService(NodePropertiesService properties, EmbeddedUploadPolicy uploads) { this.properties = properties; this.uploads = uploads; }
 
-    public record Editor(Node node, RichTextDocument document, String revision, Map<String, ObjectInfo> objects) { }
+    public record Editor(Node node, RichTextDocument document, String revision, Map<String, ObjectInfo> objects, int maxEmbeddedFileBytes) { }
     public record ObjectInfo(String label, String imageUrl) { }
     static record Stored(ProtectedRichTextCodec.Reference reference, Object[] values) { }
 
@@ -49,7 +50,7 @@ public class RichTextEditingService {
             }
             info.put(object.reference().key(), new ObjectInfo(label, imageUrl));
         }
-        return new Editor(node, new ProtectedRichTextCodec().open(document, references(objects)), revision(node, objects), info);
+        return new Editor(node, new ProtectedRichTextCodec().open(document, references(objects)), revision(node, objects), info, uploads.fileBytes());
     }
 
     private Node editableNode(long id) {
@@ -71,15 +72,30 @@ public class RichTextEditingService {
     /** Saves text, protected offsets and new PNG rows atomically; uploads are never persisted on GET or cancel. */
     @Transactional
     public void save(long id, String xml, String expectedRevision, String imageJson) {
+        save(id, xml, expectedRevision, imageJson, "{}");
+    }
+
+    /** Validates attachments/images together and commits their payloads, offsets and node metadata atomically. */
+    @Transactional
+    public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson) {
         Node node = editableNode(id);
         var objects = storedObjects(id);
         if (!revision(node, objects).equals(expectedRevision)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Node changed; reload the editor.");
         String canonical;
         ProtectedRichTextCodec.Saved saved;
         Map<String, byte[]> images;
+        Map<String, PendingRichTextFiles.File> files;
         try {
-            images = PendingRichTextImages.decode(imageJson);
-            saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(objects), images.keySet());
+            if (imageJson == null || fileJson == null || (long) imageJson.length() + fileJson.length() > EmbeddedUploadPolicy.JSON_CHARACTERS)
+                throw new IllegalArgumentException("Upload too large");
+            int limit = uploads.fileBytes();
+            images = PendingRichTextImages.decode(imageJson, limit);
+            files = PendingRichTextFiles.decode(fileJson, limit);
+            if (images.size() + files.size() > 10 || images.values().stream().mapToLong(bytes -> bytes.length).sum()
+                    + files.values().stream().mapToLong(file -> file.bytes().length).sum() > EmbeddedUploadPolicy.TOTAL_BYTES)
+                throw new IllegalArgumentException("Upload too large");
+            var keys = new java.util.HashSet<String>(images.keySet()); keys.addAll(files.keySet());
+            saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(objects), keys);
             canonical = new RichTextXmlWriter().write(saved.text());
         }
         catch (IllegalArgumentException error) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid rich-text XML", error); }
@@ -93,17 +109,21 @@ public class RichTextEditingService {
         // Move all keys to a disjoint range first to avoid composite-key collisions.
         for (var object : objects) move(id, object.reference().table(), object.reference().offset(), -object.reference().offset() - 1);
         for (var object : objects) move(id, object.reference().table(), -object.reference().offset() - 1, saved.offsets().get(object.reference()));
-        for (var entry : images.entrySet()) {
+        var pending = new java.util.LinkedHashMap<String, PendingRichTextFiles.File>();
+        images.forEach((key, bytes) -> pending.put(key, new PendingRichTextFiles.File("", bytes)));
+        pending.putAll(files);
+        for (var entry : pending.entrySet()) {
             entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
                 try (var insert = connection.prepareStatement("INSERT INTO image "
-                        + "(node_id, offset, justification, anchor, png, filename, link, time) VALUES (?, ?, 'left', '', ?, '', '', 0)")) {
+                        + "(node_id, offset, justification, anchor, png, filename, link, time) VALUES (?, ?, 'left', '', ?, ?, '', ?)")) {
                     insert.setLong(1, id); insert.setInt(2, saved.newImages().get(entry.getKey()));
-                    insert.setBytes(3, entry.getValue());
+                    insert.setBytes(3, entry.getValue().bytes()); insert.setString(4, entry.getValue().name());
+                    insert.setLong(5, entry.getValue().name().isEmpty() ? 0 : Instant.now().getEpochSecond());
                     if (insert.executeUpdate() != 1) throw new java.sql.SQLException("Image insert failed");
                 }
             });
         }
-        if (!images.isEmpty()) entityManager.createNativeQuery("UPDATE node SET has_image = 1 WHERE node_id = :id")
+        if (!pending.isEmpty()) entityManager.createNativeQuery("UPDATE node SET has_image = 1 WHERE node_id = :id")
                 .setParameter("id", id).executeUpdate();
         entityManager.clear();
     }

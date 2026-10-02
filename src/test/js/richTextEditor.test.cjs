@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 /** Executes the real editor script against a small DOM double to test model/history behavior. */
-function editor(initialRuns) {
+function editor(initialRuns, maxFileBytes) {
     const handlers = new Map();
     function element(id = '') {
         return {id, value:'', style:{}, dataset:{}, childNodes:[], selectionStart:0, selectionEnd:0,
@@ -13,7 +13,7 @@ function editor(initialRuns) {
             replaceChildren() {this.childNodes = [];}, appendChild(child) {this.childNodes.push(child);},
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker'].map(id => [id, element(id)]));
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     let saved;
@@ -30,7 +30,7 @@ function editor(initialRuns) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:{}},
+    vm.runInNewContext(source, {document, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:{},richEditorMaxFileBytes:maxFileBytes},
         crypto:{randomUUID:()=> 'test-uuid'},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
@@ -118,4 +118,22 @@ test('new image slot and submitted payload follow undo/redo together', async () 
     assert.deepEqual(JSON.parse(e.ids.richImages.value),{'new-image:test-uuid':'data:image/png;base64,AQID'});
     e.key('z');assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});
     e.key('y');assert.equal(text(e.runs()),'A\uFFFC😀B\nC');assert.ok(JSON.parse(e.ids.richImages.value)['new-image:test-uuid']);
+});
+
+test('attachment binary/name stay paired with its slot through undo/redo',async()=>{
+ const e=editor();e.select(1,1);
+ e.ids.richFilePicker.files=[{type:'application/octet-stream',size:3,name:'Türkçe test.bin',data:'data:application/octet-stream;base64,AQID'}];
+ e.fire('richFilePicker','change');await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(text(e.runs()),'A\uFFFC😀B\nC');
+ assert.deepEqual(JSON.parse(e.ids.richFiles.value),{'new-file:test-uuid':{name:'Türkçe test.bin',data:'AQID'}});
+ e.key('z');e.runs();assert.deepEqual(JSON.parse(e.ids.richFiles.value),{});
+ e.key('y');e.runs();assert.equal(JSON.parse(e.ids.richFiles.value)['new-file:test-uuid'].name,'Türkçe test.bin');
+});
+test('tenant size limit blocks both image and attachment before file reading',async()=>{
+ const e=editor(undefined,2);e.select(1,1);
+ const file={type:'image/png',size:3,name:'a.png',data:'data:image/png;base64,AQID'};
+ e.ids.richImageFile.files=[file];e.fire('richImageFile','change');
+ e.ids.richFilePicker.files=[file];e.fire('richFilePicker','change');
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richFiles.value),{});assert.deepEqual(JSON.parse(e.ids.richImages.value),{});
 });

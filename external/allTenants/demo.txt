@@ -8,3 +8,5 @@ datasource.init-mode=always
 custom.isWritable=true
 custom.newNodeName=New Node
 custom.newNodeTags=
+# Shared size limit for rich-text images and attachments (decimal MB, 1-20).
+custom.maxEmbeddedFileSizeMB=9

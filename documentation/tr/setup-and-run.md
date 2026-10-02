@@ -302,3 +302,19 @@ JDK 17+ kurun, terminali/Komut İstemi'ni kapatıp yeniden açın ve `java -vers
 - macOS üzerinde doğrulanmış kurulum testi
 
 Geliştirme/operasyon profilleri, scheduled task denemeleri ve uzak veritabanı sürücüleri için [isteğe bağlı özellikler](optional-features.md) belgesine bakın.
+
+
+Rich text editöründe resim ve dosya ekleme için tenant TXT dosyasına isteğe bağlı ayar:
+
+```properties
+custom.maxEmbeddedFileSizeMB=9
+```
+
+Dosya başına decimal MB sınırıdır (1 MB = 1.000.000 byte). 1-20 arası tam sayı kabul edilir;
+yoksa veya geçersizse 9 MB kullanılır. Resimlerde kaynak dosya ve PNG'ye dönüştürülmüş sonuç
+ayrı ayrı bu sınıra uymalıdır. Tek kayıtta en fazla 10 yeni nesne ve toplam 20 MB binary
+kabul edilir. Boyut sınırı writable izni vermez; admin ve writable tenant/node kuralları
+aynı kalır. Ayar değişince veri kaynaklarını yeniden yükleyin. Toplam form limiti
+server.tomcat.max-http-form-post-size=32MB; proxy daha düşük bir limit koyuyorsa onu da
+uygun şekilde yapılandırın. Bu uygulama varsayılanı CherryTree veya SQLite'ın kesin bir
+boyut sınırı olarak değerlendirilmemelidir.

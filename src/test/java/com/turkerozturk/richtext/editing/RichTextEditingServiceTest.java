@@ -16,7 +16,7 @@ class RichTextEditingServiceTest {
     private final EntityManager entityManager = mock(EntityManager.class);
     private final Query query = mock(Query.class);
     private final Node node = mock(Node.class);
-    private final RichTextEditingService service = new RichTextEditingService(properties);
+    private final RichTextEditingService service = new RichTextEditingService(properties, new EmbeddedUploadPolicy(new com.turkerozturk.multipledatabases.CustomPropertiesHolder()));
     private final java.sql.Connection connection;
     RichTextEditingServiceTest() throws Exception {
         connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:");
@@ -107,6 +107,19 @@ class RichTextEditingServiceTest {
         assertThat(stored).hasSize(1);
         assertThat(stored.get(0).reference().offset()).isEqualTo(1);
         assertThat(javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream((byte[]) stored.get(0).values()[5])).getWidth()).isEqualTo(1);
+        verify(entityManager).createNativeQuery(contains("has_image = 1"));
+    }
+
+    @Test void savesAttachmentFilenameAndUnchangedBinaryInImageTable() throws Exception {
+        byte[] original = {0, 1, (byte) 255, (byte) 137};
+        String files = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-file:test",
+                java.util.Map.of("name", "Türkçe test.bin", "data", java.util.Base64.getEncoder().encodeToString(original))));
+        service.save(12, "<node><rich_text>😀</rich_text><rich_text __sweet_object='new-file:test'>\uFFFC</rich_text></node>", service.open(12).revision(), "{}", files);
+        var stored = RichTextEditingService.readObjects(connection, 12);
+        assertThat(stored).hasSize(1); assertThat(stored.get(0).reference().offset()).isEqualTo(1);
+        assertThat((byte[]) stored.get(0).values()[5]).isEqualTo(original);
+        assertThat(stored.get(0).values()[6]).isEqualTo("Türkçe test.bin");
+        assertThat(((Number) stored.get(0).values()[8]).longValue()).isPositive();
         verify(entityManager).createNativeQuery(contains("has_image = 1"));
     }
 

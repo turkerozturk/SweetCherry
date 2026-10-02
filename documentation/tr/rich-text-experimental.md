@@ -360,3 +360,36 @@ PNG/JPEG dosyası ekleyin; varsa panodan ekran görüntüsü yapıştırın. Res
 emoji/metin ekleyin, undo/redo ve görsel/textarea geçişi yapın. Kaydedip SweetCherry ve
 CherryTree'de açın; eski resim/attachment/table/codebox konumlarını kontrol edin. İptalde
 kayıt eklenmediğini, read-only tenant/node ve user hesabında işlemin kapalı kaldığını sınayın.
+
+
+## Attachment ekleme ve ortak tenant boyut sınırı
+
+Dosya ekle düğmesi herhangi bir dosyayı attachment olarak alır; dosyanın MIME tipi onun
+resim olarak yorumlanmasına neden olmaz. Editörde ataç ve dosya adıyla korunan kutu görünür.
+Dosya adı yalnızca basename olarak saklanır; path ve kontrol karakterleri kabul edilmez.
+Binary veri decode sonrası aynen image.png alanına, ad image.filename alanına yazılır.
+anchor ve link boş; justification=left; time kaydetme anındaki Unix saniyesidir. Normal
+okuma görünümü mevcut /download/{node_id}/{offset} bağlantısıyla indirmeyi sağlar.
+Attachment içeriği çalıştırılmaz, parse edilmez veya uzak bir URL'den indirilmez.
+
+Yeni resim ve dosyalar aynı protected-slot/Unicode offset, undo/redo ve transaction
+akışını paylaşır. Yeni dosya undo ile kaldırılırsa Save isteğine dahil edilmez; redo ile
+geri gelir. Sayfa kapatma veya Cancel kayıt oluşturmaz. Kaydetmede tüm eski nesnelerin
+aynı sırada ve tam bir kez bulunması şartı sürer. Nesne silme kilidi henüz eklenmez.
+
+Tenant TXT ayarı custom.maxEmbeddedFileSizeMB=9 resim ve attachment için ortaktır.
+MB decimal olarak yorumlanır. Geçerli aralık 1-20 tam sayıdır; eksik/geçersiz ayar 9 MB'a
+döner. Kaydetmede ayar yeniden okunur; frontend sınırı değiştirilerek aşılamaz. Resim
+kaynak verisi ve normalize PNG ayrı ayrı limite uymalıdır. Dosyanın binary verisi üzerinde
+boyut kontrolü uygulanır. Bir Save işleminde toplam en fazla 10 yeni nesne, 20 MB binary
+ve iki payload JSON alanı birlikte 30 milyon karakter kabul edilir. HTTP/proxy form
+boyutu limitleri ayrıca geçerlidir; base64/form kodlaması binary dosyadan daha büyüktür.
+Bu sınırlar SweetCherry uygulama politikasıdır; SQLite/CherryTree'nin kesin sınırı değildir.
+
+Beklenen Java test sayısı 147; Node test sayısı 18:
+`node --test src/test/js/*.test.cjs`.
+Manuel test: CTB kopyasında PDF, TXT ve binary dosya ekleyin; emoji/metin ve mevcut
+nesneler arasında konumlandırın. Undo/redo ve Cancel ardından Save davranışını kontrol
+edin. SweetCherry'den indirip orijinal dosyayla byte/hash karşılaştırın; CherryTree'de de
+attachment görünümünü ve açılmasını kontrol edin. Tenant sınırını 1 yapıp veri kaynaklarını
+yeniden yükleyin; 1 MB üstü dosya ve resmin reddini deneyin. Sonra ayarı geri alın.

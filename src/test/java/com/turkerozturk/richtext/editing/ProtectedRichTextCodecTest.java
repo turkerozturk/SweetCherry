@@ -66,4 +66,10 @@ class ProtectedRichTextCodecTest {
         assertThatThrownBy(() -> codec.save(new RichTextDocument(List.of(marker("new-image:test", 0), marker("new-image:test", 1))), List.of(), keys)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> codec.save(new RichTextDocument(List.of()), List.of(), keys)).isInstanceOf(IllegalArgumentException.class);
     }
+    @Test void placesAttachmentAndImageSlotsWithIndependentFinalOffsets() {
+        var doc = new RichTextDocument(List.of(marker("new-file:test", 0), new RichTextDocument.TextRun("😀", Map.of(), 1), marker("new-image:test", 2)));
+        var saved = codec.save(doc, List.of(), java.util.Set.of("new-file:test", "new-image:test"));
+        assertThat(saved.newImages()).containsEntry("new-file:test", 0).containsEntry("new-image:test", 2);
+        assertThat(saved.text().runs().get(0).text()).isEqualTo("😀");
+    }
 }

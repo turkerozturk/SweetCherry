@@ -15,6 +15,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="hidden" name="revision" th:value="${editor.revision}">
 <input type="hidden" name="xml" id="richXml">
 <input type="hidden" name="images" id="richImages" value="{}">
+<input type="hidden" name="files" id="richFiles" value="{}">
 <label><input type="checkbox" id="richVisualMode" checked> <span th:text="#{richtext.edit.visual}"></span></label>
 <div class="toolbar">
 <button type="button" id="richUndo" th:text="#{richtext.edit.undo}" title="Ctrl+Z"></button>
@@ -30,6 +31,9 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <select data-choice="justification" th:aria-label="#{richtext.edit.align}"><option value="left" th:text="#{richtext.edit.left}"></option><option value="center" th:text="#{richtext.edit.center}"></option><option value="right" th:text="#{richtext.edit.right}"></option><option value="fill" th:text="#{richtext.edit.justify}"></option></select>
 <button type="button" id="richAddImage" th:text="#{richtext.edit.addImage}"></button>
 <input type="file" id="richImageFile" accept="image/png,image/jpeg" hidden>
+<button type="button" id="richAddFile" th:text="#{richtext.edit.addFile}"></button>
+<input type="file" id="richFilePicker" hidden>
+<span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
 <span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError}"></span>
 <button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
 </div>
@@ -39,7 +43,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 </form>
-<script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
+<script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/node/richTextEditor.js"></script>
 </body></html>
