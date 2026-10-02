@@ -13,6 +13,12 @@
         function visit(node, inherited) {
             if (node.nodeType === 3) { add(node.nodeValue, inherited, node); return; }
             if (node.nodeType !== 1) return;
+            if (node.dataset && node.dataset.richObject) {
+                const start = offset;
+                add('\uFFFC', {__sweet_object:node.dataset.richObject});
+                positions.set(node,{start,end:offset,boundaries:[start,offset]});
+                return;
+            }
             let attributes = inherited;
             if (node.dataset && node.dataset.richAttributes) {
                 try { attributes = JSON.parse(node.dataset.richAttributes); } catch (_) { attributes = inherited; }

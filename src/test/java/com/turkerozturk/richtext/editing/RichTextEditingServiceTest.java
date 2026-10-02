@@ -17,7 +17,20 @@ class RichTextEditingServiceTest {
     private final Query query = mock(Query.class);
     private final Node node = mock(Node.class);
     private final RichTextEditingService service = new RichTextEditingService(properties);
-    RichTextEditingServiceTest() {
+    private final java.sql.Connection connection;
+    RichTextEditingServiceTest() throws Exception {
+        connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:");
+        try (var statement = connection.createStatement()) {
+            statement.execute("CREATE TABLE image (node_id INTEGER, offset INTEGER, justification TEXT, anchor TEXT, png BLOB, filename TEXT, link TEXT, time INTEGER)");
+            statement.execute("CREATE TABLE grid (node_id INTEGER, offset INTEGER, txt TEXT)");
+            statement.execute("CREATE TABLE codebox (node_id INTEGER, offset INTEGER, txt TEXT)");
+        }
+        var session = mock(org.hibernate.Session.class);
+        when(entityManager.unwrap(org.hibernate.Session.class)).thenReturn(session);
+        when(session.doReturningWork(any())).thenAnswer(call -> {
+            org.hibernate.jdbc.ReturningWork<?> work = call.getArgument(0);
+            return work.execute(connection);
+        });
         ReflectionTestUtils.setField(service, "entityManager", entityManager);
         when(properties.writable()).thenReturn(true);
         when(properties.realNode(12)).thenReturn(node);
@@ -27,6 +40,14 @@ class RichTextEditingServiceTest {
         when(query.setParameter(anyString(), any())).thenReturn(query);
         when(query.getSingleResult()).thenReturn(0L);
         when(query.executeUpdate()).thenReturn(1);
+    }
+
+    @org.junit.jupiter.api.AfterEach void closeConnection() throws Exception { connection.close(); }
+
+    private void addImage() {
+        try (var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO image VALUES (12, 1, 'left', '', X'0102', '', '', 0)");
+        } catch (java.sql.SQLException error) { throw new IllegalStateException(error); }
     }
 
     @Test void opensPlainTextAsTextModelWithoutWriting() {
@@ -51,10 +72,25 @@ class RichTextEditingServiceTest {
         assertThatThrownBy(() -> service.open(12)).isInstanceOf(AccessDeniedException.class);
     }
 
-    @Test void rejectsEmbeddedObjectsEvenWhenFlagsAreMissing() {
-        when(query.getSingleResult()).thenReturn(1L);
-        assertThatThrownBy(() -> service.open(12)).isInstanceOf(ResponseStatusException.class);
+    @Test void protectsExistingObjectsEvenWhenFlagsAreMissing() {
+        addImage();
+        var editor = service.open(12);
+        assertThat(editor.document().runs()).anySatisfy(run -> assertThat(run.attributes()).containsEntry("__sweet_object", "image:1"));
+        assertThatThrownBy(() -> service.save(12, "<node><rich_text>Removed</rich_text></node>", editor.revision()))
+                .isInstanceOf(ResponseStatusException.class);
         verify(query, never()).executeUpdate();
+    }
+
+    @Test void savesTextAndMovesObjectKeysThroughTemporaryOffsets() {
+        addImage();
+        var editor = service.open(12);
+        service.save(12, "<node><rich_text>ZZT</rich_text><rich_text __sweet_object='image:1'>\uFFFC</rich_text><rich_text>ext</rich_text></node>", editor.revision());
+        verify(query).setParameter("from", 1);
+        verify(query).setParameter("to", -2);
+        verify(query).setParameter("from", -2);
+        verify(query).setParameter("to", 3);
+        verify(query, times(3)).executeUpdate();
+        verify(entityManager).clear();
     }
 
     @Test void rejectsUnsupportedTypeAndAliasFromRealNodeGuard() {

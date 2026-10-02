@@ -27,3 +27,11 @@ test('restored visual selection never splits a surrogate pair',()=>{
  editor.ownerDocument={createRange:()=>({setStart(node,offset){start=[node,offset];},setEnd(node,offset){end=[node,offset];}}),getSelection:()=>({removeAllRanges(){},addRange(){}})};
  model.restore(editor,1,2);assert.equal(start[0],value);assert.equal(start[1],1);assert.equal(end[1],3);
 });
+
+test('protected object DOM becomes one marker, not its image or label text',()=>{
+ const slot=element('SPAN',[element('IMG')]);slot.dataset.richObject='image:12';
+ const editor=root([element('DIV',[element('SPAN',[text('A')],{}),slot,element('SPAN',[text('B')],{})])]);
+ const runs=model.scan(editor).runs;
+ assert.equal(runs.map(run=>run.text).join(''),'A\uFFFCB');
+ assert.deepEqual(runs[1].attributes,{__sweet_object:'image:12'});
+});

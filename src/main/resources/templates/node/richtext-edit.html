@@ -8,6 +8,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <body>
 <h1 th:text="#{richtext.edit.title}"></h1><strong th:text="${editor.node.name}"></strong>
 <p class="note" th:text="#{richtext.edit.help}"></p>
+<p id="protectedHint" class="note" th:hidden="${#maps.isEmpty(editor.objects)}" th:text="#{richtext.edit.protected}"></p>
 <p class="note" th:if="${editor.node.syntax == 'plain-text'}" th:text="#{richtext.edit.convert}"></p>
 <form id="richEditForm" th:action="@{/nodes/richtext/edit/{id}(id=${editor.node.nodeId})}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
@@ -34,7 +35,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 </form>
-<script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []};</script>
+<script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/node/richTextEditor.js"></script>
 </body></html>

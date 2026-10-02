@@ -274,3 +274,56 @@ liste, nesne ekleme/silme ve rich text nesnelerini düzenleme bu aşamaya dahil 
 Java test sayısı 124 kalır. Node testleri toplam 12 olur:
 `node --test src/test/js/*.test.cjs`. Manuel test: görsel ve textarea görünümü arasında
 geçiş, metin/biçim, Enter, boş satır, emoji, cut/paste, undo/redo, save/reopen ve CherryTree.
+
+
+## Mevcut nesneleri koruyarak metin düzenleme
+
+Rich text editörü artık resim, ek dosya, çapa, tablo ve codebox içeren gerçek düğümlerin
+metinlerini düzenleyebilir. Admin, writable tenant ve düğümün read-only olmaması koşulları
+aynı kalır. Görsel düzenlemede resimler küçük önizlemeyle, diğer nesneler adlandırılmış
+korunan kutularla gösterilir. Bu aşamada nesne ekleme, silme veya yeniden sıralama yoktur.
+Textarea görünümünde her nesne tek bir korunan U+FFFC karakteriyle temsil edilir.
+
+`ProtectedRichTextCodec` metin parçaları ile nesneleri ortak Unicode code-point konumlarına
+yerleştirir. Kaydetmede mevcut nesnelerin tam bir kez ve aynı sırada bulunduğunu doğrular;
+nesne işaretçilerini XML'den çıkarır ve yeni CTB buffer offset'lerini hesaplar. Editöre özel
+`__sweet_object` attribute'u veritabanına yazılmaz. Bilinmeyen metin attribute'ları korunur.
+
+Metin, rich-text biti, ts_lastsave ve image/grid/codebox offset'leri aynı transaction içinde
+kaydedilir. Composite key çakışmalarını önlemek için offset'ler önce geçici negatif değerlere,
+sonra nihai konumlarına taşınır. Yalnızca offset sütunu güncellenir; binary payload, dosya adı,
+anchor, link, tablo ve codebox verileri değiştirilmez. Bir kayıt bulunamazsa işlem geri alınır.
+Revizyon kontrolü bütün nesne alanlarını da kapsar; editör açıkken dışarıdan yapılan değişiklik
+eski sayfadan sessizce ezilmez. CTB nesne konumlarının geçerli ve benzersiz olması gerekir.
+
+Yeni testlerle Java test sayısı 131, Node test sayısı 13 olur. Node testleri Maven sayısına
+dahil değildir: `node --test src/test/js/*.test.cjs`.
+Manuel kontrolü demo.ctb'nin bir kopyasında yapın: 53 numaralı düğümde nesnelerden önce ve
+nesneler arasına metin/emoji ekleyin; biçim verin, undo/redo yapın ve kaydedin. SweetCherry
+ve CherryTree'de tekrar açıp resim, dosya indirme, çapa, tablo ve codebox'ın yerlerini ve
+verilerini kontrol edin. Nesne kutusunu silme girişimi engellenmelidir.
+
+
+### SQLite binary okuma düzeltmesi
+
+Nesne revizyonu için image.png alanı okunurken Hibernate'in BLOB çıkarımı SQLite JDBC'de
+`SQLFeatureNotSupportedException` oluşturabiliyordu. Sorgu artık binary sütunu nullable hex
+metni olarak döndürür; servis bunu byte dizisine çevirerek aynı revizyon hesabında kullanır.
+NULL ve boş binary birbirinden ayrılır. Veritabanında payload değişikliği yapılmaz.
+`SqliteObjectPayloadTest` gerçek SQLite JDBC bağlantısıyla binary/boş/NULL okumasını sınar;
+bu ek testle beklenen Java test sayısı 132 olur.
+
+
+### Karışık nesne kayıtlarında JDBC okuma
+
+Hex sorgusu driver seviyesinde çalışsa da Hibernate'in otomatik scalar type discovery
+mekanizması karışık CTB kayıtlarında bir sütunu Decimal olarak okuyabiliyordu. Nesne
+okuma artık Session.doReturningWork ile mevcut tenant transaction'ının bağlantısını
+kullanır. image.png getBytes ile, diğer sütunlar SQLite getObject ile okunur. Hibernate
+BLOB/Decimal çıkarımı bu yolda kullanılmaz. Bağlantı servis tarafından kapatılmaz;
+statement ve result set kaynakları try-with-resources ile kapatılır.
+
+SqliteObjectPayloadTest artık üretimde kullanılan readObjects metodunu doğrudan çağırır;
+aynı düğümde NULL anchor payload, boş payload, PNG binary, attachment, binary tablo verisi
+ve codebox metnini birlikte sınar. Servis testleri de gerçek bellekte SQLite bağlantısıyla
+bu okuyucuyu kullanır. Test sayısı 132 kalır. Anchor ikonlarının gösterimi değiştirilmez.

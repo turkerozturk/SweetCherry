@@ -89,6 +89,16 @@
 
     /** Splits runs at editing boundaries, keeping unmodified attributes and empty runs outside the edit. */
     function replace(start, end, text) {
+        let protectedOffset = 0;
+        for (const run of runs) {
+            const finish = protectedOffset + count(run.text);
+            if (run.attributes.__sweet_object && start < finish && end > protectedOffset) {
+                const hint = document.getElementById('protectedHint');
+                if (hint) hint.hidden = false;
+                return false;
+            }
+            protectedOffset = finish;
+        }
         const before = [], after = [];
         let offset = 0, attributes = {};
         for (const run of runs) {
@@ -102,14 +112,18 @@
             }
             offset = finish;
         }
+        delete attributes.__sweet_object;
         runs = [...before, ...(text ? [{text, attributes}] : []), ...after];
+        return true;
     }
     input.addEventListener('input', () => {
         const oldChars = Array.from(previous), newChars = Array.from(input.value);
         let start = 0, tail = 0;
         while (start < oldChars.length && start < newChars.length && oldChars[start] === newChars[start]) start++;
         while (tail < oldChars.length - start && tail < newChars.length - start && oldChars[oldChars.length - 1 - tail] === newChars[newChars.length - 1 - tail]) tail++;
-        replace(start, oldChars.length - tail, newChars.slice(start, newChars.length - tail).join(''));
+        if (!replace(start, oldChars.length - tail, newChars.slice(start, newChars.length - tail).join(''))) {
+            input.value = previous; restoreSelection(); return;
+        }
         previous = input.value;
         rememberSelection(); render();
         if (!composing) commitHistory();
@@ -131,7 +145,7 @@
         const selected = [];
         for (const run of runs) {
             const finish = offset + count(run.text);
-            if (finish <= start || offset >= end) output.push(run);
+            if (run.attributes.__sweet_object || finish <= start || offset >= end) output.push(run);
             else {
                 const from = Math.max(start, offset) - offset, to = Math.min(end, finish) - offset;
                 if (from) output.push({text: sub(run.text, 0, from), attributes: {...run.attributes}});
@@ -171,6 +185,22 @@
             paragraph = document.createElement('div'); paragraph.style.margin = '0';
         }
         for (const run of runs) {
+          if (run.attributes.__sweet_object) {
+            const key = run.attributes.__sweet_object;
+            const object = (window.richEditorObjects || {})[key] || {label:key};
+            const slot = document.createElement('span');
+            slot.dataset.richObject = key; slot.contentEditable = 'false';
+            slot.style.display = 'inline-block'; slot.style.border = '1px solid #aaa'; slot.style.padding = '4px';
+            slot.title = object.label;
+            if (object.imageUrl) {
+                const image = document.createElement('img');
+                image.src = object.imageUrl + '?_tenantView=' + encodeURIComponent(window.richEditorTenant || '');
+                image.alt = object.label; image.style.maxWidth = '100%'; image.style.maxHeight = '220px';
+                image.draggable = false; slot.appendChild(image);
+            } else slot.textContent = '[' + object.label + ']';
+            paragraph.appendChild(slot);
+            continue;
+          }
           const lines = run.text.split('\n');
           for (let index = 0; index < lines.length; index++) {
             const span = document.createElement('span'), a = run.attributes;
@@ -211,7 +241,7 @@
     /** Applies plain text input to the same model/history used by the textarea mode. */
     function visualChange(text, start = selection[0], end = selection[1]) {
         captureSelection();
-        replace(start,end,text);
+        if (!replace(start,end,text)) return;
         previous = runs.map(run=>run.text).join(''); input.value = previous;
         selection = [start + count(text), start + count(text)];
         render(); focusEditor(); restoreSelection(); commitHistory();
@@ -256,7 +286,10 @@
         });
         preview.addEventListener('input',()=>{
             if (!visual()) return;
-            runs=window.RichTextVisualModel.scan(preview).runs;
+            const incoming=window.RichTextVisualModel.scan(preview).runs;
+            const keys=list=>list.filter(run=>run.attributes.__sweet_object).map(run=>run.attributes.__sweet_object);
+            if (JSON.stringify(keys(incoming)) !== JSON.stringify(keys(runs))) {render();restoreSelection();return;}
+            runs=incoming;
             previous=runs.map(run=>run.text).join('');input.value=previous;
             rememberSelection(); if (!composing) commitHistory();
         });
