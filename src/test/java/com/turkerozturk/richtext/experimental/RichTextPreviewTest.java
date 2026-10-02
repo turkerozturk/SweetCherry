@@ -116,4 +116,22 @@ class RichTextPreviewTest {
         }
     }
 
+    @Test void embedsStylesAndConvertsSameNodeAnchorToPanelFragment() {
+        var node = node(53, 53);
+        when(node.getTxt()).thenReturn("<node><rich_text link='node 53 capalink'>Anchor</rich_text></node>");
+        var result = service.compare(53, "token");
+        assertThat(result.experimental().html()).contains("about:srcdoc#capalink", "target=\"_self\"", "hljs", "img-src data:")
+                .doesNotContain("rel=\"stylesheet\"");
+    }
+
+    @Test void embedsLegacyImageBytesInsteadOfRequestingFromOpaqueOrigin() {
+        var node = node(53, 53);
+        when(legacy.parseNodeTxt(node)).thenReturn("<img src='/images/53/1912'>");
+        var image = mock(com.turkerozturk.image.Image.class);
+        when(image.getPng()).thenReturn(new byte[]{1, 2, 3});
+        when(images.findByNodeIdAndOffset(53L, 1912)).thenReturn(java.util.Optional.of(image));
+        assertThat(service.compare(53, "token").legacy().html()).contains("data:image/png;base64,AQID")
+                .doesNotContain("src=\"/images/");
+    }
+
 }

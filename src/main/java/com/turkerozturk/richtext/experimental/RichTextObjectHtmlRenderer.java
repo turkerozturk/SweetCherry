@@ -82,7 +82,7 @@ public final class RichTextObjectHtmlRenderer {
             }
             case ANCHOR -> {
                 if (!(payload instanceof EmbeddedContent.Anchor anchor)) throw mismatch(ref);
-                yield "<span id=\"" + escape(anchor.name()) + "\" class=\"rich-text-anchor\"></span>";
+                yield "<span id=\"" + escape(anchor.name()) + "\" class=\"rich-text-anchor\" aria-label=\"Anchor\">⚓</span>";
             }
             case CODEBOX -> {
                 if (!(payload instanceof EmbeddedContent.CodeBox box)) throw mismatch(ref);

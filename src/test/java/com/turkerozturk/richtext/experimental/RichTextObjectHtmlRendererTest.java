@@ -97,4 +97,10 @@ class RichTextObjectHtmlRendererTest {
         } finally { highlighter.setSyntaxHighlightingEnabled(previous); }
     }
 
+    @Test void displaysAnchorMarkerAtItsActualObjectPosition() {
+        var ref = new EmbeddedObject(ObjectKind.ANCHOR, 53, 0);
+        assertThat(renderer.render(layout(ref), Map.of(ref, new EmbeddedContent.Anchor("capalink")), "token"))
+                .contains("id=\"capalink\"", "⚓");
+    }
+
 }

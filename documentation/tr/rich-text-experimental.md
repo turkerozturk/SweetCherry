@@ -163,3 +163,17 @@ korunur. Bu davranış görsel karşılaştırmada ayrıca kontrol edilmelidir.
 
 Beş test eklenir; önceki 98 üzerine toplam 103 beklenir. Eski parser'ın iç algoritması
 değişmez; önizlemenin bağlantı politikası iki panel için güncellenir.
+
+## Sandbox kaynakları ve aynı düğüm anchor'ları
+
+Sandbox'ta `allow-same-origin` yoktur; iframe'in opaque origin'i nedeniyle önceki
+`img-src 'self'` ve `style-src 'self'` yerel kaynakları engelleyebilirdi. Önizleme artık
+highlight CSS'ini style içine, eski panelin aynı içerik düğümüne ait resimlerini PNG data
+URI içine gömer. CSP yalnızca data resimlerine ve inline stillere izin verir; network
+kaynaklarına veya düğüm scriptlerine izin verilmez. Parent sayfanın güvenilir highlight.js
+işlemi aynı biçimde devam eder. Kaynak haritası yorumları gömülen CSS'ten kaldırılır.
+
+Aynı içerik ID'sine yönelik node+anchor bağlantısı `about:srcdoc#anchor` ve `_self`
+olarak hazırlanır; ilgili iframe içinde kaydırılır. Diğer düğüm bağlantıları yeni sekmede
+kalır. Anchor nesnesi konumunda ⚓ gösterilir. Alias önizlemede karşılaştırma master
+content ID üzerinden yapılır. Üç test eklenir; toplam 106 beklenir.
