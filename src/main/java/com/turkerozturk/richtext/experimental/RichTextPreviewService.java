@@ -72,13 +72,14 @@ public class RichTextPreviewService {
     /** Makes comparison output non-interactive; the iframe sandbox remains the security boundary. */
     private String previewHtml(String html) {
         var document = org.jsoup.Jsoup.parse(html);
+        document.outputSettings().prettyPrint(false);
         document.select("script,iframe,object,embed,base,meta,link,form").remove();
         document.select("a").removeAttr("href").removeAttr("target");
         document.select("input,button,select,textarea").attr("disabled", "disabled");
         document.head().appendElement("meta").attr("charset", "UTF-8");
         document.head().appendElement("meta").attr("http-equiv", "Content-Security-Policy")
                 .attr("content", "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'");
-        document.head().appendElement("style").text("body{margin:12px;font-family:system-ui,sans-serif;overflow-wrap:anywhere;}"
+        document.head().appendElement("style").text("body{margin:12px;font-family:system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;}"
                 + "img{max-width:100%;height:auto;}table{border-collapse:collapse;}td,th{border:1px solid #ccc;padding:4px;}"
                 + "pre{max-width:100%;overflow-x:auto;}");
         return document.outerHtml();

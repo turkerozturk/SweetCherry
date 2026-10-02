@@ -128,3 +128,16 @@ boş satır, link metni, resim, ek dosya, anchor, tablo ve codebox sırası kar�
 Yeni parser'ın henüz desteklemediği biçimler önceki bölümlerde listelenmiştir.
 
 Bu yamada sekiz test eklenir; önceki 87 üzerine toplam 95 beklenir.
+
+## Önizleme düzeltmesi: anchor kayıtları ve satır sonları
+
+Image tablosunda anchor kayıtlarının `png` alanı NULL olabilir. Image entity'sindeki
+`@PostLoad` metadata hesabı artık bu kayıtları sıfır byte olarak kabul eder; binary veri
+veya veritabanı değiştirilmez. Böylece tüm image-table kayıtlarını okuyan deneysel yol,
+anchor'ları yüklerken durmaz. Örnekteki sekiz anchor kaydı bu durumdadır.
+
+Önizleme HTML'inin Jsoup pretty-print işlemi kapatıldı; iki panelde de `white-space:pre-wrap`
+kullanılır. XML'deki gerçek newline ve tekrarlı boşlukların korunması test edilir.
+Hata izolasyon testlerinin bilerek bozuk XML/exception kullanması WARN logu üretir;
+bu loglar test başarısızlığı değildir. Manuel önizlemede oluşan WARN ise gerçek sorundur.
+Bu düzeltmede üç test eklenir; önceki 95 üzerine toplam 98 beklenir.

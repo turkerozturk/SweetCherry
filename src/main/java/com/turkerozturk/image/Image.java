@@ -69,10 +69,11 @@ public class Image implements Serializable {
     @Transient
     private String fileExtension;
 
+    /** Derives display metadata; anchor rows legitimately have no binary payload. */
     @PostLoad
     private void doAfterInitialization() {
-        fileSize = png.length;
-        fileExtension = StringHelper.getFileExtension(fileName);
+        fileSize = png == null ? 0 : png.length;
+        fileExtension = StringHelper.getFileExtension(fileName == null ? "" : fileName);
     }
 
     // Getter ve setter metotları

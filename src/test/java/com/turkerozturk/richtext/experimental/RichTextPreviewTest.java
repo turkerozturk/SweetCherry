@@ -105,4 +105,15 @@ class RichTextPreviewTest {
                 .isEqualTo("redirect:/");
         verifyNoInteractions(service);
     }
+    @Test void previewKeepsNewlinesAndRepeatedSpacesInBothPanes() {
+        var node = node(53, 53);
+        when(node.getTxt()).thenReturn("<node><rich_text>first\n\n  second\nthird</rich_text></node>");
+        when(legacy.parseNodeTxt(node)).thenReturn("<span>first\n\n  second\nthird</span>");
+        var result = service.compare(53, "token");
+        for (var pane : List.of(result.legacy(), result.experimental())) {
+            assertThat(pane.failed()).isFalse();
+            assertThat(pane.html()).contains("first\n\n  second\nthird", "white-space:pre-wrap");
+        }
+    }
+
 }
