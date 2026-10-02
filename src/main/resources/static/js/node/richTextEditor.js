@@ -9,9 +9,19 @@
     const count = value => Array.from(value).length;
     const sub = (value, start, end) => Array.from(value).slice(start, end).join('');
     let selection = [0, 0];
+    const mode = document.getElementById('richVisualMode');
+    const visual = () => !!(mode && mode.checked && window.RichTextVisualModel);
+    function focusEditor() { if (visual()) preview.focus(); else input.focus(); }
+    function restoreSelection() {
+        if (visual()) window.RichTextVisualModel.restore(preview, selection[0], selection[1]);
+        else input.setSelectionRange(sub(previous,0,selection[0]).length,sub(previous,0,selection[1]).length);
+    }
     /** Tracks textarea UTF-16 selection as model code-point positions before toolbar focus changes. */
     function rememberSelection() {
-        selection = [count(input.value.slice(0, input.selectionStart)), count(input.value.slice(0, input.selectionEnd))];
+        if (visual()) {
+            const current = window.RichTextVisualModel.selection(preview);
+            if (current) selection = current;
+        } else selection = [count(input.value.slice(0, input.selectionStart)), count(input.value.slice(0, input.selectionEnd))];
     }
     input.addEventListener('select', rememberSelection);
     input.addEventListener('keyup', rememberSelection);
@@ -53,13 +63,15 @@
         previous = runs.map(run => run.text).join('');
         input.value = previous;
         selection = [...state.selection];
-        input.focus();
-        input.setSelectionRange(sub(previous, 0, selection[0]).length, sub(previous, 0, selection[1]).length);
-        render(); updateHistoryButtons();
+        render(); focusEditor(); restoreSelection(); updateHistoryButtons();
     }
     form.addEventListener('keydown', event => {
         if (!(event.ctrlKey || event.metaKey) || event.altKey || event.isComposing) return;
         const key = event.key.toLowerCase();
+        const shortcuts = {b:['weight','heavy'],i:['style','italic'],u:['underline','single']};
+        if (visual() && shortcuts[key]) {
+            event.preventDefault(); rememberSelection(); format(...shortcuts[key],true); return;
+        }
         if (key === 'z' || key === 'y') {
             event.preventDefault();
             restoreHistory(key === 'y' || event.shiftKey ? 1 : -1);
@@ -136,7 +148,7 @@
             } else if (remove || !value) delete run.attributes[key];
             else run.attributes[key] = value;
         }
-        runs = output; render(); commitHistory(); input.focus();
+        runs = output; render(); commitHistory(); focusEditor(); restoreSelection();
     }
     document.querySelectorAll('[data-format]').forEach(button => {
         button.addEventListener('pointerdown', event => event.preventDefault());
@@ -163,6 +175,7 @@
           for (let index = 0; index < lines.length; index++) {
             const span = document.createElement('span'), a = run.attributes;
             span.textContent = lines[index];
+            span.dataset.richAttributes = JSON.stringify(a);
             if (a.weight === 'heavy') span.style.fontWeight = 'bold';
             if (a.style === 'italic') span.style.fontStyle = 'italic';
             span.style.textDecoration = [a.underline === 'single' ? 'underline' : '', a.strikethrough === 'true' ? 'line-through' : ''].filter(Boolean).join(' ');
@@ -175,7 +188,7 @@
             const sizes = {h1:'2em',h2:'1.5em',h3:'1.17em',h4:'1em',h5:'.83em',h6:'.67em',small:'.83em',sub:'.83em',sup:'.83em'};
             if (sizes[a.scale]) span.style.fontSize = sizes[a.scale];
             if (a.scale === 'sub' || a.scale === 'sup') span.style.verticalAlign = a.scale === 'sup' ? 'super' : 'sub';
-            if (lines[index]) {
+            if (lines[index] || run.text === '') {
                 const align = {left:'left',right:'right',center:'center',fill:'justify'}[a.justification] || 'left';
                 paragraph.style.textAlign = align;
                 paragraph.appendChild(span);
@@ -183,7 +196,7 @@
             if (index < lines.length - 1) flush(true);
           }
         }
-        flush();
+        flush(true);
     }
     /** Serializes the text model to CTB XML; the server validates and canonicalizes it again. */
     form.addEventListener('submit', () => {
@@ -195,5 +208,72 @@
         }
         document.getElementById('richXml').value = new XMLSerializer().serializeToString(xml);
     });
+    /** Applies plain text input to the same model/history used by the textarea mode. */
+    function visualChange(text, start = selection[0], end = selection[1]) {
+        captureSelection();
+        replace(start,end,text);
+        previous = runs.map(run=>run.text).join(''); input.value = previous;
+        selection = [start + count(text), start + count(text)];
+        render(); focusEditor(); restoreSelection(); commitHistory();
+    }
+    if (mode && window.RichTextVisualModel) {
+        const syncMode = () => {
+            input.hidden = visual();
+            const title = document.getElementById('richPreviewTitle');
+            title.textContent = visual() ? title.dataset.visual : title.dataset.preview;
+            document.getElementById('richTextLabel').hidden = visual();
+            preview.contentEditable = visual() ? 'true' : 'false';
+            preview.setAttribute('role', visual() ? 'textbox' : 'region');
+            preview.setAttribute('aria-multiline','true');
+            render(); focusEditor(); restoreSelection();
+        };
+        mode.addEventListener('change',syncMode);
+        preview.addEventListener('keyup',rememberSelection);
+        preview.addEventListener('pointerup',rememberSelection);
+        preview.addEventListener('blur',rememberSelection);
+        preview.addEventListener('beforeinput',event=>{
+            if (!visual()) return;
+            if (event.inputType === 'historyUndo' || event.inputType === 'historyRedo') {
+                event.preventDefault(); restoreHistory(event.inputType === 'historyUndo' ? -1 : 1); return;
+            }
+            captureSelection();
+            if (!event.cancelable || event.isComposing || composing) return;
+            const formats = {formatBold:['weight','heavy'],formatItalic:['style','italic'],formatUnderline:['underline','single'],formatStrikeThrough:['strikethrough','true']};
+            if (formats[event.inputType]) {event.preventDefault();format(...formats[event.inputType],true);return;}
+            let [start,end]=selection;
+            if (event.inputType === 'insertText' || event.inputType === 'insertReplacementText') {
+                event.preventDefault(); visualChange(event.data || '',start,end);
+            } else if (event.inputType === 'insertParagraph' || event.inputType === 'insertLineBreak') {
+                event.preventDefault(); visualChange('\n',start,end);
+            } else if (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward') {
+                event.preventDefault();
+                if (start === end) {
+                    if (event.inputType === 'deleteContentBackward') start=Math.max(0,start-1);
+                    else end=Math.min(count(previous),end+1);
+                }
+                visualChange('',start,end);
+            }
+        });
+        preview.addEventListener('input',()=>{
+            if (!visual()) return;
+            runs=window.RichTextVisualModel.scan(preview).runs;
+            previous=runs.map(run=>run.text).join('');input.value=previous;
+            rememberSelection(); if (!composing) commitHistory();
+        });
+        preview.addEventListener('compositionstart',()=>{captureSelection();composing=true;});
+        preview.addEventListener('compositionend',()=>{composing=false;commitHistory();});
+        preview.addEventListener('paste',event=>{
+            if (!visual()) return;
+            event.preventDefault();rememberSelection();visualChange(event.clipboardData.getData('text/plain').replace(/\r\n?/g,'\n'));
+        });
+        preview.addEventListener('cut',event=>{
+            if (!visual()) return;
+            rememberSelection(); event.preventDefault();
+            event.clipboardData.setData('text/plain',sub(previous,selection[0],selection[1]));visualChange('');
+        });
+        // HTML/objects are deliberately not accepted through drag-and-drop in this stage.
+        preview.addEventListener('drop',event=>{if(visual())event.preventDefault();});
+        syncMode();
+    }
     render(); commitHistory();
 })();

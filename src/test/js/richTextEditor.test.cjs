@@ -89,3 +89,11 @@ test('preview aligns each paragraph and keeps mixed inline formatting', () => {
     assert.equal(e.ids.richPreview.childNodes[0].style.textAlign,'center');
     assert.equal(e.ids.richPreview.childNodes[0].childNodes[1].style.fontWeight,'bold');
 });
+
+
+test('rendering keeps a final empty paragraph after Enter', () => {
+    const e = editor(); e.type('A\n');
+    assert.equal(e.ids.richPreview.childNodes.length,2);
+    assert.equal(e.ids.richPreview.childNodes[1].childNodes.length,1);
+    assert.equal(text(e.runs()),'A\n');
+});

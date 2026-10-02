@@ -252,3 +252,25 @@ Gerçek editör script'ini küçük DOM test double ile çalıştıran altı reg
 undo-redo, yeni redo kolu, toolbar/kısayol uyumu, native history isteği ve önizleme
 hizalamasını sınar. Bunlar Maven/JUnit sayısına dahil değildir; Java test sayısı 124 kalır.
 Tarayıcıda Ctrl+Z/Y, paste, renk/biçim, save/reopen ve mobil Geri al/Yinele ayrıca denenmelidir.
+
+## İlk görsel düzenleme görünümü
+
+Editörde Görsel düzenleme seçeneği varsayılan olarak açıktır. Aynı araç çubuğu artık biçimli
+metin üzerinde çalışır; seçeneği kapatınca önceki textarea + önizleme görünümüne dönülür.
+İki görünüm aynı model ve undo/redo geçmişini paylaşır; backend kayıt yolu değişmez.
+Bu birinci görsel sürüm sadece metin/biçim içindir; nesne içeren düğüm kısıtı devam eder.
+
+Enter/newline, emoji ve karakter silme, seçili metni değiştirme, paste/cut ve CTRL+B/I/U
+model üzerinden işlenir. Paste düz metin alır; dışarıdan HTML, script veya nesne aktarmaz.
+Drag-and-drop bu aşamada devre dışıdır. Native/IME düzenlemelerinde DOM metni ve korunmuş
+attribute metadata'sı modele okunur. Script/HTML, kayıt formatı olarak kullanılmaz.
+Bilinen/bilinmeyen mevcut attribute'lar metin parçalarıyla birlikte taşınır. Son boş paragraf
+ve boş attributed span korunur. Seçimler DOM UTF-16 konumundan Unicode code point'e çevrilir.
+
+Bu custom editör henüz olgun bir masaüstü editörünün tüm davranışlarını sağlamaz. Mobil
+IME, selection, paste ve tarayıcı undo davranışı ayrıca manuel denenmelidir. Link ekleme,
+liste, nesne ekleme/silme ve rich text nesnelerini düzenleme bu aşamaya dahil değildir.
+
+Java test sayısı 124 kalır. Node testleri toplam 12 olur:
+`node --test src/test/js/*.test.cjs`. Manuel test: görsel ve textarea görünümü arasında
+geçiş, metin/biçim, Enter, boş satır, emoji, cut/paste, undo/redo, save/reopen ve CherryTree.
