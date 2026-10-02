@@ -13,18 +13,53 @@ public final class RichTextObjectHtmlRenderer {
 
     /** Requires a tenant-view token for download links; images are embedded PNG snapshots. */
     public String render(RichTextLayout layout, Map<EmbeddedObject, EmbeddedContent> contents, String tenantView) {
-        var html = new StringBuilder("<div class=\"rich-text-preview\" style=\"white-space:pre-wrap;overflow-wrap:anywhere\">");
+        var html = new StringBuilder("<div class=\"rich-text-preview\" style=\"overflow-wrap:anywhere\">");
+        var paragraph = new StringBuilder();
+        String alignment = "left";
+        boolean afterBlock = false;
         for (var part : layout.parts()) {
             if (part instanceof TextPart text) {
-                html.append(textRenderer.renderContent(new RichTextDocument(List.of(text.run()))));
+                var run = text.run();
+                String value = run.text();
+                if (afterBlock && value.startsWith("\n")) value = value.substring(1);
+                if (!value.isEmpty()) afterBlock = false;
+                String align = switch (run.attributes().getOrDefault("justification", "")) {
+                    case "right" -> "right"; case "center" -> "center"; case "fill" -> "justify"; default -> "left";
+                };
+                String[] lines = value.split("\n", -1);
+                for (int i = 0; i < lines.length; i++) {
+                    if (!lines[i].isEmpty()) {
+                        alignment = align;
+                        var fragment = new RichTextDocument.TextRun(lines[i], run.attributes(), 0);
+                        paragraph.append(textRenderer.renderContent(new RichTextDocument(List.of(fragment)), tenantView));
+                    }
+                    if (i < lines.length - 1) {
+                        appendParagraph(html, paragraph, alignment, true);
+                        alignment = "left";
+                    }
+                }
             } else {
                 var ref = ((ObjectPart) part).object();
                 var payload = contents.get(ref);
                 if (payload == null) throw new IllegalArgumentException("Missing object payload: " + ref);
-                html.append(renderObject(ref, payload, tenantView));
+                if (ref.kind() == ObjectKind.TABLE || ref.kind() == ObjectKind.CODEBOX) {
+                    appendParagraph(html, paragraph, alignment, false);
+                    html.append(renderObject(ref, payload, tenantView));
+                    afterBlock = true;
+                    alignment = "left";
+                } else paragraph.append(renderObject(ref, payload, tenantView));
             }
         }
+        appendParagraph(html, paragraph, alignment, false);
         return html.append("</div>").toString();
+    }
+
+    /** Formats a complete line once, so mixed inline styles do not break paragraph alignment. */
+    private void appendParagraph(StringBuilder html, StringBuilder paragraph, String alignment, boolean keepEmpty) {
+        if (paragraph.length() == 0 && !keepEmpty) return;
+        html.append("<div style=\"white-space:pre-wrap;text-align:").append(alignment).append(";margin:0\">")
+                .append(paragraph.length() == 0 ? "<br>" : paragraph).append("</div>");
+        paragraph.setLength(0);
     }
 
     /** Applies kind-specific rendering; stored text, filenames and anchors are always HTML-escaped. */
@@ -39,11 +74,11 @@ public final class RichTextObjectHtmlRenderer {
             }
             case ATTACHMENT -> {
                 if (!(payload instanceof EmbeddedContent.Attachment attachment)) throw mismatch(ref);
-                String label = escape(attachment.filename());
+                String label = "<span aria-hidden=\"true\">📎</span> " + escape(attachment.filename());
                 if (tenantView == null || tenantView.isBlank()) yield "<span class=\"rich-text-attachment\">" + label + "</span>";
                 String url = "/download/" + ref.nodeId() + "/" + ref.bufferOffset() + "?_tenantView="
                         + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
-                yield "<a class=\"rich-text-attachment\" href=\"" + escape(url) + "\">" + label + "</a>";
+                yield "<a class=\"rich-text-attachment\" target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(url) + "\">" + label + "</a>";
             }
             case ANCHOR -> {
                 if (!(payload instanceof EmbeddedContent.Anchor anchor)) throw mismatch(ref);
@@ -51,8 +86,8 @@ public final class RichTextObjectHtmlRenderer {
             }
             case CODEBOX -> {
                 if (!(payload instanceof EmbeddedContent.CodeBox box)) throw mismatch(ref);
-                yield "<div style=\"max-width:100%;overflow-x:auto\"><pre style=\"white-space:pre;margin:0\"><code data-language=\""
-                        + escape(box.syntax()) + "\">" + escape(box.text()) + "</code></pre></div>";
+                yield "<div style=\"max-width:100%;overflow-x:auto\">"
+                        + com.turkerozturk.helpers.highlighter.CodeHighLighter.highlightLanguage(box.syntax(), box.text()) + "</div>";
             }
             case TABLE -> {
                 if (!(payload instanceof EmbeddedContent.Table table)) throw mismatch(ref);

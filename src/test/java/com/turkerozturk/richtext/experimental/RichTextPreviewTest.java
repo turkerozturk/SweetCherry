@@ -112,7 +112,7 @@ class RichTextPreviewTest {
         var result = service.compare(53, "token");
         for (var pane : List.of(result.legacy(), result.experimental())) {
             assertThat(pane.failed()).isFalse();
-            assertThat(pane.html()).contains("first\n\n  second\nthird", "white-space:pre-wrap");
+            assertThat(pane.html()).contains("first", "  second", "third", "white-space:pre-wrap");
         }
     }
 

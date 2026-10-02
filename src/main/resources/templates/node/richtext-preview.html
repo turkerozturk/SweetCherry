@@ -30,15 +30,17 @@
     <section>
         <h2 th:text="#{richtext.preview.legacy}">Existing parser</h2>
         <p class="error" th:if="${preview.legacy.failed}" th:text="#{richtext.preview.failed}"></p>
-        <iframe th:unless="${preview.legacy.failed}" sandbox="" referrerpolicy="no-referrer"
+        <iframe th:unless="${preview.legacy.failed}" sandbox="allow-popups allow-popups-to-escape-sandbox allow-downloads" referrerpolicy="no-referrer"
                 th:title="#{richtext.preview.legacy}" th:srcdoc="${preview.legacy.html}"></iframe>
     </section>
     <section>
         <h2 th:text="#{richtext.preview.experimental}">Experimental parser</h2>
         <p class="error" th:if="${preview.experimental.failed}" th:text="#{richtext.preview.failed}"></p>
-        <iframe th:unless="${preview.experimental.failed}" sandbox="" referrerpolicy="no-referrer"
+        <iframe th:unless="${preview.experimental.failed}" sandbox="allow-popups allow-popups-to-escape-sandbox allow-downloads" referrerpolicy="no-referrer"
                 th:title="#{richtext.preview.experimental}" th:srcdoc="${preview.experimental.html}"></iframe>
     </section>
 </main>
+<script src="/js/thirdparty/highlightjs/highlight.min.js"></script>
+<script src="/js/node/richTextPreview.js"></script>
 </body>
 </html>

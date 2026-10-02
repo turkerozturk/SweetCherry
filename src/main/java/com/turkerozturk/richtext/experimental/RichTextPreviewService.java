@@ -74,11 +74,27 @@ public class RichTextPreviewService {
         var document = org.jsoup.Jsoup.parse(html);
         document.outputSettings().prettyPrint(false);
         document.select("script,iframe,object,embed,base,meta,link,form").remove();
-        document.select("a").removeAttr("href").removeAttr("target");
+        for (var link : document.select("a")) {
+            String href = link.attr("href");
+            boolean internal = href.matches("/(nodes/[1-9][0-9]*|download/[1-9][0-9]*/[0-9]+)\\?_tenantView=[^\\s]*");
+            boolean external = false;
+            try {
+                var uri = java.net.URI.create(href);
+                external = ("https".equalsIgnoreCase(uri.getScheme()) || "http".equalsIgnoreCase(uri.getScheme())) && uri.getHost() != null;
+            } catch (IllegalArgumentException ignored) { }
+            if (!internal && !external && !href.startsWith("#")) link.removeAttr("href");
+            else if (!href.startsWith("#")) link.attr("target", "_blank").attr("rel", "noopener noreferrer");
+        }
+        for (var element : document.getAllElements()) {
+            for (var attribute : new java.util.ArrayList<>(element.attributes().asList())) {
+                if (attribute.getKey().toLowerCase(java.util.Locale.ROOT).startsWith("on")) element.removeAttr(attribute.getKey());
+            }
+        }
         document.select("input,button,select,textarea").attr("disabled", "disabled");
         document.head().appendElement("meta").attr("charset", "UTF-8");
         document.head().appendElement("meta").attr("http-equiv", "Content-Security-Policy")
-                .attr("content", "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'");
+                .attr("content", "default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; form-action 'none'; base-uri 'none'");
+        document.head().appendElement("link").attr("rel", "stylesheet").attr("href", "/css/thirdparty/highlightjs/default.min.css");
         document.head().appendElement("style").text("body{margin:12px;font-family:system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;}"
                 + "img{max-width:100%;height:auto;}table{border-collapse:collapse;}td,th{border:1px solid #ccc;padding:4px;}"
                 + "pre{max-width:100%;overflow-x:auto;}");

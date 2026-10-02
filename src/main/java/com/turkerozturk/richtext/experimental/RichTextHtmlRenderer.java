@@ -13,6 +13,11 @@ public final class RichTextHtmlRenderer {
 
     /** Returns formatted inline text for composition with independently rendered object slots. */
     public String renderContent(RichTextDocument document) {
+        return renderContent(document, null);
+    }
+
+    /** Resolves only HTTP(S), numeric node links and encoded anchor fragments. */
+    public String renderContent(RichTextDocument document, String tenantView) {
         var html = new StringBuilder();
         for (var run : document.runs()) {
             var attributes = run.attributes();
@@ -34,9 +39,10 @@ public final class RichTextHtmlRenderer {
             if (!size.isEmpty()) css.append("font-size:").append(size).append(';');
             if ("sub".equals(attributes.get("scale"))) css.append("vertical-align:sub;");
             if ("sup".equals(attributes.get("scale"))) css.append("vertical-align:super;");
-            String href = externalHref(attributes.get("link"));
+            String href = linkHref(attributes.get("link"), tenantView);
             if (href != null) html.append("<a href=\"").append(escape(href))
                     .append("\" target=\"_blank\" rel=\"noopener noreferrer\">");
+            if (href != null) css.append("color:#3584e4;");
             html.append("<span style=\"").append(css).append("\">").append(escape(run.text())).append("</span>");
             if (href != null) html.append("</a>");
         }
@@ -50,6 +56,20 @@ public final class RichTextHtmlRenderer {
             color = "#" + color.substring(1, 3) + color.substring(5, 7) + color.substring(9, 11);
         }
         if (color.matches("#[0-9a-fA-F]{6}")) css.append(property).append(':').append(color).append(';');
+    }
+
+    private String linkHref(String link, String tenantView) {
+        String external = externalHref(link);
+        if (external != null) return external;
+        if (link == null || !link.startsWith("node ") || tenantView == null) return null;
+        String[] parts = link.split(" ", 3);
+        if (parts.length < 2 || !parts[1].matches("[1-9][0-9]*")) return null;
+        String url = "/nodes/" + parts[1] + "?_tenantView=" + encode(tenantView);
+        return parts.length == 3 ? url + "#" + encode(parts[2]) : url;
+    }
+
+    private String encode(String value) {
+        return java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20");
     }
 
     /** Internal/file links remain in the model; previews activate only absolute HTTP(S) links. */

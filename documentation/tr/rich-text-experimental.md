@@ -141,3 +141,25 @@ kullanılır. XML'deki gerçek newline ve tekrarlı boşlukların korunması tes
 Hata izolasyon testlerinin bilerek bozuk XML/exception kullanması WARN logu üretir;
 bu loglar test başarısızlığı değildir. Manuel önizlemede oluşan WARN ise gerçek sorundur.
 Bu düzeltmede üç test eklenir; önceki 95 üzerine toplam 98 beklenir.
+
+## Hizalama, bağlantılar ve codebox güncellemesi
+
+Yeni HTML renderer aynı satırdaki farklı biçimli parçaları tek paragrafta toplar.
+`right`, `center`, `fill` sırasıyla sağ/orta/iki yana yaslama olur. Link metni mavi
+gösterilir. HTTP(S), sayısal node ve node+anchor bağlantıları desteklenir; dosya/folder
+linkleri henüz desteklenmez. Node bağlantılarına mevcut tenant token eklenir.
+Ek dosyalar ataç simgesi ve mevcut download endpoint'ine bağlantıyla gösterilir.
+LaTeX özel gösterimi hâlâ kapsam dışıdır.
+
+Önceki önizlemenin bağlantıları devre dışı bırakma kuralı güncellendi: izin verilen
+bağlantılar yeni sekmede açılır, download izni verilir. Sandbox'ta script/same-origin/form
+izni yoktur. Düğüm içeriğinin script, form ve event handler'ları ayıklanır. Parent sayfa,
+mevcut yerel highlight.js ile detached DOM'daki codebox'ları renklendirip iframe'e koyar.
+`myapp.syntax-highlighting.enabled` ayarına uyulur. Bilinmeyen lexer düz metin kalır.
+
+Tablo/codebox'ın ardından gelen ilk newline, blok satırının sonlandırıcısı olarak işlenir;
+böylece fazladan boş paragraf oluşturmaz. Birden fazla newline varsa sonraki boş satırlar
+korunur. Bu davranış görsel karşılaştırmada ayrıca kontrol edilmelidir.
+
+Beş test eklenir; önceki 98 üzerine toplam 103 beklenir. Eski parser'ın iç algoritması
+değişmez; önizlemenin bağlantı politikası iki panel için güncellenir.

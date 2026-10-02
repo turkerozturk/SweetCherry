@@ -59,4 +59,42 @@ class RichTextObjectHtmlRendererTest {
         image.bytes()[1] = 9;
         assertThat(image.bytes()).containsExactly((byte)1, (byte)2);
     }
+    @Test void alignsMixedInlineRunsAsOneParagraph() {
+        var doc = new RichTextXmlReader().read("<node><rich_text justification='center'>First </rich_text><rich_text justification='center' weight='heavy'>bold</rich_text><rich_text>\n</rich_text><rich_text justification='right'>Right</rich_text></node>");
+        var layout = new RichTextLayoutBuilder().build(doc, List.of());
+        String html = renderer.render(layout, Map.of(), "token");
+        assertThat(html).contains("text-align:center", "text-align:right", "font-weight:bold");
+        assertThat(org.jsoup.Jsoup.parse(html).select("div[style*=text-align:center]")).hasSize(1);
+    }
+
+    @Test void resolvesExternalInternalAndAnchorLinksWithBlueText() {
+        var doc = new RichTextXmlReader().read("<node><rich_text link='webs https://example.org'>Web</rich_text><rich_text link='node 25'>Node</rich_text><rich_text link='node 53 capalink'>Anchor</rich_text></node>");
+        String html = renderer.render(new RichTextLayoutBuilder().build(doc, List.of()), Map.of(), "token");
+        assertThat(html).contains("https://example.org", "/nodes/25?_tenantView=token", "/nodes/53?_tenantView=token#capalink", "color:#3584e4;");
+    }
+
+    @Test void attachmentIncludesPaperclipAndDownloadTarget() {
+        var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 2034);
+        String html = renderer.render(layout(ref), Map.of(ref, new EmbeddedContent.Attachment("pango.pdf")), "token");
+        assertThat(html).contains("📎", "target=\"_blank\"", "/download/53/2034?_tenantView=token");
+    }
+
+    @Test void tableLineTerminatorDoesNotCreateAnExtraEmptyParagraph() {
+        var ref = new EmbeddedObject(ObjectKind.TABLE, 53, 0);
+        var layout = new RichTextLayout(List.of(new ObjectPart(ref), new TextPart(new RichTextDocument.TextRun("\nLast", Map.of(), 0))));
+        String html = renderer.render(layout, Map.of(ref, new EmbeddedContent.Table(List.of(List.of("Head")), Map.of())), "token");
+        assertThat(html).doesNotContain("<br>").contains("Last");
+    }
+
+    @Test void codeboxUsesExistingHighlightingSettingAndLanguageAlias() {
+        var highlighter = new com.turkerozturk.helpers.highlighter.CodeHighLighter();
+        boolean previous = com.turkerozturk.helpers.highlighter.CodeHighLighter.enabledLanguageFor("java") != null;
+        try {
+            highlighter.setSyntaxHighlightingEnabled(true);
+            var ref = new EmbeddedObject(ObjectKind.CODEBOX, 53, 0);
+            String html = renderer.render(layout(ref), Map.of(ref, new EmbeddedContent.CodeBox("class A {}", "java")), "token");
+            assertThat(html).contains("cherry-highlight", "data-language=\"java\"", "class A {}");
+        } finally { highlighter.setSyntaxHighlightingEnabled(previous); }
+    }
+
 }
