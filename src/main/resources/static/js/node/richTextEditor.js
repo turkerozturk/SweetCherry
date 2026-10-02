@@ -161,7 +161,9 @@
         }
         const remove = toggle && selected.every(run => run.attributes[key] === value);
         for (const run of selected) {
-            if (key === 'clear') {
+            if (key === 'externalLinkRemove') {
+                if ((run.attributes.link || '').startsWith('webs ')) delete run.attributes.link;
+            } else if (key === 'clear') {
                 for (const property of ['weight','style','underline','strikethrough','family','foreground','background','scale','justification']) delete run.attributes[property];
             } else if (remove || !value) delete run.attributes[key];
             else run.attributes[key] = value;
@@ -175,6 +177,56 @@
     document.querySelectorAll('[data-color]').forEach(control => control.addEventListener('change', () => format(control.dataset.color, control.value)));
     document.querySelectorAll('[data-choice]').forEach(control => control.addEventListener('change', () => format(control.dataset.choice, control.value)));
     document.getElementById('clearFormat').addEventListener('click', () => format('clear', ''));
+
+    const linkButton=document.getElementById('richLink'),linkDialog=document.getElementById('richLinkDialog');
+    if (linkButton && linkDialog) {
+        const urlInput=document.getElementById('richLinkUrl'),error=document.getElementById('richLinkError');
+        let linkSelection;
+        /** Expands a caret inside an external link to its entire contiguous, possibly formatted text range. */
+        function openLink() {
+            captureSelection();
+            if (selection[0] === selection[1]) {
+                let offset=0, candidate;
+                const segments=runs.map(run=>{const start=offset;offset+=count(run.text);return {run,start,end:offset};});
+                const caret=selection[0];
+                let index=segments.findIndex(item=>item.start<=caret && caret<item.end && (item.run.attributes.link || '').startsWith('webs '));
+                if (index<0) index=segments.findIndex(item=>item.end===caret && (item.run.attributes.link || '').startsWith('webs '));
+                if(index>=0) {
+                    candidate=segments[index].run.attributes.link;
+                    let first=index,last=index;
+                    while(first>0 && segments[first-1].run.attributes.link===candidate) first--;
+                    while(last+1<segments.length && segments[last+1].run.attributes.link===candidate) last++;
+                    selection=[segments[first].start,segments[last].end];
+                }
+            }
+            let offset=0;
+            const selected=runs.filter(run=>{const start=offset;offset+=count(run.text);return !run.attributes.__sweet_object && offset>selection[0] && start<selection[1];});
+            if (!selected.length) {document.getElementById('selectionHint').hidden=false;return;}
+            linkSelection=[...selection];
+            const links=[...new Set(selected.map(run=>run.attributes.link || ''))];
+            urlInput.value=links.length===1 && links[0].startsWith('webs ') ? links[0].slice(5) : '';
+            document.getElementById('richLinkRemove').disabled=!selected.some(run=>(run.attributes.link || '').startsWith('webs '));
+            error.hidden=true;linkDialog.showModal();urlInput.focus();
+        }
+        function closeLink() {linkDialog.close();selection=[...linkSelection];focusEditor();restoreSelection();}
+        linkButton.addEventListener('pointerdown',event=>event.preventDefault());
+        linkButton.addEventListener('click',openLink);
+        document.getElementById('richLinkApply').addEventListener('click',()=>{
+            try {
+                const value=urlInput.value.trim();
+                if (/[\u0000-\u001f\u007f]/.test(value)) throw new Error('Invalid URL');
+                const url=new URL(value);
+                if (!['http:','https:'].includes(url.protocol) || !url.hostname || url.username || url.password || url.href.length>4091) throw new Error('Invalid URL');
+                closeLink();format('link','webs '+url.href);
+            } catch (_) {error.hidden=false;urlInput.focus();}
+        });
+        document.getElementById('richLinkRemove').addEventListener('click',()=>{closeLink();format('externalLinkRemove','');});
+        document.getElementById('richLinkCancel').addEventListener('click',closeLink);
+        linkDialog.addEventListener('cancel',event=>{event.preventDefault();closeLink();});
+        urlInput.addEventListener('keydown',event=>{
+            if(event.key==='Enter'){event.preventDefault();document.getElementById('richLinkApply').click();}
+        });
+    }
 
     /** Builds a safe preview from text nodes and controlled styles, never from stored HTML. */
     function render() {
@@ -216,7 +268,10 @@
             span.dataset.richAttributes = JSON.stringify(a);
             if (a.weight === 'heavy') span.style.fontWeight = 'bold';
             if (a.style === 'italic') span.style.fontStyle = 'italic';
-            span.style.textDecoration = [a.underline === 'single' ? 'underline' : '', a.strikethrough === 'true' ? 'line-through' : ''].filter(Boolean).join(' ');
+            span.style.textDecoration = [a.underline === 'single' || (a.link || '').startsWith('webs ') ? 'underline' : '', a.strikethrough === 'true' ? 'line-through' : ''].filter(Boolean).join(' ');
+            if ((a.link || '').startsWith('webs ')) {
+                span.title=a.link.slice(5); if (!a.foreground) span.style.color='#3584e4';
+            }
             if (a.family === 'monospace') span.style.fontFamily = 'monospace';
             for (const [attribute, css] of [['foreground','color'],['background','backgroundColor']]) {
                 let color = a[attribute] || '';

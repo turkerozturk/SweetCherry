@@ -11,9 +11,10 @@ function editor(initialRuns, maxFileBytes) {
         return {id, value:'', style:{}, dataset:{}, childNodes:[], selectionStart:0, selectionEnd:0,
             hidden:true, disabled:false, addEventListener(type, fn) {handlers.set(id + ':' + type, fn);},
             replaceChildren() {this.childNodes = [];}, appendChild(child) {this.childNodes.push(child);},
+            showModal() {this.open=true;}, close() {this.open=false;}, click() {const handler=handlers.get(id+':click');if(handler)handler({});},
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel'].map(id => [id, element(id)]));
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     let saved;
@@ -30,7 +31,7 @@ function editor(initialRuns, maxFileBytes) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:{},richEditorMaxFileBytes:maxFileBytes},
+    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:{},richEditorMaxFileBytes:maxFileBytes},
         crypto:{randomUUID:()=> 'test-uuid'},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
@@ -136,4 +137,32 @@ test('tenant size limit blocks both image and attachment before file reading',as
  e.ids.richFilePicker.files=[file];e.fire('richFilePicker','change');
  await new Promise(resolve=>setImmediate(resolve));
  assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richFiles.value),{});assert.deepEqual(JSON.parse(e.ids.richImages.value),{});
+});
+
+test('external link creation, removal and undo preserve formatted selected text',()=>{
+ const e=editor();e.select(1,3);e.fire('bold','click');e.fire('richLink','click');
+ assert.equal(e.ids.richLinkDialog.open,true);
+ e.ids.richLinkUrl.value='https://example.org/?a=1&b=2';e.fire('richLinkApply','click');
+ assert.equal(e.runs()[1].attributes.link,'webs https://example.org/?a=1&b=2');
+ assert.equal(e.runs()[1].attributes.weight,'heavy');
+ e.fire('richLink','click');e.fire('richLinkRemove','click');assert.equal(e.runs()[1].attributes.link,undefined);
+ e.key('z');assert.equal(e.runs()[1].attributes.link,'webs https://example.org/?a=1&b=2');
+});
+test('caret edits the target across adjacent differently formatted link runs',()=>{
+ const e=editor([{text:'AB',attributes:{link:'webs https://example.org/',weight:'heavy'}},{text:'C',attributes:{link:'webs https://example.org/',style:'italic'}},{text:'D',attributes:{}}]);
+ e.select(1,1);e.fire('richLink','click');assert.equal(e.ids.richLinkUrl.value,'https://example.org/');
+ e.ids.richLinkUrl.value='https://example.net/';e.fire('richLinkApply','click');
+ const runs=e.runs();assert.equal(runs[0].attributes.link,'webs https://example.net/');assert.equal(runs[1].attributes.link,'webs https://example.net/');
+ assert.equal(runs[0].attributes.weight,'heavy');assert.equal(runs[1].attributes.style,'italic');assert.equal(runs[2].attributes.link,undefined);
+});
+test('invalid link targets and cancel never alter content',()=>{
+ const e=editor();e.select(0,1);e.fire('richLink','click');
+ e.ids.richLinkUrl.value='javascript:alert(1)';e.fire('richLinkApply','click');assert.equal(e.ids.richLinkError.hidden,false);
+ assert.equal(e.ids.richLinkDialog.open,true);assert.equal(e.runs()[0].attributes.link,undefined);
+ e.fire('richLinkCancel','click');assert.equal(e.ids.richLinkDialog.open,false);assert.equal(text(e.runs()),'A😀B\nC');
+});
+test('remove external link skips protected objects and preserves internal links',()=>{
+ const e=editor([{text:'A',attributes:{link:'webs https://example.org/'}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}},{text:'B',attributes:{link:'node 12'}}]);
+ e.select(0,3);e.fire('richLink','click');e.fire('richLinkRemove','click');
+ const runs=e.runs();assert.equal(runs[0].attributes.link,undefined);assert.equal(runs[1].attributes.__sweet_object,'image:1');assert.equal(runs[2].attributes.link,'node 12');
 });

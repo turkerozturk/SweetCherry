@@ -393,3 +393,33 @@ nesneler arasında konumlandırın. Undo/redo ve Cancel ardından Save davranı�
 edin. SweetCherry'den indirip orijinal dosyayla byte/hash karşılaştırın; CherryTree'de de
 attachment görünümünü ve açılmasını kontrol edin. Tenant sınırını 1 yapıp veri kaynaklarını
 yeniden yükleyin; 1 MB üstü dosya ve resmin reddini deneyin. Sonra ayarı geri alın.
+
+
+## External link hedeflerini düzenleme
+
+Araç çubuğunda Dış bağlantı düğmesi seçili metne HTTP/HTTPS hedefi ekler. Görsel veya
+textarea görünümünde mevcut bir external link'in içine imleç koyup düğmeye basınca aynı
+hedefe sahip bitişik metin parçaları birlikte seçilir. Farklı weight/style/color parçalarının
+biçimleri korunur. Metnin bir kısmı özellikle seçilmişse işlem o seçime uygulanır.
+Link kaldırma metni ve biçimini silmez; yalnızca external link attribute'unu kaldırır.
+İptal/Escape içerik değişikliği yapmaz. Uygulama ve kaldırma aynı undo/redo modelini kullanır.
+
+CTB'de attribute formatı link="webs https://..." olarak saklanır. URL tarayıcıda normalize
+edilir (örneğin Unicode domain/karakterler); XML writer attribute'u güvenle escape eder.
+Editör bağlantıyı tıklanabilir yapmaz; alt çizgi, varsayılan mavi renk ve hover hedefiyle
+belirtir. Açıkça seçilmiş foreground rengi korunur. Okuma görünümündeki mevcut link renderer
+bağlantıyı açar. Metin düzenleme hedef URL'yi değiştirmez; hedef bu diyalogdan düzenlenir.
+
+ExternalRichTextLinks kaydetmeden önce yeni/değişmiş link attribute'larını doğrular:
+absolute HTTP(S), host, en fazla 4096 karakter ve kontrol karakteri/kullanıcı bilgisi olmaması.
+Mevcut internal/file/anchor attribute değerleri korunur. Internal/anchor link hedeflerini
+oluşturma veya düzenleme bu yamaya dahil değildir. Korunan object slot'larına link attribute'u
+uygulanmaz. Tenant, writable, admin, real node, read-only, revision ve CSRF kontrolleri sürer.
+
+Beklenen Java test sayısı 153; Node test sayısı 22:
+`node --test src/test/js/*.test.cjs`.
+Manuel test: kalın/renkli bir metin seçip dış bağlantı ekleyin; metnin bir kısmını farklı biçimde
+formatlayın; caret ile aynı link'in hedefini değiştirin. Link kaldırma ve undo/redo deneyin.
+Save/reopen ve CherryTree'de hedefi kontrol edin. Query string (&), fragment (#), Unicode,
+Cancel/Escape ve geçersiz javascript/file hedeflerini de deneyin. Nesneli düğümde diğer
+object offset ve payload'larının değişmediğini gözle kontrol edin.

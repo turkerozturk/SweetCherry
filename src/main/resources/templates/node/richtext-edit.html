@@ -35,6 +35,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="file" id="richFilePicker" hidden>
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
 <span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError}"></span>
+<button type="button" id="richLink" th:text="#{richtext.edit.link}"></button>
 <button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
 </div>
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
@@ -43,6 +44,17 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 </form>
+<dialog id="richLinkDialog" aria-labelledby="richLinkTitle">
+<h2 id="richLinkTitle" th:text="#{richtext.edit.link}"></h2>
+<label for="richLinkUrl" th:text="#{richtext.edit.linkUrl}"></label>
+<input id="richLinkUrl" type="url" maxlength="4091" placeholder="https://example.org" style="width:100%;box-sizing:border-box">
+<p id="richLinkError" role="alert" hidden th:text="#{richtext.edit.linkError}"></p>
+<div class="actions" style="margin-top:1rem">
+<button type="button" id="richLinkApply" th:text="#{richtext.edit.linkApply}"></button>
+<button type="button" id="richLinkRemove" th:text="#{richtext.edit.linkRemove}"></button>
+<button type="button" id="richLinkCancel" th:text="#{richtext.edit.cancel}"></button>
+</div>
+</dialog>
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/node/richTextEditor.js"></script>

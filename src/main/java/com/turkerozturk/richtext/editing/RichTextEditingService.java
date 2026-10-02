@@ -96,6 +96,9 @@ public class RichTextEditingService {
                 throw new IllegalArgumentException("Upload too large");
             var keys = new java.util.HashSet<String>(images.keySet()); keys.addAll(files.keySet());
             saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(objects), keys);
+            var original = "custom-colors".equals(node.getSyntax()) ? new RichTextXmlReader().read(node.getTxt())
+                    : new RichTextDocument(List.of());
+            ExternalRichTextLinks.validateChanges(saved.text(), original);
             canonical = new RichTextXmlWriter().write(saved.text());
         }
         catch (IllegalArgumentException error) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid rich-text XML", error); }

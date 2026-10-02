@@ -123,6 +123,19 @@ class RichTextEditingServiceTest {
         verify(entityManager).createNativeQuery(contains("has_image = 1"));
     }
 
+    @Test void savesExternalTargetWithoutLosingTextFormatting() {
+        service.save(12, "<node><rich_text weight='heavy' foreground='#3584e4' link='webs https://example.org/?a=1&amp;b=2'>Text</rich_text></node>", service.open(12).revision());
+        var xml = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(query).setParameter(eq("xml"), xml.capture());
+        var saved = new com.turkerozturk.richtext.experimental.RichTextXmlReader().read(xml.getValue());
+        assertThat(saved.runs().get(0).attributes()).containsEntry("link", "webs https://example.org/?a=1&b=2").containsEntry("weight", "heavy").containsEntry("foreground", "#3584e4");
+    }
+    @Test void rejectsUnsafeNewExternalTargetBeforeAnyWrite() {
+        String revision = service.open(12).revision();
+        assertThatThrownBy(() -> service.save(12, "<node><rich_text link='webs javascript:alert(1)'>Text</rich_text></node>", revision)).isInstanceOf(ResponseStatusException.class);
+        verify(query, never()).executeUpdate();
+    }
+
     @Test void rejectsUnsupportedTypeAndAliasFromRealNodeGuard() {
         when(node.getSyntax()).thenReturn("java");
         assertThatThrownBy(() -> service.open(12)).isInstanceOf(ResponseStatusException.class);
