@@ -191,3 +191,20 @@ sayfa içi bağlantı olur. Tablo/codebox yatay kaydırma markup'ı korunur. Mob
 content JS/CSS, scroll-to-top ve toolbar dosyaları değiştirilmez. Rich text düzenleme veya
 veritabanına yazma işlemi eklenmez. Parser hatası sessizce eski parser'a dönülmez; hatalı
 örnekler ayrıca incelenmelidir. Üç test eklenir; toplam 109 beklenir.
+
+## XML yazıcı ve semantik round-trip
+
+`RichTextXmlWriter` yalnızca `node.txt` XML metni üretir. Veritabanı yazmaz; node veya
+nesne tablolarını güncellemez. Henüz editör veya rich text kaydetme endpoint'i yoktur.
+Metin parçaları, boş parçalar ve tüm attribute değerleri korunur. Attribute sırası,
+boş element gösterimi ve XML declaration biçimi değişebilir; byte-level aynılık vaat edilmez.
+
+Yazıcı HTML'i XML'e çevirmek için kullanılmaz: girdi `RichTextDocument` modelidir.
+XML-invalid kontrol karakterleri, eşleşmemiş surrogate'lar, geçersiz attribute adları ve
+uyumsuz metin offset'leri reddedilir. Yeni nesne konumlarını hesaplamaz; içerik değişmeden
+round-trip'te mevcut yerleşimin korunduğu test edilir. Metin düzenlenirse nesne offset'leri
+ayrıca hesaplanıp ileride tek transaction'da kaydedilmelidir.
+
+Testler proje fixture'ı, 13 boş parça, Unicode, newline/CR/tab/boşluk, birleşik biçimler,
+bilinmeyen attribute, link değerleri ve nesne yerleşimini kapsar. Sekiz test eklenir;
+önceki 109 üzerine toplam 117 beklenir. Sonraki aşama nesnesiz yeni rich text editörüdür.
