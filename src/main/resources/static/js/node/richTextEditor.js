@@ -18,6 +18,63 @@
     input.addEventListener('pointerup', rememberSelection);
     input.addEventListener('blur', rememberSelection);
 
+    const history = [];
+    let historyIndex = -1;
+    let composing = false;
+    const snapshot = () => ({runs: runs.map(run => ({text: run.text, attributes: {...run.attributes}})),
+        selection: [...selection]});
+
+    /** Captures text and formatting as one editor state, discarding the obsolete redo branch. */
+    function commitHistory() {
+        const next = snapshot();
+        if (historyIndex >= 0 && JSON.stringify(history[historyIndex].runs) === JSON.stringify(next.runs)) return;
+        history.splice(historyIndex + 1);
+        history.push(next);
+        if (history.length > 200) history.shift();
+        historyIndex = history.length - 1;
+        updateHistoryButtons();
+    }
+    function updateHistoryButtons() {
+        document.getElementById('richUndo').disabled = historyIndex <= 0;
+        document.getElementById('richRedo').disabled = historyIndex >= history.length - 1;
+    }
+    function captureSelection() {
+        rememberSelection();
+        if (historyIndex >= 0) history[historyIndex].selection = [...selection];
+    }
+    /** Restores the model, textarea and selection together instead of using textarea-only native undo. */
+    function restoreHistory(direction) {
+        if (composing) return;
+        const next = historyIndex + direction;
+        if (next < 0 || next >= history.length) return;
+        historyIndex = next;
+        const state = history[historyIndex];
+        runs = state.runs.map(run => ({text: run.text, attributes: {...run.attributes}}));
+        previous = runs.map(run => run.text).join('');
+        input.value = previous;
+        selection = [...state.selection];
+        input.focus();
+        input.setSelectionRange(sub(previous, 0, selection[0]).length, sub(previous, 0, selection[1]).length);
+        render(); updateHistoryButtons();
+    }
+    form.addEventListener('keydown', event => {
+        if (!(event.ctrlKey || event.metaKey) || event.altKey || event.isComposing) return;
+        const key = event.key.toLowerCase();
+        if (key === 'z' || key === 'y') {
+            event.preventDefault();
+            restoreHistory(key === 'y' || event.shiftKey ? 1 : -1);
+        }
+    });
+    input.addEventListener('beforeinput', event => {
+        if (event.inputType === 'historyUndo' || event.inputType === 'historyRedo') {
+            event.preventDefault(); restoreHistory(event.inputType === 'historyUndo' ? -1 : 1);
+        } else captureSelection();
+    });
+    input.addEventListener('compositionstart', () => { captureSelection(); composing = true; });
+    input.addEventListener('compositionend', () => { composing = false; commitHistory(); });
+    document.getElementById('richUndo').addEventListener('click', () => restoreHistory(-1));
+    document.getElementById('richRedo').addEventListener('click', () => restoreHistory(1));
+
     /** Splits runs at editing boundaries, keeping unmodified attributes and empty runs outside the edit. */
     function replace(start, end, text) {
         const before = [], after = [];
@@ -43,12 +100,14 @@
         replace(start, oldChars.length - tail, newChars.slice(start, newChars.length - tail).join(''));
         previous = input.value;
         rememberSelection(); render();
+        if (!composing) commitHistory();
     });
 
     /** Applies a property only to selected text; alignment covers all touched paragraphs. */
     function format(key, value, toggle = false) {
         let [start, end] = selection;
         if (start === end) { document.getElementById('selectionHint').hidden = false; return; }
+        captureSelection();
         if (key === 'justification') {
             const chars = Array.from(input.value);
             while (start > 0 && chars[start - 1] !== '\n') start--;
@@ -77,7 +136,7 @@
             } else if (remove || !value) delete run.attributes[key];
             else run.attributes[key] = value;
         }
-        runs = output; render(); input.focus();
+        runs = output; render(); commitHistory(); input.focus();
     }
     document.querySelectorAll('[data-format]').forEach(button => {
         button.addEventListener('pointerdown', event => event.preventDefault());
@@ -90,9 +149,20 @@
     /** Builds a safe preview from text nodes and controlled styles, never from stored HTML. */
     function render() {
         preview.replaceChildren();
+        let paragraph = document.createElement('div');
+        paragraph.style.margin = '0';
+        function flush(allowEmpty = false) {
+            if (paragraph.childNodes.length || allowEmpty) {
+                if (!paragraph.childNodes.length) paragraph.appendChild(document.createElement('br'));
+                preview.appendChild(paragraph);
+            }
+            paragraph = document.createElement('div'); paragraph.style.margin = '0';
+        }
         for (const run of runs) {
+          const lines = run.text.split('\n');
+          for (let index = 0; index < lines.length; index++) {
             const span = document.createElement('span'), a = run.attributes;
-            span.textContent = run.text;
+            span.textContent = lines[index];
             if (a.weight === 'heavy') span.style.fontWeight = 'bold';
             if (a.style === 'italic') span.style.fontStyle = 'italic';
             span.style.textDecoration = [a.underline === 'single' ? 'underline' : '', a.strikethrough === 'true' ? 'line-through' : ''].filter(Boolean).join(' ');
@@ -105,8 +175,15 @@
             const sizes = {h1:'2em',h2:'1.5em',h3:'1.17em',h4:'1em',h5:'.83em',h6:'.67em',small:'.83em',sub:'.83em',sup:'.83em'};
             if (sizes[a.scale]) span.style.fontSize = sizes[a.scale];
             if (a.scale === 'sub' || a.scale === 'sup') span.style.verticalAlign = a.scale === 'sup' ? 'super' : 'sub';
-            preview.appendChild(span);
+            if (lines[index]) {
+                const align = {left:'left',right:'right',center:'center',fill:'justify'}[a.justification] || 'left';
+                paragraph.style.textAlign = align;
+                paragraph.appendChild(span);
+            }
+            if (index < lines.length - 1) flush(true);
+          }
         }
+        flush();
     }
     /** Serializes the text model to CTB XML; the server validates and canonicalizes it again. */
     form.addEventListener('submit', () => {
@@ -118,5 +195,5 @@
         }
         document.getElementById('richXml').value = new XMLSerializer().serializeToString(xml);
     });
-    render();
+    render(); commitHistory();
 })();

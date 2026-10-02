@@ -233,3 +233,22 @@ insert/delete/update yapılmaz. Henüz mevcut nesneli rich text düzenlenemez.
 Yedi backend test eklenir; önceki 117 üzerine toplam 124 beklenir. Manuel test: yeni boş
 düğüm, Türkçe/emoji/newline, seçili metin biçimlendirme, save/reopen ve CherryTree ile açma.
 Read-only, nesneli düğüm, stale tab ve İptal davranışını da kontrol edin.
+
+## Editör geçmişi ve önizleme hizalaması
+
+Textarea'nın yerleşik undo geçmişi yalnızca metni tuttuğundan, native Ctrl+Z/Y sonrasında
+biçim modeli kaybolabiliyordu. Editör artık metin parçaları, attribute'lar ve seçimi tek
+snapshot içinde tutar. Ctrl+Z, Ctrl+Y, Ctrl+Shift+Z, toolbar düğmeleri ve beforeinput
+historyUndo/historyRedo istekleri aynı geçmişi kullanır. Undo sonrası yeni değişiklik redo
+kolunu kaldırır. Geçmiş son 200 durumu tutar; sayfa kapanınca silinir. IME composition
+sırasında parçalı girişler tek geçmiş adımında toplanır. Bu ilk sürüm hâlâ textarea +
+önizlemedir; tam WYSIWYG değildir.
+
+Önizleme artık aynı satırdaki biçim parçalarını bir paragrafta toplar; left/right/center/fill
+hizalamasını gösterir ve boş satırları korur. Backend XML/kayıt yolu değiştirilmez.
+
+Gerçek editör script'ini küçük DOM test double ile çalıştıran altı regresyon testi:
+`node --test src/test/js/richTextEditor.test.cjs`. Testler Unicode seçimi, format/typing
+undo-redo, yeni redo kolu, toolbar/kısayol uyumu, native history isteği ve önizleme
+hizalamasını sınar. Bunlar Maven/JUnit sayısına dahil değildir; Java test sayısı 124 kalır.
+Tarayıcıda Ctrl+Z/Y, paste, renk/biçim, save/reopen ve mobil Geri al/Yinele ayrıca denenmelidir.
