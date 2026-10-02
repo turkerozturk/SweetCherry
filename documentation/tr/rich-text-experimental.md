@@ -208,3 +208,28 @@ ayrıca hesaplanıp ileride tek transaction'da kaydedilmelidir.
 Testler proje fixture'ı, 13 boş parça, Unicode, newline/CR/tab/boşluk, birleşik biçimler,
 bilinmeyen attribute, link değerleri ve nesne yerleşimini kapsar. Sekiz test eklenir;
 önceki 109 üzerine toplam 117 beklenir. Sonraki aşama nesnesiz yeni rich text editörüdür.
+
+## İlk metin/biçim editörü
+
+Yeni reader/workspace toolbar'ındaki Rich text düğmesi, admin ve writable tenant için
+nesnesiz plain-text/rich-text düğümlerde görünür. Doğrudan yol:
+`/nodes/richtext/edit/{id}`. Yeni düğüm oluşturma önceki düğme üzerinden yapılır; bu editörde
+kaydetmek plain-text düğümü `custom-colors` biçimine dönüştürür. GET ve İptal dönüşüm yapmaz.
+
+Metin alanında metni seçip bold/italic/underline/strike, monospace, foreground/background,
+scale ve paragraf hizalaması uygulanır. Bu ilk sürüm tam WYSIWYG değildir: metin alanı ve
+biçimli önizleme ayrıdır. Önizlemenin hizalama gösterimi sınırlıdır; kayıt formatına hizalama
+attribute'u yazılır. Mevcut link/bilinmeyen attribute'lar seçili metin değiştirilmedikçe korunur;
+link ekleme, listeler, nesneler ve daha gelişmiş düzenleme sonraki aşamalardır.
+
+Backend admin, tenant token, tenant writable, gerçek node, content read-only, uygun syntax
+ve gerçek image/codebox/grid tablo kayıtlarını denetler. Nesne flag'leri yanlış olsa bile
+nesneli kayıt reddedilir. CSRF mevcut Spring Security/Thymeleaf mekanizmasını kullanır.
+Kaydetme XML'i yeniden okuyup canonical writer ile üretir; txt/syntax/rich bit ve lastsave
+tek transaction'da değişir. Diğer title bits ve node properties korunur. Eski içerik/revision
+ve koşullu UPDATE, başka sekmede değişmiş düğümün ezilmesini engeller. Nesne tablolarına
+insert/delete/update yapılmaz. Henüz mevcut nesneli rich text düzenlenemez.
+
+Yedi backend test eklenir; önceki 117 üzerine toplam 124 beklenir. Manuel test: yeni boş
+düğüm, Türkçe/emoji/newline, seçili metin biçimlendirme, save/reopen ve CherryTree ile açma.
+Read-only, nesneli düğüm, stale tab ve İptal davranışını da kontrol edin.
