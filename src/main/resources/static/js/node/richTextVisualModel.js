@@ -13,6 +13,19 @@
         function visit(node, inherited) {
             if (node.nodeType === 3) { add(node.nodeValue, inherited, node); return; }
             if (node.nodeType !== 1) return;
+            if (node.dataset && node.dataset.richCaret) {
+                const start = offset;
+                for (const child of node.childNodes) {
+                    if (child.nodeType === 3) {
+                        const value = child.nodeValue.replace(/\u200B/g,'');
+                        const from = offset;
+                        if (value) add(value, inherited);
+                        positions.set(child,{start:from,end:offset,caret:true});
+                    } else visit(child,inherited);
+                }
+                positions.set(node,{start,end:offset,boundaries:[start,offset]});
+                return;
+            }
             if (node.dataset && node.dataset.richObject) {
                 const start = offset;
                 add('\uFFFC', {__sweet_object:node.dataset.richObject});
@@ -51,7 +64,7 @@
         function point(node, position) {
             const record = model.positions.get(node);
             if (!record) return 0;
-            return node.nodeType === 3 ? record.start + Array.from(node.nodeValue.slice(0,position)).length
+            return node.nodeType === 3 ? record.start + Math.min(record.end-record.start,Array.from(record.caret ? node.nodeValue.slice(0,position).replace(/\u200B/g,'') : node.nodeValue.slice(0,position)).length)
                 : record.boundaries ? record.boundaries[Math.min(position,record.boundaries.length - 1)] : record.start;
         }
         const a = point(selected.anchorNode,selected.anchorOffset), b = point(selected.focusNode,selected.focusOffset);
@@ -63,6 +76,14 @@
         function point(position) {
             for (const [node, record] of model.positions) {
                 if (node.nodeType === 3 && position >= record.start && position <= record.end) {
+                    if (record.caret) {
+                        let offset=0, length=0;
+                        for (const character of node.nodeValue) {
+                            if (character !== '\u200B' && length >= position-record.start) break;
+                            offset += character.length; if (character !== '\u200B') length++;
+                        }
+                        return [node,offset];
+                    }
                     return [node,Array.from(node.nodeValue).slice(0,position-record.start).join('').length];
                 }
             }

@@ -17,7 +17,7 @@ public final class ProtectedRichTextCodec {
         }
         public String key() { return table + ":" + offset; }
     }
-    public record Saved(RichTextDocument text, Map<Reference, Integer> offsets) { }
+    public record Saved(RichTextDocument text, Map<Reference, Integer> offsets, Map<String, Integer> newImages) { }
 
     /** Inserts one protected character per final-buffer object without losing formatted text. */
     public RichTextDocument open(RichTextDocument document, List<Reference> references) {
@@ -42,13 +42,23 @@ public final class ProtectedRichTextCodec {
 
     /** Requires every original object exactly once and in order; returns text XML and new buffer offsets. */
     public Saved save(RichTextDocument edited, List<Reference> references) {
+        return save(edited, references, java.util.Set.of());
+    }
+
+    /** Allows separately validated new image slots while keeping every existing object in its original order. */
+    public Saved save(RichTextDocument edited, List<Reference> references, java.util.Set<String> imageKeys) {
+        var newImages = new LinkedHashMap<String, Integer>();
         var expected = references.stream().sorted(java.util.Comparator.comparingInt(Reference::offset)).toList();
         var text = new ArrayList<RichTextDocument.TextRun>();
         var offsets = new LinkedHashMap<Reference, Integer>();
         int bufferOffset = 0, textOffset = 0, next = 0;
         for (var run : edited.runs()) {
             String key = run.attributes().get(OBJECT_ATTRIBUTE);
-            if (key != null) {
+            if (key != null && imageKeys.contains(key)) {
+                if (!OBJECT_CHARACTER.equals(run.text()) || run.attributes().size() != 1 || newImages.containsKey(key))
+                    throw new IllegalArgumentException("Invalid new image slot");
+                newImages.put(key, bufferOffset++);
+            } else if (key != null) {
                 if (next >= expected.size() || !expected.get(next).key().equals(key)
                         || !OBJECT_CHARACTER.equals(run.text()) || run.attributes().size() != 1) {
                     throw new IllegalArgumentException("Protected object changed, removed or reordered");
@@ -60,7 +70,8 @@ public final class ProtectedRichTextCodec {
             }
         }
         if (next != expected.size()) throw new IllegalArgumentException("Protected objects are missing");
-        return new Saved(new RichTextDocument(text), Map.copyOf(offsets));
+        if (!newImages.keySet().equals(imageKeys)) throw new IllegalArgumentException("Unused image payload");
+        return new Saved(new RichTextDocument(text), Map.copyOf(offsets), Map.copyOf(newImages));
     }
 
     private ObjectKind kind(String table) {

@@ -327,3 +327,36 @@ SqliteObjectPayloadTest artık üretimde kullanılan readObjects metodunu doğru
 aynı düğümde NULL anchor payload, boş payload, PNG binary, attachment, binary tablo verisi
 ve codebox metnini birlikte sınar. Servis testleri de gerçek bellekte SQLite bağlantısıyla
 bu okuyucuyu kullanır. Test sayısı 132 kalır. Anchor ikonlarının gösterimi değiştirilmez.
+
+
+## Dosyadan ve panodan resim ekleme
+
+Rich text editöründe Resim ekle düğmesi PNG/JPEG dosyası seçer. Panoda gerçek resim binary
+verisi varsa paste ile eklenebilir; web sayfasındaki uzak resim URL'leri indirilmez. Görsel ve
+textarea görünümü aynı modeli kullanır. Resim kaydedene kadar yalnızca tarayıcı belleğinde
+kalır; iptal veya sayfayı kapatma CTB'ye nesne eklemez. Undo/redo yeni resmin işaretçisini de
+geri alır/getirir. Kayda sadece mevcut modelde kalan yeni resim payload'ları gönderilir.
+
+Backend yeni resimleri ImageIO ile doğrulayıp PNG'ye dönüştürür. Bir resim en fazla 8 MB,
+bir kayıt en fazla 10 resim ve 16 milyon pixel/resim kabul eder. Toplam JSON sınırı 16 MB,
+üretilen toplam PNG sınırı 12 MB'dır. Dosya adı, HTML veya harici URL veritabanına resim
+olarak yazılmaz. Yeni image kayıtlarında justification=left; anchor, filename, link boş ve
+time=0 olur. node.has_image=1; txt, is_richtxt, ts_lastsave ve tüm object offset'leri aynı
+transaction içinde kaydedilir. Admin/writable/real-node/read-only ve tenant/revision/CSRF
+kontrolleri korunur. Mevcut nesnelerin silinmesi veya sırasının değiştirilmesi hâlâ yasaktır.
+
+Clipboard düz metni U+FFFC yer tutucularını atar; nesneyi kopyalamadan boş OBJ karakteri
+yapıştırmaz. Mevcut içerikte daha önce kaydedilmiş bağımsız U+FFFC karakterleri otomatik
+silinmez. Nesnelerin iki yanında DOM caret alanları vardır; bunların yardımcı karakterleri
+XML'e yazılmaz. Metin biçimini clipboard ile taşıma bu aşamaya dahil değildir.
+
+server.tomcat.max-http-form-post-size=32MB hem ana connector hem ek HTTP connector için
+uygulanır. JAR yanındaki harici application.yml kullanılıyorsa bu ayarı oraya da ekleyin;
+reverse proxy daha düşük body sınırı uyguluyorsa onun da yeterli olması gerekir.
+
+Beklenen Java test sayısı 138; Node test sayısı 16:
+`node --test src/test/js/*.test.cjs`. Manuel test: bir CTB kopyasında boş ve nesneli düğüme
+PNG/JPEG dosyası ekleyin; varsa panodan ekran görüntüsü yapıştırın. Resimden önce/sonra
+emoji/metin ekleyin, undo/redo ve görsel/textarea geçişi yapın. Kaydedip SweetCherry ve
+CherryTree'de açın; eski resim/attachment/table/codebox konumlarını kontrol edin. İptalde
+kayıt eklenmediğini, read-only tenant/node ve user hesabında işlemin kapalı kaldığını sınayın.

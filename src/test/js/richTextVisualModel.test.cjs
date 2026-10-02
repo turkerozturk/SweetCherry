@@ -35,3 +35,13 @@ test('protected object DOM becomes one marker, not its image or label text',()=>
  assert.equal(runs.map(run=>run.text).join(''),'A\uFFFCB');
  assert.deepEqual(runs[1].attributes,{__sweet_object:'image:12'});
 });
+
+test('caret pads around a lone object never enter the text or offset model',()=>{
+ const left=text('\u200B'),right=text('\u200B');
+ const a=element('SPAN',[left]),b=element('SPAN',[right]);a.dataset.richCaret=b.dataset.richCaret='true';
+ const slot=element('SPAN',[text('Codebox')]);slot.dataset.richObject='codebox:0';
+ const editor=root([element('DIV',[a,slot,b])]);
+ assert.equal(model.scan(editor).runs.map(run=>run.text).join(''),'\uFFFC');
+ editor.ownerDocument={getSelection:()=>({rangeCount:1,anchorNode:right,anchorOffset:1,focusNode:right,focusOffset:1})};
+ assert.deepEqual(model.selection(editor),[1,1]);
+});

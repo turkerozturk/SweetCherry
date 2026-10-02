@@ -65,13 +65,21 @@ public class RichTextEditingService {
     /** Saves canonical CTB XML and the rich-text bit together, refusing stale pages or newly added objects. */
     @Transactional
     public void save(long id, String xml, String expectedRevision) {
+        save(id, xml, expectedRevision, "{}");
+    }
+
+    /** Saves text, protected offsets and new PNG rows atomically; uploads are never persisted on GET or cancel. */
+    @Transactional
+    public void save(long id, String xml, String expectedRevision, String imageJson) {
         Node node = editableNode(id);
         var objects = storedObjects(id);
         if (!revision(node, objects).equals(expectedRevision)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Node changed; reload the editor.");
         String canonical;
         ProtectedRichTextCodec.Saved saved;
+        Map<String, byte[]> images;
         try {
-            saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(objects));
+            images = PendingRichTextImages.decode(imageJson);
+            saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(objects), images.keySet());
             canonical = new RichTextXmlWriter().write(saved.text());
         }
         catch (IllegalArgumentException error) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid rich-text XML", error); }
@@ -85,6 +93,18 @@ public class RichTextEditingService {
         // Move all keys to a disjoint range first to avoid composite-key collisions.
         for (var object : objects) move(id, object.reference().table(), object.reference().offset(), -object.reference().offset() - 1);
         for (var object : objects) move(id, object.reference().table(), -object.reference().offset() - 1, saved.offsets().get(object.reference()));
+        for (var entry : images.entrySet()) {
+            entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
+                try (var insert = connection.prepareStatement("INSERT INTO image "
+                        + "(node_id, offset, justification, anchor, png, filename, link, time) VALUES (?, ?, 'left', '', ?, '', '', 0)")) {
+                    insert.setLong(1, id); insert.setInt(2, saved.newImages().get(entry.getKey()));
+                    insert.setBytes(3, entry.getValue());
+                    if (insert.executeUpdate() != 1) throw new java.sql.SQLException("Image insert failed");
+                }
+            });
+        }
+        if (!images.isEmpty()) entityManager.createNativeQuery("UPDATE node SET has_image = 1 WHERE node_id = :id")
+                .setParameter("id", id).executeUpdate();
         entityManager.clear();
     }
 

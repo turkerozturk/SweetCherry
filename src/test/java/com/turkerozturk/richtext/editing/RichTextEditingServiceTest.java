@@ -31,6 +31,9 @@ class RichTextEditingServiceTest {
             org.hibernate.jdbc.ReturningWork<?> work = call.getArgument(0);
             return work.execute(connection);
         });
+        doAnswer(call -> {
+            org.hibernate.jdbc.Work work = call.getArgument(0); work.execute(connection); return null;
+        }).when(session).doWork(any());
         ReflectionTestUtils.setField(service, "entityManager", entityManager);
         when(properties.writable()).thenReturn(true);
         when(properties.realNode(12)).thenReturn(node);
@@ -91,6 +94,20 @@ class RichTextEditingServiceTest {
         verify(query).setParameter("to", 3);
         verify(query, times(3)).executeUpdate();
         verify(entityManager).clear();
+    }
+
+    @Test void insertsValidatedImageAtItsFinalUnicodeOffset() throws Exception {
+        var picture = new java.awt.image.BufferedImage(1, 1, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        var bytes = new java.io.ByteArrayOutputStream(); javax.imageio.ImageIO.write(picture, "png", bytes);
+        String data = "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(bytes.toByteArray());
+        String images = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-image:test", data));
+        String revision = service.open(12).revision();
+        service.save(12, "<node><rich_text>😀</rich_text><rich_text __sweet_object='new-image:test'>\uFFFC</rich_text><rich_text>Text</rich_text></node>", revision, images);
+        var stored = RichTextEditingService.readObjects(connection, 12);
+        assertThat(stored).hasSize(1);
+        assertThat(stored.get(0).reference().offset()).isEqualTo(1);
+        assertThat(javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream((byte[]) stored.get(0).values()[5])).getWidth()).isEqualTo(1);
+        verify(entityManager).createNativeQuery(contains("has_image = 1"));
     }
 
     @Test void rejectsUnsupportedTypeAndAliasFromRealNodeGuard() {

@@ -74,6 +74,8 @@ springdoc:
 # https://www.youtube.com/watch?v=B4FxG2Diio0
 # SSL HTTPS
 server:
+  tomcat:
+    max-http-form-post-size: 32MB # Rich-text image data is submitted together with the XML.
   # Varsayilan hesaplar gelistirme/yerel kullanim icindir. Bu nedenle iki HTTP connector da
   # varsayilan olarak yalnizca bu bilgisayardan erisilebilir. Uzak erisim bilincli olarak
   # yapilandirilacaksa guvenli kimlik bilgileri ve HTTPS ile birlikte degistirilmelidir.

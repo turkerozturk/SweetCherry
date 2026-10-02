@@ -9,6 +9,9 @@
     const count = value => Array.from(value).length;
     const sub = (value, start, end) => Array.from(value).slice(start, end).join('');
     let selection = [0, 0];
+    const pendingImages = {};
+    let readingImage = false;
+    const plainClipboard = text => text.replace(/\uFFFC/g, '');
     const mode = document.getElementById('richVisualMode');
     const visual = () => !!(mode && mode.checked && window.RichTextVisualModel);
     function focusEditor() { if (visual()) preview.focus(); else input.focus(); }
@@ -194,11 +197,15 @@
             slot.title = object.label;
             if (object.imageUrl) {
                 const image = document.createElement('img');
-                image.src = object.imageUrl + '?_tenantView=' + encodeURIComponent(window.richEditorTenant || '');
+                image.src = key.startsWith('new-image:') ? object.imageUrl : object.imageUrl + '?_tenantView=' + encodeURIComponent(window.richEditorTenant || '');
                 image.alt = object.label; image.style.maxWidth = '100%'; image.style.maxHeight = '220px';
                 image.draggable = false; slot.appendChild(image);
             } else slot.textContent = '[' + object.label + ']';
-            paragraph.appendChild(slot);
+            const caret = () => {
+                const span = document.createElement('span'); span.dataset.richCaret = 'true';
+                span.appendChild(document.createTextNode('\u200B')); return span;
+            };
+            paragraph.appendChild(caret()); paragraph.appendChild(slot); paragraph.appendChild(caret());
             continue;
           }
           const lines = run.text.split('\n');
@@ -229,7 +236,10 @@
         flush(true);
     }
     /** Serializes the text model to CTB XML; the server validates and canonicalizes it again. */
-    form.addEventListener('submit', () => {
+    form.addEventListener('submit', event => {
+        if (readingImage) { event.preventDefault(); return; }
+        const imageInput = document.getElementById('richImages');
+        if (imageInput) imageInput.value = JSON.stringify(Object.fromEntries(runs.filter(run=>pendingImages[run.attributes.__sweet_object]).map(run=>[run.attributes.__sweet_object,pendingImages[run.attributes.__sweet_object]])));
         const xml = document.implementation.createDocument(null, 'node');
         for (const run of runs) {
             const element = xml.createElement('rich_text');
@@ -246,6 +256,61 @@
         selection = [start + count(text), start + count(text)];
         render(); focusEditor(); restoreSelection(); commitHistory();
     }
+    /** Keeps file data local until Save and adds its protected slot to the shared undo/redo model. */
+    async function addImage(file) {
+        const status = document.getElementById('richImageStatus');
+        if (readingImage) return;
+        if (!['image/png','image/jpeg'].includes(file.type) || file.size > 8000000) {
+            if (status) status.textContent = status.dataset.error; return;
+        }
+        const at = [...selection], source = JSON.stringify(runs);
+        readingImage = true;
+        try {
+            const data = await new Promise((resolve,reject)=>{
+                const reader = new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file);
+            });
+            // An asynchronous read must not replace text entered while the file was loading.
+            if (source !== JSON.stringify(runs)) throw new Error('Editor changed');
+            if (Object.keys(pendingImages).length >= 10 || Object.values(pendingImages).reduce((n,value)=>n+value.length,0)+data.length > 15000000) throw new Error('Upload too large');
+            const key = 'new-image:' + crypto.randomUUID();
+            if (!replace(at[0],at[1],'\uFFFC')) return;
+            let offset = 0;
+            for (const run of runs) {
+                if (offset === at[0] && run.text === '\uFFFC' && !run.attributes.__sweet_object) {
+                    run.attributes = {__sweet_object:key}; break;
+                }
+                offset += count(run.text);
+            }
+            pendingImages[key] = data;
+            window.richEditorObjects = window.richEditorObjects || {};
+            window.richEditorObjects[key] = {label:file.name || 'Image',imageUrl:data};
+            previous = runs.map(run=>run.text).join(''); input.value=previous;
+            selection=[at[0]+1,at[0]+1]; render(); focusEditor(); restoreSelection(); commitHistory();
+            if (status) status.textContent='';
+        } catch (_) { if (status) status.textContent=status.dataset.error; }
+        finally { readingImage=false; }
+    }
+    const imageButton=document.getElementById('richAddImage'),imageFile=document.getElementById('richImageFile');
+    if (imageButton && imageFile) {
+        imageButton.addEventListener('pointerdown',event=>event.preventDefault());
+        imageButton.addEventListener('click',()=>{captureSelection();imageFile.click();});
+        imageFile.addEventListener('change',()=>{if(imageFile.files[0])addImage(imageFile.files[0]);imageFile.value='';});
+    }
+    // Clipboard object slots are not transferable; copy only their surrounding text.
+    for (const target of [input,preview]) {
+        target.addEventListener('copy',event=>{
+            rememberSelection();event.preventDefault();event.clipboardData.setData('text/plain',plainClipboard(sub(previous,...selection)));
+        });
+    }
+    input.addEventListener('cut',event=>{
+        rememberSelection();event.preventDefault();
+        event.clipboardData.setData('text/plain',plainClipboard(sub(previous,...selection)));visualChange('');
+    });
+    input.addEventListener('paste',event=>{
+        event.preventDefault();rememberSelection();
+        const file=Array.from(event.clipboardData.files || []).find(file=>file.type.startsWith('image/'));
+        if(file)addImage(file);else visualChange(plainClipboard(event.clipboardData.getData('text/plain')).replace(/\r\n?/g,'\n'));
+    });
     if (mode && window.RichTextVisualModel) {
         const syncMode = () => {
             input.hidden = visual();
@@ -297,12 +362,15 @@
         preview.addEventListener('compositionend',()=>{composing=false;commitHistory();});
         preview.addEventListener('paste',event=>{
             if (!visual()) return;
-            event.preventDefault();rememberSelection();visualChange(event.clipboardData.getData('text/plain').replace(/\r\n?/g,'\n'));
+            event.preventDefault(); rememberSelection();
+            const file = Array.from(event.clipboardData.files || []).find(file=>file.type.startsWith('image/'));
+            if (file) { addImage(file); return; }
+            visualChange(plainClipboard(event.clipboardData.getData('text/plain')).replace(/\r\n?/g,'\n'));
         });
         preview.addEventListener('cut',event=>{
             if (!visual()) return;
             rememberSelection(); event.preventDefault();
-            event.clipboardData.setData('text/plain',sub(previous,selection[0],selection[1]));visualChange('');
+            event.clipboardData.setData('text/plain',plainClipboard(sub(previous,selection[0],selection[1])));visualChange('');
         });
         // HTML/objects are deliberately not accepted through drag-and-drop in this stage.
         preview.addEventListener('drop',event=>{if(visual())event.preventDefault();});

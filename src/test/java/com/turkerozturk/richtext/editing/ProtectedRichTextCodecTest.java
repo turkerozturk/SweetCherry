@@ -53,4 +53,17 @@ class ProtectedRichTextCodecTest {
         String xml=new RichTextXmlWriter().write(codec.save(codec.open(doc,refs),refs).text());
         assertThat(xml).doesNotContain("__sweet_object","\uFFFC");
     }
+    @Test void insertsNewImageBetweenExistingObjectsWithoutChangingTheirOrder() {
+        var refs = List.of(new Reference("image", 0), new Reference("grid", 1));
+        var edited = new RichTextDocument(List.of(marker("image:0", 0), marker("new-image:test", 1), marker("grid:1", 2)));
+        var saved = codec.save(edited, refs, java.util.Set.of("new-image:test"));
+        assertThat(saved.offsets()).containsEntry(refs.get(0), 0).containsEntry(refs.get(1), 2);
+        assertThat(saved.newImages()).containsEntry("new-image:test", 1);
+        assertThat(new RichTextXmlWriter().write(saved.text())).doesNotContain("__sweet_object", "\uFFFC");
+    }
+    @Test void rejectsDuplicatedAndUnusedImagePayloads() {
+        var keys = java.util.Set.of("new-image:test");
+        assertThatThrownBy(() -> codec.save(new RichTextDocument(List.of(marker("new-image:test", 0), marker("new-image:test", 1))), List.of(), keys)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> codec.save(new RichTextDocument(List.of()), List.of(), keys)).isInstanceOf(IllegalArgumentException.class);
+    }
 }

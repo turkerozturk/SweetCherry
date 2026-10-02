@@ -178,10 +178,15 @@ public class SweetCherry implements CommandLineRunner {
     @Value("${server.address:127.0.0.1}")
     private String serverAddress;
 
+    @Value("${server.tomcat.max-http-form-post-size:32MB}")
+    private String maxFormPostSize;
+
+    /** Applies the same form size limit to the additional HTTP connector used by local/proxy clients. */
     private Connector connector() {
 
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
         connector.setPort(httpPort);
+        connector.setMaxPostSize(Math.toIntExact(org.springframework.util.unit.DataSize.parse(maxFormPostSize).toBytes()));
         connector.setProperty("address", serverAddress);
         connector.setSecure(false);
         connector.setScheme("http");

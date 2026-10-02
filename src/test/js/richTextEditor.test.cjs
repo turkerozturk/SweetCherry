@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 /** Executes the real editor script against a small DOM double to test model/history behavior. */
-function editor() {
+function editor(initialRuns) {
     const handlers = new Map();
     function element(id = '') {
         return {id, value:'', style:{}, dataset:{}, childNodes:[], selectionStart:0, selectionEnd:0,
@@ -13,7 +13,7 @@ function editor() {
             replaceChildren() {this.childNodes = [];}, appendChild(child) {this.childNodes.push(child);},
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus'].map(id => [id, element(id)]));
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     let saved;
@@ -21,6 +21,7 @@ function editor() {
         getElementById: id => ids[id],
         querySelectorAll: selector => selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
         createElement: () => element(),
+        createTextNode: text => ({text}),
         implementation: {createDocument() {
             const root = element();
             return {documentElement:root, createElement() {
@@ -29,7 +30,9 @@ function editor() {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, window:{richEditorDocument:{runs:[{text:'A😀B\nC', attributes:{future:'keep'}}]}},
+    vm.runInNewContext(source, {document, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:{}},
+        crypto:{randomUUID:()=> 'test-uuid'},
+        FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
     function fire(id, type, event = {}) {handlers.get(id + ':' + type)(event);}
     function select(start, end) {ids.richText.selectionStart = start; ids.richText.selectionEnd = end; fire('richText','select');}
@@ -96,4 +99,23 @@ test('rendering keeps a final empty paragraph after Enter', () => {
     assert.equal(e.ids.richPreview.childNodes.length,2);
     assert.equal(e.ids.richPreview.childNodes[1].childNodes.length,1);
     assert.equal(text(e.runs()),'A\n');
+});
+
+test('copy/paste omits protected object characters without removing existing slots', () => {
+    const e=editor([{text:'A',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}},{text:'B',attributes:{}}]);
+    e.select(0,3);let copied;
+    e.fire('richText','copy',{preventDefault(){},clipboardData:{setData(type,value){copied=value;}}});
+    assert.equal(copied,'AB');
+    e.select(3,3);e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData(){return 'X\uFFFCY';}}});
+    assert.equal(text(e.runs()),'A\uFFFCBXY');
+    assert.equal(e.runs().filter(run=>run.attributes.__sweet_object).length,1);
+});
+test('new image slot and submitted payload follow undo/redo together', async () => {
+    const e=editor();e.select(1,1);
+    e.ids.richImageFile.files=[{type:'image/png',size:3,data:'data:image/png;base64,AQID',name:'test.png'}];
+    e.fire('richImageFile','change');await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(text(e.runs()),'A\uFFFC😀B\nC');
+    assert.deepEqual(JSON.parse(e.ids.richImages.value),{'new-image:test-uuid':'data:image/png;base64,AQID'});
+    e.key('z');assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});
+    e.key('y');assert.equal(text(e.runs()),'A\uFFFC😀B\nC');assert.ok(JSON.parse(e.ids.richImages.value)['new-image:test-uuid']);
 });
