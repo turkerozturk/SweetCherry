@@ -430,6 +430,9 @@ public class NodeController {
     }
 
     /** Reuses the normal node preparation and permissions for an AJAX content fragment. */
+    @Autowired
+    private com.turkerozturk.richtext.experimental.RichTextRenderingService richTextRenderingService;
+
     @GetMapping("/tree/content/{nodeId}")
     @RequiresTenant
     public String treeContent(@PathVariable long nodeId, Model model, HttpServletRequest request) {
@@ -437,6 +440,7 @@ public class NodeController {
             model.addAttribute("isRootNode", true);
             model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
         } else {
+            request.setAttribute("newRichTextView", Boolean.TRUE);
             getNodeAsHtml(nodeId, model, request, "desktop");
             model.addAttribute("isRootNode", false);
         }
@@ -495,7 +499,10 @@ public class NodeController {
             node.setBreadcrumbs(nodeService.addBreadcrumbs(nodeId));
 
 
-            node = nodeContentParserService.parseNodeContent(node, request);
+            if (!("custom-colors".equals(node.getSyntax()) && ("reader".equals(viewMode)
+                    || Boolean.TRUE.equals(request.getAttribute("newRichTextView"))))) {
+                node = nodeContentParserService.parseNodeContent(node, request);
+            }
 
 
             List<Long> sharedNodeIds = childrenService.getSharedNodeIdsByMasterId(nodeId);
@@ -632,6 +639,16 @@ public class NodeController {
 
 
 
+
+        if ("reader".equals(viewMode) || Boolean.TRUE.equals(request.getAttribute("newRichTextView"))) {
+            Node contentNode = (Node) model.getAttribute("node");
+            if (contentNode != null && "custom-colors".equals(contentNode.getSyntax())) {
+                var session = request.getSession(false);
+                String token = session == null ? null : (String) session.getAttribute(
+                        com.turkerozturk.multipledatabases.TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
+                contentNode.setTxtAsHtml(richTextRenderingService.renderLive(contentNode, token));
+            }
+        }
 
         model.addAttribute("viewMode", viewMode);
 

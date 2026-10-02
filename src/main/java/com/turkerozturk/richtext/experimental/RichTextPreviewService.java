@@ -51,17 +51,8 @@ public class RichTextPreviewService {
         }
         Pane newPane;
         try {
-            var references = new CtbObjectReferences();
-            var adapter = new EmbeddedContentAdapter();
-            var payloads = new LinkedHashMap<EmbeddedObject, EmbeddedContent>();
-            for (var image : images.getImagesByNodeId(contentId)) {
-                add(payloads, references.fromImage(image), adapter.fromImage(image));
-            }
-            for (var box : node.getCodeBoxes()) add(payloads, references.fromCodeBox(box), adapter.fromCodeBox(box));
-            for (var table : node.getGrids()) add(payloads, references.fromTable(table), adapter.fromTable(table));
-            var document = new RichTextXmlReader().read(node.getTxt());
-            var layout = new RichTextLayoutBuilder().build(document, new java.util.ArrayList<>(payloads.keySet()));
-            newPane = new Pane(previewHtml(new RichTextObjectHtmlRenderer().render(layout, payloads, tenantView), contentId), false);
+            String rendered = new RichTextRenderingService(images).render(node, tenantView);
+            newPane = new Pane(previewHtml(rendered, contentId), false);
         } catch (RuntimeException error) {
             log.warn("Experimental rich-text preview failed for node {}", contentId, error);
             newPane = new Pane("", true);

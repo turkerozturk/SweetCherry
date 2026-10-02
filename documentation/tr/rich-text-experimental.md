@@ -177,3 +177,17 @@ Aynı içerik ID'sine yönelik node+anchor bağlantısı `about:srcdoc#anchor` v
 olarak hazırlanır; ilgili iframe içinde kaydırılır. Diğer düğüm bağlantıları yeni sekmede
 kalır. Anchor nesnesi konumunda ⚓ gösterilir. Alias önizlemede karşılaştırma master
 content ID üzerinden yapılır. Üç test eklenir; toplam 106 beklenir.
+
+## Yeni reader/workspace görünümlerinde kullanım
+
+Yeni mobil reader ve masaüstü tree content artık `custom-colors` içeriklerini ortak
+`RichTextRenderingService` üzerinden gösterir. Eski mobil/desktop görünümler, quick content
+ve PDF yolu bu değişiklik kapsamına alınmadı. Plain-text ve kod düğümlerinin yolu değişmez.
+Karşılaştırma sayfası aynı ortak çekirdeği kullanır ve sandbox politikasını ayrıca uygular.
+
+Canlı görünümde PNG data URI yerine mevcut `/images/{id}/{offset}` URL'si ve tenant token
+kullanılır. Böylece mevcut büyüteç/zoom/orijinal resim işlemleri korunur. Aynı düğüm anchor'ı
+sayfa içi bağlantı olur. Tablo/codebox yatay kaydırma markup'ı korunur. Mobil ve masaüstü
+content JS/CSS, scroll-to-top ve toolbar dosyaları değiştirilmez. Rich text düzenleme veya
+veritabanına yazma işlemi eklenmez. Parser hatası sessizce eski parser'a dönülmez; hatalı
+örnekler ayrıca incelenmelidir. Üç test eklenir; toplam 109 beklenir.

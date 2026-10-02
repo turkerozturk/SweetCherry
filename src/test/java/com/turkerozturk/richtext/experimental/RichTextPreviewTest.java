@@ -29,6 +29,7 @@ class RichTextPreviewTest {
         when(children.findByNodeId(treeId)).thenReturn(child);
         var node = mock(Node.class);
         when(nodes.findById(contentId)).thenReturn(node);
+        when(node.getNodeId()).thenReturn(contentId);
         when(node.getSyntax()).thenReturn("custom-colors");
         when(node.getTxt()).thenReturn("<node><rich_text>Example</rich_text></node>");
         when(node.getName()).thenReturn("Title");
