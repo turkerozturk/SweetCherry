@@ -423,3 +423,38 @@ formatlayın; caret ile aynı link'in hedefini değiştirin. Link kaldırma ve u
 Save/reopen ve CherryTree'de hedefi kontrol edin. Query string (&), fragment (#), Unicode,
 Cancel/Escape ve geçersiz javascript/file hedeflerini de deneyin. Nesneli düğümde diğer
 object offset ve payload'larının değişmediğini gözle kontrol edin.
+
+
+## Tablo ekleme ve hücre düzenleme
+
+Tablo ekle düğmesi ayrı bir hücre diyaloğu açar. Yeni tabloda satır sayısı başlık dahil
+1-100, sütun sayısı 1-20 olabilir. Ölçüleri değiştirince Boyutu uygula düğmesine basılır.
+Hücreler düz metindir; newline, emoji ve XML özel karakterleri korunur. İlk görünen satır
+başlıktır; CTB grid.txt XML'inde başlık satırı en sona taşınır. Yeni tablonun col_widths
+attribute'u her sütun için 0; justification=left; col_min=col_max=200 olur.
+
+Mevcut desteklenen tablo kutusunda Tabloyu düzenle düğmesi görünür. Bu ilk sürüm yalnızca
+hücre metinlerini düzenler; mevcut satır/sütun sayısını değiştirmez. Root table attribute'ları
+(col_widths ve bilinmeyen attribute'lar dahil), justification, col_min ve col_max aynen korunur.
+XML'e yerleştirilmiş biçimli/nested cell content, geçersiz UTF-8 veya sınır dışı tablo varsa
+hücre editörü açılmaz; nesne korunan kutu olarak kalır ve normal metin kaydı ona dokunmaz.
+
+Yeni tablo boyutu değiştirilirken mevcut hücreler korunur. Küçültmede dolu hücrelerin dışarıda
+kalması engellenir; kullanıcı önce bu hücreleri temizlemelidir. Nesne silme bu yamada yoktur.
+Tablo değişiklikleri metinden ayrı payload'ta, aynı undo/redo snapshot'ında tutulur. Undo yeni
+tabloyu kaldırırsa Save isteğine dahil edilmez. Cancel/Escape yalnızca diyaloğu kapatır.
+
+RichTextTableCodec yalnızca rectangular string arrays alır; key, XML karakterleri ve boyut
+kontrollerini yapar. Hücre başına 5000 karakter, toplam tablo JSON alanına 2 milyon karakter
+ve en fazla 20 tablo edit payload'ı sınırı vardır. Yeni resim/dosya/tablo nesnelerinin toplamı
+bir Save'de en fazla 10 olur. Mevcut tabloların nesne sırası ve tüm object offset'leri aynı
+koruma kurallarına tabidir. Yeni tabloda node.has_table=1 olur. txt/ts_lastsave, offset'ler ve
+grid kayıtları tek tenant transaction'ında yazılır; metadata değişmez ve kaydı bulunamayan
+nesne işlem hatasına neden olur. Admin/writable/real node/read-only/revision/CSRF sürer.
+
+Beklenen Java test sayısı 162; Node test sayısı 25:
+`node --test src/test/js/*.test.cjs`.
+Manuel test: CTB kopyasında yeni tablo ekleyip header/body metinleri, emoji, & ve newline
+yazın; ölçüleri değiştirin ve undo/redo deneyin. Demo 15 ve 53'te mevcut tabloların hücrelerini
+düzenleyin; Save/reopen ve CherryTree'de header sırası ve sütun genişliklerini kontrol edin.
+Metin eklenince tablo ve diğer nesnelerin offset'lerinin doğru yerde kaldığını kontrol edin.

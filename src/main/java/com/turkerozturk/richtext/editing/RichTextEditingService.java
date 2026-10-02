@@ -26,7 +26,7 @@ public class RichTextEditingService {
     public RichTextEditingService(NodePropertiesService properties, EmbeddedUploadPolicy uploads) { this.properties = properties; this.uploads = uploads; }
 
     public record Editor(Node node, RichTextDocument document, String revision, Map<String, ObjectInfo> objects, int maxEmbeddedFileBytes) { }
-    public record ObjectInfo(String label, String imageUrl) { }
+    public record ObjectInfo(String label, String imageUrl, List<List<String>> tableRows) { }
     static record Stored(ProtectedRichTextCodec.Reference reference, Object[] values) { }
 
     /** Checks actual object tables as well as read-only and alias restrictions before offering an editor. */
@@ -48,7 +48,12 @@ public class RichTextEditingService {
                 else if (!filename.isEmpty()) label = "📎 " + filename;
                 else { label = "Image"; imageUrl = "/images/" + id + "/" + object.reference().offset(); }
             }
-            info.put(object.reference().key(), new ObjectInfo(label, imageUrl));
+            List<List<String>> tableRows = null;
+            if (table.equals("grid")) {
+                try { tableRows = RichTextTableCodec.open(tableXml(object)); }
+                catch (IllegalArgumentException ignored) { /* Unsupported table remains protected and untouched. */ }
+            }
+            info.put(object.reference().key(), new ObjectInfo(label, imageUrl, tableRows));
         }
         return new Editor(node, new ProtectedRichTextCodec().open(document, references(objects)), revision(node, objects), info, uploads.fileBytes());
     }
@@ -78,6 +83,12 @@ public class RichTextEditingService {
     /** Validates attachments/images together and commits their payloads, offsets and node metadata atomically. */
     @Transactional
     public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson) {
+        save(id, xml, expectedRevision, imageJson, fileJson, "{}");
+    }
+
+    /** Saves table cell edits and new tables without changing existing table metadata or other object payloads. */
+    @Transactional
+    public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson, String tableJson) {
         Node node = editableNode(id);
         var objects = storedObjects(id);
         if (!revision(node, objects).equals(expectedRevision)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Node changed; reload the editor.");
@@ -85,6 +96,7 @@ public class RichTextEditingService {
         ProtectedRichTextCodec.Saved saved;
         Map<String, byte[]> images;
         Map<String, PendingRichTextFiles.File> files;
+        Map<String, String> tables;
         try {
             if (imageJson == null || fileJson == null || (long) imageJson.length() + fileJson.length() > EmbeddedUploadPolicy.JSON_CHARACTERS)
                 throw new IllegalArgumentException("Upload too large");
@@ -94,7 +106,17 @@ public class RichTextEditingService {
             if (images.size() + files.size() > 10 || images.values().stream().mapToLong(bytes -> bytes.length).sum()
                     + files.values().stream().mapToLong(file -> file.bytes().length).sum() > EmbeddedUploadPolicy.TOTAL_BYTES)
                 throw new IllegalArgumentException("Upload too large");
+            var tableRows = RichTextTableCodec.decode(tableJson);
+            var tableXmls = new java.util.LinkedHashMap<String, String>();
+            for (var entry : tableRows.entrySet()) {
+                Stored original = objects.stream().filter(object -> object.reference().key().equals(entry.getKey())).findFirst().orElse(null);
+                if (!entry.getKey().startsWith("new-table:") && original == null) throw new IllegalArgumentException("Unknown table");
+                tableXmls.put(entry.getKey(), RichTextTableCodec.write(entry.getValue(), original == null ? null : tableXml(original)));
+            }
+            tables = Map.copyOf(tableXmls);
             var keys = new java.util.HashSet<String>(images.keySet()); keys.addAll(files.keySet());
+            tables.keySet().stream().filter(key -> key.startsWith("new-table:")).forEach(keys::add);
+            if (keys.size() > 10) throw new IllegalArgumentException("Too many new objects");
             saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(objects), keys);
             var original = "custom-colors".equals(node.getSyntax()) ? new RichTextXmlReader().read(node.getTxt())
                     : new RichTextDocument(List.of());
@@ -128,7 +150,33 @@ public class RichTextEditingService {
         }
         if (!pending.isEmpty()) entityManager.createNativeQuery("UPDATE node SET has_image = 1 WHERE node_id = :id")
                 .setParameter("id", id).executeUpdate();
+        for (var entry : tables.entrySet()) {
+            boolean fresh = entry.getKey().startsWith("new-table:");
+            var reference = fresh ? null : objects.stream().map(Stored::reference).filter(ref -> ref.key().equals(entry.getKey())).findFirst().orElseThrow();
+            int offset = fresh ? saved.newImages().get(entry.getKey()) : saved.offsets().get(reference);
+            entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
+                String sql = fresh ? "INSERT INTO grid (txt, node_id, offset, justification, col_min, col_max) VALUES (?, ?, ?, 'left', 200, 200)"
+                        : "UPDATE grid SET txt = ? WHERE node_id = ? AND offset = ?";
+                try (var statement = connection.prepareStatement(sql)) {
+                    statement.setString(1, entry.getValue()); statement.setLong(2, id); statement.setInt(3, offset);
+                    if (statement.executeUpdate() != 1) throw new java.sql.SQLException("Table changed; reload the editor");
+                }
+            });
+        }
+        if (tables.keySet().stream().anyMatch(key -> key.startsWith("new-table:"))) entityManager.createNativeQuery("UPDATE node SET has_table = 1 WHERE node_id = :id")
+                .setParameter("id", id).executeUpdate();
         entityManager.clear();
+    }
+
+    /** SQLite may expose table XML as text or UTF-8 binary, depending on how the CTB was written. */
+    private static String tableXml(Stored object) {
+        Object value = object.values()[4];
+        if (value instanceof byte[] bytes) {
+            try { return StandardCharsets.UTF_8.newDecoder().onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT).decode(java.nio.ByteBuffer.wrap(bytes)).toString(); }
+            catch (java.nio.charset.CharacterCodingException error) { throw new IllegalArgumentException("Invalid table UTF-8", error); }
+        }
+        return value == null ? "" : value.toString();
     }
 
     /** Uses the current tenant transaction's JDBC connection, avoiding inferred Hibernate scalar types. */

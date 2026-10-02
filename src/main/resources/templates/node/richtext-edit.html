@@ -16,6 +16,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="hidden" name="xml" id="richXml">
 <input type="hidden" name="images" id="richImages" value="{}">
 <input type="hidden" name="files" id="richFiles" value="{}">
+<input type="hidden" name="tables" id="richTables" value="{}">
 <label><input type="checkbox" id="richVisualMode" checked> <span th:text="#{richtext.edit.visual}"></span></label>
 <div class="toolbar">
 <button type="button" id="richUndo" th:text="#{richtext.edit.undo}" title="Ctrl+Z"></button>
@@ -35,6 +36,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="file" id="richFilePicker" hidden>
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
 <span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError}"></span>
+<button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
 <button type="button" id="richLink" th:text="#{richtext.edit.link}"></button>
 <button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
 </div>
@@ -44,6 +46,16 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 </form>
+<dialog id="richTableDialog" style="max-width:95vw;max-height:90vh" aria-labelledby="richTableTitle">
+<h2 id="richTableTitle" th:text="#{richtext.edit.table}"></h2>
+<p th:text="#{richtext.edit.tableHelp}"></p>
+<label for="richTableRows" th:text="#{richtext.edit.tableRows}"></label><input id="richTableRows" type="number" min="1" max="100" value="3">
+<label for="richTableColumns" th:text="#{richtext.edit.tableColumns}"></label><input id="richTableColumns" type="number" min="1" max="20" value="3">
+<button type="button" id="richTableResize" th:text="#{richtext.edit.tableResize}"></button>
+<div id="richTableCells" style="overflow:auto;max-height:55vh;margin:1rem 0"></div>
+<p id="richTableError" role="alert" hidden th:text="#{richtext.edit.tableError}"></p>
+<div class="actions"><button type="button" id="richTableApply" th:text="#{richtext.edit.linkApply}"></button><button type="button" id="richTableCancel" th:text="#{richtext.edit.cancel}"></button></div>
+</dialog>
 <dialog id="richLinkDialog" aria-labelledby="richLinkTitle">
 <h2 id="richLinkTitle" th:text="#{richtext.edit.link}"></h2>
 <label for="richLinkUrl" th:text="#{richtext.edit.linkUrl}"></label>

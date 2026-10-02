@@ -22,7 +22,7 @@ class RichTextEditingServiceTest {
         connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:");
         try (var statement = connection.createStatement()) {
             statement.execute("CREATE TABLE image (node_id INTEGER, offset INTEGER, justification TEXT, anchor TEXT, png BLOB, filename TEXT, link TEXT, time INTEGER)");
-            statement.execute("CREATE TABLE grid (node_id INTEGER, offset INTEGER, txt TEXT)");
+            statement.execute("CREATE TABLE grid (node_id INTEGER, offset INTEGER, justification TEXT, txt TEXT, col_min INTEGER, col_max INTEGER)");
             statement.execute("CREATE TABLE codebox (node_id INTEGER, offset INTEGER, txt TEXT)");
         }
         var session = mock(org.hibernate.Session.class);
@@ -133,6 +133,34 @@ class RichTextEditingServiceTest {
     @Test void rejectsUnsafeNewExternalTargetBeforeAnyWrite() {
         String revision = service.open(12).revision();
         assertThatThrownBy(() -> service.save(12, "<node><rich_text link='webs javascript:alert(1)'>Text</rich_text></node>", revision)).isInstanceOf(ResponseStatusException.class);
+        verify(query, never()).executeUpdate();
+    }
+
+    @Test void insertsTableWithHeaderLastAndUpdatesNodeFlag() throws Exception {
+        String tables = "{\"new-table:test\":[[\"Header\"],[\"Body\"]]}";
+        service.save(12, "<node><rich_text>😀</rich_text><rich_text __sweet_object='new-table:test'>\uFFFC</rich_text></node>", service.open(12).revision(), "{}", "{}", tables);
+        var stored = RichTextEditingService.readObjects(connection, 12);
+        assertThat(stored).hasSize(1); assertThat(stored.get(0).reference().table()).isEqualTo("grid");
+        assertThat(stored.get(0).reference().offset()).isEqualTo(1);
+        assertThat(RichTextTableCodec.open(stored.get(0).values()[4].toString()).get(0)).containsExactly("Header");
+        verify(entityManager).createNativeQuery(contains("has_table = 1"));
+    }
+    @Test void editsExistingTableCellsWhilePreservingMetadata() throws Exception {
+        try (var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO grid VALUES (12, 1, 'right', '<table col_widths=\"120\" future=\"keep\"><row><cell>Old</cell></row></table>', 80, 240)");
+        }
+        var editor = service.open(12);
+        assertThat(editor.objects().get("grid:1").tableRows().get(0)).containsExactly("Old");
+        service.save(12, "<node><rich_text>T</rich_text><rich_text __sweet_object='grid:1'>\uFFFC</rich_text><rich_text>ext</rich_text></node>", editor.revision(), "{}", "{}", "{\"grid:1\":[[\"New\"]]}");
+        var row = RichTextEditingService.readObjects(connection, 12).get(0).values();
+        assertThat(row[3]).isEqualTo("right"); assertThat(((Number) row[5]).intValue()).isEqualTo(80); assertThat(((Number) row[6]).intValue()).isEqualTo(240);
+        var table = new com.turkerozturk.richtext.experimental.EmbeddedContentAdapter().readTable(row[4].toString());
+        assertThat(table.attributes()).containsEntry("future", "keep").containsEntry("col_widths", "120");
+        assertThat(table.rows().get(0)).containsExactly("New");
+    }
+    @Test void rejectsUnknownTableBeforeAnyWrite() {
+        assertThatThrownBy(() -> service.save(12, "<node><rich_text>Text</rich_text></node>", service.open(12).revision(), "{}", "{}", "{\"grid:999\":[[\"X\"]]}"))
+                .isInstanceOf(ResponseStatusException.class);
         verify(query, never()).executeUpdate();
     }
 

@@ -22,8 +22,8 @@ public class RichTextEditingController {
 
     @PostMapping("/nodes/richtext/edit/{id}")
     public String save(@PathVariable long id, @RequestParam String xml, @RequestParam String revision,
-            @RequestParam(defaultValue = "{}") String images, @RequestParam(defaultValue = "{}") String files) {
-        service.save(id, xml, revision, images, files);
+            @RequestParam(defaultValue = "{}") String images, @RequestParam(defaultValue = "{}") String files, @RequestParam(defaultValue = "{}") String tables) {
+        service.save(id, xml, revision, images, files, tables);
         return "redirect:/nodes/" + id;
     }
 }

@@ -10,6 +10,7 @@
     const sub = (value, start, end) => Array.from(value).slice(start, end).join('');
     let selection = [0, 0];
     const pendingImages = {}, pendingFiles = {};
+    let tableChanges = {};
     const uploadLimit = window.richEditorMaxFileBytes || 9000000;
     let readingImage = false;
     const plainClipboard = text => text.replace(/\uFFFC/g, '');
@@ -36,12 +37,12 @@
     let historyIndex = -1;
     let composing = false;
     const snapshot = () => ({runs: runs.map(run => ({text: run.text, attributes: {...run.attributes}})),
-        selection: [...selection]});
+        selection: [...selection], tables:JSON.parse(JSON.stringify(tableChanges))});
 
     /** Captures text and formatting as one editor state, discarding the obsolete redo branch. */
     function commitHistory() {
         const next = snapshot();
-        if (historyIndex >= 0 && JSON.stringify(history[historyIndex].runs) === JSON.stringify(next.runs)) return;
+        if (historyIndex >= 0 && JSON.stringify(history[historyIndex].runs) === JSON.stringify(next.runs) && JSON.stringify(history[historyIndex].tables) === JSON.stringify(next.tables)) return;
         history.splice(historyIndex + 1);
         history.push(next);
         if (history.length > 200) history.shift();
@@ -64,6 +65,7 @@
         historyIndex = next;
         const state = history[historyIndex];
         runs = state.runs.map(run => ({text: run.text, attributes: {...run.attributes}}));
+        tableChanges = JSON.parse(JSON.stringify(state.tables || {}));
         previous = runs.map(run => run.text).join('');
         input.value = previous;
         selection = [...state.selection];
@@ -228,6 +230,68 @@
         });
     }
 
+    const tableButton=document.getElementById('richTable'),tableDialog=document.getElementById('richTableDialog');
+    let openTable;
+    if (tableButton && tableDialog) {
+        const rowCount=document.getElementById('richTableRows'),columnCount=document.getElementById('richTableColumns');
+        const cells=document.getElementById('richTableCells'),error=document.getElementById('richTableError');
+        let tableKey, tableSelection, inputs=[];
+        const readCells=()=>inputs.map(row=>row.map(input=>input.value));
+        function drawTable(rows) {
+            cells.replaceChildren();inputs=[];
+            const table=document.createElement('table');table.style.borderCollapse='collapse';
+            rows.forEach((row,index)=>{
+                const tr=document.createElement('tr'),controls=[];
+                row.forEach(value=>{
+                    const cell=document.createElement(index===0?'th':'td'),input=document.createElement('textarea');
+                    input.value=value;input.maxLength=5000;input.rows=2;
+                    input.style.width='10rem';input.style.minHeight='3rem';input.style.font='inherit';
+                    cell.appendChild(input);tr.appendChild(cell);controls.push(input);
+                });table.appendChild(tr);inputs.push(controls);
+            });cells.appendChild(table);
+        }
+        /** Opens cell editing in header-first order; existing table dimensions stay fixed in this first version. */
+        openTable=key=>{
+            captureSelection();tableSelection=[...selection];tableKey=key;
+            const rows=key ? tableChanges[key] || window.richEditorObjects[key].tableRows : [['','',''],['','',''],['','','']];
+            rowCount.value=rows.length;columnCount.value=rows[0].length;
+            const existing=!!key && !key.startsWith('new-table:');
+            rowCount.disabled=columnCount.disabled=document.getElementById('richTableResize').disabled=existing;
+            drawTable(rows);error.hidden=true;tableDialog.showModal();
+        };
+        function closeTable(){tableDialog.close();selection=[...tableSelection];focusEditor();restoreSelection();}
+        tableButton.addEventListener('pointerdown',event=>event.preventDefault());
+        tableButton.addEventListener('click',()=>openTable(null));
+        document.getElementById('richTableResize').addEventListener('click',()=>{
+            const nr=Number(rowCount.value),nc=Number(columnCount.value),old=readCells();
+            if(!Number.isInteger(nr)||!Number.isInteger(nc)||nr<1||nr>100||nc<1||nc>20
+                ||old.some((row,r)=>row.some((value,c)=>value && (r>=nr||c>=nc)))){error.hidden=false;return;}
+            drawTable(Array.from({length:nr},(_,r)=>Array.from({length:nc},(_,c)=>old[r]?.[c] || '')));error.hidden=true;
+        });
+        document.getElementById('richTableApply').addEventListener('click',()=>{
+            const rows=readCells();
+            if(Number(rowCount.value)!==rows.length || Number(columnCount.value)!==rows[0].length || rows.some(row=>row.some(value=>value.length>5000))){error.hidden=false;return;}
+            if(!tableKey) {
+                if(runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length>=10){error.hidden=false;return;}
+                closeTable();captureSelection();
+                if(!replace(selection[0],selection[1],'\uFFFC'))return;
+                tableKey='new-table:'+crypto.randomUUID();
+                let offset=0;
+                for(const run of runs){
+                    if(offset===selection[0] && run.text==='\uFFFC' && !run.attributes.__sweet_object){run.attributes={__sweet_object:tableKey};break;}
+                    offset+=count(run.text);
+                }
+                window.richEditorObjects=window.richEditorObjects || {};
+                window.richEditorObjects[tableKey]={label:tableButton.textContent,tableRows:rows};
+                previous=runs.map(run=>run.text).join('');input.value=previous;
+                selection=[selection[0]+1,selection[0]+1];
+            } else closeTable();
+            tableChanges[tableKey]=rows;render();commitHistory();focusEditor();restoreSelection();
+        });
+        document.getElementById('richTableCancel').addEventListener('click',closeTable);
+        tableDialog.addEventListener('cancel',event=>{event.preventDefault();closeTable();});
+    }
+
     /** Builds a safe preview from text nodes and controlled styles, never from stored HTML. */
     function render() {
         preview.replaceChildren();
@@ -258,6 +322,11 @@
                 const span = document.createElement('span'); span.dataset.richCaret = 'true';
                 span.appendChild(document.createTextNode('\u200B')); return span;
             };
+            if (object.tableRows && openTable) {
+                const button=document.createElement('button');button.type='button';button.textContent=tableButton.dataset.edit;
+                button.addEventListener('pointerdown',event=>event.preventDefault());
+                button.addEventListener('click',()=>openTable(key));slot.appendChild(button);
+            }
             paragraph.appendChild(caret()); paragraph.appendChild(slot); paragraph.appendChild(caret());
             continue;
           }
@@ -294,6 +363,9 @@
     /** Serializes the text model to CTB XML; the server validates and canonicalizes it again. */
     form.addEventListener('submit', event => {
         if (readingImage) { event.preventDefault(); return; }
+        const tablesInput=document.getElementById('richTables');
+        const activeKeys=runs.map(run=>run.attributes.__sweet_object);
+        if(tablesInput)tablesInput.value=JSON.stringify(Object.fromEntries(Object.entries(tableChanges).filter(([key])=>activeKeys.includes(key))));
         const filesInput = document.getElementById('richFiles');
         if (filesInput) filesInput.value = JSON.stringify(Object.fromEntries(runs.filter(run=>pendingFiles[run.attributes.__sweet_object]).map(run=>[run.attributes.__sweet_object,pendingFiles[run.attributes.__sweet_object]])));
         const imageInput = document.getElementById('richImages');
@@ -334,7 +406,7 @@
             const activeKeys = runs.map(run=>run.attributes.__sweet_object);
             const activeImages = Object.entries(pendingImages).filter(([key])=>activeKeys.includes(key));
             const activeFiles = Object.entries(pendingFiles).filter(([key])=>activeKeys.includes(key));
-            if (activeImages.length + activeFiles.length >= 10 || activeImages.reduce((n,[,value])=>n+value.length,0)
+            if (runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length >= 10 || activeImages.reduce((n,[,value])=>n+value.length,0)
                 + activeFiles.reduce((n,[,value])=>n+value.data.length,0)+data.length > 29000000) throw new Error('Upload too large');
             const key = (attachment ? 'new-file:' : 'new-image:') + crypto.randomUUID();
             if (!replace(at[0],at[1],'\uFFFC')) return;

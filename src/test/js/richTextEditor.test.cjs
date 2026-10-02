@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 /** Executes the real editor script against a small DOM double to test model/history behavior. */
-function editor(initialRuns, maxFileBytes) {
+function editor(initialRuns, maxFileBytes, objects) {
     const handlers = new Map();
     function element(id = '') {
         return {id, value:'', style:{}, dataset:{}, childNodes:[], selectionStart:0, selectionEnd:0,
@@ -14,7 +14,7 @@ function editor(initialRuns, maxFileBytes) {
             showModal() {this.open=true;}, close() {this.open=false;}, click() {const handler=handlers.get(id+':click');if(handler)handler({});},
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel'].map(id => [id, element(id)]));
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     let saved;
@@ -31,7 +31,7 @@ function editor(initialRuns, maxFileBytes) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:{},richEditorMaxFileBytes:maxFileBytes},
+    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},richEditorMaxFileBytes:maxFileBytes},
         crypto:{randomUUID:()=> 'test-uuid'},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
@@ -165,4 +165,34 @@ test('remove external link skips protected objects and preserves internal links'
  const e=editor([{text:'A',attributes:{link:'webs https://example.org/'}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}},{text:'B',attributes:{link:'node 12'}}]);
  e.select(0,3);e.fire('richLink','click');e.fire('richLinkRemove','click');
  const runs=e.runs();assert.equal(runs[0].attributes.link,undefined);assert.equal(runs[1].attributes.__sweet_object,'image:1');assert.equal(runs[2].attributes.link,'node 12');
+});
+
+test('new table cells and protected slot travel together through undo/redo',()=>{
+ const e=editor();e.select(1,1);e.fire('richTable','click');
+ const rows=e.ids.richTableCells.childNodes[0].childNodes;
+ rows[0].childNodes[0].childNodes[0].value='Header';rows[1].childNodes[0].childNodes[0].value='Body';
+ e.fire('richTableApply','click');assert.equal(text(e.runs()),'A\uFFFC😀B\nC');
+ assert.equal(JSON.parse(e.ids.richTables.value)['new-table:test-uuid'][0][0],'Header');
+ e.key('z');e.runs();assert.deepEqual(JSON.parse(e.ids.richTables.value),{});
+ e.key('y');e.runs();assert.equal(JSON.parse(e.ids.richTables.value)['new-table:test-uuid'][1][0],'Body');
+});
+test('table cell edits and cancel preserve the existing slot with independent history',()=>{
+ const e=editor([{text:'\uFFFC',attributes:{__sweet_object:'grid:0'}}],undefined,{'grid:0':{label:'Table',tableRows:[['Original']]}});
+ const slot=e.ids.richPreview.childNodes[0].childNodes.find(node=>node.dataset.richObject);
+ slot.childNodes[0].click();assert.equal(e.ids.richTableRows.disabled,true);
+ e.ids.richTableCells.childNodes[0].childNodes[0].childNodes[0].childNodes[0].value='Changed';
+ e.fire('richTableApply','click');e.runs();assert.equal(JSON.parse(e.ids.richTables.value)['grid:0'][0][0],'Changed');
+ e.key('z');e.runs();assert.deepEqual(JSON.parse(e.ids.richTables.value),{});assert.equal(text(e.runs()),'\uFFFC');
+ e.key('y');e.runs();assert.equal(JSON.parse(e.ids.richTables.value)['grid:0'][0][0],'Changed');
+ const next=e.ids.richPreview.childNodes[0].childNodes.find(node=>node.dataset.richObject);next.childNodes[0].click();
+ e.ids.richTableCells.childNodes[0].childNodes[0].childNodes[0].childNodes[0].value='Cancelled';
+ e.fire('richTableCancel','click');e.runs();assert.equal(JSON.parse(e.ids.richTables.value)['grid:0'][0][0],'Changed');
+});
+test('table resize preserves cells and refuses to discard nonempty removed cells',()=>{
+ const e=editor();e.fire('richTable','click');
+ e.ids.richTableCells.childNodes[0].childNodes[2].childNodes[2].childNodes[0].value='Keep';
+ e.ids.richTableRows.value=1;e.ids.richTableColumns.value=1;e.fire('richTableResize','click');
+ assert.equal(e.ids.richTableError.hidden,false);assert.equal(e.ids.richTableCells.childNodes[0].childNodes.length,3);
+ e.ids.richTableRows.value=4;e.ids.richTableColumns.value=4;e.fire('richTableResize','click');
+ assert.equal(e.ids.richTableError.hidden,true);assert.equal(e.ids.richTableCells.childNodes[0].childNodes[2].childNodes[2].childNodes[0].value,'Keep');
 });
