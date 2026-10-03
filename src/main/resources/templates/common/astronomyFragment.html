@@ -1,39 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"><body>
 <div th:fragment="astronomyFragment">
-
-
     <span id="clock"></span>
-
-    <span id="moonphase" th:text="${moonTime4j.moonPhaseWidget}"
-         th:title="${moonTime4j.moonPhaseWidgetSecondary}"></span>
-
-
-
-    <button type="button"
-            id="AlertsBellButton"
-            class="btn"
-            data-bs-toggle="popover"
-            data-bs-placement="bottom"
-            data-bs-trigger="focus"
-            title="Sun And Moon"
-            data-bs-html="true"
-            data-bs-content="<div id='AlertBellContainer'>Loading...</div>">
-
-      <!--  <img th:src="@{/img/icons/ct_w-sunny.svg}"/>
-        <img th:src="@{/img/icons/ct_w-night-clear.svg}"/> -->
-        <i class="fas fa-sun"></i>
-        <i class="fas fa-moon"></i>
-
-    </button>
-
-
-
+    <th:block th:if="${astronomyEnabled}">
+        <span th:if="${moonTime4j != null}" id="moonphase" th:text="${moonTime4j.moonPhaseWidget}"
+              th:title="${#messages.msg(moonTime4j.lastPhaseKey) + ' ' + moonTime4j.lastFormatted + ' → ' + #messages.msg(moonTime4j.nextPhaseKey) + ' ' + moonTime4j.nextFormatted + ' (' + astronomyInfo.timezone + ')'}"></span>
+        <button type="button" class="btn astronomy-button" data-bs-toggle="popover" data-bs-placement="bottom"
+                data-bs-trigger="focus" th:title="#{astronomy.title}" data-bs-html="true"
+                th:attr="data-astronomy-error=#{astronomy.loadError},data-astronomy-loading=#{astronomy.loading}"
+                data-bs-content="&lt;div class='astronomy-popup'&gt;&lt;/div&gt;">
+            <i class="fas fa-sun" aria-hidden="true"></i><i class="fas fa-moon" aria-hidden="true"></i>
+        </button>
+    </th:block>
 </div>
-
-</body>
-</html>
+</body></html>

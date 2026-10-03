@@ -20,281 +20,46 @@
  */
 package com.turkerozturk.sunandmoon;
 
-import jakarta.annotation.PostConstruct;
-import net.time4j.*;
+import net.time4j.Moment;
 import net.time4j.calendar.astro.MoonPhase;
-import net.time4j.engine.TimeMetric;
-import net.time4j.format.expert.ChronoFormatter;
-import net.time4j.format.expert.PatternType;
-import net.time4j.tz.Timezone;
-import net.time4j.tz.ZonalOffset;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-/**
- * Simdilik tek amaci Time4j kutuphanesini kullanarak icinde bulundugumuz iki ay halini gorsellestiren bir html string
- * icerik dondurmek. Bu sinifa moment yani simdiki zamani gonderip getMoonPhaseWidget() metodu ile html icerigi almak.
- * Ay hakkinda diger bilgileri Time4j ve commons-suncalc ile almak kolay. Ama bu ay fazlarini almak zor. Bir tam gunum
- * harcandi.
- */
 @Component
 public class MoonTime4j {
+    public record Snapshot(String moonPhaseWidget, String lastPhaseKey, String nextPhaseKey,
+                           String lastFormatted, String nextFormatted, int illuminationPercent) {}
 
-    @Value("${astronomy.zonalOffset}")
-    private Integer zonalOffset;
-    private Moment moment;
-    private int illuminationPercent;
-    private MoonPhaseEnum lastMoonPhase;
-    private MoonPhaseEnum nextMoonPhase;
-    private Moment lastMoonPhaseMoment;
-    private Moment nextMoonPhaseMoment;
-    private String moonPhaseWidget;
-    private String moonPhaseWidgetSecondary;
-
-
-    public MoonTime4j() {
-    }
-
-    @PostConstruct
-    public void setup() {
-        Moment moment = Moment.nowInSystemTime();
-        this.moment = moment;
-        this.illuminationPercent = (int) MoonPhase.getIllumination(moment);
-        prepareLastMoonPhase(moment);
-        prepareNextMoonPhase(moment);
-
-        prepareMoonPhaseWidget();
-        prepareMoonPhaseWidgetSecondary();
-    }
-
-    private void prepareMoonPhaseWidget() {
-        StringBuilder sb = new StringBuilder();
-
-        Duration durationFromLastToNow = calculateDurationBetween(lastMoonPhaseMoment, moment);
-        Duration durationFromNowToNext = calculateDurationBetween(moment, nextMoonPhaseMoment);
-
-        sb.append("\n");
-        sb.append(lastMoonPhase.phaseEmoticon);
-        sb.append(" ");
-        sb.append(drawDurationDays(durationFromLastToNow));
-        sb.append(">");
-        sb.append(drawDurationDays(durationFromNowToNext));
-        sb.append(" ");
-        sb.append(nextMoonPhase.phaseEmoticon);
-
-        this.moonPhaseWidget = sb.toString();
-    }
-
-    private void prepareMoonPhaseWidgetSecondary() {
-        StringBuilder sb = new StringBuilder();
-
-        Duration durationFromLastToNow = calculateDurationBetween(lastMoonPhaseMoment, moment);
-        Duration durationFromNowToNext = calculateDurationBetween(moment, nextMoonPhaseMoment);
-
-
-        // sb.append("\n");
-        // sb.append(durationFromLastToNow);
-
-        //  sb.append("\n");
-        //  sb.append(durationFromNowToNext);
-
-        sb.append("\n");
-        sb.append(nextMoonPhase.phaseEmoticon + formattedDate(nextMoonPhaseMoment) + " " + nextMoonPhase.time4jName);
-        sb.append("\n");
-        sb.append("\uD83E\uDC0A"+ " " + formattedDate(moment) + " NOW");
-        sb.append("\n");
-        sb.append(lastMoonPhase.phaseEmoticon + formattedDate(lastMoonPhaseMoment) + " " + lastMoonPhase.time4jName);
-
-
-        this.moonPhaseWidgetSecondary = sb.toString();
-    }
-
-    /**
-     * example:
-     * P1DT15H9M (duration.toString boyle bir string cikti veriyor, gun saat dakikayi buradan akmak mumkun
-     *            basinda eksi isareti de olur fark negatif cikarsa)
-     * P6DT5H4M
-     * 🌕 ->------ 🌗
-     * @param duration
-     * @return
-     */
-    private String drawDurationDays(Duration duration) {
-        Pattern pattern = Pattern.compile("\\d+");
-        Matcher matcher = pattern.matcher(duration.toString());
-        if (matcher.find()) {
-            return drawLines(Integer.parseInt(matcher.group()));
-        } else {
-            return null;
+    /** Builds an immutable phase snapshot for the supplied instant and IANA time zone. */
+    public Snapshot calculate(Instant now, ZoneId zone) {
+        Moment moment = Moment.from(now);
+        Moment previous = null, next = null;
+        MoonPhase previousPhase = null, nextPhase = null;
+        for (MoonPhase phase : MoonPhase.values()) {
+            Moment before = phase.before(moment);
+            Moment after = phase.atOrAfter(moment);
+            if (previous == null || before.isAfter(previous)) { previous = before; previousPhase = phase; }
+            if (next == null || after.isBefore(next)) { next = after; nextPhase = phase; }
         }
+        var formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm").withZone(zone);
+        String widget = MoonPhaseEnum.byTime4jName(previousPhase.name()).phaseEmoticon + " "
+                + days(instant(previous), now) + ">" + days(now, instant(next)) + " "
+                + MoonPhaseEnum.byTime4jName(nextPhase.name()).phaseEmoticon;
+        return new Snapshot(widget, "astronomy.phase." + previousPhase.name(),
+                "astronomy.phase." + nextPhase.name(), formatter.format(instant(previous)),
+                formatter.format(instant(next)), (int) Math.round(MoonPhase.getIllumination(moment) * 100));
     }
 
-    private String drawLines(int number) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < number; i++) {
-            sb.append("-");
-        }
-        return sb.toString();
+    /** Converts the astronomical event to a Java instant for zone-aware presentation. */
+    private static Instant instant(Moment moment) {
+        return Instant.ofEpochSecond(moment.getPosixTime(), moment.getNanosecond());
     }
 
-    private Duration calculateDurationBetween(Moment moment1, Moment moment2) {
-        Timezone tz = Timezone.ofSystem();  // or choose an explicit zone
-        PlainTimestamp tsp1 = moment1.toZonalTimestamp(tz.getID());
-        PlainTimestamp tsp2 = moment2.toZonalTimestamp(tz.getID());
-
-        TimeMetric<IsoUnit,Duration<IsoUnit>> zonedMetric =
-                Duration.in(
-                        tz,
-                        CalendarUnit.YEARS, CalendarUnit.MONTHS, CalendarUnit.DAYS,
-                        ClockUnit.HOURS, ClockUnit.MINUTES);
-        Duration<IsoUnit> duration = zonedMetric.between(tsp1, tsp2);
-        return duration;
+    /** Each dash represents a complete elapsed day, not the first digit of a duration string. */
+    private static String days(Instant start, Instant end) {
+        return "-".repeat((int) Math.max(0, Math.min(31, Duration.between(start, end).toDays())));
     }
-
-
-    private void prepareLastMoonPhase(Moment moment) {
-
-        Map<MoonPhase, Moment> phaseMap = new HashMap<>();
-
-        phaseMap.put(MoonPhase.NEW_MOON, MoonPhase.NEW_MOON.before(moment));
-        phaseMap.put(MoonPhase.FIRST_QUARTER, MoonPhase.FIRST_QUARTER.before(moment));
-        phaseMap.put(MoonPhase.FULL_MOON, MoonPhase.FULL_MOON.before(moment));
-        phaseMap.put(MoonPhase.LAST_QUARTER, MoonPhase.LAST_QUARTER.before(moment));
-
-        MoonPhase closestPhase = null;
-        Moment closestDate = null;
-
-        for (Map.Entry<MoonPhase, Moment> entry : phaseMap.entrySet()) {
-            if (entry.getValue().isBefore(moment)) {
-                if (closestDate == null || entry.getValue().isAfter(closestDate)) {
-                    closestDate = entry.getValue();
-                    closestPhase = entry.getKey();
-                }
-            }
-        }
-
-        this.lastMoonPhase = MoonPhaseEnum.byTime4jName(closestPhase.toString());
-
-        this.lastMoonPhaseMoment = closestDate;
-
-    }
-
-    private void prepareNextMoonPhase(Moment moment) {
-
-        Map<MoonPhase, Moment> phaseMap = new HashMap<>();
-
-        phaseMap.put(MoonPhase.NEW_MOON, MoonPhase.NEW_MOON.atOrAfter(moment));
-        phaseMap.put(MoonPhase.FIRST_QUARTER, MoonPhase.FIRST_QUARTER.atOrAfter(moment));
-        phaseMap.put(MoonPhase.FULL_MOON, MoonPhase.FULL_MOON.atOrAfter(moment));
-        phaseMap.put(MoonPhase.LAST_QUARTER, MoonPhase.LAST_QUARTER.atOrAfter(moment));
-
-        MoonPhase closestPhase = null;
-        Moment closestDate = null;
-
-        for (Map.Entry<MoonPhase, Moment> entry : phaseMap.entrySet()) {
-            if (entry.getValue().isAfter(moment)) {
-                if (closestDate == null || entry.getValue().isBefore(closestDate)) {
-                    closestDate = entry.getValue();
-                    closestPhase = entry.getKey();
-                }
-            }
-        }
-
-        this.nextMoonPhase = MoonPhaseEnum.byTime4jName(closestPhase.toString());
-
-        this.nextMoonPhaseMoment = closestDate;
-    }
-
-    // TODO make timezone and date format separate
-    public String formattedDate(Moment moment) {
-        // http://time4j.net/tutorial/format.html
-        // https://stackoverflow.com/questions/44205662/formatting-time4j-moment kaynagi sayesinde zar zor buldum.
-        System.out.println("zonal offset: " + zonalOffset);
-        ChronoFormatter<Moment> f =
-                ChronoFormatter.ofMomentPattern(
-                        "uuuu-MM-dd HH:mm", PatternType.CLDR, Locale.ROOT, ZonalOffset.ofTotalSeconds(zonalOffset));
-
-
-        return f.format(moment);
-    }
-
-    public int getIlluminationPercent() {
-        return illuminationPercent;
-    }
-
-    public void setIlluminationPercent(int illuminationPercent) {
-        this.illuminationPercent = illuminationPercent;
-    }
-
-
-    public String getMoonPhaseWidget() {
-        return moonPhaseWidget;
-    }
-
-    public void setMoonPhaseWidget(String moonPhaseWidget) {
-        this.moonPhaseWidget = moonPhaseWidget;
-    }
-
-    public MoonPhaseEnum getLastMoonPhase() {
-        return lastMoonPhase;
-    }
-
-    public void setLastMoonPhase(MoonPhaseEnum lastMoonPhase) {
-        this.lastMoonPhase = lastMoonPhase;
-    }
-
-    public MoonPhaseEnum getNextMoonPhase() {
-        return nextMoonPhase;
-    }
-
-    public void setNextMoonPhase(MoonPhaseEnum nextMoonPhase) {
-        this.nextMoonPhase = nextMoonPhase;
-    }
-
-    public Moment getLastMoonPhaseMoment() {
-        return lastMoonPhaseMoment;
-    }
-
-    public void setLastMoonPhaseMoment(Moment lastMoonPhaseMoment) {
-        this.lastMoonPhaseMoment = lastMoonPhaseMoment;
-    }
-
-    public Moment getNextMoonPhaseMoment() {
-        return nextMoonPhaseMoment;
-    }
-
-    public void setNextMoonPhaseMoment(Moment nextMoonPhaseMoment) {
-        this.nextMoonPhaseMoment = nextMoonPhaseMoment;
-    }
-
-    public String getMoonPhaseWidgetSecondary() {
-        return moonPhaseWidgetSecondary;
-    }
-
-    public void setMoonPhaseWidgetSecondary(String moonPhaseWidgetSecondary) {
-        this.moonPhaseWidgetSecondary = moonPhaseWidgetSecondary;
-    }
-
-    public int getZonalOffset() {
-        return zonalOffset;
-    }
-
-    public void setZonalOffset(int zonalOffset) {
-        this.zonalOffset = zonalOffset;
-    }
-
-    public Moment getMoment() {
-        return moment;
-    }
-
-    public void setMoment(Moment moment) {
-        this.moment = moment;
-    }
-
-
 }

@@ -40,18 +40,7 @@
     </script>
 
 
-    <script>
-        $('#AlertsBellButton').on('show.bs.popover', function (e) {
-    $.ajax({
-        url: '/astronomy',
-        type: 'get',
-        cache: false,
-        success: function (data) {
-            $('#AlertBellContainer').html(data);
-        }
-    });
-});
-    </script>
+    <script th:src="@{/js/common/astronomyWidget.js}"></script>
 
 
 </div>

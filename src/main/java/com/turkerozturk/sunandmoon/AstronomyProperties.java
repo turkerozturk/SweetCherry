@@ -26,12 +26,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "astronomy")
 public class AstronomyProperties {
+    private boolean enabled = true;
     private String latitude;
     private String longitude;
     private String timezone;
     private int zonalOffset;
 
-    // Getters ve Setters
+    public boolean isEnabled() { return enabled; }
+
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 
     public String getLatitude() {
         return latitude;

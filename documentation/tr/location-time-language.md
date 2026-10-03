@@ -1,49 +1,58 @@
 # Konum, tarih/saat ve arayüz dili
 
-Bu belge mevcut davranışı ve release öncesi kalan düzenlemeleri ayırır. Ayarlar CTB dosyasına değil, JAR'ın yanındaki `application.yml` dosyasına aittir. Aynı sunucuyu kullanan istemciler astronomi için aynı yapılandırılmış konumu kullanır.
+Astronomi widget’ı çevrimdışı hesaplama yapan yardımcı bir özelliktir. Harici servis veya internet bağlantısı kullanmaz; hesaplar Commons Suncalc ve Time4J ile sunucuda yapılır. Ayarlar CTB dosyasına değil, JAR’ın yanındaki `application.yml` dosyasına aittir. Aynı sunucuyu kullanan istemciler aynı ayarlanmış konumu kullanır.
 
-## Mevcut konum ayarları
+## Konum ve etkinleştirme
 
 ```yaml
 astronomy:
+  enabled: true
   latitude: "40°59'21.5\"N"
   longitude: "29°02'14.4\"E"
   timezone: Europe/Istanbul
-  zonalOffset: 10800
 ```
 
-Bu değerler uygulamanın mevcut örnek konumudur; kullanıcının konumu otomatik bulunmaz. Tarayıcıdan GPS izni istenmez. Güneşin doğuş/batış saatleri için enlem ve boylam, yerel gösterim için zaman dilimi gerekir. Şehir düzeyinde konum seçmek bu yardımcı widget için genellikle yeterlidir; evin tam koordinatını yayımlamak gerekmez. Ay fazının anı konumdan bağımsızdır; onu yerel saat olarak göstermek zaman dilimine bağlıdır.
+Widget varsayılan olarak açıktır. Bu koordinatlar İstanbul’da örnek bir konumdur; kullanıcının gerçek konumu otomatik bulunmaz. Tarayıcıdan GPS izni istenmez. Kendi şehrinizin koordinatlarını ve IANA zaman dilimini girip uygulamayı yeniden başlatın. Şehir düzeyinde konum bu yardımcı bilgi için genellikle yeterlidir; evinizin tam koordinatını yayımlamanız gerekmez. Açılan bilgi kutusu, hesapların ayarlanmış konuma ait olduğunu, tarihi ve zaman dilimini belirtir.
 
-**DİKKAT:** `CommonsSunCalc` içindeki mevcut koordinat ayrıştırması N/S/E/W yönlerini ve kesirli saniyeleri doğru değerlendirmiyor. Örnekteki saniyelerin kesir kısmı kaybolabilir; S/W değerlerine güvenilmemeli. Yukarıdaki örnek mevcut yapılandırmayı belgeler; farklı konumlar için güvenilir yapılandırma desteği tamamlanmış sayılmaz.
+`astronomy.enabled: false` güneş/ay göstergesini ve hesaplamaları kapatır. Header’daki tarayıcı saati kalır. Widget kapalıyken konum alanlarının geçerli olması gerekmez.
 
-## Tarih ve zaman kaynakları
+Koordinatlar signed decimal derece veya derece/dakika/saniye (DMS) olarak verilebilir:
 
-| Alan | Mevcut kaynak |
+| Biçim | Enlem | Boylam |
+| --- | --- | --- |
+| Ondalık derece | `-33.5` | `151.2` |
+| DMS | `33°30'0"S` | `151°12'0"E` |
+
+N/E pozitif, S/W negatiftir; kesirli saniyeler korunur. İşaret ve yönü aynı değerde birlikte kullanmayın. Enlem −90…90, boylam −180…180 aralığındadır; dakika/saniye 60’tan küçük olmalıdır. Ondalık ayırıcı noktadır. Hatalı koordinat veya zaman diliminde başka bir konum kullanılmaz: bilgi kutusu uyarı verir, loga mesaj yazılır; düğüm sayfaları çalışmaya devam eder.
+
+Doğuş/batış bilgileri seçilen yerel gün içindir. Bazı enlem ve günlerde olay gerçekleşmez; örneğin kutup yazında güneş batmayabilir. Böyle durumlarda “—” gösterilir. Hesaplar yaklaşık astronomi bilgisidir; gözlem koşulları gerçek ufuk ve hava durumuna göre değişebilir.
+
+## Zaman kaynakları ve güncelleme
+
+| Alan | Kaynak |
 | --- | --- |
 | Header saati | Tarayıcıdaki `Date`; cihazın saati ve zaman dilimi. |
-| CTB `ts_creation` / `ts_lastsave` | Unix saniyesi; yeni yazmalarda `Instant.now()` ile alınır. |
-| `#dates` ile CTB tarih gösterimi | Sunucunun/JVM'nin varsayılan zaman dilimine bağlıdır. |
-| Güneş hesabı | Yapılandırılmış `astronomy.timezone`; hesap gününü seçen `LocalDate.now()` ise sunucunun varsayılan bölgesini kullanır. |
-| Ay fazı tarih gösterimi | `astronomy.zonalOffset` sabit saniye offset'i; duration hesabında sistem zaman dilimi de kullanılır. |
+| CTB `ts_creation` / `ts_lastsave` | Unix saniyesi; yeni yazmalarda `Instant.now()`. |
+| `#dates` ile CTB tarih gösterimi | Sunucunun/JVM’nin varsayılan zaman dilimi. |
+| Güneş/ay doğuş ve batış günü | Güncel anın `astronomy.timezone` içindeki yerel tarihi. |
+| Ay fazı tarihleri | Aynı IANA zaman dilimi; yaz/kış saati kuralları dahil. |
 
-`10800`, UTC+03:00 için saniye değeridir. Sabit offset yaz/kış saati değişen bölgelerde yeterli değildir. Dil seçmek zaman dilimi veya GPS konumu seçmek değildir. Sunucu ve istemci saatlerinin doğru olması gerekir.
+`astronomy.zonalOffset` eski yapılandırmalarla uyumluluk için okunabilir, ancak widget tarafından kullanılmaz; kaldırabilirsiniz. Dil seçmek zaman dilimi seçmek değildir. Ay fazının anı konumdan bağımsızdır; yerel saat gösterimi zaman dilimine bağlıdır.
 
-Ay fazı widget'ı `MoonTime4j` içinde başlangıçta hazırlanır; uzun süre çalışan uygulamada güncel anla yeniden hesaplama ihtiyacı vardır. Güneş hesabı ise controller advice üzerinden istekler sırasında çalışır. Bu yardımcı bilgiler henüz bütün bölgeler için doğrulanmış değildir.
+Hesap sonuçları değiştirilemez bir snapshot olarak en fazla bir dakika önbellekte tutulur. Sonraki sayfa isteği veya bilgi kutusunu açma işlemi gerektiğinde yeniden hesaplar. Ay fazı artık yalnızca uygulama açılışında hesaplanmaz. Her istemci için ayrı astronomi hesabı veya sürekli arka plan isteği yoktur. Açık bırakılan sayfadaki küçük faz göstergesi bir sonraki sayfa yüklemesinde güncellenir. Sunucu ve istemci saatleri doğru olmalıdır.
 
 ## Dil
 
-`LocaleConfiguration`, `locale` çereziyle dili saklar; varsayılan Türkçe'dir ve mevcut çerez süresi bir saattir. `lang` parametresi dili değiştirir. Mesaj dosyaları `messages.properties`, `messages_en.properties`, `messages_tr.properties` olup UTF-8 olarak düzenlenmelidir.
+`LocaleConfiguration`, `locale` çereziyle dili saklar; varsayılan Türkçe, mevcut çerez süresi bir saattir. `lang` parametresi dili değiştirir. Mesaj dosyaları `messages.properties`, `messages_en.properties`, `messages_tr.properties` olup UTF-8 olarak düzenlenmelidir.
 
-Dil değiştirme seçili düğümü, `_tenantView`, diğer URL seçeneklerini ve çapa bağlantısını korur. Bazı eski ekranlarda ve astronomi widget'ında sabit/teknik İngilizce veya Türkçe ifadeler vardır; mesaj dosyalarına taşınmaları gerekir. Tarih biçimi ile dil tercihi ayrıca ele alınmalıdır. `spring.mvc.locale` altındaki mevcut dil listesi, özel locale resolver'ın varsayılanını değiştiren bir kullanıcı ayarı olarak düşünülmemelidir.
+Dil değiştirme seçili düğümü, `_tenantView`, diğer URL seçeneklerini ve çapa bağlantısını korur. Astronomi başlıkları, faz adları, durum mesajları ve tablo etiketleri TR/EN mesaj dosyalarından gelir. Bazı eski ekranlarda sabit ifadeler bulunabilir. CTB tarih biçimi ve locale çerezi süresi ayrıca değerlendirilecektir. `spring.mvc.locale` altındaki mevcut dil listesi, özel locale resolver’ın varsayılanını değiştiren kullanıcı ayarı değildir.
 
-## Release öncesi çalışma
+## Kontroller ve sonraki işler
 
-- [ ] Koordinatları signed decimal derece veya açık DMS biçimiyle ayrıştır; yön/kesir ve geçerli aralıkları test et. Geçersiz konum sessizce başka konuma dönüşmemeli.
-- [ ] Güneş hesabının gününü yapılandırılmış IANA zaman diliminde seç.
-- [ ] Ay tarihlerini de aynı IANA zaman dilimiyle göster; sabit offset'e bağımlılığı kaldır.
-- [ ] Ay fazını güncel anla yenile; paylaşılan değişkenlerde eşzamanlı istek davranışını gözden geçir.
-- [ ] Widget'ı isteğe bağlı yap; konum belirtilmemişse örnek bir konumu gerçek kullanıcı konumu gibi sunma. Kapalıyken astronomi hesabı da çalışmamalı.
-- [ ] Ana ekran tarihlerini, locale çerezini ve astronomi mesajlarını TR/EN için kontrol et.
-- [ ] Farklı zaman dilimleri, S/W koordinatları, gün sınırı ve yaz/kış saati senaryolarını test et.
+Otomatik testler koordinat yönleri/kesirleri, geçersiz ayarlar, UTC gün sınırı, kutup yazı, IANA yaz saati, kapalı widget ve önbellek yenilemesini kapsar. Manuel kontrolde kendi konumunuzla saatleri, TR/EN etiketlerini, kapalı widget’ı ve hatalı ayarlarda düğüm sayfasının çalışmasını doğrulayın.
 
-Otomatik tarayıcı konumu, kullanıcıya özel konum saklama ve ayar arayüzü sonraki aşamadır; ilk sürüm için elle belirlenen konum ve açık bir etkinleştirme seçeneği yeterlidir.
+Kullanıcıya özel konum, isteğe bağlı tarayıcı konumu, ayar arayüzü ve CTB tarih gösteriminin zaman dilimi tercihi sonraki aşamadır. Mevcut widget sunucu düzeyinde elle belirlenmiş konum kullanır.
+
+Kullanılan kütüphaneler:
+- https://shredzone.org/maven/commons-suncalc/
+- https://github.com/MenoData/Time4J

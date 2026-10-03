@@ -2,10 +2,11 @@
 # https://shredzone.org/maven/commons-suncalc/examples.html
 # LOCATION
 astronomy:
+  enabled: true # Offline widget; configured location below is an example, not automatic GPS.
   latitude: 40°59'21.5"N
   longitude: 29°02'14.4"E
   timezone: Europe/Istanbul
-  zonalOffset: 10800
+  # Legacy zonalOffset is no longer used; timezone includes daylight-saving rules.
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # EMAIL

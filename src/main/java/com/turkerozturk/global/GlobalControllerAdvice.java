@@ -21,7 +21,7 @@
 package com.turkerozturk.global;
 
 import com.turkerozturk.sunandmoon.MoonTime4j;
-import com.turkerozturk.helpers.CommonsSunCalc;
+import com.turkerozturk.sunandmoon.AstronomyWidgetService;
 import com.turkerozturk.helpers.SolarSystem;
 import com.turkerozturk.multipledatabases.MultitenantConfiguration;
 import com.turkerozturk.multipledatabases.TenantContext;
@@ -46,29 +46,28 @@ public class GlobalControllerAdvice {
     private boolean syntaxHighlightingEnabled;
 
     @Autowired
-    private CommonsSunCalc commonsSunCalc;
-
-    @Autowired
-    private MoonTime4j moonTime4j;
+    private AstronomyWidgetService astronomy;
 
     @Autowired
     private TenantService tenantService;
 
+    @ModelAttribute("astronomyEnabled")
+    public boolean isAstronomyEnabled() { return astronomy.isEnabled(); }
+
+    @ModelAttribute("astronomyInfo")
+    public AstronomyWidgetService.Snapshot getAstronomyInfo() { return astronomy.snapshot(); }
+
     @ModelAttribute("astronomyWidget")
     public SolarSystem getAstronomyWidget() {
-        // Astronomy widget verisi burada elde edilir veya hesaplanir
-
-        commonsSunCalc.getAstronomy();
-        return commonsSunCalc.getSolarSystem();
+        var snapshot = astronomy.snapshot();
+        return snapshot == null ? null : snapshot.sun();
     }
-
 
     @ModelAttribute("moonTime4j")
-    public MoonTime4j getMoonTime4jWidget() {
-        // Astronomy widget verisi burada elde edilir veya hesaplanir
-        return moonTime4j;
+    public MoonTime4j.Snapshot getMoonTime4jWidget() {
+        var snapshot = astronomy.snapshot();
+        return snapshot == null ? null : snapshot.moon();
     }
-
 
     @ModelAttribute("tenantNames")
     public List<String> getTenantNames() {

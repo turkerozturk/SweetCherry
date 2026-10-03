@@ -1,35 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-
-
-</head>
-<body>
-    <section th:fragment="content">
-
-        <table class="table">
-            <tr>
-                <td th:text="${astronomyWidget.sunRiseFormatted}"></td>
-
-                <td th:text="${astronomyWidget.moonRiseFormatted}"></td>
-            </tr>
-            <tr>
-                <td>
-                    <img th:src="@{/img/icons/ct_W-sunny.svg}"/>
-                </td>
-
-                <td>
-                    <img th:src="@{/img/icons/ct_W-night-clear.svg}"/>
-                </td>
-            </tr>
-            <tr>
-                <td th:text="${astronomyWidget.sunSetFormatted}"></td>
-
-                <td th:text="${astronomyWidget.moonSetFormatted}"></td>
-            </tr>
-        </table>
-
-    </section>
-</body>
-</html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content">
+    <p th:unless="${astronomyEnabled}" th:text="#{astronomy.disabled}"></p>
+    <th:block th:if="${astronomyEnabled}">
+        <p th:if="${astronomyWidget == null}" th:text="#{astronomy.unavailable}"></p>
+        <th:block th:if="${astronomyWidget != null}">
+            <p class="small" th:text="#{astronomy.configured(${astronomyInfo.date},${astronomyInfo.timezone})}"></p>
+            <table class="table table-sm">
+                <thead><tr><th></th><th th:text="#{astronomy.sun}"></th><th th:text="#{astronomy.moon}"></th></tr></thead>
+                <tbody>
+                <tr><th th:text="#{astronomy.rise}"></th><td th:text="${astronomyWidget.sunRiseFormatted}"></td><td th:text="${astronomyWidget.moonRiseFormatted}"></td></tr>
+                <tr><th th:text="#{astronomy.set}"></th><td th:text="${astronomyWidget.sunSetFormatted}"></td><td th:text="${astronomyWidget.moonSetFormatted}"></td></tr>
+                </tbody>
+            </table>
+            <p class="small" th:text="#{astronomy.noEvent}"></p>
+            <p th:if="${moonTime4j != null}" th:text="#{astronomy.illumination(${moonTime4j.illuminationPercent})}"></p>
+        </th:block>
+    </th:block>
+</section>
+</body></html>
