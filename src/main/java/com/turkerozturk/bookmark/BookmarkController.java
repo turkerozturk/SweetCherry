@@ -55,6 +55,7 @@ public class BookmarkController {
 
         List<Bookmark> available = new ArrayList<>();
         List<Long> missing = new ArrayList<>();
+        var paths = new java.util.LinkedHashMap<Long, java.util.LinkedHashMap<Long, String>>();
         for (Bookmark bookmark : bookmarks) {
             Children child = childrenService.findById(bookmark.getNodeId());
             if (child == null) {
@@ -68,11 +69,12 @@ public class BookmarkController {
                 missing.add(bookmark.getNodeId());
                 continue;
             }
-            node.setBreadcrumbs(nodeService.addBreadcrumbs(realId));
+            paths.put(bookmark.getNodeId(), occurrencePath(child));
             bookmark.setNode(node);
             available.add(bookmark);
         }
         model.addAttribute("bookmarks", available);
+        model.addAttribute("bookmarkPaths", paths);
         model.addAttribute("missingBookmarkIds", missing);
 
         model.addAttribute("canWriteBookmarks", bookmarkWriteService.writable());
@@ -85,4 +87,23 @@ public class BookmarkController {
 
     }
 
+    /** Builds each bookmark path from its own parent chain without mutating a shared master Node. */
+    private java.util.LinkedHashMap<Long,String> occurrencePath(Children selected) {
+        var trail = new ArrayList<Children>();
+        var seen = new java.util.HashSet<Long>();
+        Children current = selected;
+        while (current != null && seen.add(current.getNodeId())) {
+            trail.add(current);
+            if (current.getFatherId() == 0) break;
+            current = childrenService.findById(current.getFatherId());
+        }
+        java.util.Collections.reverse(trail);
+        var path = new java.util.LinkedHashMap<Long,String>();
+        for (Children item : trail) {
+            long contentId = item.getMasterId() != null && item.getMasterId() != 0 ? item.getMasterId() : item.getNodeId();
+            var display = nodeService.findById(contentId);
+            if (display != null) path.put(item.getNodeId(),display.getName());
+        }
+        return path;
+    }
 }

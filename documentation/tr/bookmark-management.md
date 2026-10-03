@@ -18,3 +18,5 @@ Yeni kayıt mevcut en büyük `sequence` değerinin sonuna eklenir. Kaldırmada 
 - Yer işareti kaldırma onayını iptal edin; liste değişmemeli.
 - Read-only CTB ve user hesabında yazma düğmeleri görünmemeli; eski veri kaynağı sekmesinden POST reddedilmeli.
 - CherryTree'de bookmark listesini ve özgün düğüm içeriğini kontrol edin.
+
+Bookmark yolları artık master'ın yolundan değil, her bookmark'ın kendi `children.father_id` zincirinden hesaplanır. Yol adları gerçek içerikten, bağlantı kimlikleri ağaç kayıtlarından gelir. Aynı master'ı paylaşan bookmark'ların yolları ayrı model verisinde tutulur. Kaldırma ikonu isim hücresinin başındadır; ek bir geniş sütun gerektirmez.

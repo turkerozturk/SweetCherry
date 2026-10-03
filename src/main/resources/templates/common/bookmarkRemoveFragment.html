@@ -3,6 +3,6 @@
 <form th:fragment="remove(id)" th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')"
       th:action="@{/bookmarks/{id}/remove(id=${id})}" method="post" th:attr="data-confirm-message=#{bookmarks.confirmRemove}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
-<button type="submit" class="btn btn-sm btn-outline-danger" th:title="#{bookmarks.remove}"><i class="fas fa-bookmark" aria-hidden="true"></i> <span th:text="#{bookmarks.remove}"></span></button>
+<button type="submit" class="btn btn-sm btn-outline-danger" th:title="#{bookmarks.remove}"><i class="fas fa-trash" aria-hidden="true"></i> <span class="visually-hidden" th:text="#{bookmarks.remove}"></span></button>
 </form>
 </body></html>

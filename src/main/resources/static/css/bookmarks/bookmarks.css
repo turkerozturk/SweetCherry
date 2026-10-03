@@ -16,3 +16,11 @@ table {
 }
 
 /*# sourceMappingURL=bookmarks.css.map */
+
+.bookmarks-table {width:100%;overflow-wrap:anywhere;}
+.bookmark-sequence {width:4.5rem;}
+.bookmark-date {width:8rem;}
+.bookmark-entry {display:flex;gap:.5rem;align-items:flex-start;}
+.bookmark-remove {flex:0 0 auto;}
+.bookmark-remove form {margin:0;}
+.bookmark-details {flex:1 1 auto;min-width:0;overflow-wrap:anywhere;}

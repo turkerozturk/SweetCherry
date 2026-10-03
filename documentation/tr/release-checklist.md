@@ -14,6 +14,18 @@ SweetCherry-0.5.0.zip
 
 Sürüm numarası kesinleştiğinde `pom.xml`, Git etiketi, ZIP adı ve sürüm notları aynı değeri kullanmalıdır. Yayımdan önce geliştirme sırasında anlamlı değişiklikler yapıldıysa `0.5.0` yerine yeni bir sürüm seçilebilir; bu karar kontrol listesini değiştirmez.
 
+## Son özellik turundan sonra odak
+
+Yeni özellik turu tamamlandı: düz/rich text düzenleme, gömülü nesneler, dört yönlü taşıma, tek düğüm/alt ağaç çoğaltma ve bookmark yönetimi artık yayım adayının parçasıdır. Bundan sonraki öncelik yeni özellik değil, doğrulama ve paketlemedir.
+
+- [ ] Bookmark shared kimlikleri, dar ekran kaldırma düğmesi ve gerçek/shared yolları son kez kontrol edildi.
+- [ ] Footer yalnızca çalışan bağlantılar içeriyor; Pricing ve boş Features/FAQs bağlantıları yok.
+- [ ] Help metinlerinin kapsamı gözden geçirildi; mevcut yardım bağlantısı korunuyor, içerik kararı ayrı.
+- [ ] `location-time-language.md` içindeki konum/zaman/widget maddeleri tamamlandı veya sürüm kapsamı açıkça daraltıldı.
+- [ ] Read-only CTB, user hesabı, CSRF, stale tenant ve güvenilmeyen CTB/HTML girdileri son güvenlik turundan geçti.
+- [ ] Temiz paket Windows/Linux üzerinde başlatıldı; gerçek not arşivi yerine CTB kopyasında CherryTree ile karşılaştırıldı.
+- [ ] Yeni editör ve yazma işlemleri sürüm notları/bilinen sınırlamalar bölümüne eklendi.
+
 ## Otomatik kontroller
 
 GitHub Actions içindeki `CI` iş akışı hem Windows hem Linux üzerinde Java 17 ile test ve paketleme yapar. Yerel son kontrol:

@@ -43,4 +43,43 @@ class BookmarkControllerTest {
         assertThat(model.get("canWriteBookmarks")).isEqualTo(true);
         assertThat(bookmark.getNodeId()).isEqualTo(10);assertThat(bookmark.getNode()).isSameAs(master);
     }
+    @Test void eachAliasKeepsItsOwnBreadcrumbsEvenWhenTheyShareOneMasterEntity() {
+        var bookmarks=mock(BookmarkService.class);var children=mock(ChildrenService.class);var nodes=mock(NodeService.class);
+        var writes=mock(BookmarkWriteService.class);var controller=new BookmarkController();
+        ReflectionTestUtils.setField(controller,"bookmarkService",bookmarks);
+        ReflectionTestUtils.setField(controller,"childrenService",children);
+        ReflectionTestUtils.setField(controller,"nodeService",nodes);
+        ReflectionTestUtils.setField(controller,"bookmarkWriteService",writes);
+        var root=new com.turkerozturk.children.Children().setNodeId(1);
+        var parent=new com.turkerozturk.children.Children().setNodeId(2);
+        var a=new com.turkerozturk.children.Children().setNodeId(10).setFatherId(2);a.setMasterId(1L);
+        var b=new com.turkerozturk.children.Children().setNodeId(11);b.setMasterId(1L);
+        var master=mock(com.turkerozturk.node.Node.class);var branch=mock(com.turkerozturk.node.Node.class);
+        when(master.getName()).thenReturn("Master");when(branch.getName()).thenReturn("Branch");
+        when(bookmarks.getBookmarks()).thenReturn(List.of(new Bookmark().setNodeId(1),new Bookmark().setNodeId(10),new Bookmark().setNodeId(11)));
+        when(children.findById(1L)).thenReturn(root);when(children.findById(2L)).thenReturn(parent);
+        when(children.findById(10L)).thenReturn(a);when(children.findById(11L)).thenReturn(b);
+        when(nodes.findById(1L)).thenReturn(master);when(nodes.findById(2L)).thenReturn(branch);
+        var model=new ExtendedModelMap();controller.getAllChildrenAsHtml(model,"tree");
+        var paths=(java.util.Map<?,?>)model.get("bookmarkPaths");
+        assertThat(paths.get(1L)).isEqualTo(java.util.Map.of(1L,"Master"));
+        assertThat(paths.get(10L)).isEqualTo(java.util.Map.of(2L,"Branch",10L,"Master"));
+        assertThat(paths.get(11L)).isEqualTo(java.util.Map.of(11L,"Master"));
+        assertThat(new java.util.ArrayList<>(((java.util.Map<?,?>)paths.get(10L)).keySet())).isEqualTo(List.of(2L,10L));
+        verify(master,never()).setBreadcrumbs(any());
+    }
+    @Test void cyclicParentDoesNotHangTheBookmarkList() {
+        var bookmarks=mock(BookmarkService.class);var children=mock(ChildrenService.class);var nodes=mock(NodeService.class);
+        var controller=new BookmarkController();
+        ReflectionTestUtils.setField(controller,"bookmarkService",bookmarks);
+        ReflectionTestUtils.setField(controller,"childrenService",children);
+        ReflectionTestUtils.setField(controller,"nodeService",nodes);
+        ReflectionTestUtils.setField(controller,"bookmarkWriteService",mock(BookmarkWriteService.class));
+        var child=new com.turkerozturk.children.Children().setNodeId(1).setFatherId(1);
+        var node=mock(com.turkerozturk.node.Node.class);when(node.getName()).thenReturn("Node");
+        when(bookmarks.getBookmarks()).thenReturn(List.of(new Bookmark().setNodeId(1)));
+        when(children.findById(1L)).thenReturn(child);when(nodes.findById(1L)).thenReturn(node);
+        var model=new ExtendedModelMap();controller.getAllChildrenAsHtml(model,"tree");
+        assertThat(((java.util.Map<?,?>)model.get("bookmarkPaths")).get(1L)).isEqualTo(java.util.Map.of(1L,"Node"));
+    }
 }

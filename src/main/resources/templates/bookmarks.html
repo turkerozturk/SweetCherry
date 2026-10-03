@@ -42,19 +42,18 @@
 
         <h1 th:text="#{bookmarks.heading}"></h1>
 
-        <table class="table table-bordered border-success table-sm">
+        <table class="bookmarks-table table table-bordered border-success table-sm">
             <thead>
             <tr>
-                <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.sequence}">Sequence</th>
+                <th scope="col" class="bookmark-sequence" th:text="#{bookmarks.grid.th.sequence}">Sequence</th>
 
-                <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.lastModifiedDate}">LAst Modified Date</th>
+                <th scope="col" class="bookmark-date" th:text="#{bookmarks.grid.th.lastModifiedDate}">LAst Modified Date</th>
                 <!--  <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.icon}">Icon</th> -->
 
                 <!-- <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.nodeId}">Node Id</th> -->
 
-                <th scope="col" class="col-10" th:text="#{bookmarks.grid.th.nodeName}">Node Name</th>
+                <th scope="col" th:text="#{bookmarks.grid.th.nodeName}">Node Name</th>
 
-                <th scope="col" th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')" th:text="#{bookmarks.actions}"></th>
                 <!-- <th scope="col" class="col-2" th:text="#{bookmarks.grid.th.tags}">Tags</th> -->
 
             </tr>
@@ -72,6 +71,9 @@
 
 
                 <td>
+                    <div class="bookmark-entry">
+                    <div class="bookmark-remove" th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')"><th:block th:replace="~{common/bookmarkRemoveFragment :: remove(${bookmark.nodeId})}"></th:block></div>
+                    <div class="bookmark-details">
 
 
                     <th:block>
@@ -97,20 +99,20 @@
                     </th:block>
 
 
-                    <th:block th:if="${bookmark.node.breadcrumbs}" class="breadcrumbs">
+                    <th:block th:if="${bookmarkPaths[bookmark.nodeId]}" class="breadcrumbs">
 
                         <a th:href="@{/rootnode(_tenantView=${tenantViewToken})}">Kök</a>
-                        <span th:each="entry : ${bookmark.node.breadcrumbs}">
+                        <span th:each="entry : ${bookmarkPaths[bookmark.nodeId]}">
                         <span>/</span>
                         <a th:href="@{/nodes/{id}(id=${entry.key},_tenantView=${tenantViewToken})}" th:text="${entry.value}"></a>
                         </span>
 
                     </th:block>
 
+                    </div></div>
                 </td>
 
 
-                <td th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')"><th:block th:replace="~{common/bookmarkRemoveFragment :: remove(${bookmark.nodeId})}"></th:block></td>
                 <!-- <td th:text="${bookmark.node.tags}"></td> -->
 
             </tr>
