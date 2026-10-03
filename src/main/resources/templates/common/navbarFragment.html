@@ -96,14 +96,6 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="/settings"
-                                   th:title="#{root.settings.description}"
-                                >
-                                    <i class=" fas fa-gear"></i>
-                                    <span href="" th:text="#{root.settings}"></span>
-                                </a>
-                            </li>
-                            <li>
                                 <a class="dropdown-item" href="/about"
                                    th:title="#{root.about.description}"
                                 >
@@ -372,6 +364,7 @@
                                 <li><div class="dropdown-divider"></div></li>
                                 <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/dashboardold}"><i class="fas fa-info-circle"></i> <span th:text="#{navbar.legacyDashboard}">Old Dashboard</span></a></li>
                                 <li><a class="dropdown-item" th:href="@{/help/index}"><i class="fas fa-life-ring"></i> <span th:text="#{navbar.legacyHelp}">Old Help</span></a></li>
+                                <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/settings}"><i class="fas fa-info-circle"></i> <span th:text="#{settings.otherInfo}">Other Information</span></a></li>
                             </th:block>
                         </ul>
                     </li>

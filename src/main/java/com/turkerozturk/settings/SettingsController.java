@@ -21,110 +21,33 @@
 package com.turkerozturk.settings;
 
 import com.turkerozturk.sunandmoon.AstronomyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * https://www.baeldung.com/spring-reloading-properties
- */
 @Controller
 public class SettingsController {
+    @Value("${myapp.openWebBrowserOnStartup:true}") private boolean openWebBrowserOnStartup;
+    @Value("${myapp.debug:false}") private boolean debug;
+    @Value("${myapp.syntax-highlighting.enabled:true}") private boolean syntaxHighlightingEnabled;
+    @Value("${server.port:8080}") private int serverPort;
+    @Value("${server.ssl.enabled:false}") private boolean sslEnabled;
+    private final AstronomyService astronomyService;
 
-    @Value("${myapp.openWebBrowserOnStartup:true}")
-    Boolean openWebBrowserOnStartup;
+    public SettingsController(AstronomyService astronomyService) { this.astronomyService = astronomyService; }
 
-    @Value("${myapp.debug:false}")
-    Boolean debug;
-
-    @Value("${myapp.syntax-highlighting.enabled:false}")
-    Boolean syntaxHighlightingEnabled;
-
-    @Autowired
-    AstronomyService astronomyService;
-
-    @Value("${server.http.port:8080}")
-    private int httpPort;
-
-    @Value("${server.port:443}")
-    private int httpsPort;
-
-
-    @Value("${server.ssl.key-store:}")
-    private String keyStore;
-
-    @Value("${server.ssl.key-store-password:}")
-    private String keyStorePassword;
-
-    @Value("${server.ssl.key-password:}")
-    private String keyPassword;
-
-    @Value("${server.ssl.key-alias:}")
-    private String keyAlias;
-
-    @Value("${server.ssl.key-store-type:}")
-    private String keyStoreType;
-
-    @Value("${server.ssl.trust-store:}")
-    private String trustStore;
-
-    @Value("${server.ssl.trust-store-password:}")
-    private String trustStorePassword;
-
-    @Value("${server.ssl.trust-store-type:}")
-    private String trustStoreType;
-
-    @Value("${server.ssl.certificate:}")
-    private String certificate;
-
-    @Value("${server.ssl.certificate-private-key:}")
-    private String certificatePrivateKey;
-
-    public SettingsController(AstronomyService astronomyService) {
-        this.astronomyService = astronomyService;
-    }
-
+    /** Exposes selected non-secret runtime information and configuration guidance for administrators. */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/settings")
     public String getSettings(Model model) {
-
         model.addAttribute("astronomyProperties", astronomyService.astronomyProperties);
-
-
         model.addAttribute("openWebBrowserOnStartup", openWebBrowserOnStartup);
         model.addAttribute("debug", debug);
         model.addAttribute("syntaxHighlightingEnabled", syntaxHighlightingEnabled);
-
-        model.addAttribute("httpPort", httpPort);
-        model.addAttribute("httpsPort", httpsPort);
-
-
-        Map<String, String> sslConfig = new HashMap<>();
-        sslConfig.put("key-store", keyStore);
-        sslConfig.put("key-store-password", keyStorePassword);
-        sslConfig.put("key-password", keyPassword);
-        sslConfig.put("key-alias", keyAlias);
-        sslConfig.put("key-store-type", keyStoreType);
-        sslConfig.put("trust-store", trustStore);
-        sslConfig.put("trust-store-password", trustStorePassword);
-        sslConfig.put("trust-store-type", trustStoreType);
-
-        model.addAttribute("sslConfig", sslConfig);
-
-        model.addAttribute("certificate", certificate);
-
-        model.addAttribute("certificatePrivateKey", certificatePrivateKey);
-
-
-
-        return ("settings/settings");
-
+        model.addAttribute("serverPort", serverPort);
+        model.addAttribute("sslEnabled", sslEnabled);
+        return "settings/settings";
     }
-
 }

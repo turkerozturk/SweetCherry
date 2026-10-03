@@ -11,3 +11,9 @@ Görünüm menüsünde sırasıyla Masaüstü, Mobil, Düşünce Haritası 1 (Ma
 Kullanıcı menüsünde kullanıcı adı tıklanamaz bilgi olarak gösterilir. Oturum Bilgisi ve POST ile Oturumu Kapat seçeneklerinin altında Eski Dashboard ve Eski Yardım bulunur. Dashboard’un mevcut ADMIN erişim kuralı korunur; bağlantı da sadece admin için gösterilir. Yardım ve dashboard kodları bu düzenlemede kaldırılmadı; gelecek inceleme için tutuluyor.
 
 Ay fazı göstergesi artık bir düğmedir: tıklama, dokunma veya klavyeyle odaklama önceki/sonraki faz adı ve tarihlerini, ayın aydınlanma oranını ve ayarlanmış zaman dilimini açılan kutuda gösterir. Güneş/ay kutusuyla aynı popover mekanizmasını kullanır. Kutuların bilgileri mevcut offline hesaplama ve önbellekten gelir; harici servis kullanılmaz.
+
+## Dashboard ve bilgi sayfaları düzenlemesi
+
+`/nodesadvanced` GET/POST adresi `/nodesadvancedwithbinding` aramasına yönlenir; eski arama uygulaması kaynakta referans olarak kalır ve HTTP mapping’i yoktur. Oluşturulma/güncellenme timeline sayfaları son 50 düğümü listeleyen ayrı şablona geçmiştir; sayfalı arama modelini kullanmaz. Eski Dashboard’un CTB ve SweetCherry link grupları korunmuştur.
+
+`/settings` Kullanıcı menüsünün sonunda “Diğer Bilgiler” adıyla yalnızca admin’e görünür. SSL parolaları, anahtar/sertifika yolları ve kullanıcı detayları modele aktarılmaz; statik yapılandırma rehberi gösterilir. MP3 örnek dosyası, kullanılmayan JLayer bağımlılığı ve eski açıklamalar kaldırılmıştır. CTB içindeki ekli ses dosyalarını sıradan attachment olarak indirme davranışı değişmez.

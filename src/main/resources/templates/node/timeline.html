@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="${#messages.msg(timelineTitleKey)}">Timeline</title></head>
+<body><section layout:fragment="content">
+<h1 th:text="${#messages.msg(timelineTitleKey)}"></h1>
+<p th:text="#{timeline.count(${#lists.size(nodes)})}"></p>
+<div class="table-responsive"><table class="table table-sm">
+<thead><tr><th>ID</th><th th:text="#{timeline.name}"></th><th th:text="#{timeline.created}"></th><th th:text="#{timeline.modified}"></th></tr></thead>
+<tbody><tr th:each="node : ${nodes}">
+<td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="${node.nodeId}"></a></td>
+<td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="${node.name}"></a></td>
+<td th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>
+<td th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>
+</tr></tbody></table></div>
+</section></body></html>

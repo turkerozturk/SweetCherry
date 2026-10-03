@@ -351,13 +351,6 @@
 			<version>5.0-2022a</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
-		<dependency>
-			<groupId>javazoom</groupId>
-			<artifactId>jlayer</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-
 		<!-- https://www.baeldung.com/spring-rest-openapi-documentation
 			http://localhost:8080/v3/api-docs
 			http://localhost:8080/swagger-ui/index.html -->
@@ -401,7 +394,6 @@
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<nonFilteredFileExtensions>
-						<nonFilteredFileExtension>mp3</nonFilteredFileExtension>
 						<!-- Add other binary file extensions if needed -->
 					</nonFilteredFileExtensions>
 				</configuration>

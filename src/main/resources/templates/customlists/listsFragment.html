@@ -8,7 +8,9 @@
 
 <div th:fragment="listsFragment">
 
-    <span th:text="${godNode.name}"></span><p>vvvvv</p>
+    <span th:if="${godNode != null}" th:text="${godNode.name}"></span>
+    <p><a th:href="@{/help/cherrytemplatetasks}" th:text="#{customlists.helpTasks}"></a> ·
+       <a th:href="@{/help/cherrytemplatenode}" th:text="#{customlists.helpNode}"></a></p>
     <div th:if="${godNode}" class="row">
 
 

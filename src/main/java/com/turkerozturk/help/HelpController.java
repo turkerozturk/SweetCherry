@@ -53,9 +53,10 @@ public class HelpController {
         return "help/information-panel";
     }
 
+    /** Redirects the retired general help page to the project README. */
     @GetMapping("/help/index")
     public String getIndex() {
-        return "help/index";
+        return "redirect:https://github.com/turkerozturk/SweetCherry#readme";
     }
 
     @GetMapping("/help/icons")
@@ -86,9 +87,10 @@ public class HelpController {
         return "/help/cherrytemplatenode";
     }
 
+    /** Keeps old PDF help links usable after removing the unverified help page. */
     @GetMapping("/help/cherrytemplatenode--pdf")
     public String helpPdf() {
-        return "/help/cherrytemplatenode--pdf";
+        return "redirect:/help/cherrytemplatenode";
     }
 
     @GetMapping("/help/cherrytemplatetasks")

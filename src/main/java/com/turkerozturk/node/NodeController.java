@@ -94,34 +94,14 @@ public class NodeController {
     public static final int DEFAULT_PAGE_SIZE = 30;
 
     /**
-     * @deprecated
-     * This method is long coding version. Use  {@link #postForm(FormSearch, BindingResult, Model, String)} instead.
-     * Sayfa ilk cagirildiginda get metodu karsilar ve once bu metoda gelinir.
-     * Bu metodun asagida post metod olani var. Ama artik o da deprecated.
-     * @param model
+     * Redirects historical search links to the maintained binding-based form.
+     * @deprecated Use {@link #postForm(FormSearch, BindingResult, Model, String)} for search results.
      */
     @Deprecated(since = "1", forRemoval = false)
-    @GetMapping("/nodesadvanced")
+    @RequestMapping(value = "/nodesadvanced", method = {RequestMethod.GET, RequestMethod.POST})
     @RequiresTenant
-    public void getAllNodesAdvancedAsHtml(Model model) {
-
-        getAllNodesAdvancedAsHtml(model,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    false,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null);
-
+    public String getAllNodesAdvancedAsHtml(Model model) {
+        return "redirect:/nodesadvancedwithbinding";
     }
 
     /*
@@ -206,7 +186,7 @@ public class NodeController {
      * @return
      */
     @Deprecated(since = "1", forRemoval = false)
-    @PostMapping("/nodesadvanced")
+    // Retired implementation retained for reference; no HTTP mapping.
     public String getAllNodesAdvancedAsHtml(Model model,
                                             @RequestParam(required = false) Integer pageNumber,
                                             @RequestParam(required = false) Integer pageSize,
@@ -678,34 +658,22 @@ public class NodeController {
         return ResponseEntity.ok(nodeIds);
     }
 
-    /**
-     * @deprecated
-     * This method is no longer necessary.
-     * @param model
-     * @return
-     */
-    @Deprecated(since = "1", forRemoval = true)
+    /** Lists the latest 50 created nodes without relying on the retired paged search template. */
     @GetMapping("/nodes/timeline/created")
+    @RequiresTenant
     public String getTimelineCreated(Model model) {
-        List<Node> recentlyCreatedNodes = nodeService.findRecentlyCreatedNodes();
-        model.addAttribute("nodes", recentlyCreatedNodes);
-        model.addAttribute("pageTitle", "Son Oluşturulanlar");
-        return NODES_ADVANCED;
+        model.addAttribute("nodes", nodeService.findRecentlyCreatedNodes());
+        model.addAttribute("timelineTitleKey", "timeline.created");
+        return "node/timeline";
     }
 
-    /**
-     * @deprecated
-     * This method is no longer necessary.
-     * @param model
-     * @return
-     */
-    @Deprecated(since = "1", forRemoval = true)
+    /** Lists the latest 50 modified nodes using the same list-based timeline view. */
     @GetMapping("/nodes/timeline/modified")
+    @RequiresTenant
     public String getTimelineModified(Model model) {
-        List<Node> recentlyModifiedNodes = nodeService.findRecentlyModifiedNodes();
-        model.addAttribute("nodes", recentlyModifiedNodes);
-        model.addAttribute("pageTitle", "Son Güncellenenler");
-        return NODES_ADVANCED;
+        model.addAttribute("nodes", nodeService.findRecentlyModifiedNodes());
+        model.addAttribute("timelineTitleKey", "timeline.modified");
+        return "node/timeline";
     }
 
     // bilgi yeni 20 nisan
