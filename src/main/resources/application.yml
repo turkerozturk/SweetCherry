@@ -86,12 +86,23 @@ server:
  #   certificate: "classpath:ssl-self-signed-certificate/certificate.crt"
  #   certificate-private-key: "classpath:ssl-self-signed-certificate/private.key"
   shutdown: graceful
+  # Proxy HTTPS is handled by an explicitly trusted peer, not arbitrary Forwarded headers.
+  forward-headers-strategy: none
   servlet:
     session:
       timeout: 30m
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+        same-site: lax
+        # Leave secure unset: Tomcat marks HTTPS cookies Secure and still permits local HTTP.
   http:
     port: 8080
   error:
+    include-message: never
+    include-stacktrace: never
+    include-exception: false
+    include-binding-errors: never
     whitelabel:
       enabled: false
 
@@ -153,6 +164,11 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  security:
+    proxy-https-enabled: false
+    proxy-https-port: 443
+    # Enable only for a hostname with a trusted HTTPS certificate, not self-signed/local HTTP.
+    hsts-enabled: false
   command-line-runner:
     enabled: false
   openWebBrowserOnStartup: false

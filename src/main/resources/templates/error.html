@@ -1,54 +1,21 @@
-<html xmlns:th="http://www.thymeleaf.org">
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
-      layout:decorate="~{_layout}">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <title>>Error Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{security.error.title}">Request failed</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.5; }
+        main { max-width: 40rem; margin: 10vh auto; }
+        code { overflow-wrap: anywhere; }
+    </style>
 </head>
 <body>
-
-<section layout:fragment="content">
-    <h1>Error Details</h1>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Property</th>
-            <th>Value</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Timestamp</td>
-            <td th:text="${timestamp}"></td>
-        </tr>
-        <tr>
-            <td>Status</td>
-            <td th:text="${status}"></td>
-        </tr>
-        <tr>
-            <td>Path</td>
-            <td th:text="${path}"></td>
-        </tr>
-        <tr>
-            <td>Message</td>
-            <td th:text="${message}"></td>
-        </tr>
-        <tr>
-            <td>Exception</td>
-            <td th:text="${exception}"></td>
-        </tr>
-        <tr>
-            <td>Trace</td>
-            <td th:text="${trace}"></td>
-        </tr>
-        <tr>
-            <td>Error</td>
-            <td><pre th:text="${error}"></pre></td>
-        </tr>
-        </tbody>
-    </table>
-</section>
-
-
+<main>
+    <h1><span th:text="${status}">500</span> <span th:text="${error}">Request failed</span></h1>
+    <p th:text="#{security.error.message}">The request could not be completed. You can return to the home page.</p>
+    <p><span th:text="#{security.error.reference}">Reference</span>: <code th:text="${errorId}"></code></p>
+    <a th:href="@{/}" th:text="#{security.error.home}">Home page</a>
+</main>
 </body>
 </html>

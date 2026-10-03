@@ -35,6 +35,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -48,6 +49,8 @@ import java.util.Properties;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    @Value("${myapp.security.hsts-enabled:false}")
+    private boolean hstsEnabled;
 
     // value after semicolon is default value
     // https://www.baeldung.com/spring-value-defaults
@@ -112,6 +115,16 @@ public class SecurityConfig {
         };
 
         return http
+                .headers(headers -> headers
+                        .referrerPolicy(referrer -> referrer.policy(
+                                ReferrerPolicyHeaderWriter.ReferrerPolicy.SAME_ORIGIN))
+                        .httpStrictTransportSecurity(hsts -> {
+                            if (hstsEnabled) {
+                                hsts.maxAgeInSeconds(31536000).includeSubDomains(false).preload(false);
+                            } else {
+                                hsts.disable();
+                            }
+                        }))
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler((request, response, authentication) -> {
@@ -127,6 +140,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
                         .requestMatchers("/nodes/delete/**", "/upload-form", "/upload-database", "/reload-datasources", "/delete/**")
                         .hasRole("ADMIN")
                         .requestMatchers("/img/**", "/about", "/main", "/features", "/static/css/**", "/webjars/**",
@@ -143,6 +157,8 @@ public class SecurityConfig {
                     expiredCookie.setPath(request.getContextPath().isEmpty() ? "/" : request.getContextPath());
                     expiredCookie.setMaxAge(0);
                     expiredCookie.setHttpOnly(true);
+                    expiredCookie.setSecure(request.isSecure());
+                    expiredCookie.setAttribute("SameSite", "Lax");
                     response.addCookie(expiredCookie);
                     response.sendRedirect(request.getContextPath() + "/login?expired");
                 }))

@@ -318,3 +318,7 @@ aynı kalır. Ayar değişince veri kaynaklarını yeniden yükleyin. Toplam for
 server.tomcat.max-http-form-post-size=32MB; proxy daha düşük bir limit koyuyorsa onu da
 uygun şekilde yapılandırın. Bu uygulama varsayılanı CherryTree veya SQLite'ın kesin bir
 boyut sınırı olarak değerlendirilmemelidir.
+
+## HTTP/HTTPS ve proxy oturumları
+
+Yerel HTTP, uygulamanın kendi SSL sertifikası ve HTTPS proxy ayarları birlikte [HTTP, HTTPS ve oturum güvenliği](https-and-session-security.md) belgesinde açıklanmıştır. Proxy arkasında Secure çerezi ve doğru HTTPS yönlendirmesi için ilgili ayarları JAR dışındaki yapılandırmaya birleştirin.

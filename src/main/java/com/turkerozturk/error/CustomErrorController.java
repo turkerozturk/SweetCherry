@@ -43,51 +43,21 @@ public class CustomErrorController implements ErrorController {
         this.errorAttributes = errorAttributes;
     }
 
+    /** Keeps exception details in server logs and exposes only a status and correlation ID. */
     @RequestMapping("/error")
     public String handleError(WebRequest webRequest, Map<String, Object> model) {
+        Map<String, Object> attributes = errorAttributes.getErrorAttributes(
+                webRequest, ErrorAttributeOptions.defaults());
+        Object status = attributes.get("status");
+        int statusCode = status instanceof Integer code && code >= 400 && code <= 599 ? code : 500;
+        String errorId = java.util.UUID.randomUUID().toString();
+        Throwable failure = errorAttributes.getError(webRequest);
+        logger.warn("Request failed: errorId={}, status={}", errorId, statusCode, failure);
 
-        // Get error attributes
-        Map<String, Object> errorAttributes = this.errorAttributes.getErrorAttributes(webRequest,
-                ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE,
-                        ErrorAttributeOptions.Include.MESSAGE,
-                        ErrorAttributeOptions.Include.EXCEPTION,
-                        ErrorAttributeOptions.Include.BINDING_ERRORS)
-        );
-
-        // Add all error attributes to the model
-        model.put("timestamp", errorAttributes.get("timestamp"));
-        model.put("status", errorAttributes.get("status"));
-        model.put("error", errorAttributes.get("error"));
-        model.put("error", errorAttributes.get("exception"));
-        model.put("error", errorAttributes.get("trace"));
-        model.put("message", errorAttributes.get("message"));
-        model.put("path", errorAttributes.get("path"));
-
-        /*
-        for (String item : errorAttributes.keySet()) {
-            System.out.println(item);
-        }
-        */
-
-        // Check the status code and return appropriate error page
-        Integer statusCode = (Integer) errorAttributes.get("status");
-        if (statusCode != null && statusCode == 500) {
-            return "errors/500"; // Custom 404 error page
-        }
-
-        if (statusCode != null && statusCode == 404) {
-            logger.info((String) errorAttributes.get("error"));
-            logger.info((String) errorAttributes.get("trace"));
-            logger.info((String) errorAttributes.get("message"));
-            logger.info((String) errorAttributes.get("exception"));
-            logger.info((String) errorAttributes.get("path"));
-
-            return "errors/404"; // Custom 404 error page
-        }
-
-
-        //the name of custom error page template
+        org.springframework.http.HttpStatus httpStatus = org.springframework.http.HttpStatus.resolve(statusCode);
+        model.put("status", statusCode);
+        model.put("error", httpStatus == null ? "Request failed" : httpStatus.getReasonPhrase());
+        model.put("errorId", errorId);
         return "error";
     }
-
 }
