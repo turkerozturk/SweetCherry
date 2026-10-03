@@ -186,4 +186,30 @@ class RichTextEditingServiceTest {
         when(query.executeUpdate()).thenReturn(0);
         assertThatThrownBy(() -> service.save(12, node.getTxt(), editor.revision())).isInstanceOf(ResponseStatusException.class);
     }
+
+    @Test void deletesSelectedRowsAndClearsWidgetFlagsOnlyOnSave() throws Exception {
+        addImage();
+        try (var statement = connection.createStatement()) {
+            statement.execute("CREATE TABLE node (node_id INTEGER, has_image INTEGER, has_table INTEGER, has_codebox INTEGER)");
+            statement.execute("INSERT INTO node VALUES (12,1,1,1)");
+            statement.execute("INSERT INTO grid VALUES (12,2,'left','<table><row><cell>X</cell></row></table>',200,200)");
+            statement.execute("INSERT INTO codebox VALUES (12,3,'code')");
+        }
+        var revision = service.open(12).revision();
+        service.save(12, "<node><rich_text>Text</rich_text></node>", revision, "{}", "{}", "{}",
+                "[\"image:1\",\"grid:2\",\"codebox:3\"]", true);
+        assertThat(RichTextEditingService.readObjects(connection,12)).isEmpty();
+        try (var statement = connection.createStatement(); var row = statement.executeQuery("SELECT * FROM node WHERE node_id=12")) {
+            assertThat(row.next()).isTrue();
+            assertThat(row.getInt("has_image")).isZero(); assertThat(row.getInt("has_table")).isZero(); assertThat(row.getInt("has_codebox")).isZero();
+        }
+    }
+    @Test void rejectsLockedOrIncompleteDeletionBeforeWriting() {
+        addImage();var revision=service.open(12).revision();
+        assertThatThrownBy(() -> service.save(12,"<node/>",revision,"{}","{}","{}","[\"image:1\"]",false))
+                .isInstanceOf(ResponseStatusException.class);
+        assertThatThrownBy(() -> service.save(12,"<node/>",revision,"{}","{}","{}","[]",true))
+                .isInstanceOf(ResponseStatusException.class);
+        verify(query,never()).executeUpdate();
+    }
 }

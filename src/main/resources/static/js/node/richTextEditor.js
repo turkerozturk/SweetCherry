@@ -11,6 +11,7 @@
     let selection = [0, 0];
     const pendingImages = {}, pendingFiles = {};
     let tableChanges = {};
+    let deletedKeys = [];
     const uploadLimit = window.richEditorMaxFileBytes || 9000000;
     let readingImage = false;
     const plainClipboard = text => text.replace(/\uFFFC/g, '');
@@ -37,7 +38,7 @@
     let historyIndex = -1;
     let composing = false;
     const snapshot = () => ({runs: runs.map(run => ({text: run.text, attributes: {...run.attributes}})),
-        selection: [...selection], tables:JSON.parse(JSON.stringify(tableChanges))});
+        selection: [...selection], deleted:[...deletedKeys], tables:JSON.parse(JSON.stringify(tableChanges))});
 
     /** Captures text and formatting as one editor state, discarding the obsolete redo branch. */
     function commitHistory() {
@@ -66,6 +67,7 @@
         const state = history[historyIndex];
         runs = state.runs.map(run => ({text: run.text, attributes: {...run.attributes}}));
         tableChanges = JSON.parse(JSON.stringify(state.tables || {}));
+        deletedKeys = [...(state.deleted || [])];
         previous = runs.map(run => run.text).join('');
         input.value = previous;
         selection = [...state.selection];
@@ -361,7 +363,60 @@
         flush(true);
     }
     /** Serializes the text model to CTB XML; the server validates and canonicalizes it again. */
+    const deletionLock = document.getElementById('richAllowDeletion');
+    const objectDialog = document.getElementById('richObjectDialog');
+    if (deletionLock && objectDialog) {
+        const list = document.getElementById('richObjectList');
+        const apply = document.getElementById('richObjectDelete');
+        let choices = [];
+        deletionLock.addEventListener('change', () => {
+            apply.disabled = !deletionLock.checked;
+            document.getElementById('richDeletionIcon').textContent = deletionLock.checked ? '🔓' : '🔒';
+        });
+        document.getElementById('richObjects').addEventListener('click', () => {
+            captureSelection(); list.replaceChildren(); choices = [];
+            runs.forEach(run => {
+                const key = run.attributes.__sweet_object;
+                if (!key) return;
+                const label = document.createElement('label');
+                label.style.display = 'flex'; label.style.margin = '.6rem 0';
+                const check = document.createElement('input'); check.type = 'checkbox';
+                label.appendChild(check);
+                const info = (window.richEditorObjects || {})[key];
+                label.appendChild(document.createTextNode(' ' + (info && info.label || key) + ' (' + key + ')'));
+                list.appendChild(label); choices.push({key, check});
+            });
+            apply.disabled = !deletionLock.checked; objectDialog.showModal();
+        });
+        /** Stages selected widget removal; history retains both markers and the explicit deletion list. */
+        apply.addEventListener('click', () => {
+            if (!deletionLock.checked || readingImage) return;
+            const selected = new Set(choices.filter(choice => choice.check.checked).map(choice => choice.key));
+            let position = 0;
+            const removedBefore = [0, 0];
+            runs.forEach(run => {
+                const length = count(run.text);
+                if (selected.has(run.attributes.__sweet_object)) {
+                    selection.forEach((caret, index) => { removedBefore[index] += Math.max(0, Math.min(length, caret - position)); });
+                    const key = run.attributes.__sweet_object;
+                    if (/^(image|grid|codebox):/.test(key) && !deletedKeys.includes(key)) deletedKeys.push(key);
+                }
+                position += length;
+            });
+            runs = runs.filter(run => !selected.has(run.attributes.__sweet_object));
+            previous = runs.map(run => run.text).join(''); input.value = previous;
+            selection = selection.map((caret, index) => caret - removedBefore[index]);
+            objectDialog.close(); render(); commitHistory(); focusEditor(); restoreSelection();
+        });
+        document.getElementById('richObjectCancel').addEventListener('click', () => objectDialog.close());
+    }
     form.addEventListener('submit', event => {
+        if (deletedKeys.length && (!deletionLock || !deletionLock.checked)) {
+            event.preventDefault(); document.getElementById('richDeletionHint').hidden = false; return;
+        }
+        const deletedInput = document.getElementById('richDeleted');
+        if (deletedInput) deletedInput.value = JSON.stringify(deletedKeys);
+
         if (readingImage) { event.preventDefault(); return; }
         const tablesInput=document.getElementById('richTables');
         const activeKeys=runs.map(run=>run.attributes.__sweet_object);

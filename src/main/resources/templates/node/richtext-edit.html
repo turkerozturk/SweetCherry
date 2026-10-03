@@ -16,6 +16,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="hidden" name="xml" id="richXml">
 <input type="hidden" name="images" id="richImages" value="{}">
 <input type="hidden" name="files" id="richFiles" value="{}">
+<input type="hidden" name="deleted" id="richDeleted" value="[]">
 <input type="hidden" name="tables" id="richTables" value="{}">
 <label><input type="checkbox" id="richVisualMode" checked> <span th:text="#{richtext.edit.visual}"></span></label>
 <div class="toolbar">
@@ -38,6 +39,8 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError}"></span>
 <button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
 <button type="button" id="richLink" th:text="#{richtext.edit.link}"></button>
+<button type="button" id="richObjects" th:text="#{richtext.edit.objects}"></button>
+<label><input type="checkbox" id="richAllowDeletion" name="allowObjectDeletion" value="true"><span id="richDeletionIcon">🔒</span><span th:text="#{richtext.edit.allowDeletion}"></span></label>
 <button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
 </div>
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
@@ -45,8 +48,16 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <h2 id="richPreviewTitle" th:attr="data-visual=#{richtext.edit.text},data-preview=#{richtext.edit.preview}" th:text="#{richtext.edit.preview}"></h2><div id="richPreview" aria-labelledby="richPreviewTitle"></div>
 <p id="richPasteStatus" class="note" role="alert" hidden th:text="#{richtext.edit.pasteError}"></p>
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
+<p id="richDeletionHint" role="alert" hidden th:text="#{richtext.edit.deletionLocked}"></p>
 <div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 </form>
+<dialog id="richObjectDialog" style="max-width:95vw;max-height:85vh;overflow:auto" aria-labelledby="richObjectTitle">
+<h2 id="richObjectTitle" th:text="#{richtext.edit.objects}"></h2>
+<p th:text="#{richtext.edit.deletionHelp}"></p>
+<div id="richObjectList"></div>
+<button type="button" id="richObjectDelete" disabled th:text="#{richtext.edit.deleteSelected}"></button>
+<button type="button" id="richObjectCancel" th:text="#{richtext.edit.cancel}"></button>
+</dialog>
 <dialog id="richTableDialog" style="max-width:95vw;max-height:90vh" aria-labelledby="richTableTitle">
 <h2 id="richTableTitle" th:text="#{richtext.edit.table}"></h2>
 <p th:text="#{richtext.edit.tableHelp}"></p>

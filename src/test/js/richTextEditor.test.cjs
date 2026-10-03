@@ -14,7 +14,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard) {
             showModal() {this.open=true;}, close() {this.open=false;}, click() {const handler=handlers.get(id+':click');if(handler)handler({});},
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel'].map(id => [id, element(id)]));
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     let saved;
@@ -215,4 +215,35 @@ test('structured HTML paste creates table payloads together with styled text as 
  assert.deepEqual(JSON.parse(e.ids.richTables.value)['new-table:test-uuid'],[['Header'],['Body']]);
  e.key('z');assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richTables.value),{});
  e.key('y');assert.equal(e.runs()[0].attributes.scale,'h2');
+});
+
+const objectRuns = () => [{text:'A',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}},{text:'B',attributes:{}}];
+test('object dialog is locked by default and cannot remove a selected widget', () => {
+    const e=editor(objectRuns()); e.fire('richObjects','click');
+    assert.equal(e.ids.richObjectDelete.disabled,true);
+    e.ids.richObjectList.childNodes[0].childNodes[0].checked=true;
+    e.fire('richObjectDelete','click'); assert.equal(text(e.runs()),'A\uFFFCB');
+    assert.equal(e.ids.richDeleted.value,'[]');
+});
+test('explicit deletion and its request are restored together by undo and redo', () => {
+    const e=editor(objectRuns());e.ids.richAllowDeletion.checked=true;e.fire('richAllowDeletion','change');
+    e.fire('richObjects','click');e.ids.richObjectList.childNodes[0].childNodes[0].checked=true;
+    e.fire('richObjectDelete','click');assert.equal(text(e.runs()),'AB');
+    assert.equal(e.ids.richText.value,'AB');
+    assert.deepEqual(JSON.parse(e.ids.richDeleted.value),['image:1']);
+    e.key('z');assert.equal(text(e.runs()),'A\uFFFCB');assert.equal(e.ids.richDeleted.value,'[]');
+    e.key('y');assert.equal(text(e.runs()),'AB');assert.equal(e.ids.richDeleted.value,'["image:1"]');
+});
+test('relocking a staged deletion prevents saving', () => {
+    const e=editor(objectRuns());e.ids.richAllowDeletion.checked=true;e.fire('richObjects','click');
+    e.ids.richObjectList.childNodes[0].childNodes[0].checked=true;e.fire('richObjectDelete','click');
+    e.ids.richAllowDeletion.checked=false;let blocked=false;
+    e.fire('richEditForm','submit',{preventDefault(){blocked=true;}});
+    assert.equal(blocked,true);assert.equal(e.ids.richDeletionHint.hidden,false);
+});
+test('removing a pending object sends no database deletion reference', () => {
+    const e=editor([{text:'\uFFFC',attributes:{__sweet_object:'new-image:test'}}]);
+    e.ids.richAllowDeletion.checked=true;e.fire('richObjects','click');
+    e.ids.richObjectList.childNodes[0].childNodes[0].checked=true;e.fire('richObjectDelete','click');
+    assert.equal(text(e.runs()),'');assert.equal(e.ids.richDeleted.value,'[]');
 });

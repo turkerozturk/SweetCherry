@@ -500,3 +500,14 @@ Editör içinde biçimli metin copy/cut/paste deneyin. Undo/redo ardından Save/
 CherryTree'de metin/biçim, link hedefi ve tablo başlığını kontrol edin. Uzak resimlerin
 bu aşamada görüntü yerine link olarak geldiğini, gerçek pano PNG/JPEG'nin hâlâ eklendiğini
 kontrol edin. Browser/pano HTML kalitesi farklı olabilir; görsel karşılaştırma gereklidir.
+
+
+### Nesneleri açıkça seçerek silme
+
+Editörde **Nesneleri yönet** listesi resim, ek dosya, çapa, tablo ve codebox nesnelerini gösterir. **Nesne silmeye izin ver** varsayılan olarak kapalıdır. Açtıktan sonra listeden seçilen nesneler kaldırılabilir. Normal metin silme işlemi korunan nesneleri kaldırmaz.
+
+Kaldırma önce editör modelinde gerçekleşir; Kaydet öncesinde geri alma/yeniden yapma desteklenir. İptal veritabanını değiştirmez. Kaydet sonrasında silinen nesnenin içeriği bu editörün geri alma geçmişinden geri getirilemez. Denemeleri CTB kopyasında yapın.
+
+Sunucu seçilen kayıtları mevcut düğüm ve revizyonla doğrular. Silme, kalan nesnelerin konumları, yeni nesneler, metin ve son kayıt zamanı aynı transaction içinde güncellenir. Son resim/tablo/codebox kaldırıldığında ilgili `has_image`, `has_table`, `has_codebox` bayrakları yeniden hesaplanır. Silinmek üzere seçilmiş tablo aynı istekte düzenlenemez. Yeni eklenmiş, henüz kaydedilmemiş nesnenin kaldırılması veritabanında DELETE oluşturmaz.
+
+Çapa silmek o çapaya yönelen bağlantıları otomatik değiştirmez; bağlantıları ayrıca kontrol edin. Kilit yeniden kapatılırsa bekleyen silmeyi kaydetmek için yeniden izin vermek veya silmeyi geri almak gerekir.

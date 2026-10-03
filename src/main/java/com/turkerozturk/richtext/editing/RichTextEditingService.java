@@ -89,6 +89,13 @@ public class RichTextEditingService {
     /** Saves table cell edits and new tables without changing existing table metadata or other object payloads. */
     @Transactional
     public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson, String tableJson) {
+        save(id, xml, expectedRevision, imageJson, fileJson, tableJson, "[]", false);
+    }
+
+    /** Deletes explicitly selected objects and saves surviving offsets/payloads in the same tenant transaction. */
+    @Transactional
+    public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson,
+            String tableJson, String deletedJson, boolean allowObjectDeletion) {
         Node node = editableNode(id);
         var objects = storedObjects(id);
         if (!revision(node, objects).equals(expectedRevision)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Node changed; reload the editor.");
@@ -97,7 +104,11 @@ public class RichTextEditingService {
         Map<String, byte[]> images;
         Map<String, PendingRichTextFiles.File> files;
         Map<String, String> tables;
+        java.util.Set<String> deleted;
+        List<Stored> survivors;
         try {
+            deleted = RichTextObjectDeletions.decode(deletedJson, allowObjectDeletion, references(objects));
+            survivors = objects.stream().filter(object -> !deleted.contains(object.reference().key())).toList();
             if (imageJson == null || fileJson == null || (long) imageJson.length() + fileJson.length() > EmbeddedUploadPolicy.JSON_CHARACTERS)
                 throw new IllegalArgumentException("Upload too large");
             int limit = uploads.fileBytes();
@@ -109,6 +120,7 @@ public class RichTextEditingService {
             var tableRows = RichTextTableCodec.decode(tableJson);
             var tableXmls = new java.util.LinkedHashMap<String, String>();
             for (var entry : tableRows.entrySet()) {
+                if (deleted.contains(entry.getKey())) throw new IllegalArgumentException("Deleted table cannot be edited");
                 Stored original = objects.stream().filter(object -> object.reference().key().equals(entry.getKey())).findFirst().orElse(null);
                 if (!entry.getKey().startsWith("new-table:") && original == null) throw new IllegalArgumentException("Unknown table");
                 tableXmls.put(entry.getKey(), RichTextTableCodec.write(entry.getValue(), original == null ? null : tableXml(original)));
@@ -117,7 +129,7 @@ public class RichTextEditingService {
             var keys = new java.util.HashSet<String>(images.keySet()); keys.addAll(files.keySet());
             tables.keySet().stream().filter(key -> key.startsWith("new-table:")).forEach(keys::add);
             if (keys.size() > 10) throw new IllegalArgumentException("Too many new objects");
-            saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(objects), keys);
+            saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(survivors), keys);
             var original = "custom-colors".equals(node.getSyntax()) ? new RichTextXmlReader().read(node.getTxt())
                     : new RichTextDocument(List.of());
             ExternalRichTextLinks.validateChanges(saved.text(), original);
@@ -131,9 +143,18 @@ public class RichTextEditingService {
                 .setParameter("id", id).setParameter("oldText", node.getTxt()).setParameter("oldSyntax", node.getSyntax())
                 .setParameter("oldRich", node.getIsRichText()).executeUpdate();
         if (updated != 1) throw new ResponseStatusException(HttpStatus.CONFLICT, "Node changed; reload the editor.");
+        for (var object : objects) if (deleted.contains(object.reference().key())) {
+            entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
+                try (var statement = connection.prepareStatement("DELETE FROM " + object.reference().table()
+                        + " WHERE node_id = ? AND offset = ?")) {
+                    statement.setLong(1, id); statement.setInt(2, object.reference().offset());
+                    if (statement.executeUpdate() != 1) throw new java.sql.SQLException("Object changed; reload the editor");
+                }
+            });
+        }
         // Move all keys to a disjoint range first to avoid composite-key collisions.
-        for (var object : objects) move(id, object.reference().table(), object.reference().offset(), -object.reference().offset() - 1);
-        for (var object : objects) move(id, object.reference().table(), -object.reference().offset() - 1, saved.offsets().get(object.reference()));
+        for (var object : survivors) move(id, object.reference().table(), object.reference().offset(), -object.reference().offset() - 1);
+        for (var object : survivors) move(id, object.reference().table(), -object.reference().offset() - 1, saved.offsets().get(object.reference()));
         var pending = new java.util.LinkedHashMap<String, PendingRichTextFiles.File>();
         images.forEach((key, bytes) -> pending.put(key, new PendingRichTextFiles.File("", bytes)));
         pending.putAll(files);
@@ -165,6 +186,15 @@ public class RichTextEditingService {
         }
         if (tables.keySet().stream().anyMatch(key -> key.startsWith("new-table:"))) entityManager.createNativeQuery("UPDATE node SET has_table = 1 WHERE node_id = :id")
                 .setParameter("id", id).executeUpdate();
+        if (!deleted.isEmpty()) entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
+            try (var statement = connection.prepareStatement("UPDATE node SET "
+                    + "has_image = EXISTS(SELECT 1 FROM image WHERE node_id = ?), "
+                    + "has_table = EXISTS(SELECT 1 FROM grid WHERE node_id = ?), "
+                    + "has_codebox = EXISTS(SELECT 1 FROM codebox WHERE node_id = ?) WHERE node_id = ?")) {
+                for (int parameter = 1; parameter <= 4; parameter++) statement.setLong(parameter, id);
+                if (statement.executeUpdate() != 1) throw new java.sql.SQLException("Node changed; reload the editor");
+            }
+        });
         entityManager.clear();
     }
 
