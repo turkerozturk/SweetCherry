@@ -16,6 +16,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ### Changed
 
+- Geliştirme sürümü `0.5.0-SNAPSHOT` olarak işaretlendi; sürümleme ve yedek sorumluluğu belgelendi.
+- Ortak arayüz markası SweetCherry olarak güncellendi; veri kaynağı ve düzenleme ekranlarına otomatik yedek alınmadığı uyarısı eklendi.
+
 - Spring Boot 3.2.4 sürümünden 3.5.16 sürümüne yükseltildi.
 - Yavaş lisans, bağımlılık raporu ve Asciidoctor görevleri isteğe bağlı Maven profillerine taşındı.
 - Paketleme çıktısı `release/SweetCherry` altında toplandı; kullanıcı tarafından değiştirilmiş demo verileri korunuyor.

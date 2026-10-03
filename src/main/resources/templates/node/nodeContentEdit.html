@@ -4,6 +4,7 @@
 <head><title>Düğüm içeriğini düzenle</title></head>
 <body>
 <section layout:fragment="content" class="container py-3">
+    <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
     <h1>Düğüm içeriğini düzenle</h1>
     <p><strong th:text="${node.name}">Düğüm adı</strong>
         <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>

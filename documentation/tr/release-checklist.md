@@ -149,3 +149,6 @@ Mevcut `myapp.login` bölümüne yalnızca `trusted-proxy-address` satırını e
 Docker ağ kipine göre `{remote_host}` gerçek WAN istemcisi yerine bir ağ geçidi adresi olabilir. Farklı dış ağlardan denemelerde aynı `clientIp` görülürse güven sınırını genişletmeyin; önce Caddy'nin gelen bağlantıda gördüğü adresi ve Docker ağ yolunu inceleyin. Uygulama yeniden başlatılırsa 15 dakikalık sayaçlar bellekte oldukları için sıfırlanır.
 
 Kurulumdaki DNS, NAT/firewall, sertifika yenileme ve dış yapılandırma kayıtları için [erişim kurulum rehberi](network-access.md) kullanılabilir.
+
+- [ ] [Sürümleme akışı](versioning.md) tamamlandı; geçici yorum arşivi yerel olarak yedeklenip depodan kaldırıldı.
+- [ ] Otomatik yedek alınmadığı uyarısı veri kaynağı seçimi ve düzenleme ekranlarında görülebiliyor.

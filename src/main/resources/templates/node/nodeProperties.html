@@ -4,6 +4,7 @@
 <head><title>Düğüm özellikleri</title></head>
 <body>
 <section layout:fragment="content" class="container py-3">
+    <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
     <h1>Düğüm özellikleri</h1>
     <form th:action="@{/nodes/properties/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
