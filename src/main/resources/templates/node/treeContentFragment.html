@@ -59,6 +59,7 @@
                 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                 <button class="btn btn-sm btn-outline-primary" type="submit" th:title="#{tree.addChildTitle}"><i class="fas fa-plus"></i> <span th:text="#{tree.addChild}"></span></button>
             </form>
+            <th:block th:replace="~{node/nodeBookmarkFragment :: addBookmark('tree')}"></th:block>
             <th:block th:replace="~{node/nodeDuplicateFragment :: duplicateControls('tree')}"></th:block>
             <th:block th:replace="~{node/nodeMoveFragment :: moveControls('tree')}"></th:block>
             <a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>

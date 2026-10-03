@@ -44,6 +44,9 @@ public class BookmarkController {
     @Autowired
     private ChildrenService childrenService;
 
+    @Autowired
+    private BookmarkWriteService bookmarkWriteService;
+
     @GetMapping("/bookmarks")
     @RequiresTenant
     public String getAllChildrenAsHtml(Model model,
@@ -72,6 +75,7 @@ public class BookmarkController {
         model.addAttribute("bookmarks", available);
         model.addAttribute("missingBookmarkIds", missing);
 
+        model.addAttribute("canWriteBookmarks", bookmarkWriteService.writable());
         model.addAttribute("viewMode", viewMode);
         if ("mobile".equals(viewMode)) {
             return "bookmarksMobile";

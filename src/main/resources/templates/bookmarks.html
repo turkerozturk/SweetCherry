@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{_layout}">
 
 <head>
@@ -19,9 +19,12 @@
         <span th:text="${missingBookmarkIds}">IDs</span>
     </p>
 
-    <th:block th:unless="${bookmarks}">
+    <div th:if="${canWriteBookmarks == true and !#lists.isEmpty(missingBookmarkIds)}" sec:authorize="hasRole('ADMIN')">
+        <div th:each="id : ${missingBookmarkIds}" class="d-flex gap-2 align-items-center mb-1"><span th:text="${id}"></span><th:block th:replace="~{common/bookmarkRemoveFragment :: remove(${id})}"></th:block></div>
+    </div>
+    <th:block th:if="${#lists.isEmpty(bookmarks)}">
 
-        <p><b>ADIM:</b> CherryTree programını kullanarak bir düğüm seçin ve menüden yer işaretlerine ekleyin.</p>>
+        <p th:text="#{bookmarks.emptyHelp}"></p>
 
 
         <p class="text-center">
@@ -34,7 +37,7 @@
     </th:block>
 
 
-    <th:block th:if="${bookmarks}">
+    <th:block th:if="${!#lists.isEmpty(bookmarks)}">
 
 
         <h1 th:text="#{bookmarks.heading}"></h1>
@@ -51,7 +54,7 @@
 
                 <th scope="col" class="col-10" th:text="#{bookmarks.grid.th.nodeName}">Node Name</th>
 
-                +
+                <th scope="col" th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')" th:text="#{bookmarks.actions}"></th>
                 <!-- <th scope="col" class="col-2" th:text="#{bookmarks.grid.th.tags}">Tags</th> -->
 
             </tr>
@@ -72,7 +75,7 @@
 
 
                     <th:block>
-                        <a th:href="'/nodes/' + ${bookmark.node.nodeId}">
+                        <a th:href="@{/nodes/{id}(id=${bookmark.nodeId},_tenantView=${tenantViewToken})}">
 
                             <img th:src="@{/img/icons/__${bookmark.node.nodeIcon.iconName}__.svg}"
                                  th:alt="${'/img/icons/' + bookmark.node.nodeIcon.iconName}" class="iconcss"
@@ -84,7 +87,7 @@
                               th:class="${bookmark.node.boldnessBit ? 'boldTitle' : ''}">
                         </span>
                         &nbsp;-&nbsp;(id:&nbsp;
-                        <a th:href="'/nodes/' + ${bookmark.node.nodeId}">
+                        <a th:href="@{/nodes/{id}(id=${bookmark.nodeId},_tenantView=${tenantViewToken})}">
                             <span th:text="${bookmark.nodeId}"></span>
                         </a>
                         &nbsp;)
@@ -96,10 +99,10 @@
 
                     <th:block th:if="${bookmark.node.breadcrumbs}" class="breadcrumbs">
 
-                        <a href="/rootnode">Kök</a>
+                        <a th:href="@{/rootnode(_tenantView=${tenantViewToken})}">Kök</a>
                         <span th:each="entry : ${bookmark.node.breadcrumbs}">
                         <span>/</span>
-                        <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}"></a>
+                        <a th:href="@{/nodes/{id}(id=${entry.key},_tenantView=${tenantViewToken})}" th:text="${entry.value}"></a>
                         </span>
 
                     </th:block>
@@ -107,6 +110,7 @@
                 </td>
 
 
+                <td th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')"><th:block th:replace="~{common/bookmarkRemoveFragment :: remove(${bookmark.nodeId})}"></th:block></td>
                 <!-- <td th:text="${bookmark.node.tags}"></td> -->
 
             </tr>
@@ -116,5 +120,6 @@
     </th:block>
 
 </section>
+<section layout:fragment="pageSpecificJsScripts"><script th:src="@{/js/node/confirmNodeCreation.js}"></script></section>
 </body>
 </html>

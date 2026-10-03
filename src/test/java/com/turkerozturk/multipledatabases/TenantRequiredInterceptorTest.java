@@ -99,6 +99,21 @@ class TenantRequiredInterceptorTest {
         assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isTrue();
     }
 
+    @Test
+    void bookmarkWritesRequireTheCurrentTenantView() throws Exception {
+        TenantContext.setCurrentTenant("Demo");
+        var session = new MockHttpSession();
+        session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");
+        for(String path : java.util.List.of("/bookmarks/10/add", "/bookmarks/10/remove")) {
+            var request = new MockHttpServletRequest("POST",path); request.setSession(session);
+            assertThat(interceptor.preHandle(request,new MockHttpServletResponse(),handlerMethod("publicPage"))).isFalse();
+            request.setParameter("_tenantView","old");
+            assertThat(interceptor.preHandle(request,new MockHttpServletResponse(),handlerMethod("publicPage"))).isFalse();
+            request.setParameter("_tenantView","current");
+            assertThat(interceptor.preHandle(request,new MockHttpServletResponse(),handlerMethod("publicPage"))).isTrue();
+        }
+    }
+
     private HandlerMethod handlerMethod(String methodName) throws NoSuchMethodException {
         return new HandlerMethod(new TestHandler(), TestHandler.class.getMethod(methodName));
     }

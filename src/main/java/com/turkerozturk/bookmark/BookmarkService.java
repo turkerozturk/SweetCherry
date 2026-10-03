@@ -30,7 +30,7 @@ public class BookmarkService {
     private BookmarkRepository bookmarkRepository;
 
     public List<Bookmark> getBookmarks() {
-        List<Bookmark> bookmarks = bookmarkRepository.findAll();
+        List<Bookmark> bookmarks = bookmarkRepository.findAll(org.springframework.data.domain.Sort.by("sequence", "nodeId"));
         return bookmarks;
     }
 

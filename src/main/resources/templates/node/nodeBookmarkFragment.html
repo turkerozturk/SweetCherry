@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
+<form th:fragment="addBookmark(view)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')"
+      th:action="@{/bookmarks/{id}/add(id=${requestedNodeId})}" method="post" data-bookmark-add
+      th:attr="data-state-url=@{/bookmarks/{id}/state(id=${requestedNodeId})},data-existing=#{bookmarks.alreadyAdded},data-error=#{bookmarks.writeError}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<input type="hidden" name="view" th:value="${view}">
+<button type="submit" class="btn btn-sm btn-outline-primary" disabled><i class="fas fa-bookmark" aria-hidden="true"></i> <span data-bookmark-label th:text="#{bookmarks.add}"></span></button>
+<span data-bookmark-error class="small text-danger" role="status"></span>
+</form>
+</body></html>
