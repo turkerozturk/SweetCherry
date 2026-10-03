@@ -16,7 +16,8 @@ Yazma izni `allTenants` altındaki ilgili tanımda `custom.isWritable=true` olar
 açıldığında silme işleminin hedefi şu şekilde belirlenir:
 
 - Paylaşılan düğüm seçilirse yalnızca o `children` kaydı silinir. Asıl düğüm,
-  onun içeriği, diğer paylaşılan başvurular ve varsa bookmark korunur.
+  onun içeriği, diğer paylaşılan başvurular ve onların bookmark kayıtları korunur.
+  Silinen paylaşılan düğümün kendi bookmark kaydı da silinir.
 - Gerçek düğüm seçilirse düğümün alt ağacı, içerik tablolarındaki kayıtları ve
   silinen gerçek düğümlere başka dallardan bağlı paylaşılan başvurular silinir.
 - Altında `father_id` üzerinden çocuk bulunan bir paylaşılan düğüm saptanırsa
@@ -38,3 +39,12 @@ ait ağaç bağlantısının URL'si kendi `children.node_id` değerini korumalı
 silme onayında bu kimliği ve gerçek düğümün kimliğini ayrı ayrı kontrol edin.
 Eski sürümlerde silinmiş düğümlerin geride bıraktığı bookmark kayıtları okuma
 sayfasında ayrıca bildirilir, otomatik olarak veritabanından temizlenmez.
+
+
+## DİKKAT: Shared node altında gerçek düğüm
+
+Manuel bir denemede CherryTree arayüzü gerçek bir düğümün shared node altına taşınmasına izin verdi. Bu gözlem tek başına CherryTree'de bir hata bulunduğu anlamına gelmez; bu düzenin silme ve gösterim kuralları ayrıca araştırılmalıdır.
+
+SweetCherry şu anda shared node'yi yaprak olarak gösterir. `children.father_id` bir shared node'yi gösteriyorsa onun altındaki kayıtlar bu görünümde beklenen yerde görünmeyebilir. Böyle bir CTB'de taşıma seçenekleri yüklenmeyebilir; silme işlemi çocuk kayıtları olan shared node için reddedilir. Çoğaltma da shared node altındaki düğümü veya böyle bir yapı içeren alt ağacı reddeder. Kayıtlar otomatik düzeltilmez ve silinmez.
+
+**TODO:** Bu hiyerarşinin CherryTree'deki gösterim, taşıma ve silme davranışını bir CTB kopyasında incelemek; SweetCherry'de uyumlu gösterim ve açık bir işlem politikası belirlemek. Şimdilik bu düzeni kullanmadan önce yedek alın; normal SweetCherry işlemlerine dönmek için gerçek düğümü CherryTree'de gerçek bir parent altına veya top-level'e taşıyın.

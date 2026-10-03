@@ -19,9 +19,11 @@
 <button id="scrollToTopBtn" type="button" hidden th:title="#{tree.scrollTop}" th:attr="aria-label=#{tree.scrollTop}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
 <footer id="workspace-status" role="status"></footer>
 <th:block th:replace="~{common/footer :: footerJsLibraries}"></th:block>
+<script th:src="@{/js/node/navigationRevision.js}"></script>
 <script th:src="@{/js/node/treeWorkspace.js}"></script>
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 <script th:src="@{/js/node/confirmNodeCreation.js}"></script>
 <script th:src="@{/js/node/nodeMove.js}"></script>
+<script th:src="@{/js/node/nodeDuplicate.js}"></script>
 </body>
 </html>

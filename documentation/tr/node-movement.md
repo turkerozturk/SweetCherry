@@ -12,7 +12,7 @@ Masaüstünde `Alt+Shift+Yön` seçili içerik düğümü için aynı işlemi ya
 
 Shared node kendi `children` kaydıyla taşınır; master ve diğer alias'lar taşınmaz. Shared node parent olamaz. Gerçek düğüm taşındığında alt ağacı ona bağlı kalır.
 
-İşlem yalnızca `children.father_id` ve `children.sequence` alanlarını günceller. Etkilenen sibling gruplarında sıra 1'den başlayarak yeniden numaralanır. İçerik, bookmark, master bağlantısı ve içerik kayıt zamanları değişmez. Taşıma sonrasında aynı düğüm yeni görünümde açılır; ağaç yeniden yüklenir. Hedef seçerek taşıma ve duplicate işlemleri sonraki aşamalardır.
+İşlem yalnızca `children.father_id` ve `children.sequence` alanlarını günceller. Etkilenen sibling gruplarında sıra 1'den başlayarak yeniden numaralanır. İçerik, bookmark, master bağlantısı ve içerik kayıt zamanları değişmez. Taşıma sonrasında aynı düğüm yeni görünümde açılır; ağaç yeniden yüklenir. Ek bir hedef seçerek taşıma yöntemi şimdilik planlanmıyor. Tek düğüm ve alt ağaç çoğaltma ayrı Çoğalt menüsündedir.
 
 POST isteği admin yetkisi, writable CTB, CSRF ve `_tenantView` denetimlerine tabidir. Hiyerarşi özeti eskiyse taşıma reddedilir. Parent zincirindeki eksik kayıt, döngü veya alias altında child varsa taşıma uygulanmaz. Aynı CTB'yi başka uygulamayla eşzamanlı düzenlemek yerine, değişiklik sonrası görünümü yenileyin.
 

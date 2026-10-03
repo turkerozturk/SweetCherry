@@ -86,14 +86,13 @@
             }
         }
     }
-    let initialized = false;
     const retry = document.getElementById('readerRetry');
     async function initialize() {
         retry.hidden = true;
-        try { await load(0, tree); initialized = true; pane.scrollTop = state.scroll; }
+        try { const scroll = pane.scrollTop || state.scroll; await load(0, tree); pane.scrollTop = scroll; }
         catch (_) { retry.hidden = false; tree.textContent = body.dataset.loadError; }
     }
-    panel.addEventListener('shown.bs.offcanvas', () => { if (!initialized) initialize(); });
+    panel.addEventListener('shown.bs.offcanvas', initialize);
     retry.addEventListener('click', initialize);
     pane.addEventListener('scroll', save, {passive:true});
     /** Recognize a deliberate single-finger horizontal swipe without intercepting scrolling or pinch zoom. */

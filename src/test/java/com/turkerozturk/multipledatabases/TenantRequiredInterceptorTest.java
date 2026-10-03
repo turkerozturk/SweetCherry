@@ -85,6 +85,20 @@ class TenantRequiredInterceptorTest {
         assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isTrue();
     }
 
+    @Test
+    void duplicateRejectsMissingAndStaleTenantTokens() throws Exception {
+        TenantContext.setCurrentTenant("Demo");
+        var request = new MockHttpServletRequest("POST", "/nodes/duplicate/10");
+        var session = new MockHttpSession();
+        session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN, "current");
+        request.setSession(session);
+        assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isFalse();
+        request.setParameter("_tenantView", "old");
+        assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isFalse();
+        request.setParameter("_tenantView", "current");
+        assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isTrue();
+    }
+
     private HandlerMethod handlerMethod(String methodName) throws NoSuchMethodException {
         return new HandlerMethod(new TestHandler(), TestHandler.class.getMethod(methodName));
     }

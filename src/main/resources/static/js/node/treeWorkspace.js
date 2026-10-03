@@ -40,6 +40,7 @@
     const expanded = new Set(Array.isArray(state.expanded) ? state.expanded : []);
     let controller;
     let stopped = false;
+    const navigationRevision = window.SweetCherryNavigationRevision();
 
     function save() {
         try { sessionStorage.setItem(storageKey, JSON.stringify({...state, expanded: [...expanded], top: pane.scrollTop, left: pane.scrollLeft})); } catch (_) { }
@@ -105,7 +106,7 @@
         return li;
     }
     /** Loads only one branch, leaving other branches and scroll positions untouched. */
-    async function toggle(li, forceOpen = false) {
+    async function toggle(li, forceOpen = false, signal) {
         if (stopped) return;
         const fold = li.querySelector(':scope > .workspace-tree-row > button');
         if (!fold || fold.disabled) return;
@@ -113,8 +114,9 @@
         if (!branch) {
             fold.disabled = true;
             try {
-                const response = await request(url('/nodes/navigation/children', {fatherId: li.dataset.nodeId}));
+                const response = await request(url('/nodes/navigation/children', {fatherId: li.dataset.nodeId}), signal);
                 const children = await response.json();
+                if (signal?.aborted) return;
                 branch = document.createElement('ul');
                 branch.hidden = true;
                 children.forEach(child => branch.append(row(child)));
@@ -134,6 +136,32 @@
         const li = find(id);
         if (li) li.querySelector(':scope > .workspace-tree-row > a').setAttribute('aria-current', 'page');
     }
+    /** Rebuilds loaded branches only after an external tree/title change, retaining expansion and scroll state. */
+    async function refreshNavigation(active) {
+        const response = await request(url('/nodes/navigation/revision'), active.signal);
+        const revision = (await response.json()).revision;
+        if (active !== controller) throw new DOMException('Superseded', 'AbortError');
+        return navigationRevision.check(revision, async () => {
+            const roots = await request(url('/nodes/navigation/children', {fatherId: 0}), active.signal);
+            const children = await roots.json();
+            if (active !== controller) throw new DOMException('Superseded', 'AbortError');
+            const top = pane.scrollTop, left = pane.scrollLeft;
+            const pending = new Set(expanded);
+            tree.replaceChildren(); children.forEach(child => tree.append(row(child)));
+            let progress;
+            do {
+                progress = false;
+                for (const id of [...pending]) {
+                    const li = find(id);
+                    if (!li) continue;
+                    pending.delete(id); progress = true;
+                    await toggle(li, true, active.signal);
+                    if (active !== controller) throw new DOMException('Superseded', 'AbortError');
+                }
+            } while (progress && pending.size);
+            pane.scrollTop = top; pane.scrollLeft = left;
+        });
+    }
     /** Fetches server-rendered content with existing role, CSRF and tenant safeguards. */
     async function select(id, push = true, reveal = false) {
         if (stopped) return;
@@ -143,6 +171,7 @@
         content.setAttribute('aria-busy', 'true');
         status.textContent = workspace.dataset.loading;
         try {
+            const treeChanged = await refreshNavigation(active);
             const response = await request(url('/tree/content/' + id), active.signal);
             const html = await response.text();
             if (active !== controller || stopped) return;
@@ -169,12 +198,12 @@
             document.title = fragment.dataset.nodeTitle + ' — SweetCherry';
             if (push) history.pushState({nodeId: Number(id)}, '', url('/tree', {nodeId: id}));
             document.dispatchEvent(new CustomEvent('sweetcherry:content-loaded', {detail: {root: content}}));
-            if (reveal) {
+            if (reveal || treeChanged) {
                 const path = content.querySelector('[data-path-ids]')?.dataset.pathIds || '';
                 for (const ancestor of path.split(',').filter(part => /^\d+$/.test(part) && Number(part) !== Number(id))) {
                     if (active !== controller) return;
                     const li = find(ancestor);
-                    if (li) await toggle(li, true);
+                    if (li) await toggle(li, true, active.signal);
                 }
             }
             if (active === controller) { markSelected(id); save(); }
@@ -226,6 +255,8 @@
     async function initialize() {
         setWidth(state.width);
         try {
+            const revisionResponse = await request(url('/nodes/navigation/revision'));
+            await navigationRevision.check((await revisionResponse.json()).revision, async () => {});
             const response = await request(url('/nodes/navigation/children', {fatherId: 0}));
             const children = await response.json();
             children.forEach(child => tree.append(row(child)));
