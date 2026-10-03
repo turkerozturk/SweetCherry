@@ -57,3 +57,180 @@ Release öncesinde bu dosyayı yerel olarak yedekleyip depodan kaldırabilirsini
 #   shutdown:
 #     enabled: true
 ```
+
+# Login ve About sadeleştirmesi
+
+Bu bölüm yorumlarla birlikte kaldırılan arayüz metinlerini de korur.
+
+## `src/main/resources/templates/login/login.html`
+
+```text
+    <img class="mb-4" th:src="@{/img/logo.jpg}" alt="" width="72" height="72">
+```
+
+## `src/main/resources/templates/login/login.html`
+
+```text
+<h1 class="h3 mb-3 font-weight-normal" th:text="#{login.sign_in_to_your_account}">Please sign in</h1>
+```
+
+## `src/main/resources/templates/login/login.html`
+
+```text
+<p class="mt-5 mb-3 text-muted"
+       th:text="#{login.a_webviewer_for_cherrytree}">A WebViewer For CherryTree - 2024</p>
+```
+
+## `src/main/resources/templates/about/about.html`
+
+```text
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{_layout}">
+<head>
+    <title>About</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+
+
+    <p th:text="#{about.developer}">
+
+    </p>
+
+
+    <p th:text="#{about.content}">
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+    <p>
+
+    </p>
+
+</section>
+</body>
+</html>
+```
+
+## `src/main/resources/messages.properties`
+
+```text
+login.a_webviewer_for_cherrytree=A WebViewer For CherryTree - 2024
+```
+
+## `src/main/resources/messages.properties`
+
+```text
+login.sign_in_to_your_account=Please sign in
+```
+
+## `src/main/resources/messages.properties`
+
+```text
+login.signin=Sign in
+```
+
+## `src/main/resources/messages.properties`
+
+```text
+about.content=It allows remote access by displaying it from the web browser.\
+It speeds up access to content.\
+It can display data together only thanks to the additional features it has. Accordingly, it can present an agent view and reminders, highlighted contents, and PDF reports.\
+It can play background sound for alarms and ambient music created by the user for concentration.\
+It provides some offline astronomy information about the positions of the moon and sun.
+```
+
+## `src/main/resources/messages.properties`
+
+```text
+root.about.description=You are using the freeware version.\
+This software uses the database of the desktop application called CherryTree to only read data.\
+2024, Türker Öztürk
+```
+
+## `src/main/resources/messages_en.properties`
+
+```text
+login.a_webviewer_for_cherrytree=A WebViewer For CherryTree - 2024
+```
+
+## `src/main/resources/messages_en.properties`
+
+```text
+login.sign_in_to_your_account=Please sign in
+```
+
+## `src/main/resources/messages_en.properties`
+
+```text
+login.signin=Sign in
+```
+
+## `src/main/resources/messages_en.properties`
+
+```text
+about.content=It allows remote access by displaying it from the web browser.\
+It speeds up access to content.\
+It can display data together only thanks to the additional features it has. Accordingly, it can present an agent view and reminders, highlighted contents, and PDF reports.\
+It can play background sound for alarms and ambient music created by the user for concentration.\
+It provides some offline astronomy information about the positions of the moon and sun.
+```
+
+## `src/main/resources/messages_en.properties`
+
+```text
+root.about.description=You are using the freeware version.\
+This software uses the database of the desktop application called CherryTree to only read data.\
+2024, Türker Öztürk
+```
+
+## `src/main/resources/messages_tr.properties`
+
+```text
+login.a_webviewer_for_cherrytree=CherryTree İçin Bir Web Görüntüleyici - 2024
+```
+
+## `src/main/resources/messages_tr.properties`
+
+```text
+login.sign_in_to_your_account=Lütfen giriş yapın
+```
+
+## `src/main/resources/messages_tr.properties`
+
+```text
+login.signin=Giriş
+```
+
+## `src/main/resources/messages_tr.properties`
+
+```text
+about.content=Web gezgininden göstermesi sayesinde uzaktan erişim imkanı verir.\
+İçeriğe erişimi hızlandırır.\
+Verileri sadece kendisinde bulunan ek özellikler sayesinde birarada görüntüleyebilir. Buna bağlı olarak ajana görünümü ve hatırlatıcılar, vurgulanmış içerikler, PDF raporlar sunabilir.\
+Arkaplanda alarm için ses ve konsantrasyon için kullanıcının oluşturacağı ortam müziklerini çalabilir.\
+Ay ve güneşin durumları ile ilgili birtakım çevrimdışı astronomi bilgileri sunar.
+```
+
+## `src/main/resources/messages_tr.properties`
+
+```text
+root.about.description=Freeware sürümü kullanmaktasınız.\
+Bu yazılım, CherryTree isimli masaüstü uygulamasına ait veritabanını, sadece veri okuyacak biçimde kullanır.\
+2024, Türker Öztürk
+```

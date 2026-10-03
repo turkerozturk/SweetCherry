@@ -1,41 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
-      layout:decorate="~{_layout}">
-<head>
-    <title>About</title>
-</head>
-<body>
-<section layout:fragment="content">
-
-
-
-    <p th:text="#{about.developer}">
-
-    </p>
-
-
-    <p th:text="#{about.content}">
-
-    </p>
-    <p>
-
-    </p>
-    <p>
-
-    </p>
-    <p>
-
-    </p>
-    <p>
-
-    </p>
-    <p>
-
-    </p>
-    <p>
-
-    </p>
-
-</section>
-</body>
-</html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{root.about}">About SweetCherry</title></head>
+<body><section layout:fragment="content">
+    <h1>SweetCherry</h1>
+    <p th:text="#{about.developer}">2024 Türker Öztürk</p>
+    <p th:text="#{about.content}">SweetCherry is a web companion for CherryTree CTB note databases.</p>
+    <p th:text="#{about.open_source}">Free and open-source software, licensed under GNU GPL version 3 or later.</p>
+    <p><a href="https://github.com/turkerozturk/SweetCherry" th:text="#{about.project_link}">Project and source code</a></p>
+    <p th:text="#{about.third_party}">SweetCherry uses third-party libraries and resources. Their licenses and notices are retained separately.</p>
+</section></body></html>

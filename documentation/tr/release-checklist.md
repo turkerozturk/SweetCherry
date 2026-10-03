@@ -152,3 +152,5 @@ Kurulumdaki DNS, NAT/firewall, sertifika yenileme ve dış yapılandırma kayıt
 
 - [ ] [Sürümleme akışı](versioning.md) tamamlandı; geçici yorum arşivi yerel olarak yedeklenip depodan kaldırıldı.
 - [ ] Otomatik yedek alınmadığı uyarısı veri kaynağı seçimi ve düzenleme ekranlarında görülebiliyor.
+
+- [ ] [Üçüncü taraf lisans ve atıf envanteri](third-party-notices-plan.md) tamamlanıp gerekli dosyalar dağıtıma eklendi.

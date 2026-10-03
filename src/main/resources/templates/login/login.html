@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login</title>
+    <title th:text="#{login.signin}">SweetCherry Sign in</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -16,7 +16,7 @@
 
         html,
         body {
-          height: 100%;
+          min-height: 100%;
         }
 
         body {
@@ -29,8 +29,8 @@
           align-items: center;
           -webkit-box-pack: center;
           justify-content: center;
-          padding-top: 40px;
-          padding-bottom: 40px;
+          padding-top: 16px;
+          padding-bottom: 16px;
           background-color: #f5f5f5;
         }
 
@@ -53,7 +53,7 @@
         .form-signin .form-control:focus {
           z-index: 2;
         }
-        .form-signin input[type="email"] {
+        .form-signin input[type="text"] {
           margin-bottom: -1px;
           border-bottom-right-radius: 0;
           border-bottom-left-radius: 0;
@@ -64,6 +64,9 @@
           border-top-right-radius: 0;
         }
 
+        .login-companion {display:flex;align-items:center;gap:.6rem;margin:.8rem 0 0;text-align:left;color:#555;font-size:.85rem;line-height:1.35}
+        .login-companion img {flex:0 0 36px;width:36px;height:36px;object-fit:contain}
+        @media (max-height:520px) {body{align-items:flex-start;padding:8px 0}.form-signin{padding:10px 15px}}
     </style>
 
 </head>
@@ -77,17 +80,11 @@ https://getbootstrap.com/docs/4.0/examples/sign-in/
       th:action="@{/login}"
       method="post">
 
-    <img class="mb-4" th:src="@{/img/logo.jpg}" alt="" width="72" height="72">
-
-
-
-    <h1 class="h3 mb-3 font-weight-normal" th:text="#{login.sign_in_to_your_account}">Please sign in</h1>
-
-    <p th:if="${expired}" class="alert alert-info" role="status">
+<p th:if="${expired}" class="alert alert-info" role="status">
         Oturumunuz sona erdi. Yeniden giriş yaptıktan sonra CTB dosyanızı seçin.
     </p>
 
-    <label class="sr-only"
+    <label class="visually-hidden"
            for="username"
            th:text="#{login.username}"
     >Username
@@ -97,10 +94,11 @@ https://getbootstrap.com/docs/4.0/examples/sign-in/
            id="username"
            name="username"
            type="text"
+           autocomplete="username" autocapitalize="none" spellcheck="false"
            th:placeholder="#{login.username}"
     />
 
-    <label class="sr-only"
+    <label class="visually-hidden"
            for="password"
            th:text="#{login.password}"
     >Password
@@ -110,6 +108,7 @@ https://getbootstrap.com/docs/4.0/examples/sign-in/
            id="password"
            name="password"
            type="password"
+           autocomplete="current-password"
            th:placeholder="#{login.password}"
     />
 
@@ -121,19 +120,23 @@ https://getbootstrap.com/docs/4.0/examples/sign-in/
     </div>
     <!--*/-->
 
-    <button class="btn btn-lg btn-primary btn-block"
+    <button class="btn btn-primary w-100"
             type="submit"
 
     >
-        <i class="fas fa-sign-in fa-border"></i>
-        <span th:text="#{login.signin}">Sign in</span>
+        <i class="fas fa-right-to-bracket" aria-hidden="true"></i>
+        <span th:text="#{login.signin}">SweetCherry Sign in</span>
 
     </button>
 
 
 
-    <p class="mt-5 mb-3 text-muted"
-       th:text="#{login.a_webviewer_for_cherrytree}">A WebViewer For CherryTree - 2024</p>
+
+
+    <div class="login-companion">
+        <img th:src="@{/img/logo.jpg}" alt="" width="36" height="36">
+        <span th:text="#{login.companion}">A web companion for CherryTree CTB note databases.</span>
+    </div>
 
     <div th:if="${param.error}" class="bg-rose-100 justify-center p-4 ring-1 ring-rose-200 rounded-md">
         <p th:text="#{login.username_and_pasword_mismatch}">Username and Password Mismatch</p>
