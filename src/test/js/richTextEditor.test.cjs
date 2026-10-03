@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 /** Executes the real editor script against a small DOM double to test model/history behavior. */
-function editor(initialRuns, maxFileBytes, objects) {
+function editor(initialRuns, maxFileBytes, objects, clipboard) {
     const handlers = new Map();
     function element(id = '') {
         return {id, value:'', style:{}, dataset:{}, childNodes:[], selectionStart:0, selectionEnd:0,
@@ -31,7 +31,7 @@ function editor(initialRuns, maxFileBytes, objects) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},richEditorMaxFileBytes:maxFileBytes},
+    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes},
         crypto:{randomUUID:()=> 'test-uuid'},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
@@ -195,4 +195,24 @@ test('table resize preserves cells and refuses to discard nonempty removed cells
  assert.equal(e.ids.richTableError.hidden,false);assert.equal(e.ids.richTableCells.childNodes[0].childNodes.length,3);
  e.ids.richTableRows.value=4;e.ids.richTableColumns.value=4;e.fire('richTableResize','click');
  assert.equal(e.ids.richTableError.hidden,true);assert.equal(e.ids.richTableCells.childNodes[0].childNodes[2].childNodes[2].childNodes[0].value,'Keep');
+});
+
+test('formatted copy/paste keeps attributes and participates in the same undo history',()=>{
+ const clipboard=require('../../main/resources/static/js/node/richTextClipboard.js');
+ const e=editor(undefined,undefined,undefined,clipboard);e.select(1,3);e.fire('bold','click');
+ const data={};e.fire('richText','copy',{preventDefault(){},clipboardData:{setData(type,value){data[type]=value;}}});
+ assert.equal(data['text/plain'],'😀');assert.match(data['text/html'],/font-weight:bold/);
+ e.select(5,5);e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData:type=>data[type]||''}});
+ assert.equal(text(e.runs()),'A😀B\n😀C');assert.equal(e.runs().find(run=>run.text==='😀'&&run.attributes.weight==='heavy').attributes.weight,'heavy');
+ e.key('z');assert.equal(text(e.runs()),'A😀B\nC');e.key('y');assert.equal(text(e.runs()),'A😀B\n😀C');
+});
+test('structured HTML paste creates table payloads together with styled text as one undo step',()=>{
+ const clipboard={...require('../../main/resources/static/js/node/richTextClipboard.js'),fromHtml:()=>[
+  {text:'Heading\n',attributes:{scale:'h2',foreground:'#3584e4'}},{table:[['Header'],['Body']]},{text:'After',attributes:{style:'italic'}}]};
+ const e=editor(undefined,undefined,undefined,clipboard);e.select(0,0);
+ e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData:type=>type==='text/html'?'<table/>':''}});
+ assert.equal(text(e.runs()),'Heading\n\uFFFCAfterA😀B\nC');
+ assert.deepEqual(JSON.parse(e.ids.richTables.value)['new-table:test-uuid'],[['Header'],['Body']]);
+ e.key('z');assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richTables.value),{});
+ e.key('y');assert.equal(e.runs()[0].attributes.scale,'h2');
 });

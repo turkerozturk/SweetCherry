@@ -439,21 +439,64 @@
         fileButton.addEventListener('click',()=>{captureSelection();filePicker.click();});
         filePicker.addEventListener('change',()=>{if(filePicker.files[0])addObject(filePicker.files[0],true);filePicker.value='';});
     }
-    // Clipboard object slots are not transferable; copy only their surrounding text.
-    for (const target of [input,preview]) {
-        target.addEventListener('copy',event=>{
-            rememberSelection();event.preventDefault();event.clipboardData.setData('text/plain',plainClipboard(sub(previous,...selection)));
-        });
-    }
-    input.addEventListener('cut',event=>{
+    /** Copies formatted text runs only; protected objects are excluded instead of producing phantom OBJ characters. */
+    function copySelection(event) {
         rememberSelection();event.preventDefault();
-        event.clipboardData.setData('text/plain',plainClipboard(sub(previous,...selection)));visualChange('');
-    });
-    input.addEventListener('paste',event=>{
+        let offset=0;const selected=[];
+        for(const run of runs){
+            const start=offset;offset+=count(run.text);
+            if(run.attributes.__sweet_object||offset<=selection[0]||start>=selection[1])continue;
+            const text=plainClipboard(sub(run.text,Math.max(0,selection[0]-start),Math.min(count(run.text),selection[1]-start)));
+            if(text)selected.push({text,attributes:{...run.attributes}});
+        }
+        event.clipboardData.setData('text/plain',selected.map(run=>run.text).join(''));
+        if(window.RichTextClipboard){
+            const safe=selected.map(run=>({text:run.text,attributes:window.RichTextClipboard.attributes(run.attributes)}));
+            event.clipboardData.setData('application/x-sweetcherry-richtext+json',JSON.stringify(safe));
+            event.clipboardData.setData('text/html',window.RichTextClipboard.toHtml(safe));
+        }
+    }
+    /** Inserts imported runs and tables as one model/history change, keeping the original objects protected. */
+    function pasteStructured(items) {
+        const incoming=[],newTables={},info={};
+        for(const item of items){
+            if(item.table){
+                const key='new-table:'+crypto.randomUUID();newTables[key]=item.table;
+                info[key]={label:tableButton?tableButton.textContent:'Table',tableRows:item.table};
+                incoming.push({text:'\uFFFC',attributes:{__sweet_object:key}});
+            }else if(item.text)incoming.push({text:item.text,attributes:{...item.attributes}});
+        }
+        if(!incoming.length)return false;
+        if(runs.filter(run=>(run.attributes.__sweet_object||'').startsWith('new-')).length+Object.keys(newTables).length>10
+            || Object.keys({...tableChanges,...newTables}).length>20 || JSON.stringify({...tableChanges,...newTables}).length>2000000)throw new Error('Clipboard tables too large');
+        captureSelection();const [start,end]=selection,text=incoming.map(run=>run.text).join('');
+        if(!replace(start,end,text))return true;
+        let offset=0;
+        for(let index=0;index<runs.length;index++){
+            if(offset===start&&runs[index].text===text&&!runs[index].attributes.__sweet_object){runs.splice(index,1,...incoming);break;}
+            offset+=count(runs[index].text);
+        }
+        tableChanges={...tableChanges,...newTables};window.richEditorObjects={...(window.richEditorObjects||{}),...info};
+        previous=runs.map(run=>run.text).join('');input.value=previous;
+        selection=[start+count(text),start+count(text)];render();focusEditor();restoreSelection();commitHistory();return true;
+    }
+    function paste(event) {
         event.preventDefault();rememberSelection();
-        const file=Array.from(event.clipboardData.files || []).find(file=>file.type.startsWith('image/'));
-        if(file)addImage(file);else visualChange(plainClipboard(event.clipboardData.getData('text/plain')).replace(/\r\n?/g,'\n'));
-    });
+        const pasteStatus=document.getElementById('richPasteStatus');if(pasteStatus)pasteStatus.hidden=true;
+        const transfer=event.clipboardData,clipboard=window.RichTextClipboard;
+        if(clipboard){
+            const own=transfer.getData('application/x-sweetcherry-richtext+json'),html=transfer.getData('text/html');
+            try{
+                if(own&&pasteStructured(clipboard.fromInternal(own)))return;
+                if(html&&pasteStructured(clipboard.fromHtml(html,document)))return;
+            }catch(_){const status=document.getElementById('richPasteStatus');if(status)status.hidden=false;return;}
+        }
+        const file=Array.from(transfer.files||[]).find(file=>file.type.startsWith('image/'));
+        if(file)addImage(file);else visualChange(plainClipboard(transfer.getData('text/plain')).replace(/\r\n?/g,'\n'));
+    }
+    for(const target of [input,preview])target.addEventListener('copy',copySelection);
+    input.addEventListener('cut',event=>{copySelection(event);visualChange('');});
+    input.addEventListener('paste',paste);
     if (mode && window.RichTextVisualModel) {
         const syncMode = () => {
             input.hidden = visual();
@@ -503,18 +546,8 @@
         });
         preview.addEventListener('compositionstart',()=>{captureSelection();composing=true;});
         preview.addEventListener('compositionend',()=>{composing=false;commitHistory();});
-        preview.addEventListener('paste',event=>{
-            if (!visual()) return;
-            event.preventDefault(); rememberSelection();
-            const file = Array.from(event.clipboardData.files || []).find(file=>file.type.startsWith('image/'));
-            if (file) { addImage(file); return; }
-            visualChange(plainClipboard(event.clipboardData.getData('text/plain')).replace(/\r\n?/g,'\n'));
-        });
-        preview.addEventListener('cut',event=>{
-            if (!visual()) return;
-            rememberSelection(); event.preventDefault();
-            event.clipboardData.setData('text/plain',plainClipboard(sub(previous,selection[0],selection[1])));visualChange('');
-        });
+        preview.addEventListener('paste',event=>{if(visual())paste(event);});
+        preview.addEventListener('cut',event=>{if(visual()){copySelection(event);visualChange('');}});
         // HTML/objects are deliberately not accepted through drag-and-drop in this stage.
         preview.addEventListener('drop',event=>{if(visual())event.preventDefault();});
         syncMode();

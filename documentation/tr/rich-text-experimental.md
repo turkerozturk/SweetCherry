@@ -458,3 +458,45 @@ Manuel test: CTB kopyasında yeni tablo ekleyip header/body metinleri, emoji, & 
 yazın; ölçüleri değiştirin ve undo/redo deneyin. Demo 15 ve 53'te mevcut tabloların hücrelerini
 düzenleyin; Save/reopen ve CherryTree'de header sırası ve sütun genişliklerini kontrol edin.
 Metin eklenince tablo ve diğer nesnelerin offset'lerinin doğru yerde kaldığını kontrol edin.
+
+
+## İlk biçimli web/clipboard yapıştırma
+
+RichTextClipboard clipboard HTML'yi inert template içinde parse edip desteklenen CTB
+metin attribute'larına ve tablo payload'larına dönüştürür. Kaynak HTML editör DOM'una
+aktarılmaz. Bold/italic/underline/strikethrough, monospace, h1-h6/small/sub/sup, desteklenen
+hex/RGB renkler, inline text-align, newline ve HTTP(S) linkler aktarılır. Web sitesinin class
+adları, harici CSS'i, özel fontları veya sayfa tasarımı kopyalanmaz. Script/style/iframe,
+SVG/MathML ve event attribute'ları aktarılmaz; URL'ler mevcut external link kurallarına uyar.
+
+Rectangular düz hücreli HTML tablolar grid payload'ına dönüşür. İlk satır başlık sayılır;
+CTB kaydında başlık yine en sonda tutulur. Birleştirilmiş hücreli/nested/uyumsuz tablolar
+metin olarak aktarılır; satır/sütun metni korunur, colspan/rowspan yapısı bu sürümde yoktur.
+Tablo hücresi içindeki biçimlendirme düz metne dönüşür. Yeni tablo nesneleri protected
+slot'larla gösterilir ve önceki tablo diyaloğundan düzenlenebilir.
+
+Uzak web img adresi indirilmez: varsa alt metni, yoksa URL'si HTTP(S) bağlantı olarak
+aktarılır. Bu ilk aşama uzak görselin binary verisini CTB'ye eklemez. HTML'de veri üretmeyen
+bir resim yapıştırmasında, panoda gerçek PNG/JPEG file varsa mevcut image ekleme yolu
+kullanılır. Sadece data-URI HTML olup binary file olmayan resimler bu sürümde import edilmez.
+İstenilen web görselleri ayrıca panodan/dosyadan eklenebilir; otomatik resim importu ayrıdır.
+
+SweetCherry içindeki copy/cut, düz metne ek olarak güvenli HTML ve özel metin/biçim clipboard
+metadata'sı sağlar. Aynı editöre paste biçimleri taşır. Desteklenen text attribute'ları ve
+external linkler korunur; bilinmeyen attribute/internal-link kopyalama bu aşamada yoktur.
+Nesne işaretçileri kopyalanmaz; image/attachment/table/codebox nesnelerinin kendisini copy ile
+çoğaltmak bu aşamaya dahil değildir. Korunan nesneyi içeren cut seçimi silinemez.
+
+Paste tek undo/redo adımıdır; tablo payload'ları ve biçimli metin birlikte geri alınır/getirilir.
+Clipboard HTML/metadata en fazla 2 milyon karakter, metin/hücre içeriği 200 bin karakter,
+DOM traversal 10 bin node ve 64 derinlikle sınırlıdır. Limit aşıldığında keserek kaydetmek
+yerine işlem yapılmaz ve bilgi gösterilir. Mevcut yeni nesne/tablo sınırları da geçerlidir.
+Backend XML/link/table/revision/tenant/role/read-only kontrolleri değişmez.
+
+Java test sayısı 162 kalır; Node test sayısı 35:
+`node --test src/test/js/*.test.cjs`.
+Manuel test: web sayfasından başlık, kalın/renkli metin, link ve basit tablo seçip yapıştırın.
+Editör içinde biçimli metin copy/cut/paste deneyin. Undo/redo ardından Save/reopen ve
+CherryTree'de metin/biçim, link hedefi ve tablo başlığını kontrol edin. Uzak resimlerin
+bu aşamada görüntü yerine link olarak geldiğini, gerçek pano PNG/JPEG'nin hâlâ eklendiğini
+kontrol edin. Browser/pano HTML kalitesi farklı olabilir; görsel karşılaştırma gereklidir.

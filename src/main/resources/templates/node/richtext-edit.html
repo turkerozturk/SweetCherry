@@ -43,6 +43,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
 <textarea id="richText" spellcheck="false"></textarea>
 <h2 id="richPreviewTitle" th:attr="data-visual=#{richtext.edit.text},data-preview=#{richtext.edit.preview}" th:text="#{richtext.edit.preview}"></h2><div id="richPreview" aria-labelledby="richPreviewTitle"></div>
+<p id="richPasteStatus" class="note" role="alert" hidden th:text="#{richtext.edit.pasteError}"></p>
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 </form>
@@ -69,5 +70,6 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 </dialog>
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
+<script src="/js/node/richTextClipboard.js"></script>
 <script src="/js/node/richTextEditor.js"></script>
 </body></html>
