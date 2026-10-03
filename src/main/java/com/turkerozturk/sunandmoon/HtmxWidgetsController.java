@@ -30,5 +30,8 @@ public class HtmxWidgetsController {
     public String getAstronomy() {
         return "astronomy";
     }
+    /** Serves fresh cached phase details for a keyboard/touch-accessible popover. */
+    @GetMapping("/astronomy/moon")
+    public String getMoonPhase() { return "moon-phase"; }
 // bilgi https://stackoverflow.com/questions/56732455/dynamically-change-content-of-a-bootstrap-4-popover-using-ajax
 }

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"><body>
+<section>
+    <p th:unless="${astronomyEnabled}" th:text="#{astronomy.disabled}"></p>
+    <th:block th:if="${astronomyEnabled}">
+        <p th:if="${moonTime4j == null}" th:text="#{astronomy.unavailable}"></p>
+        <th:block th:if="${moonTime4j != null}">
+            <p class="small" th:text="${astronomyInfo.timezone}"></p>
+            <table class="table table-sm">
+                <tr><th th:text="#{astronomy.previousPhase}"></th><td><span th:text="${#messages.msg(moonTime4j.lastPhaseKey)}"></span><br><span th:text="${moonTime4j.lastFormatted}"></span></td></tr>
+                <tr><th th:text="#{astronomy.nextPhase}"></th><td><span th:text="${#messages.msg(moonTime4j.nextPhaseKey)}"></span><br><span th:text="${moonTime4j.nextFormatted}"></span></td></tr>
+            </table>
+            <p th:text="#{astronomy.illumination(${moonTime4j.illuminationPercent})}"></p>
+        </th:block>
+    </th:block>
+</section></body></html>

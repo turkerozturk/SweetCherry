@@ -26,9 +26,9 @@ class MobileReaderTest {
         assertThat(model.get("childNodes")).isEqualTo(List.of());
     }
 
-    @Test void legacyMobileRemainsAvailable() {
+    @Test void legacyMobileSelectionUsesMaintainedReader() {
         assertThat(controller().getRootNodesAsHtml(new ExtendedModelMap(), new MockHttpServletRequest(), Locale.ENGLISH, null, "mobile"))
-                .isEqualTo("node/nodeMobile");
+                .isEqualTo("node/mobileReader");
     }
 
     private NodeController controller() {

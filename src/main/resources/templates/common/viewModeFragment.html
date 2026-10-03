@@ -1,48 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"><body>
 <div th:fragment="viewModeFragment">
-    <li th:if="${currentTenantName}">
-        <a class="dropdown-item" href="/changeView?mode=tree">
-            <i class="fas fa-sitemap"></i>
-            <span th:text="#{tree.workspace}">Full tree</span>
-            <i th:if="${viewMode == 'tree'}" class="fas fa-check"></i>
-        </a>
-    </li>
-
-    <li th:if="${currentTenantName}"><a class="dropdown-item" href="/changeView?mode=reader"><i class="fas fa-book-open"></i> <span th:text="#{reader.view}">Mobile reader</span><i th:if="${viewMode == 'reader'}" class="fas fa-check"></i></a></li>
-
-    <li>
-        <a class="dropdown-item" href="/changeView?mode=desktop">
-            &nbsp;<i class="fas fa-regular fa-desktop"></i>
-            <span th:text="#{label.desktopView}">Desktop View</span>
-            &nbsp;<i th:if="${viewMode == 'desktop'}" class="fas fa-check"></i>
-        </a>
-    </li>
-
-    <li>
-        <a class="dropdown-item" href="/changeView?mode=mobile">
-            &nbsp;<i class="fas fa-regular fa-mobile"></i>
-            <span th:text="#{label.mobileView}">Mobile View</span>
-            &nbsp;<i th:if="${viewMode == 'mobile'}" class="fas fa-check"></i>
-        </a>
-    </li>
-
+    <li><a class="dropdown-item" th:href="@{/changeView(mode='tree')}"><i class="fas fa-desktop"></i> <span th:text="#{view.desktop}">Desktop</span> <i th:if="${viewMode == 'tree'}" class="fas fa-check"></i></a></li>
+    <li><a class="dropdown-item" th:href="@{/changeView(mode='reader')}"><i class="fas fa-mobile-alt"></i> <span th:text="#{view.mobile}">Mobile</span> <i th:if="${viewMode == 'reader'}" class="fas fa-check"></i></a></li>
     <li th:if="${currentTenantName}"><div class="dropdown-divider"></div></li>
-    <li th:if="${currentTenantName}">
-        <a class="dropdown-item" th:href="@{/quick-mind-map/all}" target="_blank" rel="noopener noreferrer">
-            <i class="fas fa-project-diagram"></i> Mermaid mind map (tüm düğümler)
-        </a>
-    </li>
-    <li th:if="${currentTenantName}">
-        <a class="dropdown-item" th:href="@{/markmap-quick-mind-map/all}" target="_blank" rel="noopener noreferrer">
-            <i class="fas fa-project-diagram"></i> Markmap mind map (tüm düğümler)
-        </a>
-    </li>
-
-</div>
-</body>
-</html>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/markmap-quick-mind-map/all}" target="_blank" rel="noopener noreferrer"><i class="fas fa-project-diagram"></i> <span th:text="#{view.mindmap1}">Mind Map 1</span></a></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/quick-mind-map/all}" target="_blank" rel="noopener noreferrer"><i class="fas fa-project-diagram"></i> <span th:text="#{view.mindmap2}">Mind Map 2</span></a></li>
+    <li th:if="${currentTenantName}"><div class="dropdown-divider"></div></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/cherrytemplatetasks}"><i class="fas fa-list"></i> <span th:text="#{view.special1}">SweetCherry Special 1</span></a></li>
+</div></body></html>

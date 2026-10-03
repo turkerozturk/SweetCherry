@@ -56,4 +56,19 @@ class TreeWorkspaceTest {
         assertThat(controller.getNodeAsHtml(55, new ExtendedModelMap(), new MockHttpServletRequest(), "tree"))
                 .isEqualTo("redirect:/tree?nodeId=55");
     }
+    @Test void legacyDesktopLinksKeepSharedIdAndTenantToken() {
+        var request = new MockHttpServletRequest(); request.setParameter("_tenantView", "old-token");
+        assertThat(controller.getNodeAsHtml(55, new ExtendedModelMap(), request, "desktop"))
+                .isEqualTo("redirect:/tree?nodeId=55&_tenantView=old-token");
+    }
+
+    @Test void legacyDesktopRootOpensWorkspace() {
+        TenantContext.setCurrentTenant("Demo");
+        assertThat(controller.getRootNodesAsHtml(new ExtendedModelMap(), new MockHttpServletRequest(),
+                java.util.Locale.ENGLISH, null, "desktop")).isEqualTo("redirect:/tree");
+        var request = new MockHttpServletRequest(); request.setParameter("_tenantView", "old-token");
+        assertThat(controller.getRootNodesAsHtml(new ExtendedModelMap(), request,
+                java.util.Locale.ENGLISH, null, "desktop")).isEqualTo("redirect:/tree?_tenantView=old-token");
+    }
+
 }

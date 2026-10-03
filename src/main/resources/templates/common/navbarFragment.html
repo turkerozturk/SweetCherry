@@ -84,16 +84,6 @@
 
                             <div class="dropdown-divider"></div>
 
-
-                            <li>
-                                <a class="dropdown-item" href="/cherrytemplatetasks"
-                                   th:title="#{root.customizedNodeListViews.description}"
-                                >
-                                    <i class=" fas fa-list"></i>
-                                    <span href="" th:text="#{root.customizedNodeListViews}"></span>
-                                </a>
-                            </li>
-
                             <div class="dropdown-divider"></div>
 
 
@@ -111,22 +101,6 @@
                                 >
                                     <i class=" fas fa-gear"></i>
                                     <span href="" th:text="#{root.settings}"></span>
-                                </a>
-                            </li>
-                            <li th:if="${operationsEnabled}">
-                                <a class="dropdown-item" href="/dashboardold"
-                                   th:title="#{root.informationBoard.description}"
-                                >
-                                    <i class=" fas fa-info-circle"></i>
-                                    <span href="" th:text="#{root.informationBoard}"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/help/index"
-                                   th:title="#{root.help.description}"
-                                >
-                                    <i class=" fas fa-life-ring"></i>
-                                    <span href="" th:text="#{root.help}"></span>
                                 </a>
                             </li>
                             <li>
@@ -391,50 +365,14 @@
                             User
                         </a>
                         <ul class="dropdown-menu">
-
-
                             <th:block sec:authorize="isAuthenticated()">
-<!--
-                                <li>Session will expire in: <span id="countdown"></span> seconds.
-                                </li>
-
-                                <div class="dropdown-divider"></div>
--->
-
-                                <li>
-                                    <a class="dropdown-item" href="/sessionInfo"
-
-                                    >
-                                        <i class="fa-solid fa-info"></i>
-                                        <span
-                                                th:text="#{navbar.sessionInfo}"
-                                        >Session Info
-                                        </span>
-
-                                    </a>
-                                </li>
-
-                                <div class="dropdown-divider"></div>
-
-
-                                <li>
-                                    <form th:action="@{/logout}" method="post">
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>
-                                        <span
-                                                th:text="#{navbar.logout}"
-                                        >Logout
-                                        </span>
-                                        &nbsp;
-                                        <span
-                                        sec:authentication="name"></span>
-                                    </button>
-                                    </form>
-                                </li>
-
+                                <li><span class="dropdown-item-text text-muted"><i class="fas fa-user" aria-hidden="true"></i> <span sec:authentication="name"></span></span></li>
+                                <li><a class="dropdown-item" th:href="@{/sessionInfo}"><i class="fas fa-info-circle"></i> <span th:text="#{navbar.sessionInfo}">Session Info</span></a></li>
+                                <li><form th:action="@{/logout}" method="post"><button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> <span th:text="#{navbar.logout}">Logout</span></button></form></li>
+                                <li><div class="dropdown-divider"></div></li>
+                                <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/dashboardold}"><i class="fas fa-info-circle"></i> <span th:text="#{navbar.legacyDashboard}">Old Dashboard</span></a></li>
+                                <li><a class="dropdown-item" th:href="@{/help/index}"><i class="fas fa-life-ring"></i> <span th:text="#{navbar.legacyHelp}">Old Help</span></a></li>
                             </th:block>
-
-
                         </ul>
                     </li>
 

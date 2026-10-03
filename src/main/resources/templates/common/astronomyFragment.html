@@ -3,8 +3,11 @@
 <div th:fragment="astronomyFragment">
     <span id="clock"></span>
     <th:block th:if="${astronomyEnabled}">
-        <span th:if="${moonTime4j != null}" id="moonphase" th:text="${moonTime4j.moonPhaseWidget}"
-              th:title="${#messages.msg(moonTime4j.lastPhaseKey) + ' ' + moonTime4j.lastFormatted + ' → ' + #messages.msg(moonTime4j.nextPhaseKey) + ' ' + moonTime4j.nextFormatted + ' (' + astronomyInfo.timezone + ')'}"></span>
+        <button th:if="${moonTime4j != null}" type="button" id="moonphase" class="btn astronomy-button"
+                th:text="${moonTime4j.moonPhaseWidget}" data-bs-toggle="popover" data-bs-placement="bottom"
+                data-bs-trigger="focus" th:title="#{astronomy.phaseTitle}" data-bs-html="true"
+                th:attr="data-astronomy-url=@{/astronomy/moon},data-astronomy-error=#{astronomy.loadError},data-astronomy-loading=#{astronomy.loading}"
+                data-bs-content="&lt;div class='astronomy-popup'&gt;&lt;/div&gt;"></button>
         <button type="button" class="btn astronomy-button" data-bs-toggle="popover" data-bs-placement="bottom"
                 data-bs-trigger="focus" th:title="#{astronomy.title}" data-bs-html="true"
                 th:attr="data-astronomy-error=#{astronomy.loadError},data-astronomy-loading=#{astronomy.loading}"

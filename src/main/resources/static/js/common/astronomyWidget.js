@@ -8,7 +8,7 @@
             if (!content) return;
             content.textContent = button.dataset.astronomyLoading;
             try {
-                const response = await fetch("/astronomy", {credentials: "same-origin"});
+                const response = await fetch(button.dataset.astronomyUrl || "/astronomy", {credentials: "same-origin"});
                 if (!response.ok || response.redirected) throw new Error("Astronomy request failed");
                 content.innerHTML = await response.text();
             } catch (error) {

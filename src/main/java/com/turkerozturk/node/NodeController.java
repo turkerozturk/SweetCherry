@@ -284,7 +284,7 @@ public class NodeController {
     @GetMapping({"/", "/rootnode", "/nodes/0"})
     public String getRootNodesAsHtml(Model model, HttpServletRequest request, Locale locale,
                                      @RequestParam(value = "lang", required = false) String lang
-            , @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+            , @CookieValue(value = "viewMode", defaultValue = "reader") String viewMode) {
 
         // bilgi dil degisikligi durumunda bu metoda yonleniyor. Geldigi sayfayi ogrenip geri yonlendiriyoruz oraya.
         // BASLA dil degisikligi yonlendirmesi
@@ -322,7 +322,13 @@ public class NodeController {
             return "selectdatasource";
         }
 
-        if ("tree".equals(viewMode)) return "redirect:/tree";
+        viewMode = com.turkerozturk.global.ViewController.normalizeMode(viewMode);
+        if ("tree".equals(viewMode)) {
+            var target = org.springframework.web.util.UriComponentsBuilder.fromPath("/tree");
+            String token = request.getParameter("_tenantView");
+            if (token != null) target.queryParam("_tenantView", token);
+            return "redirect:" + target.build().encode().toUriString();
+        }
 
         model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
 
@@ -388,12 +394,7 @@ public class NodeController {
 
         model.addAttribute("viewMode", viewMode);
 
-        if ("reader".equals(viewMode)) return "node/mobileReader";
-        if ("mobile".equals(viewMode)) {
-            return "node/nodeMobile";
-        } else {
-            return "node/node";
-        }
+        return "node/mobileReader";
 
     }
 
@@ -441,18 +442,29 @@ public class NodeController {
             model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
         } else {
             request.setAttribute("newRichTextView", Boolean.TRUE);
-            getNodeAsHtml(nodeId, model, request, "desktop");
+            prepareNodePage(nodeId, model, request, "tree");
             model.addAttribute("isRootNode", false);
         }
         return "node/treeContentFragment :: treeContent";
     }
 
+    /** Opens maintained views while migrating legacy desktop/mobile selections. */
     @GetMapping("/nodes/{nodeId}")
     @RequiresTenant
     public String getNodeAsHtml(@PathVariable long nodeId, Model model, HttpServletRequest request,
-                                @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+                                @CookieValue(value = "viewMode", defaultValue = "reader") String viewMode) {
+        viewMode = com.turkerozturk.global.ViewController.normalizeMode(viewMode);
+        if ("tree".equals(viewMode)) {
+            var target = org.springframework.web.util.UriComponentsBuilder.fromPath("/tree").queryParam("nodeId", nodeId);
+            String token = request.getParameter("_tenantView");
+            if (token != null) target.queryParam("_tenantView", token);
+            return "redirect:" + target.build().encode().toUriString();
+        }
+        return prepareNodePage(nodeId, model, request, viewMode);
+    }
 
-        if ("tree".equals(viewMode)) return "redirect:/tree?nodeId=" + nodeId;
+    /** Shares node preparation between the mobile page and the protected workspace fragment. */
+    private String prepareNodePage(long nodeId, Model model, HttpServletRequest request, String viewMode) {
 
         model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
         model.addAttribute("requestedNodeId", nodeId);
@@ -652,12 +664,7 @@ public class NodeController {
 
         model.addAttribute("viewMode", viewMode);
 
-        if ("reader".equals(viewMode)) return "node/mobileReader";
-        if ("mobile".equals(viewMode)) {
-            return "node/nodeMobile";
-        } else {
-            return "node/node";
-        }
+        return "node/mobileReader";
 
 
 

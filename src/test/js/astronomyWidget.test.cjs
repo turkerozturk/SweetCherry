@@ -5,9 +5,9 @@ const vm = require('node:vm');
 const path = require('node:path');
 const script = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/common/astronomyWidget.js'), 'utf8');
 
-function page(fetch, buttons = true) {
+function page(fetch, buttons = true, url = undefined) {
     const content = {}; let listener;
-    const button = {dataset: {astronomyLoading: 'Loading', astronomyError: 'Failed'},
+    const button = {dataset: {astronomyLoading: 'Loading', astronomyError: 'Failed', astronomyUrl: url},
         getAttribute: () => 'popover-id', addEventListener: (name, callback) => {assert.equal(name, 'shown.bs.popover'); listener = callback;}};
     vm.runInNewContext(script, {fetch, document: {querySelectorAll: () => buttons ? [button] : [],
         getElementById: () => ({querySelector: () => content})}});
@@ -28,4 +28,12 @@ test('does not insert a redirected login page into the popover', async () => {
 });
 test('disabled widget does not request astronomy data', () => {
     page(() => {throw new Error('Unexpected request');}, false);
+});
+
+test('moon phase opens its own detail endpoint', async () => {
+    const result = page(async (url) => {
+        assert.equal(url, '/astronomy/moon');
+        return {ok: true, redirected: false, text: async () => '<table>Moon phases</table>'};
+    }, true, '/astronomy/moon');
+    await result.open(); assert.equal(result.content.innerHTML, '<table>Moon phases</table>');
 });
