@@ -1,6 +1,6 @@
 # HTTP, HTTPS ve oturum güvenliği
 
-SweetCherry yerel HTTP, uygulamanın kendi TLS bağlantısı ve HTTPS reverse proxy ile kullanılabilir. Bu seçenekler birbirinin yerine zorunlu tutulmaz.
+SweetCherry yerel HTTP, uygulamanın kendi TLS bağlantısı ve HTTPS reverse proxy ile kullanılabilir. Bu seçenekler birbirinin yerine zorunlu tutulmaz. Ağ, sertifika üretimi, dış ayar dosyası, DNS, firewall ve sorun giderme adımları için [erişim kurulum rehberine](network-access.md) bakın.
 
 | Kullanım | Ana bağlantı | Ek HTTP portu | Proxy ayarı | HSTS |
 |---|---|---|---|---|

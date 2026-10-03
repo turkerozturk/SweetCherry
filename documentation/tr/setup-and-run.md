@@ -322,3 +322,5 @@ boyut sınırı olarak değerlendirilmemelidir.
 ## HTTP/HTTPS ve proxy oturumları
 
 Yerel HTTP, uygulamanın kendi SSL sertifikası ve HTTPS proxy ayarları birlikte [HTTP, HTTPS ve oturum güvenliği](https-and-session-security.md) belgesinde açıklanmıştır. Proxy arkasında Secure çerezi ve doğru HTTPS yönlendirmesi için ilgili ayarları JAR dışındaki yapılandırmaya birleştirin.
+
+Ağ kurulumu için [localhost, LAN ve WAN erişim rehberi](network-access.md): HTTP, self-signed TLS, Let’s Encrypt/dinamik DNS, Caddy ve diğer proxy seçenekleri; firewall, port yönlendirme ve sorun giderme.

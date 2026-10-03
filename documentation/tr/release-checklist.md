@@ -128,9 +128,10 @@ sha256sum SweetCherry-0.5.0.zip
 Varsayılan davranış TCP bağlantısının IP adresini kullanır. Caddy arkasında bütün WAN istemcileri aynı proxy IP'sinden görünür. Caddy'ye gelen istemci adresini tek başlıkta iletmek için ilgili site bloğuna örneklerdeki IP adreslerini sizinkilerle değiştirerek şunu koyun: 
 
 ```caddyfile
-xyz.duckdns.org {
+notes.example.org {
     reverse_proxy 192.168.0.5:8080 {
         header_up X-SweetCherry-Client-IP {remote_host}
+        header_up X-SweetCherry-Forwarded-Proto {scheme}
     }
 }
 ```
@@ -146,3 +147,5 @@ myapp:
 Mevcut `myapp.login` bölümüne yalnızca `trusted-proxy-address` satırını ekleyin; diğer kullanıcı adlarını silmeyin. Caddy yapılandırmasını doğrulayıp yeniden yükledikten ve SweetCherry'yi yeniden başlattıktan sonra logdaki `clientIp` değerini kontrol edin. Proxy dışındaki isteklerde başlık yok sayılır. Güvenilir proxy eşleşse bile başlık eksik, birden fazla veya geçersizse doğrudan proxy IP'si kullanılır. Bu adres varsayılan olarak yalnız giriş sınırı ve giriş logları için kullanılır. HTTPS proxy desteği ayrıca etkinleştirilirse yalnız bu peer'dan gelen protocol başlığı da kabul edilir; ayrıntılar [HTTP, HTTPS ve oturum güvenliği](https-and-session-security.md) belgesindedir.
 
 Docker ağ kipine göre `{remote_host}` gerçek WAN istemcisi yerine bir ağ geçidi adresi olabilir. Farklı dış ağlardan denemelerde aynı `clientIp` görülürse güven sınırını genişletmeyin; önce Caddy'nin gelen bağlantıda gördüğü adresi ve Docker ağ yolunu inceleyin. Uygulama yeniden başlatılırsa 15 dakikalık sayaçlar bellekte oldukları için sıfırlanır.
+
+Kurulumdaki DNS, NAT/firewall, sertifika yenileme ve dış yapılandırma kayıtları için [erişim kurulum rehberi](network-access.md) kullanılabilir.
