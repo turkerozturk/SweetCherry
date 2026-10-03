@@ -21,6 +21,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/properties/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/content/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/richtext/edit/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/move/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/children/")
                 || request.getRequestURI().equals(request.getContextPath() + "/nodes/top-level")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/expo/")

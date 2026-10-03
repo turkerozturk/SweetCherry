@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<form th:fragment="moveControls(view)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')"
+      th:action="@{/nodes/move/{id}(id=${requestedNodeId})}" method="post" data-node-move
+      th:attr="data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-error=#{node.move.error},aria-label=#{node.move.title}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<input type="hidden" name="revision" value="">
+<input type="hidden" name="direction" value="">
+<input type="hidden" name="view" th:value="${view}">
+<span class="small" th:text="#{node.move.title}"></span>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="UP" disabled th:title="#{node.move.up}" th:attr="aria-label=#{node.move.up}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="DOWN" disabled th:title="#{node.move.down}" th:attr="aria-label=#{node.move.down}"><i class="fas fa-arrow-down" aria-hidden="true"></i></button>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="LEFT" disabled th:title="#{node.move.left}" th:attr="aria-label=#{node.move.left}"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="RIGHT" disabled th:title="#{node.move.right}" th:attr="aria-label=#{node.move.right}"><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+<span data-move-error class="small text-danger" role="status"></span>
+</form>
+</body></html>
