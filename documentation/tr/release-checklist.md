@@ -154,3 +154,5 @@ Kurulumdaki DNS, NAT/firewall, sertifika yenileme ve dış yapılandırma kayıt
 - [ ] Otomatik yedek alınmadığı uyarısı veri kaynağı seçimi ve düzenleme ekranlarında görülebiliyor.
 
 - [ ] [Üçüncü taraf lisans ve atıf envanteri](third-party-notices-plan.md) tamamlanıp gerekli dosyalar dağıtıma eklendi.
+
+- [ ] [Windows x64 Java içeren dağıtım](windows-bundled-distribution.md) CI ve gerçek Java kurulmamış Windows üzerinde denendi; EXE/ZIP, checksum ve runtime manifesti Release’e eklendi.

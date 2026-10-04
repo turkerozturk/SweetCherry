@@ -328,3 +328,5 @@ Ağ kurulumu için [localhost, LAN ve WAN erişim rehberi](network-access.md): H
 ## Otomatik yedek alınmaz
 
 **SweetCherry otomatik yedek oluşturmaz.** Yazma iznini etkinleştirmeden önce ayrı CTB yedeği saklayın. [Yedek sorumluluğu ve tenant sihirbazı planı](backups-and-tenant-plans.md). [Sürümleme ve release akışı](versioning.md).
+
+Windows x64 için Java içeren EXE/ZIP paketleme: [Windows dağıtım rehberi](windows-bundled-distribution.md).

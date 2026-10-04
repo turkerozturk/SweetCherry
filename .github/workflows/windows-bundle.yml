@@ -1,0 +1,65 @@
+name: Windows x64 bundled distribution
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Test and prepare the existing distribution
+        shell: pwsh
+        run: |
+          .\mvnw.cmd --batch-mode clean package
+          if ($LASTEXITCODE -ne 0) { throw 'Maven package failed.' }
+      - name: Download Java 17 JRE and Launch4j
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tools = Join-Path $env:RUNNER_TEMP 'sweetcherry-tools'
+          New-Item $tools -ItemType Directory | Out-Null
+          $metadata = @(Invoke-RestMethod 'https://api.adoptium.net/v3/assets/latest/17/hotspot?architecture=x64&image_type=jre&os=windows&vendor=eclipse')
+          if ($metadata.Count -ne 1) { throw 'Expected one Temurin Windows x64 JRE.' }
+          $package = $metadata[0].binary.package
+          if ($package.link -notlike 'https://github.com/adoptium/temurin17-binaries/releases/download/*') { throw 'Unexpected runtime download origin.' }
+          $archive = Join-Path $tools 'runtime.zip'
+          Invoke-WebRequest $package.link -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $package.checksum) { throw 'Runtime checksum mismatch.' }
+          Invoke-WebRequest 'https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.50/launch4j-3.50-win32.zip' -OutFile "$tools/launch4j.zip"
+          Expand-Archive "$tools/launch4j.zip" "$tools/launch4j"
+          $launch = @(Get-ChildItem "$tools/launch4j" -Filter launch4jc.exe -Recurse)
+          if ($launch.Count -ne 1) { throw 'Launch4j executable not found.' }
+          $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (!(Test-Path $iscc)) { throw 'This Windows runner needs Inno Setup 6 installed.' }
+          "SC_LAUNCH4J=$($launch[0].DirectoryName)" >> $env:GITHUB_ENV
+          "SC_ISCC=$iscc" >> $env:GITHUB_ENV
+          "SC_RUNTIME_ARCHIVE=$archive" >> $env:GITHUB_ENV
+          "SC_RUNTIME_SHA256=$($package.checksum)" >> $env:GITHUB_ENV
+          "SC_RUNTIME_VERSION=$($metadata[0].release_name)" >> $env:GITHUB_ENV
+      - name: Build EXE and portable ZIP
+        shell: pwsh
+        run: |
+          ./packaging/windows/build-bundle.ps1 -Launch4jHome $env:SC_LAUNCH4J -IsccPath $env:SC_ISCC -RuntimeArchive $env:SC_RUNTIME_ARCHIVE -RuntimeSha256 $env:SC_RUNTIME_SHA256 -RuntimeVersion $env:SC_RUNTIME_VERSION
+      - name: Test installer and launcher without system Java
+        shell: pwsh
+        run: |
+          $installer = @(Get-ChildItem dist/windows/*-setup.exe)
+          if ($installer.Count -ne 1) { throw 'Expected one installer.' }
+          ./packaging/windows/smoke-test.ps1 -InstallerPath $installer[0].FullName
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SweetCherry-windows-x64-java17
+          path: |
+            dist/windows/*-setup.exe
+            dist/windows/*-windows-x64.zip
+            dist/windows/SHA256SUMS.txt
+            release/SweetCherry/windows-bundle.json
+          if-no-files-found: error
+          retention-days: 14

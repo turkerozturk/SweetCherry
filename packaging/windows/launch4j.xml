@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>SweetCherry.jar</jar>
+  <outfile>SweetCherry.exe</outfile>
+  <errTitle>SweetCherry (Windows x64)</errTitle>
+  <cmdLine>--server.port=8443 --server.http.port=8080 --myapp.openWebBrowserOnStartup=true</cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <stayAlive>true</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <icon>SweetCherry.ico</icon>
+  <singleInstance><mutexName>SweetCherry.Windows.x64</mutexName></singleInstance>
+  <jre>
+    <!-- Path-only configuration prevents fallback to an unrelated system Java. -->
+    <path>runtime</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+  </jre>
+  <messages>
+    <startupErr>SweetCherry could not start. Use run.bat for diagnostics and check myapp.log.</startupErr>
+    <jreNotFoundErr>The bundled Java runtime is missing. Extract the complete SweetCherry folder again.</jreNotFoundErr>
+    <launcherErr>SweetCherry launcher failed. Use run.bat for diagnostics.</launcherErr>
+  </messages>
+</launch4jConfig>

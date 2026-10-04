@@ -52,3 +52,6 @@ allTenants/
 exportedFiles/
 release/
 login-credentials.properties
+
+# Windows distribution build output
+/dist/
