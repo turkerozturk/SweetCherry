@@ -5,7 +5,6 @@
   <jar>SweetCherry.jar</jar>
   <outfile>SweetCherry.exe</outfile>
   <errTitle>SweetCherry (Windows x64)</errTitle>
-  <cmdLine>--server.port=8443 --server.http.port=8080 --myapp.openWebBrowserOnStartup=true</cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
   <stayAlive>true</stayAlive>
@@ -17,6 +16,10 @@
     <path>runtime</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
+    <!-- Command-line Spring options override these defaults without duplicate option values. -->
+    <opt>-Dserver.port=8443</opt>
+    <opt>-Dserver.http.port=8080</opt>
+    <opt>-Dmyapp.openWebBrowserOnStartup=true</opt>
   </jre>
   <messages>
     <startupErr>SweetCherry could not start. Use run.bat for diagnostics and check myapp.log.</startupErr>
