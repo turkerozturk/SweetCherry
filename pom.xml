@@ -581,6 +581,22 @@
 				</plugins>
 			</build>
 		</profile>
+        <!-- Explicitly enabled by the Windows bundle script after the distribution is prepared. -->
+        <profile>
+            <id>windows-launcher</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                        <artifactId>launch4j-maven-plugin</artifactId>
+                        <version>2.7.0</version>
+                        <configuration>
+                            <infile>${project.basedir}/dist/windows/launch4j.xml</infile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 	</profiles>
 
 </project>

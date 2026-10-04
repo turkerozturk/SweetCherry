@@ -25,7 +25,7 @@ CTB dosyaları başka konumlarda kalabilir; mevcut tenant bağlantıları kullan
 1. Bu dosyaları push edin. Normal CI önceki gibi çalışır; yeni paketleme her push’ta çalışmaz.
 2. GitHub → Actions → **Windows x64 bundled distribution** → **Run workflow**. Geliştirme denemesinde main’i, release paketinde sürüm etiketini seçin. Dosya adının sürümü checkout’taki `pom.xml` sürümünden alınır.
 3. Windows runner normal Maven `clean package` ile testleri çalıştırır. Temurin’in en güncel Java 17 Windows x64 JRE paketini resmi Adoptium API üzerinden çözer; yayımlanan SHA-256 ile indirilen dosyayı doğrular. Tam runtime’ın lisans/legal dosyaları korunur.
-4. Launch4j 3.50 resmi SourceForge ZIP’i ile EXE oluşturulur. Runner’da Inno Setup 6 bulunmalıdır (Windows GitHub hosted runner kurulumu); yoksa açık hata ile durur. Araç sürümleri ve runtime sürümü/checksum’ı `windows-bundle.json` içinde kaydedilir. Launch4j ZIP’i resmî SourceForge indirme sayfasındaki SHA-256 değeriyle doğrulanır. Geçersiz yanıt veya indirme hatasında diğer SourceForge mirror denenir. Beklenen hash değişirse güncel resmî dosya doğrulanmadan kontrol kaldırılmamalıdır.
+4. Launch4j EXE, `windows-launcher` Maven profilindeki `launch4j-maven-plugin:2.7.0` ile oluşturulur. Plugin Launch4j 3.50 core ve platform araçlarını Maven repository üzerinden çözer; SourceForge ZIP indirmesi yapılmaz. Normal `clean package` bu plugini çalıştırmaz; bundle scripti yalnız ilgili Maven goal’u çağırır. Runner’da Inno Setup 6 bulunmalıdır; yoksa açık hata ile durur. Araç ve runtime sürümleri `windows-bundle.json` içinde kaydedilir.
 5. Sihirbaz geçici klasöre sessiz kurulup varolan kullanıcı dosyalarını koruduğu kontrol edilir. Boşluk ve Türkçe karakterli klasörde, farklı çalışma dizininden, sistem JAVA_HOME/PATH olmadan **üretilen EXE** başlatılır ve localhost sağlık yanıtı doğrulanır. Sadece CI test süreci test sonunda kapatılır; kullanıcı süreçlerine uygulanmaz.
 6. Başarılı artifact’ten şunları indirin: `SweetCherry-<version>-windows-x64-setup.exe`, `SweetCherry-<version>-windows-x64.zip`, `SHA256SUMS.txt`, `windows-bundle.json`. Artifact 14 gün tutulur; kalıcı dağıtım için GitHub Release’e dosyaları yükleyin. İş akışı release veya tag oluşturmaz/yayımlamaz.
 
@@ -35,11 +35,11 @@ Runtime en güncel Java 17 olarak seçildiğinden aynı commit farklı tarihlerd
 
 ## Yerel paketleme (isteğe bağlı)
 
-Windows x64 JDK 17, Launch4j 3.50, Inno Setup 6.3+ ve doğrulanmış Temurin Java 17 x64 JRE ZIP’i gerekir. Temiz bir checkout kullanın; gerçek kullanılan release klasörünüzden paket oluşturmayın. `packaging/windows/build-bundle.ps1` Maven’den sonra Launch4j/Inno yolları, runtime ZIP’i, resmi SHA-256 ve sürüm adı parametreleriyle çalıştırılır. Parametre örneği:
+Windows x64 JDK 17, Maven wrapper ve Inno Setup 6.3+ ve doğrulanmış Temurin Java 17 x64 JRE ZIP’i gerekir. Temiz bir checkout kullanın; gerçek kullanılan release klasörünüzden paket oluşturmayın. `packaging/windows/build-bundle.ps1` Maven’den sonra Inno yolu, runtime ZIP’i, resmi SHA-256 ve sürüm adı parametreleriyle çalıştırılır. Parametre örneği:
 
 ```powershell
 .\mvnw.cmd clean package
-.\packaging\windows\build-bundle.ps1 -Launch4jHome 'C:\Tools\launch4j' -IsccPath 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' -RuntimeArchive 'C:\Downloads\temurin-jre17.zip' -RuntimeSha256 'RESMI_SHA256_DEGERI' -RuntimeVersion 'RESMI_RELEASE_ADI'
+.\packaging\windows\build-bundle.ps1 -IsccPath 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' -RuntimeArchive 'C:\Downloads\temurin-jre17.zip' -RuntimeSha256 'RESMI_SHA256_DEGERI' -RuntimeVersion 'RESMI_RELEASE_ADI'
 ```
 
 Örnek checksum/sürüm değerlerini gerçek paket bilgileriyle değiştirin; örnek komutu değişmeden çalıştırmayın. PowerShell script çalıştırma politikanız engelliyorsa kurumsal politikanızı devre dışı bırakmadan uygun yerel çalıştırma yöntemini belirleyin. Çıktı `dist/windows` altında oluşur ve Git’e eklenmez. Paketleme araçları son kullanıcıya dağıtılmaz.
@@ -59,3 +59,6 @@ Windows x64 JDK 17, Launch4j 3.50, Inno Setup 6.3+ ve doğrulanmış Temurin Jav
 - https://jrsoftware.org/ishelp/
 - https://adoptium.net/temurin/releases/
 - https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases
+
+Launch4j plugin kaynakları: https://github.com/orphan-oss/launch4j-maven-plugin/tree/launch4j-maven-plugin-2.7.0
+Plugin uygulamanın runtime bağımlılığı değildir ve SweetCherry.jar içine eklenmez. Maven cache araç indirmelerini saklar; yeni bir runner ilk çalışmada paketleri indirir.

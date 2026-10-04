@@ -1,6 +1,5 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)][string]$Launch4jHome,
     [Parameter(Mandatory)][string]$IsccPath,
     [Parameter(Mandatory)][string]$RuntimeArchive,
     [Parameter(Mandatory)][string]$RuntimeSha256,
@@ -30,7 +29,7 @@ New-Item $out -ItemType Directory -Force | Out-Null
 $unpack = Join-Path $out 'runtime-unpack'
 if (Test-Path $unpack) { Remove-Item $unpack -Recurse -Force }
 New-Item $unpack -ItemType Directory | Out-Null
-Expand-Archive $RuntimeArchive $unpack
+[System.IO.Compression.ZipFile]::ExtractToDirectory($RuntimeArchive, $unpack)
 $runtimeRoots = @(Get-ChildItem $unpack -Directory | Where-Object { Test-Path (Join-Path $_.FullName 'bin/java.exe') })
 if ($runtimeRoots.Count -ne 1) { throw 'Expected one Java runtime root.' }
 $runtime = Join-Path $bundle 'runtime'
@@ -55,12 +54,19 @@ foreach ($entry in ([ordered]@{
 [void]$config.launch4jConfig.AppendChild($versionInfo)
 $configPath = Join-Path $out 'launch4j.xml'
 $config.Save($configPath)
-& "$Launch4jHome/launch4jc.exe" $configPath
+# Invoke only this Maven goal; do not rebuild or rerun tests after preparing the runtime.
+Push-Location $repo
+try {
+    & "$repo/mvnw.cmd" --batch-mode -Pwindows-launcher com.akathist.maven.plugins.launch4j:launch4j-maven-plugin:2.7.0:launch4j
+    if ($LASTEXITCODE -ne 0) { throw 'Launch4j Maven plugin failed.' }
+} finally {
+    Pop-Location
+}
 if ($LASTEXITCODE -ne 0 -or !(Test-Path "$bundle/SweetCherry.exe")) { throw 'Launch4j failed.' }
 $commit = (& git -C $repo rev-parse HEAD).Trim()
 @{
     applicationVersion=$version; commit=$commit; architecture='windows-x64'; java=$RuntimeVersion;
-    runtimeArchiveSha256=$RuntimeSha256.ToLowerInvariant(); launch4j='3.50';
+    runtimeArchiveSha256=$RuntimeSha256.ToLowerInvariant(); launch4j='3.50'; launch4jMavenPlugin='2.7.0';
     innoSetup=(Get-Item $IsccPath).VersionInfo.FileVersion
 } | ConvertTo-Json | Set-Content "$bundle/windows-bundle.json" -Encoding utf8
 & $IsccPath "/DSourceDir=$bundle" "/DOutputDir=$out" "/DAppVersion=$version" "/DFileVersion=$fileVersion" "$PSScriptRoot/SweetCherry.iss"
