@@ -24,16 +24,41 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $tools = Join-Path $env:RUNNER_TEMP 'sweetcherry-tools'
-          New-Item $tools -ItemType Directory | Out-Null
+          New-Item $tools -ItemType Directory -Force | Out-Null
+          trap {
+            Write-Host ($_ | Format-List * -Force | Out-String)
+            Write-Host $_.ScriptStackTrace
+            throw $_
+          }
+          Write-Host 'Reading Temurin runtime metadata.'
           $metadata = @(Invoke-RestMethod 'https://api.adoptium.net/v3/assets/latest/17/hotspot?architecture=x64&image_type=jre&os=windows&vendor=eclipse')
           if ($metadata.Count -ne 1) { throw 'Expected one Temurin Windows x64 JRE.' }
           $package = $metadata[0].binary.package
           if ($package.link -notlike 'https://github.com/adoptium/temurin17-binaries/releases/download/*') { throw 'Unexpected runtime download origin.' }
           $archive = Join-Path $tools 'runtime.zip'
-          Invoke-WebRequest $package.link -OutFile $archive
+          Write-Host 'Downloading and verifying Temurin runtime.'
+          Invoke-WebRequest $package.link -OutFile $archive -MaximumRetryCount 3 -RetryIntervalSec 5
           if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $package.checksum) { throw 'Runtime checksum mismatch.' }
-          Invoke-WebRequest 'https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.50/launch4j-3.50-win32.zip' -OutFile "$tools/launch4j.zip"
-          Expand-Archive "$tools/launch4j.zip" "$tools/launch4j"
+          Write-Host 'Downloading Launch4j ZIP.'
+          $launchArchive = Join-Path $tools 'launch4j.zip'
+          Invoke-WebRequest 'https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.50/launch4j-3.50-win32.zip' -OutFile $launchArchive -MaximumRetryCount 3 -RetryIntervalSec 5
+          Write-Host "Opening Launch4j ZIP ($((Get-Item $launchArchive).Length) bytes)."
+          # Validate the ZIP before extracting; a download error page must not be used as a tool.
+          $zip = $null
+          try {
+            $zip = [System.IO.Compression.ZipFile]::OpenRead($launchArchive)
+            if ($zip.Entries.Count -eq 0) { throw 'Launch4j ZIP is empty.' }
+          } catch {
+            throw "Launch4j download is not a readable ZIP: $($_.Exception.Message)"
+          } finally {
+            if ($null -ne $zip) { $zip.Dispose() }
+          }
+          try {
+            # Avoid Expand-Archive's PowerShell module initialization path on hosted runners.
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($launchArchive, (Join-Path $tools 'launch4j'))
+          } catch {
+            throw "Launch4j ZIP extraction failed: $($_.Exception.Message)"
+          }
           $launch = @(Get-ChildItem "$tools/launch4j" -Filter launch4jc.exe -Recurse)
           if ($launch.Count -ne 1) { throw 'Launch4j executable not found.' }
           $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
