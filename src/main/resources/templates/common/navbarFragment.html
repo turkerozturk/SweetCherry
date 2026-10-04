@@ -332,7 +332,9 @@
                         <ul class="dropdown-menu">
                             <li sec:authorize="isAuthenticated()">
                                 <th:block sec:authorize="hasRole('ADMIN')">
-                                    <form method="POST" action="/shutdownContext" th:action="@{/shutdownContext}">
+                                    <form method="POST" action="/shutdownContext" th:action="@{/shutdownContext}"
+                                          data-shutdown-confirm="Stop SweetCherry? All connected users will lose access."
+                                          th:attr="data-shutdown-confirm=#{navbar.shutdownConfirm}">
                                     <button class="dropdown-item" type="submit">
                                         <i class="fa-solid fa-power-off"></i>
                                         <span
@@ -380,6 +382,7 @@
             </div>
         </div>
     </nav>
+    <script defer th:src="@{/js/common/confirmShutdown.js}" src="/js/common/confirmShutdown.js"></script>
 
 
 </div>

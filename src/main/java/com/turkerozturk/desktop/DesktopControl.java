@@ -63,13 +63,23 @@ public final class DesktopControl {
         log.addActionListener(e -> background(() -> {
             File file = new File("myapp.log");
             if (!file.isFile()) throw new IllegalStateException(text("Log henüz oluşmadı.", "The log file does not exist yet."));
-            Desktop.getDesktop().open(file);
+            openTextFile(file);
         }));
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         buttons.add(open); buttons.add(stop); buttons.add(log);
+        JButton folder = new JButton(text("Uygulama Klasörü", "Application Folder"));
+        folder.addActionListener(e -> background(() -> Desktop.getDesktop().open(new File(".").getCanonicalFile())));
+        JPanel files = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); files.add(folder);
+        JLabel loginHelp = new JLabel(text(
+                "<html>Varsayılan kullanıcı adları: <b>admin</b> ve <b>user</b>.<br>Şifreler uygulama klasöründeki <b>login-credentials.properties</b> dosyasındadır.<br><b>admin.password</b> bir ayar anahtarıdır; kullanıcı adı değildir.<br>Şifreyi dosyada değiştirip SweetCherry’yi yeniden başlatın.<br>application.yml içinde özel giriş ayarları varsa onlar kullanılır.</html>",
+                "<html>Default usernames: <b>admin</b> and <b>user</b>.<br>Passwords are in <b>login-credentials.properties</b> in the application folder.<br><b>admin.password</b> is a setting key, not a username.<br>Change the password in the file, then restart SweetCherry.<br>Custom login settings in application.yml take precedence.</html>"));
         panel.add(title); panel.add(Box.createVerticalStrut(12)); panel.add(status);
         panel.add(Box.createVerticalStrut(8)); panel.add(address); panel.add(Box.createVerticalStrut(8));
         panel.add(progress); panel.add(Box.createVerticalStrut(16)); panel.add(buttons);
+        panel.add(Box.createVerticalStrut(12)); panel.add(loginHelp); panel.add(Box.createVerticalStrut(8)); panel.add(files);
+        for (Component component : panel.getComponents()) {
+            if (component instanceof JComponent item) item.setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
         frame.setContentPane(panel); frame.pack(); frame.setMinimumSize(frame.getSize());
         frame.setLocationRelativeTo(null); frame.setVisible(true);
         Image image = Toolkit.getDefaultToolkit().getImage(DesktopControl.class.getResource("/static/img/logo.jpg"));
@@ -147,6 +157,17 @@ public final class DesktopControl {
             if (tray != null) SystemTray.getSystemTray().remove(tray);
             frame.dispose();
         });
+    }
+
+    /** Opens Windows logs with Notepad instead of a potentially broken .log file association. */
+    private static void openTextFile(File file) throws Exception {
+        if (System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT).contains("win")) {
+            String windows = System.getenv("SystemRoot");
+            File notepad = new File(windows == null ? "C:\\Windows" : windows, "System32/notepad.exe");
+            new ProcessBuilder(notepad.getAbsolutePath(), file.getCanonicalPath()).start();
+        } else {
+            Desktop.getDesktop().open(file);
+        }
     }
 
     private void openBrowser() { if (url != null) background(() -> Desktop.getDesktop().browse(URI.create(url))); }
