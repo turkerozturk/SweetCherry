@@ -41,18 +41,35 @@ jobs:
           if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $package.checksum) { throw 'Runtime checksum mismatch.' }
           Write-Host 'Downloading Launch4j ZIP.'
           $launchArchive = Join-Path $tools 'launch4j.zip'
-          Invoke-WebRequest 'https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.50/launch4j-3.50-win32.zip' -OutFile $launchArchive -MaximumRetryCount 3 -RetryIntervalSec 5
-          Write-Host "Opening Launch4j ZIP ($((Get-Item $launchArchive).Length) bytes)."
-          # Validate the ZIP before extracting; a download error page must not be used as a tool.
-          $zip = $null
-          try {
-            $zip = [System.IO.Compression.ZipFile]::OpenRead($launchArchive)
-            if ($zip.Entries.Count -eq 0) { throw 'Launch4j ZIP is empty.' }
-          } catch {
-            throw "Launch4j download is not a readable ZIP: $($_.Exception.Message)"
-          } finally {
-            if ($null -ne $zip) { $zip.Dispose() }
+          # SHA-256 published on the official SourceForge download page for this exact release.
+          $launchSha256 = '93621e5007106a01ad3cbb84871886e8e8d6a6beca7111842eaaf0cf85b57767'
+          $launchDownloaded = $false
+          $launchMirrors = @('https://phoenixnap.dl.sourceforge.net', 'https://netix.dl.sourceforge.net', 'https://downloads.sourceforge.net')
+          foreach ($mirror in $launchMirrors) {
+            $url = "$mirror/project/launch4j/launch4j-3/3.50/launch4j-3.50-win32.zip"
+            try {
+              Write-Host "Trying Launch4j mirror: $mirror"
+              Invoke-WebRequest $url -OutFile $launchArchive -TimeoutSec 90 -MaximumRetryCount 2 -RetryIntervalSec 3
+              $actualHash = (Get-FileHash $launchArchive -Algorithm SHA256).Hash
+              if ($actualHash -ne $launchSha256) {
+                throw "Launch4j SHA-256 mismatch; received $((Get-Item $launchArchive).Length) bytes (possibly an HTML response)."
+              }
+              $zip = $null
+              try {
+                $zip = [System.IO.Compression.ZipFile]::OpenRead($launchArchive)
+                if ($zip.Entries.Count -eq 0) { throw 'Launch4j ZIP is empty.' }
+              } finally {
+                if ($null -ne $zip) { $zip.Dispose() }
+              }
+              $launchDownloaded = $true
+              Write-Host "Launch4j ZIP verified ($((Get-Item $launchArchive).Length) bytes)."
+              break
+            } catch {
+              Write-Warning "Launch4j mirror failed: $mirror : $($_.Exception.Message)"
+              Remove-Item $launchArchive -ErrorAction SilentlyContinue
+            }
           }
+          if (!$launchDownloaded) { throw 'No Launch4j mirror returned the expected verified ZIP.' }
           try {
             # Avoid Expand-Archive's PowerShell module initialization path on hosted runners.
             [System.IO.Compression.ZipFile]::ExtractToDirectory($launchArchive, (Join-Path $tools 'launch4j'))
