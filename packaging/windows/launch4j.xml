@@ -17,6 +17,7 @@
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
     <!-- Command-line Spring options override these defaults without duplicate option values. -->
+    <opt>-Dmyapp.desktop.enabled=true</opt>
     <opt>-Dserver.port=8443</opt>
     <opt>-Dserver.http.port=8080</opt>
     <opt>-Dmyapp.openWebBrowserOnStartup=true</opt>

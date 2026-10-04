@@ -50,11 +50,36 @@ public class SweetCherry implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(SweetCherry.class);
 
+    private static boolean desktopMode;
+
     private static ConfigurableApplicationContext context; // https://www.baeldung.com/java-restart-spring-boot-app
 
     public static void main(String[] args) {
 
-        context = SpringApplication.run(SweetCherry.class, args);
+        com.turkerozturk.desktop.DesktopControl controls = null;
+        if (com.turkerozturk.desktop.DesktopControl.requested(args)) {
+            System.setProperty("java.awt.headless", "false");
+            try { controls = com.turkerozturk.desktop.DesktopControl.show(); }
+            catch (Exception error) { logger.error("Cannot create desktop controls", error); System.exit(1); return; }
+        }
+        final com.turkerozturk.desktop.DesktopControl desktop = controls;
+        desktopMode = desktop != null;
+        SpringApplication application = new SpringApplication(SweetCherry.class);
+        if (desktop != null) {
+            application.setHeadless(false);
+            application.addListeners((org.springframework.context.ApplicationListener<ApplicationReadyEvent>) event -> {
+                ConfigurableApplicationContext readyContext = event.getApplicationContext();
+                int port = readyContext.getEnvironment().getProperty("server.http.port", Integer.class, 8080);
+                desktop.ready("http://localhost:" + port, readyContext::close,
+                        readyContext.getEnvironment().getProperty("myapp.openWebBrowserOnStartup", Boolean.class, true));
+            });
+            application.addListeners((org.springframework.context.ApplicationListener<org.springframework.context.event.ContextClosedEvent>) event -> desktop.closed());
+        }
+        try { context = application.run(args); }
+        catch (RuntimeException error) {
+            if (desktop == null) throw error;
+            desktop.failed(error);
+        }
 
     }
 
@@ -117,7 +142,7 @@ public class SweetCherry implements CommandLineRunner {
     @EventListener({ApplicationReadyEvent.class})
     void applicationReadyEvent() {
         logger.info("Application started ...");
-        if (openWebBrowserOnStartup) {
+        if (openWebBrowserOnStartup && !desktopMode) {
             logger.info("launching browser now");
             browse("http://localhost:8080");
         }

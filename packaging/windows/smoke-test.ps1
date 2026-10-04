@@ -22,7 +22,7 @@ $oldPath=$env:PATH; $oldJava=$env:JAVA_HOME
 $process=$null
 try {
     $env:PATH="$env:SystemRoot/System32"; $env:JAVA_HOME=''
-    $process=Start-Process "$testDir/SweetCherry.exe" -ArgumentList @('--l4j-debug','--server.port=18443','--server.http.port=18080','--myapp.openWebBrowserOnStartup=false') -WorkingDirectory $env:RUNNER_TEMP -PassThru
+    $process=Start-Process "$testDir/SweetCherry.exe" -ArgumentList @('--myapp.desktop.enabled=false','--l4j-debug','--server.port=18443','--server.http.port=18080','--myapp.openWebBrowserOnStartup=false') -WorkingDirectory $env:RUNNER_TEMP -PassThru
     $ready=$false
     $lastResponse='No HTTP response received.'
     for ($attempt=0; $attempt -lt 60; $attempt++) {

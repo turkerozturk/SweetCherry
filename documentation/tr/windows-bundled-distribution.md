@@ -62,3 +62,13 @@ Windows x64 JDK 17, Maven wrapper ve Inno Setup 6.3+ ve doğrulanmış Temurin J
 
 Launch4j plugin kaynakları: https://github.com/orphan-oss/launch4j-maven-plugin/tree/launch4j-maven-plugin-2.7.0
 Plugin uygulamanın runtime bağımlılığı değildir ve SweetCherry.jar içine eklenmez. Maven cache araç indirmelerini saklar; yeni bir runner ilk çalışmada paketleri indirir.
+
+## Masaüstü kontrol penceresi
+
+Windows EXE `myapp.desktop.enabled=true` JVM özelliğiyle aynı Java sürecinde Swing kontrol penceresini açar. Başlatma sırasında bekleme göstergesi görünür. Sunucu hazır olduğunda adres ve **Tarayıcıda Aç**, **SweetCherry’yi Durdur**, **Logu Aç** seçenekleri kullanılabilir. Pencere kapatılırken arka planda çalıştırma veya durdurma seçilir. Sistem tepsisi destekleniyorsa kontrol penceresi, tarayıcı ve kapatma menüsü vardır; desteklenmiyorsa arka plan seçimi pencereyi küçültür.
+
+Durdurma Spring context'i kapatır; mevcut graceful shutdown kullanılır. Web arayüzünden kapatma da tepsi ikonunu ve kontrol penceresini kaldırır. Port kullanımda olduğunda kullanıcı bilgilendirilir; başka uygulama kapatılmaz ve port kendiliğinden değiştirilmez. Başlatma hatasından sonra log incelenip uygulama kapatılarak yeniden çalıştırılır. Bu sürümde kontrol penceresinde yeniden başlatma düğmesi yoktur.
+
+`run.bat`, `run.sh`, `run.command` ve normal JAR başlatması bu GUI'yi açmaz. Açıkça etkinleştirmek için `--myapp.desktop.enabled=true`, EXE'de devre dışı bırakmak için `--myapp.desktop.enabled=false` kullanılır. Bu erken başlatma seçeneği yalnız JVM özelliği veya komut satırından okunur; YAML içine yazmak etkinleştirmez. Tarayıcı açılması mevcut `myapp.openWebBrowserOnStartup` ayarını kullanır. Masaüstü kontrol dili işletim sisteminin Java diline göre Türkçe veya İngilizcedir; web dil seçimi bağımsızdır.
+
+CI sunucu smoke testi GUI'yi kapatarak çalışır. Gerçek Windows testinde başlangıç penceresi, tarayıcı, arka planda çalışma, tepsiden geri açma, pencereden/webden kapatma ve dolu portta hata mesajı kontrol edilmelidir. EXE mutex'i ikinci sunucu sürecini engellemeye devam eder; ikinci tıklama mevcut kontrol penceresini öne getirmez, tepsi kullanılır.
