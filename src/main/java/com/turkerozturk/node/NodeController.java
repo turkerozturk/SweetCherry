@@ -295,6 +295,10 @@ public class NodeController {
         
         String dataSourceMessage = null;
 
+        if (model.getAttribute("dataSourceOperationError") != null) {
+            return "selectdatasource";
+        }
+
         if (!TenantContext.hasCurrentTenant()) {
             dataSourceMessage = messageSource.getMessage("selectdatasource.please_select_a_datasource",
                     null, locale);

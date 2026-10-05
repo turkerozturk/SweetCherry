@@ -66,6 +66,7 @@ public class TenantService {
         for (Map.Entry<Object, DataSource> entry : resolvedDataSources.entrySet()) {
             String tenantId = (String) entry.getKey();
             DataSource dataSource = entry.getValue();
+            if (dataSource instanceof ManagedTenantDataSource managed) dataSource = managed.configuration();
 
             logger.info("Tenant ID: " + tenantId);
 
@@ -73,7 +74,7 @@ public class TenantService {
                 HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
                 logger.info("URL: " + hikariDataSource.getJdbcUrl());
                 logger.info("Username: " + hikariDataSource.getUsername());
-                logger.info("Password: " + hikariDataSource.getPassword());
+                logger.info("Password: [hidden]");
                 logger.info("Driver Class Name: " + hikariDataSource.getDriverClassName());
             } else {
                 logger.info("DataSource is not an instance of HikariDataSource. Implement appropriate logic to extract information.");
@@ -93,6 +94,7 @@ public class TenantService {
         for (Map.Entry<Object, DataSource> entry : resolvedDataSources.entrySet()) {
             String tenantName = (String) entry.getKey();
             DataSource dataSource = entry.getValue();
+            if (dataSource instanceof ManagedTenantDataSource managed) dataSource = managed.configuration();
 
 
 

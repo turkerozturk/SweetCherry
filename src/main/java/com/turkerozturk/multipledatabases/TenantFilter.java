@@ -34,6 +34,9 @@ import java.io.IOException;
 @Order(1)
 class TenantFilter implements Filter {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private TenantService tenantService;
+
     private static final Logger logger = LoggerFactory.getLogger(TenantFilter.class);
 
     @Override
@@ -47,7 +50,17 @@ class TenantFilter implements Filter {
         HttpSession session = req.getSession(false);
         String tenantName = session == null ? null
                 : (String) session.getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT);
-        // logger.info("Tenant Name: " + tenantName);
+        // A closed/reloaded pool invalidates selections in other sessions, without logging them out.
+        if (tenantName != null && session.getAttribute("TENANT_POOL_GENERATION") != null) {
+            javax.sql.DataSource source = tenantService.getAllTenants().get(tenantName);
+            Object generation = session.getAttribute("TENANT_POOL_GENERATION");
+            if (!(source instanceof ManagedTenantDataSource managed) || managed.isClosed() || !generation.equals(managed.generation())) {
+                session.removeAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT);
+                session.removeAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
+                session.removeAttribute("TENANT_POOL_GENERATION");
+                tenantName = null;
+            }
+        }
         if (tenantName != null) {
             TenantContext.setCurrentTenant(tenantName); //
         } else {

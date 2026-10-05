@@ -152,12 +152,15 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                     dataSourceBuilder.username(dsUsername);
                     dataSourceBuilder.password(dsPassword);
                     dataSourceBuilder.url(dsUrl);
+                    String registrationName = dsHumanFriendlyName;
                     if (!resolvedDataSources.containsKey(dsHumanFriendlyName)) {
-                        resolvedDataSources.put(dsHumanFriendlyName, dataSourceBuilder.build());
+                        resolvedDataSources.put(dsHumanFriendlyName, new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
+                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build()));
                     } else {
-                        resolvedDataSources.put(dsHumanFriendlyName +
-                                "(random: " + StringHelper.generateRandomString(3) + ")",
-                                dataSourceBuilder.build());
+                        registrationName = dsHumanFriendlyName + "(random: " + StringHelper.generateRandomString(3) + ")";
+                        resolvedDataSources.put(registrationName,
+                                new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
+                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build()));
                     }
                     logger.info("Data source: " + dsHumanFriendlyName +
                             ", db: " + tenantProperties.getProperty("datasource.url"));
@@ -175,7 +178,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                             .forEach(key -> customProperties.put(key, tenantProperties.getProperty(key)));
                     customProperties.put("propertyFileName", propertyFile.getName());
                     // Inside the loop in getResolvedDataSources
-                    customPropertiesHolder.addCustomProperties(dsHumanFriendlyName, customProperties);
+                    customPropertiesHolder.addCustomProperties(registrationName, customProperties);
                     // Optionally, log or store the custom properties somewhere for later use
                     customProperties.forEach((key, value) ->
                             logger.info("Custom Property [" + key + "] = " + value + "(" + dsHumanFriendlyName + ")"));
@@ -201,11 +204,24 @@ public class MultitenantConfiguration implements ApplicationContextAware {
         return resolvedDataSources;
     }
 
+    /** Releases previous pools before replacing tenant registrations; refuses reload during active queries. */
     public void reloadDataSource() {
-        DataSource dataSource = createDataSource();
-        ((MultitenantDataSource) dataSource()).setTargetDataSources(getResolvedDataSources());
-        ((MultitenantDataSource) dataSource()).afterPropertiesSet();
+        var routing = (MultitenantDataSource) dataSource();
+        for (DataSource previous : routing.getResolvedDataSources().values()) {
+            if (previous instanceof ManagedTenantDataSource managed) managed.close();
+            else if (previous instanceof com.zaxxer.hikari.HikariDataSource hikari) hikari.close();
+        }
+        routing.setTargetDataSources(getResolvedDataSources());
+        routing.afterPropertiesSet();
         logger.info("Data sources reloaded.");
+    }
+
+    /** Releases pooled database resources when the application shuts down. */
+    @jakarta.annotation.PreDestroy
+    public void closePools() {
+        for (DataSource source : ((MultitenantDataSource) dataSource()).getResolvedDataSources().values()) {
+            if (source instanceof ManagedTenantDataSource managed) managed.configuration().close();
+        }
     }
 
     @Override

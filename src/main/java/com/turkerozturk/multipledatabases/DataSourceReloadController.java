@@ -31,8 +31,11 @@ public class DataSourceReloadController {
     private MultitenantConfiguration multitenantConfiguration;
 
     @PostMapping("/reload-datasources")
-    public String reloadDataSources() {
-        multitenantConfiguration.reloadDataSource();
+    public String reloadDataSources(jakarta.servlet.http.HttpServletRequest request) {
+        try { multitenantConfiguration.reloadDataSource(); }
+        catch (IllegalStateException error) {
+            request.getSession().setAttribute("dataSourceOperationError", "busy");
+        }
         //return "Data sources reloaded successfully";
         return "redirect:/";  // Ana sayfaya yonlendir
 

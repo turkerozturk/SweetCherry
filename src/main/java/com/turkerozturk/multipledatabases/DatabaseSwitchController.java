@@ -58,7 +58,17 @@ public class DatabaseSwitchController {
             throw new org.springframework.web.server.ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST, "Bilinmeyen veri kaynağı");
         }
+        javax.sql.DataSource source = tenantService.getAllTenants().get(tenant);
+        String generation = null;
+        try {
+            if (source instanceof ManagedTenantDataSource managed) generation = managed.activate();
+        } catch (java.sql.SQLException | RuntimeException error) {
+            logger.warn("Data source selection failed for {}", tenant, error);
+            request.getSession().setAttribute("dataSourceOperationError", "select");
+            return "redirect:/";
+        }
         HttpSession session = request.getSession(); // chatgpt onerdi.
+        session.setAttribute("TENANT_POOL_GENERATION", generation);
         session.setAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT, tenant); // Bu sayede
         session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN, UUID.randomUUID().toString());
 

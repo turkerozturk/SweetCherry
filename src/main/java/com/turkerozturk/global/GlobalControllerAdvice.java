@@ -87,6 +87,16 @@ public class GlobalControllerAdvice {
         }
     }
 
+    /** Displays a one-request source operation warning without exposing JDBC credentials or stack traces. */
+    @ModelAttribute("dataSourceOperationError")
+    public String dataSourceOperationError(jakarta.servlet.http.HttpServletRequest request) {
+        var session = request.getSession(false);
+        if (session == null) return null;
+        String code = (String) session.getAttribute("dataSourceOperationError");
+        session.removeAttribute("dataSourceOperationError");
+        return code;
+    }
+
     @ModelAttribute("currentTenantName")
     public String getCurrentTenantName() {
         return TenantContext.getCurrentTenant();

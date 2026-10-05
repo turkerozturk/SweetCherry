@@ -29,10 +29,11 @@
         <tbody>
         <tr th:each="tenant : ${tenants}">
             <td th:text="${tenant.tenantName == currentTenantName ? 'Active' : 'Passive'}"></td>
-            <td><i><b th:text="${tenant.tenantName}"></b></i></td>
+            <td><a th:href="@{/tenants/config(tenant=${tenant.tenantName})}" th:title="${tenant.fileName}" download aria-label="Download tenant configuration">
+                <i class="fas fa-download" aria-hidden="true"></i></a> <i><b th:text="${tenant.tenantName}"></b></i></td>
             <td th:text="${tenant.url}"></td>
             <td th:text="${tenant.username}"></td>
-            <td th:text="${tenant.password}"></td>
+            <td>••••••</td>
             <td th:text="${tenant.driverClassName}"></td>
             <td th:text="${tenant.fileName}"></td>
             <td th:text="${tenant.isWritable}"></td>

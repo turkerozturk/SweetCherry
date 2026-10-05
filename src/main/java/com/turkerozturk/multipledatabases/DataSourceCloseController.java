@@ -36,7 +36,7 @@ public class DataSourceCloseController {
 
 
     @Autowired
-    private MultitenantConfiguration multitenantConfiguration;
+    private TenantService tenantService;
 
     @PostMapping("/close-datasources")
     public String closeDataSources(ServletRequest request) {
@@ -47,6 +47,14 @@ public class DataSourceCloseController {
         // TenantContext.setCurrentTenant(tenantName);
         HttpSession session = req.getSession(); // chatgpt onerdi, session degiskeninde tutmayi. Yoksa setCurrentTenant diger metodlarca anlasilmiyor ve database degismiyor.
         String tenantName = (String) session.getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT);
+        javax.sql.DataSource source = tenantService.getAllTenants().get(tenantName);
+        try {
+            if (source instanceof ManagedTenantDataSource managed) managed.close();
+        } catch (IllegalStateException error) {
+            session.setAttribute("dataSourceOperationError", "busy");
+            return "redirect:/";
+        }
+        session.removeAttribute("TENANT_POOL_GENERATION");
         TenantContext.setCurrentTenant(null);
         session.setAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT, null);
         session.removeAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
