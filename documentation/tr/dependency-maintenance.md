@@ -163,3 +163,67 @@ POM kaynakları:
 - https://repo.maven.apache.org/maven2/org/apache/pdfbox/pdfbox/3.0.8/pdfbox-3.0.8.pom
 - https://repo.maven.apache.org/maven2/org/apache/pdfbox/fontbox/3.0.8/fontbox-3.0.8.pom
 - https://repo.maven.apache.org/maven2/org/apache/pdfbox/pdfbox-io/3.0.8/pdfbox-io-3.0.8.pom
+
+
+## Sürüm property düzeni ve güncelleme yöntemi
+
+Başlangıç commit'i: `907902b`. İstenen 16 bağımlılığın mevcut sürümleri 14 adet
+`sweetcherry.*.version` property’sine taşınmıştır. OpenPDF ve extra fonts aynı;
+Time4J base ve sqlxml aynı property’yi kullanır. tzdata kendi sürüm çizgisindedir.
+Bu düzenleme sürüm yükseltmez, scope değiştirmez veya Spring Boot BOM'una yeni
+override eklemez. Önceki incelemede bilinçli eklenen Commons/PostgreSQL override’ları
+korunur. POM yorumları silinmemiştir.
+
+### Her kütüphaneyi tek tek mi güncellemek gerekir?
+
+Her seferinde tüm uygulamayı elle dolaşmak gerekmez. Değişiklik birimi **bir
+bağımsız bağımlılık veya birbiriyle uyumlu olması gereken grup** olmalıdır:
+
+| Grup | Birlikte değerlendirme | Hedefli kabul kontrolü |
+|---|---|---|
+| Spring Boot parent/BOM | Spring, Security, Hibernate ve Boot tarafından yönetilen modüller | Başlatma, login/yetki, tenant ve temel okuma/yazma |
+| PDF | OpenPDF + extra fonts; Flying Saucer'ın istediği OpenPDF ve Java/API sınırı | Türkçe font, resim/tablo içeren PDF |
+| POI | poi + poi-ooxml; gerekli Commons transitifleri | XLSX üretme ve açma |
+| Time4J | base + sqlxml; ayrı sürümlenen tzdata | Astronomi, tarih/saat ve zaman dilimi |
+| SQLite JDBC | Tek sürücü; native platform ve transaction davranışı | Windows/Pi açma, kayıt, rollback, pool kapatma/dosya kilidi |
+| jsoup | Bağımsız güncelleme; HTML/XML dönüşüm davranışı | Rich-text node 53, düzenleme/kaydetme ve yapıştırma |
+| Web arayüzü | Bootstrap/jQuery eklentileri ve gerçekten yüklenen statik dosyalar | Menü, editör, tablo ve mobil görünüm |
+| springdoc / Thymeleaf eklentileri | Spring Boot/Thymeleaf ana sürümüyle uyumluluk | Uygulama açılışı, şablonlar ve API belgeleri erişimi |
+
+1. Çalışan commit'ten ayrı branch açın; mevcut test sonucunu başlangıç kabul edin.
+2. Resmi sürüm notlarını, Java minimumunu ve framework uyumluluk matrisini okuyun.
+   “En yüksek sürüm” ile “bu proje için uygun sürüm” aynı şey değildir.
+3. Bir grup güncellenir; `mvnw.cmd clean package` ve `mvnw.cmd -Preports compile`
+   çalıştırılır. Seçilen transitif sürümler önceki raporla karşılaştırılır.
+4. Gerçek paketli JAR başlatılır; ilgili özelliğin hedefli manuel kabul testi yapılır.
+   Testler uygulamanın tam Spring context açılışını kapsamıyorsa build başarısı tek
+   başına runtime başarısı değildir. Native/launcher değişikliklerinde Windows
+   bundle ve Raspberry Pi kontrolü ayrıca gerekir.
+5. Başarılı grup ayrı commit edilir. Başarısızlıkta ilk anlamlı `Caused by` satırı,
+   güncelleme farkı ve dependency-tree ile neden bulunur; o grup geri alınabilir.
+   Daha geniş bir grup başarısızsa adaylar küçültülerek hata kaynağı izole edilir.
+
+Patch/minor numarası uyumluluk garantisi değildir; major geçişler genellikle
+ayrı migration işi olarak planlanır. Örneğin springdoc 3.x Spring Boot 4 içindir;
+SweetCherry Boot 3.5 ile 2.x çizgisinde kalır. OpenPDF 2.1.x ve sonrası Java 21
+ister; 3.x ayrıca `com.lowagie` → `org.openpdf` paket adı geçişi içerir.
+
+### Otomatik araçlar nasıl yardımcı olur?
+
+Dependabot ve Renovate yeni sürümleri izleyip inceleme için PR açabilir.
+Dependabot varsayılan olarak tek bağımlılık için PR açar; grup kurallarıyla
+birlikte ele alınacak modüller, güncelleme türleri ve takvim tanımlanabilir.
+Renovate de grup/uyumluluk kuralları ve CI sonucu ile yönetilebilir. Bot önerisi
+uygulama uyumluluğu onayı değildir. SweetCherry için haftalık öneri, sınırlı PR
+sayısı, major geçişlerde manuel inceleme ve otomatik merge olmaması uygun bir
+başlangıç politikasıdır. Bu yamada bot veya workflow konfigürasyonu eklenmemiştir.
+
+Yaygın bakım akışı: bot PR'ı → sürüm notu/uyumluluk incelemesi → CI test ve paketleme
+→ hedefli kullanım kontrolü → merge. BOM yönetimindeki modüller tek tek rastgele
+sabitlenmez; gerektiğinde belgelenmiş override veya parent güncellemesi yapılır.
+
+Kaynaklar:
+- https://springdoc.org/ (uyumluluk matrisi)
+- https://github.com/LibrePDF/OpenPDF (Java ve paket adı gereksinimleri)
+- https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
+- https://docs.renovatebot.com/key-concepts/automerge/
