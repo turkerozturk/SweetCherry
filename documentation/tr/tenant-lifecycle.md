@@ -15,3 +15,5 @@ Yükleme başarısızsa önceki oturum seçimi korunur; kullanıcıya genel aç�
 Manuel kontrol: CTB seç → sorgu aç → CTB kapat → Windows'ta dosyayı yeniden adlandır/overwrite et → kaynağı yeniden seç. Eksik dosyayla seçimde dosyanın kendiliğinden oluşmadığını kontrol et. Boş dosya ile seçimde okunur uyarı bekle. Menü ve seçim sayfasındaki yükleme/kapatma aynı backend'i kullanır. İki oturumla aynı kaynağı açıp kapatıldığında diğer oturumun yeniden kaynak seçmek zorunda kaldığını kontrol et.
 
 Tenant config silme ve aktarım güvenliği: [Ayarlar ve bağlantı portları](settings.md). Silme yalnız config dosyasını kaldırır; CTB veya uzak veritabanını silmez.
+
+Silinmiş veya yeniden yükleme sonrasında kaldırılmış bir tenant eski sayfadan seçilirse `/setTenant` 400 yerine güncel seçim listesine uyarıyla döner. Başka geçerli seçim varsa değiştirilmez. `/setTenant` adresini GET ile açmak yalnız `/` seçim/giriş akışına yönlendirir; seçim değiştirmek halen CSRF korumalı POST işlemiyle yapılır.

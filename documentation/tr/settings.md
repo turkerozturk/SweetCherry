@@ -62,3 +62,9 @@ HTTPS, tarayıcı ile TLS'i sonlandıran sunucu/proxy arasındaki upload ve down
 Ayrıntılı kurulum: [Ağ erişimi](network-access.md), [HTTPS ve oturum güvenliği](https-and-session-security.md), [Veri kaynağı yaşam döngüsü](tenant-lifecycle.md), [İsteğe bağlı özellikler](optional-features.md).
 
 Kaynaklar: https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Transport_Layer_Security ve https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
+
+## Rutin loglar
+
+`myapp.debug=false` iken veri kaynağı klasör yolu, kayıt/custom property listesi, isWritable bilgileri, mevcut seçim, kapatma/yeniden yükleme ve exportedFiles klasör yolu gibi rutin INFO mesajları yazılmaz. `true` iken bu bilgiler yeniden görünür. Hikari havuzunun start/stop INFO mesajları da bu ayara uyar; `logging.level.com.zaxxer.hikari` açıkça tanımlanmışsa bu log seviyesi tercih edilir. Ayar uygulama yeniden başlatıldığında uygulanır.
+
+Gerçek WARN/ERROR mesajları ve login güvenlik kayıtları gizlenmez. Bütün Spring/Hibernate/Tomcat logları bu ayarın kapsamına alınmamıştır. Tenant klasörünün alt klasörleri taranmaz; SQLite dosya başlığı taşıyan dosyalar config olarak parse edilmeye çalışılmaz. Metin config dosyalarının adları ve uzantıları kayıt birleştirmede kullanılmaz. Aynı veritabanına ayrı name ve ayarlarla bağlanan tenantlar ayrı kalır.

@@ -50,6 +50,7 @@
                         <input type="hidden" name="includeDescendants" value="true"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
                     </form>
+                    <a class="dropdown-item" th:href="@{/mindmap-export(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{mindmap.export.menu}"></a>
                 </div>
             </div>
             <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>

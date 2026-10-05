@@ -37,6 +37,9 @@ import java.nio.file.LinkOption;
 @Controller
 public class ExportedFilesController {
 
+    @org.springframework.beans.factory.annotation.Value("${myapp.debug:false}")
+    private boolean debugEnabled;
+
     private static final Logger logger = LoggerFactory.getLogger(ExportedFilesController.class);
 
 
@@ -49,7 +52,7 @@ public class ExportedFilesController {
     @GetMapping("/exportedFiles")
     public String listFiles(Model model) {
         String directoryPath = applicationPath + File.separator + exportingFolderName;
-        logger.info("Exported Files directory Path: " + directoryPath);
+        if (debugEnabled) logger.info("Exported Files directory Path: " + directoryPath);
 
         File directory = new File(directoryPath);
 

@@ -40,6 +40,9 @@ import java.util.UUID;
 @Controller
 public class DatabaseSwitchController {
 
+    @org.springframework.beans.factory.annotation.Value("${myapp.debug:false}")
+    private boolean debugEnabled;
+
     private static final Logger logger = LoggerFactory.getLogger(DatabaseSwitchController.class);
 
     @Autowired
@@ -53,12 +56,12 @@ public class DatabaseSwitchController {
      * @return
      */
     @PostMapping("/setTenant")
-    public String setTenant(@RequestParam("tenant") String tenant, HttpServletRequest request) {
-        if (!tenantService.getAllTenants().containsKey(tenant)) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST, "Bilinmeyen veri kaynağı");
+    public String setTenant(@RequestParam(value="tenant", required=false) String tenant, HttpServletRequest request) {
+        javax.sql.DataSource source = tenant == null ? null : tenantService.getAllTenants().get(tenant);
+        if (source == null) {
+            request.getSession().setAttribute("dataSourceOperationError", "missing");
+            return "redirect:/";
         }
-        javax.sql.DataSource source = tenantService.getAllTenants().get(tenant);
         String generation = null;
         try {
             if (source instanceof ManagedTenantDataSource managed) generation = managed.activate();
@@ -86,6 +89,10 @@ public class DatabaseSwitchController {
         return "redirect:/";  // Ana sayfaya yonlendir
     }
 
+    /** Keeps the POST action URL safe to open directly without changing the selected database. */
+    @GetMapping("/setTenant")
+    public String selectionPage() { return "redirect:/"; }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/tenants")
     public String listTenants(Model model, HttpServletRequest request) {
@@ -94,7 +101,7 @@ public class DatabaseSwitchController {
 
         model.addAttribute("tenants", tenantForms);
 
-        logger.info("Current Tenant Name: \"" + TenantContext.getCurrentTenant() + "\"");
+        if (debugEnabled) logger.info("Current Tenant Name: \"" + TenantContext.getCurrentTenant() + "\"");
 /*
         HttpSession session = request.getSession(); // chatgpt onerdi.
         String currentTenant = (String) session.getAttribute("CURRENT_TENANT");

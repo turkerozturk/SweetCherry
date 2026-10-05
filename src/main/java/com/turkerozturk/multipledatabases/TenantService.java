@@ -36,6 +36,9 @@ import java.util.Map;
 @Service
 public class TenantService {
 
+    @org.springframework.beans.factory.annotation.Value("${myapp.debug:false}")
+    private boolean debugEnabled;
+
     private static final Logger logger = LoggerFactory.getLogger(TenantService.class);
 
     @Autowired
@@ -68,16 +71,16 @@ public class TenantService {
             DataSource dataSource = entry.getValue();
             if (dataSource instanceof ManagedTenantDataSource managed) dataSource = managed.configuration();
 
-            logger.info("Tenant ID: " + tenantId);
+            if (debugEnabled) logger.info("Tenant ID: " + tenantId);
 
             if (dataSource instanceof HikariDataSource) {
                 HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
-                logger.info("URL: " + hikariDataSource.getJdbcUrl());
-                logger.info("Username: " + hikariDataSource.getUsername());
-                logger.info("Password: [hidden]");
-                logger.info("Driver Class Name: " + hikariDataSource.getDriverClassName());
+                if (debugEnabled) logger.info("URL: " + hikariDataSource.getJdbcUrl());
+                if (debugEnabled) logger.info("Username: " + hikariDataSource.getUsername());
+                if (debugEnabled) logger.info("Password: [hidden]");
+                if (debugEnabled) logger.info("Driver Class Name: " + hikariDataSource.getDriverClassName());
             } else {
-                logger.info("DataSource is not an instance of HikariDataSource. Implement appropriate logic to extract information.");
+                if (debugEnabled) logger.info("DataSource is not an instance of HikariDataSource. Implement appropriate logic to extract information.");
             }
 
         }
@@ -117,7 +120,7 @@ public class TenantService {
 
                 if(customProperties.containsKey("custom.isWritable")) {
                     String isWritableAsString = customProperties.get("custom.isWritable");
-                    logger.info("isWritable: " + isWritableAsString + " (" + tenantName + ")");
+                    if (debugEnabled) logger.info("isWritable: " + isWritableAsString + " (" + tenantName + ")");
                     boolean isWritable = isWritableAsString.equals("true");
                     tenantForm.setWritable(isWritable);
 
@@ -136,7 +139,7 @@ public class TenantService {
 
 
             } else {
-                logger.info("DataSource is not an instance of HikariDataSource. Implement appropriate logic to extract information.");
+                if (debugEnabled) logger.info("DataSource is not an instance of HikariDataSource. Implement appropriate logic to extract information.");
             }
 
         }

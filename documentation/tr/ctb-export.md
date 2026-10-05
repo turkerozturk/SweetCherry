@@ -102,3 +102,7 @@ Bağlantı tanım dosyalarını `allTenants` klasörüne yüklemek için SweetCh
 - Export sonucu, dosya yolu ve eklenen düğüm sayısını kullanıcıya daha ayrıntılı göster.
 - Download ve delete işlemlerinde izin verilen dosya adlarını sunucu tarafında daha sıkı doğrula.
 - `exportednodes.ctb` dosyasını aktif tenant olarak kullanma senaryosunu ayrıca test et ve belgele.
+
+## Freeplane / FreeMind dışa aktarma
+
+Yeni masaüstü ve mobil düğüm sayfalarının Export menüsünde **Freeplane / FreeMind (.mm)** bulunur. Ortak sayfa şablonundaki `/mindmap-export?nodeId=<ağaç-kimliği>` formu ID alanını doldurur; doğrudan açıldığında kimlik elle girilebilir. Tenant kapalıysa önce veri kaynağı seçimi gerekir. Görünüm token'ı ve POST CSRF kontrolü korunur. Paylaşımlı düğümde ID, shared occurrence'ın kendi kimliğidir; görünen ad/stiller master'dan okunur. Shared occurrence bir yapraktır; master'ın çocukları onun alt ağacı gibi dışa aktarılmaz. İkonlar seçilirse `.mm` dosyasının yanında eşleşen PNG ikonları içeren `ctbicons` klasörü gerekir.

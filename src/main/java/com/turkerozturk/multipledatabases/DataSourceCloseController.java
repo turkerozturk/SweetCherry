@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class DataSourceCloseController {
 
+    @org.springframework.beans.factory.annotation.Value("${myapp.debug:false}")
+    private boolean debugEnabled;
+
     private static final Logger logger = LoggerFactory.getLogger(DataSourceCloseController.class);
 
 
@@ -58,7 +61,7 @@ public class DataSourceCloseController {
         TenantContext.setCurrentTenant(null);
         session.setAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT, null);
         session.removeAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
-        logger.info(String.format("Data Source closed. Session variable %s is cleared.", TenantContext.SESSION_VARIABLE__CURRENT_TENANT));
+        if (debugEnabled) logger.info(String.format("Data Source closed. Session variable %s is cleared.", TenantContext.SESSION_VARIABLE__CURRENT_TENANT));
 
         return "redirect:/";  // Ana sayfaya yonlendir
 

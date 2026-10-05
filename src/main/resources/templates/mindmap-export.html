@@ -1,164 +1,27 @@
 <!DOCTYPE html>
-<html lang="tr"
-      xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
-
-    <title>Freeplane Mind Map Export</title>
-
-    <link rel="stylesheet"
-          th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}">
-</head>
-
-<body class="bg-light">
-
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    CherryTree → Freeplane
-                </div>
-
-                <div class="card-body">
-                    <form th:action="@{/mindmap-export}"
-                          method="post">
-                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-
-                        <input type="hidden"
-                               th:if="${_csrf != null}"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}">
-
-                        <div class="mb-3">
-                            <label for="nodeId"
-                                   class="form-label">
-                                Root node ID
-                            </label>
-
-                            <input type="number"
-                                   class="form-control"
-                                   id="nodeId"
-                                   name="nodeId"
-                                   min="1"
-                                   step="1"
-                                   required>
-
-                            <div class="form-text">
-                                CherryTree GUI'de görünen node ID
-                                değerini yazın.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="level"
-                                   class="form-label">
-                                Maksimum alt seviye
-                            </label>
-
-                            <input type="number"
-                                   class="form-control"
-                                   id="level"
-                                   name="level"
-                                   min="0"
-                                   step="1"
-                                   placeholder="Boş bırakılırsa tümü">
-
-                            <div class="form-text">
-                                0: yalnızca root, 1: root ve doğrudan
-                                çocukları. Boş bırakılırsa bütün alt
-                                ağaç dışa aktarılır.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="foldMode"
-                                   class="form-label">
-                                Düğümlerin açık/kapalı durumu
-                            </label>
-
-                            <select class="form-select"
-                                    id="foldMode"
-                                    name="foldMode">
-                                <option value="chat" selected>
-                                    Yalnız adı “chat” olanları kapat
-                                </option>
-                                <option value="all-folded">
-                                    Tüm alt düğümleri kapat
-                                </option>
-                                <option value="all-unfolded">
-                                    Tüm düğümleri açık bırak
-                                </option>
-                            </select>
-
-                            <div class="form-text">
-                                Ana düğüm her zaman açık bırakılır.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="includeColors"
-                                   class="form-label">
-                                Düğüm başlık renkleri
-                            </label>
-
-                            <select class="form-select"
-                                    id="includeColors"
-                                    name="includeColors">
-                                <option value="true" selected>
-                                    Renkleri ekle
-                                </option>
-                                <option value="false">
-                                    Renkleri ekleme
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="includeIcons"
-                                   class="form-label">
-                                CherryTree ikonları
-                            </label>
-
-                            <select class="form-select"
-                                    id="includeIcons"
-                                    name="includeIcons">
-                                <option value="false" selected>
-                                    İkonları ekleme
-                                </option>
-                                <option value="true">
-                                    İkonları ekle
-                                </option>
-                            </select>
-
-                            <div class="form-text mt-2">
-                                Seçerseniz, download edeceğiniz mindmap
-                                dosyası kendisiyle aynı klasörde
-                                <strong>ctbicons</strong> isimli bir klasör
-                                olmasını ve içinde orijinal adları CherryTree
-                                uygulamasının kaynak kodlarında bulunan SVG
-                                uzantılı dosyalardan dönüştürülmüş aynı isimde
-                                PNG uzantılı dosyaların olmasını bekler.
-                                Freeplane uygulaması o dosyaları bulamazsa
-                                düğümlerin altında bulamadığına dair hata
-                                mesajı gösterir ve çirkin bir görünüm oluşur.
-                                <strong>ctbicons</strong> klasörünüz varsa
-                                seçin, yoksa seçmeyin.
-                            </div>
-                        </div>
-
-                        <button type="submit"
-                                class="btn btn-primary">
-                            Mind map indir
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-</body>
-</html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{mindmap.export.title}"></title></head>
+<body><section layout:fragment="content">
+<h1 th:text="#{mindmap.export.title}"></h1>
+<p th:if="${rootName != null}" th:text="${rootName}"></p>
+<div class="card"><div class="card-body">
+<form th:action="@{/mindmap-export}" method="post">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div class="mb-3"><label class="form-label" for="nodeId" th:text="#{mindmap.export.root}"></label>
+<input class="form-control" type="number" name="nodeId" id="nodeId" min="1" step="1" required th:value="${nodeId}">
+<div class="form-text" th:text="#{mindmap.export.rootHelp}"></div></div>
+<div class="mb-3"><label class="form-label" for="level" th:text="#{mindmap.export.level}"></label>
+<input class="form-control" type="number" name="level" id="level" min="0" step="1" th:placeholder="#{mindmap.export.allLevels}">
+<div class="form-text" th:text="#{mindmap.export.levelHelp}"></div></div>
+<div class="mb-3"><label class="form-label" for="foldMode" th:text="#{mindmap.export.fold}"></label>
+<select class="form-select" name="foldMode" id="foldMode"><option value="chat" selected th:text="#{mindmap.export.foldChat}"></option>
+<option value="all-folded" th:text="#{mindmap.export.foldAll}"></option><option value="all-unfolded" th:text="#{mindmap.export.unfoldAll}"></option></select>
+<div class="form-text" th:text="#{mindmap.export.foldHelp}"></div></div>
+<div class="mb-3"><label class="form-label" for="includeColors" th:text="#{mindmap.export.colors}"></label>
+<select class="form-select" name="includeColors" id="includeColors"><option value="true" selected th:text="#{mindmap.export.include}"></option><option value="false" th:text="#{mindmap.export.exclude}"></option></select></div>
+<div class="mb-3"><label class="form-label" for="includeIcons" th:text="#{mindmap.export.icons}"></label>
+<select class="form-select" name="includeIcons" id="includeIcons"><option value="false" selected th:text="#{mindmap.export.exclude}"></option><option value="true" th:text="#{mindmap.export.include}"></option></select>
+<div class="form-text" th:text="#{mindmap.export.iconsHelp}"></div></div>
+<button class="btn btn-primary" type="submit" th:text="#{mindmap.export.download}"></button>
+</form></div></div>
+</section></body></html>

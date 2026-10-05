@@ -21,13 +21,24 @@ class DatabaseSwitchControllerTest {
         ReflectionTestUtils.setField(controller, "tenantService", service);
         MockHttpServletRequest request = new MockHttpServletRequest();
 
-        assertThatThrownBy(() -> controller.setTenant("Unknown", request))
-                .isInstanceOf(ResponseStatusException.class);
-        assertThat(request.getSession(false)).isNull();
+        assertThat(controller.setTenant("Unknown", request)).isEqualTo("redirect:/");
+        assertThat(request.getSession().getAttribute("dataSourceOperationError")).isEqualTo("missing");
+        assertThat(request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT)).isNull();
         controller.setTenant("Demo", request);
         Object first = request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
         controller.setTenant("Demo", request);
         Object second = request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
         assertThat(first).isNotNull().isNotEqualTo(second);
+    }
+    @Test void removedSelectionPreservesAnotherValidSourceAndGetNeverChangesIt() {
+        var service=mock(TenantService.class);
+        when(service.getAllTenants()).thenReturn(Map.of("Demo",mock(DataSource.class)));
+        var controller=new DatabaseSwitchController(); ReflectionTestUtils.setField(controller,"tenantService",service);
+        var request=new MockHttpServletRequest(); controller.setTenant("Demo",request);
+        Object token=request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
+        controller.setTenant("Deleted",request);
+        assertThat(request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT)).isEqualTo("Demo");
+        assertThat(request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN)).isEqualTo(token);
+        assertThat(controller.selectionPage()).isEqualTo("redirect:/");
     }
 }

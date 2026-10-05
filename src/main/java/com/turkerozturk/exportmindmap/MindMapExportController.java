@@ -29,6 +29,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Controller
+@com.turkerozturk.multipledatabases.RequiresTenant
 public class MindMapExportController {
 
     private static final String DEFAULT_FOLD_MODE = "chat";
@@ -45,7 +46,15 @@ public class MindMapExportController {
     }
 
     @GetMapping("/mindmap-export")
-    public String showExportPage() {
+    /** Prefills the tree occurrence ID, resolving only its displayed content through the real master. */
+    public String showExportPage(@RequestParam(required=false) Long nodeId, org.springframework.ui.Model model) {
+        if (nodeId != null) {
+            if (nodeId <= 0) throw new ResponseStatusException(BAD_REQUEST);
+            Children occurrence=childrenRepository.findByNodeId(nodeId);
+            if (occurrence == null) throw new ResponseStatusException(NOT_FOUND);
+            model.addAttribute("rootName", findDisplayNode(occurrence).getName());
+        }
+        model.addAttribute("nodeId", nodeId);
         return "mindmap-export";
     }
 
@@ -283,7 +292,7 @@ public class MindMapExportController {
                 maximumLevel == null
                         || currentLevel < maximumLevel;
 
-        if (mayWriteChildren) {
+        if (mayWriteChildren && (treeNode.getMasterId() == null || treeNode.getMasterId() == 0)) {
             List<Children> children =
                     childrenRepository
                             .findByFatherIdOrderBySequenceAsc(

@@ -9,6 +9,7 @@
 
 
 <div th:fragment="tenantFragment">
+    <p class="alert alert-warning" th:if="${dataSourceOperationError == 'missing'}" th:text="#{tenant.selectionMissing}"></p>
     <p class="alert alert-warning" th:if="${dataSourceOperationError == 'select'}" th:text="#{tenant.selectionFailed}"></p>
     <p class="alert alert-warning" th:if="${dataSourceOperationError == 'busy'}" th:text="#{tenant.closeBusy}"></p>
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>

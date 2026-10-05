@@ -48,6 +48,9 @@ import java.util.Properties;
 @Configuration
 public class MultitenantConfiguration implements ApplicationContextAware {
 
+    @org.springframework.beans.factory.annotation.Value("${myapp.debug:false}")
+    private boolean debugEnabled;
+
     private static final Logger logger = LoggerFactory.getLogger(MultitenantConfiguration.class);
     //   @Value("${defaultTenant:tenant_1}") // olur da properties dosyasinda belirtilmezse,
     //   varsayilan veritabani baglantisi tenant_1.properties dosyasinda anlaminda.
@@ -103,7 +106,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
 
         //Path p = Path.of(TargetFilePathHelper.getTargetPath(PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES));
         Path p = Path.of(Paths.get(".").toAbsolutePath().normalize().toString() + File.separator + PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES);
-        logger.info("PATH: " + p.toString());
+        if (debugEnabled) logger.info("PATH: " + p.toString());
 
 
         try {
@@ -112,7 +115,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                 logger.warn("Data Source Folder \"" + p + "\" is not Found!" +
                         " Trying to create...");
                 Files.createDirectories(p);
-                logger.info("Data Source Folder \"" + p + "\" is created!");
+                if (debugEnabled) logger.info("Data Source Folder \"" + p + "\" is created!");
             } else {
 
 
@@ -128,8 +131,20 @@ public class MultitenantConfiguration implements ApplicationContextAware {
 
         File[] files = p.toFile().listFiles(); // bu klasorde ayri dosyalar halinde tum veritabanlarina ait baglantilar
 
-        assert files != null;
+        if (files == null) {
+            logger.warn("Cannot list tenant configuration folder: {}", p);
+            return resolvedDataSources;
+        }
         for (File propertyFile : files) {
+            try {
+                if (!isTenantConfigCandidate(propertyFile.toPath())) {
+                    if (debugEnabled) logger.info("Skipping non-config entry: {}", propertyFile.getName());
+                    continue;
+                }
+            } catch (IOException error) {
+                logger.warn("Cannot inspect tenant configuration entry: {}", propertyFile.getName());
+                continue;
+            }
             Properties tenantProperties = new Properties();
             DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
 
@@ -162,7 +177,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                                 new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
                                         .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build()));
                     }
-                    logger.info("Data source: " + dsHumanFriendlyName +
+                    if (debugEnabled) logger.info("Data source: " + dsHumanFriendlyName +
                             ", db: " + tenantProperties.getProperty("datasource.url"));
 
                     // bilgi: CustomPropertiesHolder.java adinda bir Component olusturduk ve buraya inject ettik.
@@ -180,7 +195,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                     // Inside the loop in getResolvedDataSources
                     customPropertiesHolder.addCustomProperties(registrationName, customProperties);
                     // Optionally, log or store the custom properties somewhere for later use
-                    customProperties.forEach((key, value) ->
+                    if (debugEnabled) customProperties.forEach((key, value) ->
                             logger.info("Custom Property [" + key + "] = " + value + "(" + dsHumanFriendlyName + ")"));
                     // BITTI custom properties
 
@@ -204,6 +219,14 @@ public class MultitenantConfiguration implements ApplicationContextAware {
         return resolvedDataSources;
     }
 
+    /** Skips directories and SQLite database payloads while preserving arbitrary text-config filenames. */
+    static boolean isTenantConfigCandidate(Path file) throws IOException {
+        if (!Files.isRegularFile(file)) return false;
+        try (var input = Files.newInputStream(file)) {
+            return !java.util.Arrays.equals(input.readNBytes(16), "SQLite format 3\0".getBytes(StandardCharsets.US_ASCII));
+        }
+    }
+
     /** Releases previous pools before replacing tenant registrations; refuses reload during active queries. */
     public synchronized void reloadDataSource() {
         var routing = (MultitenantDataSource) dataSource();
@@ -213,7 +236,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
         }
         routing.setTargetDataSources(getResolvedDataSources());
         routing.afterPropertiesSet();
-        logger.info("Data sources reloaded.");
+        if (debugEnabled) logger.info("Data sources reloaded.");
     }
 
     /** Removes one config and its registration after releasing its pool; leaves database contents untouched. */
