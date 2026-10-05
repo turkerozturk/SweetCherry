@@ -33,7 +33,7 @@ Aşağıdaki “korundu” ifadesi güvenlik onayı değil, bu yamada sürümün
 | Spring Boot ve yönetilen modüller | Parent 3.5.16; web, JPA, security, validation, actuator, test, cache, mail, websocket, devtools | Spring/Hibernate sürümlerini ayrı ayrı yükseltmeyin. Parent/BOM güncellemesi ayrı test grubu; güvenlik duyuruları ve destek durumu yayın günü tekrar kontrol edilir. |
 | SQLite JDBC | 3.44.1.0 | Native sürücü güncellemesi ayrı grup. Olmayan CTB'nin oluşturulmaması, pool kapatma, dosya kilidinin bırakılması, rich-text nesne kayıtları ve transaction rollback Windows/Raspberry Pi'de test edilmeli. |
 | MySQL JDBC | 9.0.0 | Boot yönetimindeki sürümle uyumluluk ve MySQL/MariaDB kullanım kapsamı ayrıca incelenir. Gerçek sunucu bağlantısı test edilmeden “uyumlu” sayılmaz. |
-| PDFBox | 3.0.1 | Resmi 3.0.8 adayı mevcut. Güvenlik sayfasındaki 2026 path-traversal duyuruları `examples` modülünü ilgilendirir; core kullanımımız otomatik olarak bu açık sayılmaz. Font/görsel/PDF çıktısı ayrı test grubu. |
+| PDFBox | 3.0.8 (önce 3.0.1) | İkinci grupta 3.0.8 seçildi. Güvenlik sayfasındaki 2026 path-traversal duyuruları `examples` modülünü ilgilendirir; core kullanımımız otomatik olarak bu açık sayılmaz. Font/görsel/PDF çıktısı ayrı test grubu. |
 | OpenPDF ve extra fonts | 2.0.2 / 2.0.2 | Birlikte tutulur. 2.0.x Java 17; 2.1.x ve sonrası Java 21 ister. Yeni ana sürümler paket adı değişikliği de içerir. Java 17 dağıtımı korunurken doğrudan en yeni ana sürüme geçilmez. |
 | Flying Saucer PDF | 9.7.1 | OpenPDF ile çözülen transitif sürüm ve kullanılan HTML→PDF API'leri birlikte incelenir. |
 | jsoup | 1.17.2 | Resmi 1.23.2 adayı mevcut. XML/HTML serileştirme davranışı rich-text okuma/önizleme/rendering çıktılarını etkileyebilir; node 53 ve boş/alias/plain-text senaryoları karşılaştırılır. |
@@ -113,3 +113,53 @@ Tekrar denemek için `mvnw.cmd -Preports compile` yeterlidir. İlk çalıştırm
 Jansi native-access uyarısı Maven'ı çalıştıran JDK'ya aittir; bu rapor hatasının nedeni olarak değerlendirilmez. `git.dirty=true` değişiklikler henüz commit edilmeden derlendiğinde beklenir.
 
 Kaynak: https://maven.apache.org/plugins-archives/maven-dependency-plugin-3.9.0/plugin-info.html
+
+
+## İkinci güncelleme grubu: PDFBox
+
+Başlangıç commit'i: `b607b60`. İlk grubun Windows x64 paketleme workflow'u,
+rich-text düzenleme ve XLSX dışa aktarma kontrolleri kullanıcı tarafından başarılı
+olarak bildirilmiştir. PostgreSQL sunucu testi bu bildirimde yer almamaktadır.
+
+PDFBox 3.0.1 → 3.0.8 olarak güncellenir. `pdfbox.version` property’si sürümü
+tek yerde tutar; `fontbox` ve `pdfbox-io` PDFBox'ın transitif bağımlılıklarıyla aynı
+3.0.8 sürümünde çözülmelidir. Resmi Java 8 minimum gereksinimi Java 17 ile uyumludur.
+Bu değişiklik, uygulamada belirli bir güvenlik açığının mevcut olduğunu iddia etmez.
+
+Maven Central'daki üç modülün yayımlanmış POM'ları karşılaştırılmıştır:
+3.0.1'de `junit-jupiter` için scope verilmediğinden `compile` kabul edilir;
+3.0.8'de açıkça `test` yazılmıştır. Önceki dependency-tree raporunda görülen
+JUnit compile/runtime bağımlılıklarının bu yoldan gelmesi böylece giderilir.
+Uygulamanın kendi `spring-boot-starter-test` bağımlılığı korunur. Ek exclusion
+veya elle fontbox sürümü zorlaması gerekmez.
+
+OpenPDF / extra fonts 2.0.2 ve Flying Saucer 9.7.1 bu grupta korunur.
+OpenPDF 2.1.x ve sonrası Java 21 gerektirdiğinden Java 17 paketine doğrudan
+geçiş yapılmaz; bu bileşenlerin bakım kararı ayrı değerlendirilir.
+
+### Kabul kontrolleri
+
+```bat
+mvnw.cmd clean package
+mvnw.cmd -Preports compile
+```
+
+- `target/dependency-tree.txt`: PDFBox, fontbox ve pdfbox-io 3.0.8 seçilmeli;
+  JUnit uygulama `compile` / `runtime` scope'uyla çözülmemelidir. Test scope'u normaldir.
+- Üretilen `target/SweetCherry.jar` ZIP olarak incelendiğinde `BOOT-INF/lib` altında
+  `junit-*`, `junit-platform-*` veya `opentest4j-*` bulunmamalıdır.
+- Login ve CTB seçimi ardından `/download-pdf` açılıp PDFBox örnek PDF'i indirilir;
+  Türkçe karakterler ve dosyanın açılması kontrol edilir. Bu eski örnek yolun font
+  dosyası erişimiyle ilgili bir hata varsa sürüm farkından ayrı değerlendirilir.
+- Düğümün PDF düğmesiyle de çıktı alınır. `/export-node-to-pdf/{nodeId}`
+  `PDFFromHTMLHelper` üzerinden OpenPDF kullanır; bu kontrol tek başına PDFBox
+  doğrulaması değildir. Türkçe metin, tablo ve görsel içeren düğüm denenir.
+- Windows Java 17 bundle workflow'u çalıştırılır; açılış ve PDF indirme kontrol edilir.
+
+Bu grupta Java kaynakları ve mevcut POM yorumları değiştirilmemiştir.
+Burada Maven çalıştırılmamıştır; build ve manuel kabul sonuçları ayrıca kaydedilir.
+
+POM kaynakları:
+- https://repo.maven.apache.org/maven2/org/apache/pdfbox/pdfbox/3.0.8/pdfbox-3.0.8.pom
+- https://repo.maven.apache.org/maven2/org/apache/pdfbox/fontbox/3.0.8/fontbox-3.0.8.pom
+- https://repo.maven.apache.org/maven2/org/apache/pdfbox/pdfbox-io/3.0.8/pdfbox-io-3.0.8.pom
