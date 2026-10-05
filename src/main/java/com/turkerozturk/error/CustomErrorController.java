@@ -43,7 +43,7 @@ public class CustomErrorController implements ErrorController {
         this.errorAttributes = errorAttributes;
     }
 
-    /** Keeps exception details in server logs and exposes only a status and correlation ID. */
+    /** Logs missing pages without a stack trace and exposes only a status and correlation ID. */
     @RequestMapping("/error")
     public String handleError(WebRequest webRequest, Map<String, Object> model) {
         Map<String, Object> attributes = errorAttributes.getErrorAttributes(
@@ -52,12 +52,17 @@ public class CustomErrorController implements ErrorController {
         int statusCode = status instanceof Integer code && code >= 400 && code <= 599 ? code : 500;
         String errorId = java.util.UUID.randomUUID().toString();
         Throwable failure = errorAttributes.getError(webRequest);
-        logger.warn("Request failed: errorId={}, status={}", errorId, statusCode, failure);
+        if (statusCode == 404) {
+            // Missing resources are normal request outcomes; never log their path or query string.
+            logger.info("Page not found: errorId={}, status=404", errorId);
+        } else {
+            logger.warn("Request failed: errorId={}, status={}", errorId, statusCode, failure);
+        }
 
         org.springframework.http.HttpStatus httpStatus = org.springframework.http.HttpStatus.resolve(statusCode);
         model.put("status", statusCode);
         model.put("error", httpStatus == null ? "Request failed" : httpStatus.getReasonPhrase());
         model.put("errorId", errorId);
-        return "error";
+        return statusCode == 404 ? "errors/404" : "error";
     }
 }

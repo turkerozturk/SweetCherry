@@ -12,6 +12,24 @@ import static org.mockito.Mockito.*;
 
 class CustomErrorControllerTest {
     @Test
+    @org.junit.jupiter.api.extension.ExtendWith(org.springframework.boot.test.system.OutputCaptureExtension.class)
+    void missingPageUsesDedicatedViewAndLogsNoExceptionDetails(
+            org.springframework.boot.test.system.CapturedOutput output) {
+        var attributes = mock(ErrorAttributes.class);
+        var request = new ServletWebRequest(new MockHttpServletRequest());
+        when(attributes.getErrorAttributes(eq(request), any(ErrorAttributeOptions.class)))
+                .thenReturn(Map.of("status", 404, "path", "/private404-marker"));
+        when(attributes.getError(request)).thenReturn(new IllegalArgumentException("private404-marker"));
+        var model = new ExtendedModelMap();
+        assertThat(new CustomErrorController(attributes).handleError(request, model)).isEqualTo("errors/404");
+        assertThat(model.keySet()).containsExactlyInAnyOrder("status", "error", "errorId");
+        assertThat(model.get("status")).isEqualTo(404);
+        assertThat(model.get("errorId").toString()).matches("[0-9a-f-]{36}");
+        assertThat(output.getAll()).contains("Page not found: errorId=", "status=404")
+                .doesNotContain("private404-marker", "IllegalArgumentException", "Request failed:");
+    }
+
+    @Test
     void neverExposesExceptionMessageTraceBindingErrorsOrPath() {
         var attributes = mock(ErrorAttributes.class);
         var request = new ServletWebRequest(new MockHttpServletRequest());
