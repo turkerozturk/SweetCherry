@@ -25,11 +25,12 @@
     document.addEventListener('submit',event=>{
         const form=event.target;if(!form.matches('[data-node-duplicate]'))return;
         const button=event.submitter;
-        if(form.dataset.duplicateReady!=='ready' || !button || button.disabled || !['single','subtree'].includes(button.dataset.duplicate)) {event.preventDefault();return;}
+        if(form.dataset.duplicateReady!=='ready' || !button || button.disabled || !['single','subtree','shared'].includes(button.dataset.duplicate)) {event.preventDefault();return;}
         const subtree=button.dataset.duplicate==='subtree';
-        const message=subtree?form.dataset.confirmSubtree.replace('%COUNT%',form.dataset.subtreeCount):form.dataset.confirmSingle;
+        const shared=button.dataset.duplicate==='shared';
+        const message=shared?form.dataset.confirmShared:subtree?form.dataset.confirmSubtree.replace('%COUNT%',form.dataset.subtreeCount):form.dataset.confirmSingle;
         if(!window.confirm(message)){event.preventDefault();return;}
-        form.elements.withSubnodes.value=String(subtree);form.dataset.duplicateReady='submitting';
+        form.elements.createShared.value=String(shared);form.elements.withSubnodes.value=String(subtree);form.dataset.duplicateReady='submitting';
         form.querySelectorAll('[data-duplicate]').forEach(control=>{control.disabled=true;});
     });
     new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan();

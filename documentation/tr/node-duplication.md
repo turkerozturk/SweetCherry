@@ -27,3 +27,7 @@ Mobil okuyucuda tam ağaç paneli her açıldığında güncel kayıtlarla yükl
 4. Onayı iptal edin; yeni kayıt oluşmamalı. Veri kaynağı değiştirildikten sonra eski sekmeden çoğaltma reddedilmeli.
 5. CherryTree'de bir düğümü taşıyın; SweetCherry'de düğüme tıklayın. Ağaç yeni yerleşimi göstermeli; değişmeyen ağaçta fold/scroll durumu korunmalı.
 6. CTB'yi CherryTree'de açıp kopyaları, sıralamayı ve içeriği doğrulayın.
+
+## Paylaşımlı düğüm oluşturma
+
+Yeni masaüstü ve mobil okuyucularda Çoğalt menüsündeki **Paylaşımlı Düğüm Oluştur**, seçili occurrence'ın hemen ardından aynı parent altında kardeş oluşturur. Yeni node_id hem node hem children kimliklerinden büyük seçilir. Yalnız children kaydı eklenir; master_id gerçek düğümü gösterir. Kaynak zaten paylaşımlıysa onun gerçek master'ı kullanılır; alias zinciri oluşturulmaz. İçerik/obje satırları, zaman damgaları ve bookmarklar kopyalanmaz. Kardeş sıraları normalleştirilir. Yönetici ve yazılabilir tenant gerekir; CSRF, tenant görünüm token'ı ve ağaç revision kontrolü korunur. Paylaşımlı düğüm içeriği master ile ortaktır; bağımsız içerik isteniyorsa gerçek düğüm çoğaltılır. Desteklenmeyen paylaşımlı parent yerleşimleri ve eski ağaç revision'ı reddedilir.

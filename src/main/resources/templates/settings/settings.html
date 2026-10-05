@@ -4,19 +4,13 @@
 <body><section layout:fragment="content">
 <h1 th:text="#{settings.otherInfo}"></h1>
 <p th:text="#{settings.configurationFile}"></p>
+<p><span th:text="#{settings.requestAddress}"></span> <code th:text="${requestAddress}"></code></p>
+<p th:text="#{settings.portOverview}"></p>
+<p><a href="https://github.com/turkerozturk/SweetCherry/blob/main/documentation/tr/settings.md" target="_blank" rel="noopener noreferrer" th:text="#{settings.guide}"></a></p>
 <div class="table-responsive"><table class="table table-sm">
-<thead><tr><th th:text="#{settings.tableColumnHeader.valueLabel}"></th><th th:text="#{settings.tableColumnHeader.currentValue}"></th></tr></thead>
-<tbody>
-<tr><td>myapp.openWebBrowserOnStartup</td><td th:text="${openWebBrowserOnStartup}"></td></tr>
-<tr><td>myapp.debug</td><td th:text="${debug}"></td></tr>
-<tr><td>myapp.syntax-highlighting.enabled</td><td th:text="${syntaxHighlightingEnabled}"></td></tr>
-<tr><td>astronomy.enabled</td><td th:text="${astronomyProperties.enabled}"></td></tr>
-<tr><td>astronomy.latitude</td><td th:text="${astronomyProperties.latitude}"></td></tr>
-<tr><td>astronomy.longitude</td><td th:text="${astronomyProperties.longitude}"></td></tr>
-<tr><td>astronomy.timezone</td><td th:text="${astronomyProperties.timezone}"></td></tr>
-<tr><td>server.port</td><td th:text="${serverPort}"></td></tr>
-<tr><td>server.ssl.enabled</td><td th:text="${sslEnabled}"></td></tr>
-</tbody></table></div>
+<thead><tr><th th:text="#{settings.tableColumnHeader.valueLabel}"></th><th th:text="#{settings.tableColumnHeader.currentValue}"></th><th th:text="#{settings.explanation}"></th></tr></thead>
+<tbody><tr th:each="item : ${configurationValues}"><td><code th:text="${item.key}"></code></td><td th:text="${item.value}"></td><td th:text="${#messages.msg('settings.explain.' + item.key)}"></td></tr></tbody>
+</table></div>
 <p th:text="#{settings.highlighterDescription}"></p>
 <p th:text="#{settings.astronomyTimezoneDescription}"></p>
 <p th:text="#{settings.tenantConfiguration}"></p>

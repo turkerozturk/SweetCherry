@@ -34,6 +34,15 @@ public class SettingsController {
     @Value("${myapp.syntax-highlighting.enabled:true}") private boolean syntaxHighlightingEnabled;
     @Value("${server.port:8080}") private int serverPort;
     @Value("${server.ssl.enabled:false}") private boolean sslEnabled;
+    @Value("${server.http.port:8080}") private int httpPort;
+    @Value("${server.address:127.0.0.1}") private String serverAddress;
+    @Value("${server.forward-headers-strategy:none}") private String forwardHeadersStrategy;
+    @Value("${server.servlet.session.timeout:30m}") private String sessionTimeout;
+    @Value("${myapp.security.proxy-https-enabled:false}") private boolean proxyHttpsEnabled;
+    @Value("${myapp.security.proxy-https-port:443}") private int proxyHttpsPort;
+    @Value("${myapp.security.hsts-enabled:false}") private boolean hstsEnabled;
+    @Value("${myapp.login.trusted-proxy-address:}") private String trustedProxyAddress;
+    @Value("${myapp.exportingFolderName:exportedFiles}") private String exportingFolderName;
     private final AstronomyService astronomyService;
 
     public SettingsController(AstronomyService astronomyService) { this.astronomyService = astronomyService; }
@@ -41,13 +50,34 @@ public class SettingsController {
     /** Exposes selected non-secret runtime information and configuration guidance for administrators. */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/settings")
-    public String getSettings(Model model) {
+    public String getSettings(Model model, jakarta.servlet.http.HttpServletRequest request) {
         model.addAttribute("astronomyProperties", astronomyService.astronomyProperties);
         model.addAttribute("openWebBrowserOnStartup", openWebBrowserOnStartup);
         model.addAttribute("debug", debug);
         model.addAttribute("syntaxHighlightingEnabled", syntaxHighlightingEnabled);
         model.addAttribute("serverPort", serverPort);
         model.addAttribute("sslEnabled", sslEnabled);
+        var values = new java.util.LinkedHashMap<String, Object>();
+        values.put("server.address", serverAddress);
+        values.put("server.port", serverPort);
+        values.put("server.http.port", httpPort);
+        values.put("server.ssl.enabled", sslEnabled);
+        values.put("server.forward-headers-strategy", forwardHeadersStrategy);
+        values.put("server.servlet.session.timeout", sessionTimeout);
+        values.put("myapp.security.proxy-https-enabled", proxyHttpsEnabled);
+        values.put("myapp.security.proxy-https-port", proxyHttpsPort);
+        values.put("myapp.security.hsts-enabled", hstsEnabled);
+        values.put("myapp.login.trusted-proxy-address", trustedProxyAddress);
+        values.put("myapp.openWebBrowserOnStartup", openWebBrowserOnStartup);
+        values.put("myapp.debug", debug);
+        values.put("myapp.syntax-highlighting.enabled", syntaxHighlightingEnabled);
+        values.put("myapp.exportingFolderName", exportingFolderName);
+        values.put("astronomy.enabled", astronomyService.astronomyProperties.isEnabled());
+        values.put("astronomy.latitude", astronomyService.astronomyProperties.getLatitude());
+        values.put("astronomy.longitude", astronomyService.astronomyProperties.getLongitude());
+        values.put("astronomy.timezone", astronomyService.astronomyProperties.getTimezone());
+        model.addAttribute("configurationValues", values);
+        model.addAttribute("requestAddress", request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort());
         return "settings/settings";
     }
 }

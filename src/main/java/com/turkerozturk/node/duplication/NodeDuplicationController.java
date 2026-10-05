@@ -18,8 +18,10 @@ public class NodeDuplicationController {
     /** Copies one occurrence or a complete branch and opens the newly allocated root in the same reader. */
     @PostMapping("/nodes/duplicate/{id}")
     public String duplicate(@PathVariable long id,@RequestParam(defaultValue="false") boolean withSubnodes,
-            @RequestParam String revision,@RequestParam(defaultValue="reader") String view) {
-        long result=service.duplicate(id,withSubnodes,revision);
+            @RequestParam String revision,@RequestParam(defaultValue="reader") String view,
+            @RequestParam(defaultValue="false") boolean createShared) {
+        if (createShared && withSubnodes) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST);
+        long result=createShared?service.createShared(id,revision):service.duplicate(id,withSubnodes,revision);
         return "tree".equals(view)?"redirect:/tree?nodeId="+result:"redirect:/nodes/"+result;
     }
 }

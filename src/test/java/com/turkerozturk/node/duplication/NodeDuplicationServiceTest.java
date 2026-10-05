@@ -112,4 +112,37 @@ class NodeDuplicationServiceTest {
         assertThatThrownBy(()->service.state(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.duplicate(1,true,"revision")).isInstanceOf(AccessDeniedException.class);
     }
+    @Test void sharedCreationAddsOnlySiblingOccurrenceAndPreservesMasterPayloads() throws Exception {
+        String revision=NodeDuplicationService.state(NodeDuplicationService.read(connection),1).revision();
+        long id=NodeDuplicationService.createShared(connection,1,revision);
+        assertThat(id).isEqualTo(13);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=13")).isEqualTo(1);
+        assertThat(number("SELECT father_id FROM children WHERE node_id=13")).isZero();
+        assertThat(number("SELECT sequence FROM children WHERE node_id=13")).isEqualTo(2);
+        assertThat(number("SELECT sequence FROM children WHERE node_id=2")).isEqualTo(3);
+        assertThat(number("SELECT COUNT(*) FROM node")).isEqualTo(3);
+        assertThat(number("SELECT COUNT(*) FROM image")).isEqualTo(2);
+        assertThat(number("SELECT COUNT(*) FROM grid")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM codebox")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM bookmark")).isEqualTo(2);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isEqualTo(20);
+    }
+    @Test void sharedCreationFromAliasPointsDirectlyToRealMaster() throws Exception {
+        String revision=NodeDuplicationService.state(NodeDuplicationService.read(connection),10).revision();
+        long id=NodeDuplicationService.createShared(connection,10,revision);
+        assertThat(number("SELECT master_id FROM children WHERE node_id="+id)).isEqualTo(3);
+        assertThat(number("SELECT father_id FROM children WHERE node_id="+id)).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id="+id)).isZero();
+    }
+    @Test void staleRevisionRejectsSharedCreationBeforeAnyChange() throws Exception {
+        String revision=NodeDuplicationService.state(NodeDuplicationService.read(connection),1).revision();
+        try(var statement=connection.createStatement()) {statement.execute("UPDATE children SET sequence=11 WHERE node_id=1");}
+        assertThatThrownBy(()->NodeDuplicationService.createShared(connection,1,revision)).isInstanceOf(ResponseStatusException.class);
+        assertThat(number("SELECT COUNT(*) FROM children")).isEqualTo(6);
+    }
+    @Test void readOnlyTenantRejectsSharedCreation() {
+        var properties=mock(NodePropertiesService.class);
+        when(properties.writable()).thenReturn(false);
+        assertThatThrownBy(()->new NodeDuplicationService(properties).createShared(1,"revision")).isInstanceOf(AccessDeniedException.class);
+    }
 }

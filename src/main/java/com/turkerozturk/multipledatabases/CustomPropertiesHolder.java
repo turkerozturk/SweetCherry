@@ -27,14 +27,20 @@ import java.util.Map;
 
 @Component
 public class CustomPropertiesHolder {
-    private final Map<String, Map<String, String>> customPropertiesMap = new HashMap<>();
+    private final Map<String, Map<String, String>> customPropertiesMap = new java.util.concurrent.ConcurrentHashMap<>();
 
     public void addCustomProperties(String tenantName, Map<String, String> properties) {
         customPropertiesMap.put(tenantName, properties);
     }
 
+    /** Treats removal without a selected tenant as a no-op. */
+    public void removeCustomProperties(String tenantName) {
+        if (tenantName != null) customPropertiesMap.remove(tenantName);
+    }
+
+    /** Returns no settings when a tenant is absent, so callers can apply their existing defaults. */
     public Map<String, String> getCustomProperties(String tenantName) {
-        return customPropertiesMap.get(tenantName);
+        return tenantName == null ? null : customPropertiesMap.get(tenantName);
     }
 }
 

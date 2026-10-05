@@ -13,3 +13,5 @@ SQLite JDBC normalde eksik dosyayı oluşturabilir. Mevcut CTB açılırken CREA
 Yükleme başarısızsa önceki oturum seçimi korunur; kullanıcıya genel açıklama, loga teknik neden verilir. İndirme ikonu `/tenants` sayfasında isim yanında durur; hover dosya adını gösterir. Tenant config dosyası bağlantı şifresi içerebildiğinden indirme yalnız ADMIN içindir ve HTTP cache kapalıdır. Tablo DB şifresini açık metin göstermez. Tenant dosyaları değiştirilmez ve SweetCherry yedek oluşturmaz.
 
 Manuel kontrol: CTB seç → sorgu aç → CTB kapat → Windows'ta dosyayı yeniden adlandır/overwrite et → kaynağı yeniden seç. Eksik dosyayla seçimde dosyanın kendiliğinden oluşmadığını kontrol et. Boş dosya ile seçimde okunur uyarı bekle. Menü ve seçim sayfasındaki yükleme/kapatma aynı backend'i kullanır. İki oturumla aynı kaynağı açıp kapatıldığında diğer oturumun yeniden kaynak seçmek zorunda kaldığını kontrol et.
+
+Tenant config silme ve aktarım güvenliği: [Ayarlar ve bağlantı portları](settings.md). Silme yalnız config dosyasını kaldırır; CTB veya uzak veritabanını silmez.

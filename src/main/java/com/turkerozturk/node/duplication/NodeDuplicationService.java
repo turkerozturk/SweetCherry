@@ -39,6 +39,40 @@ public class NodeDuplicationService {
         entityManager.clear();
         return result;
     }
+    /** Creates a sibling occurrence linked to the real master, without copying content or embedded objects. */
+    @Transactional
+    public long createShared(long id, String revision) {
+        requireWritable();
+        long result=entityManager.unwrap(org.hibernate.Session.class).doReturningWork(connection -> createShared(connection,id,revision));
+        entityManager.clear();
+        return result;
+    }
+
+    /** Inserts one alias row and normalizes sibling positions only after validating the supplied tree revision. */
+    static long createShared(Connection connection,long id,String expected) throws SQLException {
+        var snapshot=read(connection); var root=selected(snapshot,id);
+        validateAncestors(snapshot,root); branch(snapshot,root,false);
+        if (!revision(snapshot).equals(expected)) throw conflict();
+        long highest=Math.max(snapshot.realIds.stream().mapToLong(Long::longValue).max().orElse(0),
+                snapshot.rows.stream().mapToLong(Row::id).max().orElse(0));
+        if (highest==Long.MAX_VALUE) throw conflict();
+        long result=highest+1;
+        var siblings=snapshot.rows.stream().filter(row->row.parent==root.parent)
+                .sorted(Comparator.comparingLong(Row::sequence).thenComparingLong(Row::id)).toList();
+        int insertAt=siblings.indexOf(root)+1;
+        try(var statement=connection.prepareStatement("UPDATE children SET sequence=? WHERE node_id=?")) {
+            for(int at=0;at<siblings.size();at++) {
+                statement.setLong(1,at+1L+(at>=insertAt?1:0)); statement.setLong(2,siblings.get(at).id);
+                if(statement.executeUpdate()!=1) throw conflict();
+            }
+        }
+        try(var statement=connection.prepareStatement("INSERT INTO children(node_id,father_id,sequence,master_id) VALUES(?,?,?,?)")) {
+            statement.setLong(1,result); statement.setLong(2,root.parent); statement.setLong(3,insertAt+1L);
+            statement.setLong(4,root.master==0?root.id:root.master);
+            if(statement.executeUpdate()!=1) throw conflict();
+        }
+        return result;
+    }
     private void requireWritable() {
         if(!properties.writable()) throw new AccessDeniedException("The selected CTB is read-only.");
     }

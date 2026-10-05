@@ -30,7 +30,11 @@
         <tr th:each="tenant : ${tenants}">
             <td th:text="${tenant.tenantName == currentTenantName ? 'Active' : 'Passive'}"></td>
             <td><a th:href="@{/tenants/config(tenant=${tenant.tenantName})}" th:title="${tenant.fileName}" download aria-label="Download tenant configuration">
-                <i class="fas fa-download" aria-hidden="true"></i></a> <i><b th:text="${tenant.tenantName}"></b></i></td>
+                <i class="fas fa-download" aria-hidden="true"></i></a>
+                <form th:action="@{/tenants/config/delete}" method="post" class="d-inline" th:attr="data-confirm-message=#{tenant.delete.confirm(${tenant.fileName})}">
+                    <input type="hidden" name="tenant" th:value="${tenant.tenantName}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" th:title="#{tenant.delete.title}" th:aria-label="#{tenant.delete.title}"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                </form> <i><b th:text="${tenant.tenantName}"></b></i></td>
             <td th:text="${tenant.url}"></td>
             <td th:text="${tenant.username}"></td>
             <td>••••••</td>
@@ -42,5 +46,6 @@
         </tbody>
     </table>
 </section>
+<section layout:fragment="pageSpecificJsScripts"><script th:src="@{/js/node/confirmNodeCreation.js}"></script></section>
 </body>
 </html>

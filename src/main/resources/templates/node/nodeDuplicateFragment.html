@@ -2,9 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <form th:fragment="duplicateControls(view)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')"
       th:action="@{/nodes/duplicate/{id}(id=${requestedNodeId})}" method="post" data-node-duplicate
-      th:attr="data-state-url=@{/nodes/duplicate/{id}/state(id=${requestedNodeId})},data-error=#{node.duplicate.error},data-confirm-single=#{node.duplicate.confirmSingle},data-confirm-subtree=#{node.duplicate.confirmSubtree}">
+      th:attr="data-state-url=@{/nodes/duplicate/{id}/state(id=${requestedNodeId})},data-error=#{node.duplicate.error},data-confirm-shared=#{node.duplicate.confirmShared},data-confirm-single=#{node.duplicate.confirmSingle},data-confirm-subtree=#{node.duplicate.confirmSubtree}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" value="">
+<input type="hidden" name="createShared" value="false">
 <input type="hidden" name="withSubnodes" value="false">
 <input type="hidden" name="view" th:value="${view}">
 <div class="dropdown">
@@ -12,6 +13,8 @@
 <ul class="dropdown-menu">
 <li><button type="submit" class="dropdown-item" data-duplicate="single" disabled th:text="#{node.duplicate.single}"></button></li>
 <li th:if="${isSharedNode != true}"><button type="submit" class="dropdown-item" data-duplicate="subtree" disabled th:text="#{node.duplicate.subtree}"></button></li>
+<li><hr class="dropdown-divider"></li>
+<li><button type="submit" class="dropdown-item" data-duplicate="shared" disabled th:text="#{node.duplicate.shared}"></button></li>
 </ul></div>
 <span data-duplicate-error class="small text-danger" role="status"></span>
 </form>

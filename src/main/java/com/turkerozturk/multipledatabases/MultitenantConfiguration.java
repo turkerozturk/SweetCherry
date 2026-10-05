@@ -205,7 +205,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
     }
 
     /** Releases previous pools before replacing tenant registrations; refuses reload during active queries. */
-    public void reloadDataSource() {
+    public synchronized void reloadDataSource() {
         var routing = (MultitenantDataSource) dataSource();
         for (DataSource previous : routing.getResolvedDataSources().values()) {
             if (previous instanceof ManagedTenantDataSource managed) managed.close();
@@ -214,6 +214,22 @@ public class MultitenantConfiguration implements ApplicationContextAware {
         routing.setTargetDataSources(getResolvedDataSources());
         routing.afterPropertiesSet();
         logger.info("Data sources reloaded.");
+    }
+
+    /** Removes one config and its registration after releasing its pool; leaves database contents untouched. */
+    public synchronized void deleteTenantConfig(String tenant, Path file) throws IOException {
+        var routing = (MultitenantDataSource) dataSource();
+        var current = routing.getResolvedDataSources();
+        DataSource source = current.get(tenant);
+        if (source == null) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND);
+        if (!(source instanceof ManagedTenantDataSource managed)) throw new IllegalStateException("Unsupported data source lifecycle");
+        managed.close();
+        Files.delete(file);
+        Map<Object, Object> remaining = new HashMap<>(current);
+        remaining.remove(tenant);
+        routing.setTargetDataSources(remaining);
+        routing.afterPropertiesSet();
+        customPropertiesHolder.removeCustomProperties(tenant);
     }
 
     /** Releases pooled database resources when the application shuts down. */

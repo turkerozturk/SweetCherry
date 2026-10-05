@@ -28,6 +28,14 @@ public class TenantConfigDownloadController {
     @GetMapping("/tenants/config")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> download(@RequestParam String tenant) throws IOException {
+        Path file = resolve(tenants, properties, directory, tenant);
+        String name = file.getFileName().toString();
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(name, StandardCharsets.UTF_8).build().toString())
+                .contentType(MediaType.TEXT_PLAIN).body(Files.readAllBytes(file));
+    }
+    /** Accepts only a registered filename inside the configuration directory, including symlink checks. */
+    static Path resolve(TenantService tenants, CustomPropertiesHolder properties, Path directory, String tenant) throws IOException {
         if (!tenants.getAllTenants().containsKey(tenant)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         var custom = properties.getCustomProperties(tenant);
         String name = custom == null ? null : custom.get("propertyFileName");
@@ -37,8 +45,6 @@ public class TenantConfigDownloadController {
         try { file = root.resolve(name).toRealPath(); }
         catch (NoSuchFileException error) { throw new ResponseStatusException(HttpStatus.NOT_FOUND); }
         if (!file.startsWith(root) || !Files.isRegularFile(file)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
-                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(name, StandardCharsets.UTF_8).build().toString())
-                .contentType(MediaType.TEXT_PLAIN).body(Files.readAllBytes(file));
+        return file;
     }
 }
