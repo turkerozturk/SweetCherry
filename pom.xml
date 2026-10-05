@@ -15,6 +15,21 @@
 	<description>A web companion and viewer for CherryTree CTB note databases</description>
 	<url>https://github.com/turkerozturk/SweetCherry</url>
 
+	<scm>
+		<connection>scm:git:https://github.com/turkerozturk/SweetCherry.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/turkerozturk/SweetCherry.git</developerConnection>
+		<url>https://github.com/turkerozturk/SweetCherry</url>
+		<tag>HEAD</tag>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/turkerozturk/SweetCherry/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<system>GitHub Actions</system>
+		<url>https://github.com/turkerozturk/SweetCherry/actions</url>
+	</ciManagement>
+
 	<developers>
 		<developer>
 			<id>turkerozturk</id>
@@ -35,6 +50,12 @@
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<!-- Reviewed overrides: see documentation/tr/dependency-maintenance.md. -->
+		<commons-lang3.version>3.21.0</commons-lang3.version>
+		<commons-io.version>2.21.0</commons-io.version>
+		<commons-codec.version>1.20.0</commons-codec.version>
+		<poi.version>5.5.1</poi.version>
+		<postgresql.version>42.7.12</postgresql.version>
 	</properties>
 	<dependencies>
 
@@ -163,7 +184,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.7.3</version>
+			<version>${postgresql.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
@@ -207,28 +228,28 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.15.1</version>
+			<version>${commons-io.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.14.0</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>5.2.5</version>
+			<version>${poi.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.5</version>
+			<version>${poi.version}</version>
 		</dependency>
 
 		<!-- https://www.webjars.org/ -->
@@ -530,7 +551,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
-						<version>3.2.0</version>
+						<version>3.9.0</version>
 						<executions>
 							<execution>
 								<id>list-dependencies</id>
@@ -538,6 +559,15 @@
 								<goals>
 									<goal>list</goal>
 								</goals>
+							</execution>
+							<execution>
+								<id>dependency-tree</id>
+								<phase>compile</phase>
+								<goals><goal>tree</goal></goals>
+								<configuration>
+									<verbose>true</verbose>
+									<outputFile>${project.build.directory}/dependency-tree.txt</outputFile>
+								</configuration>
 							</execution>
 						</executions>
 						<configuration>

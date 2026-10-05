@@ -156,3 +156,7 @@ Kurulumdaki DNS, NAT/firewall, sertifika yenileme ve dış yapılandırma kayıt
 - [ ] [Üçüncü taraf lisans ve atıf envanteri](third-party-notices-plan.md) tamamlanıp gerekli dosyalar dağıtıma eklendi.
 
 - [ ] [Windows x64 Java içeren dağıtım](windows-bundled-distribution.md) CI ve gerçek Java kurulmamış Windows üzerinde denendi; EXE/ZIP, checksum ve runtime manifesti Release’e eklendi.
+
+## Bağımlılık bakım kabulü
+
+[Bağımlılık bakım belgesindeki](dependency-maintenance.md) ilk güncelleme grubunun otomatik/manüel kontrollerini tamamlayın. Çözülen transitif bağımlılık ağacının güvenlik incelemesi ve kalan SQLite, parser/PDF, frontend ve zaman dilimi güncelleme adayları ayrıca değerlendirilmelidir.
