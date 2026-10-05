@@ -8,7 +8,7 @@
 </head>
 <body class="tree-workspace-page">
 <header id="workspace-header"><th:block th:replace="~{common/header :: header}"></th:block></header>
-<main id="tree-workspace" th:attr="data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse},data-image-title=#{tree.openImage}">
+<main id="tree-workspace" th:attr="data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-missing=#{tree.nodeMissing},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse},data-image-title=#{tree.openImage}">
     <nav id="workspace-tree-pane" th:attr="aria-label=#{tree.workspace}">
         <a class="workspace-database" th:href="@{/tree(nodeId=0,_tenantView=${tenantViewToken})}" th:text="${currentTenantName}">Database</a>
         <ul id="workspace-tree"></ul>

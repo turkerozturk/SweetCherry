@@ -66,8 +66,14 @@
     async function request(path, signal) {
         const response = await fetch(path, {credentials: 'same-origin', cache: 'no-store', signal});
         if (response.status === 409) { stop(workspace.dataset.stale); throw new Error('stale'); }
-        if (response.redirected || response.status === 401) { stop(workspace.dataset.expired); throw new Error('expired'); }
-        if (!response.ok) throw new Error('load');
+        const loginRedirect = response.redirected && new URL(response.url, location.origin).pathname === '/login';
+        if (loginRedirect || response.status === 401) { stop(workspace.dataset.expired); throw new Error('expired'); }
+        if (!response.ok) {
+            const error = new Error('load');
+            error.status = response.status;
+            throw error;
+        }
+        if (response.redirected) throw new Error('unexpected redirect');
         return response;
     }
     function image(name) {
@@ -208,7 +214,17 @@
             }
             if (active === controller) { markSelected(id); save(); }
         } catch (error) {
-            if (error.name !== 'AbortError' && !stopped && active === controller) status.textContent = workspace.dataset.error;
+            // A deleted node may still be selected in this tab or in an old URL; keep the session usable.
+            if (error.status === 404 && Number(id) !== 0 && !stopped && active === controller) {
+                state.selected = 0;
+                expanded.delete(String(id));
+                save();
+                history.replaceState({nodeId: 0}, '', url('/tree', {nodeId: 0}));
+                await select(0, false, false);
+                if (!stopped) status.textContent = workspace.dataset.missing;
+                return;
+            }
+            if (error.name !== 'AbortError'  && !stopped && active === controller) status.textContent = workspace.dataset.error;
         } finally { if (active === controller) content.removeAttribute('aria-busy'); }
     }
     workspace.addEventListener('click', event => {
