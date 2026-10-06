@@ -74,37 +74,24 @@ public class PdfFromHtmlController {
 
     }
 
+    @Autowired
+    private NodePdfExportService nodePdfExportService;
+
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/export-node-to-pdf/{nodeId}")
     public ResponseEntity<byte[]> exportNodeAsPdf(@PathVariable long nodeId, HttpServletRequest request) {
-
-        // DATA (we are not using it for now, will use later)
-        Node node = nodeService.getById(nodeId);
-        // TEMPLATE ENGINE
-        Context context = new Context();
-        node = nodeContentParserService.parseNodeContent(node, request);
-
-        String txt = nodeContentParserService.parseNodeTxt(node, true);
-        node.setTxtAsHtml(txt);
-
-        context.setVariable( "newlinechar" , '\n' ) ;
-
-
-        context.setVariable("node", node);
-
-        String sourceHTMLContent = templateEngine.process("node/exportNodeToPdf", context);
-
-        // STRING HTML TO BYTE ARRAY PDF CONVERSION
-        byte[] pdfBytes = pdfFromHTMLHelper.createPdfFromHtml(sourceHTMLContent);
-
-        // PREPARATION FOR PDF FILE DOWNLOAD
-        String targetPdfFileName = node.getName();
+        var export = nodePdfExportService.export(nodeId);
+        String filename = export.title() == null ? "Node-" + nodeId : export.title();
+        filename = filename.replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "_").strip();
+        if (filename.isBlank()) filename = "Node-" + nodeId;
+        if (filename.length() > 120) filename = filename.substring(0, 120);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("filename", targetPdfFileName.replace(" ",""));
-        headers.setContentLength(pdfBytes.length);
-
-        // SERVING PDF FILE
-        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        headers.setContentDisposition(org.springframework.http.ContentDisposition.attachment()
+                .filename(filename + ".pdf", java.nio.charset.StandardCharsets.UTF_8).build());
+        headers.setContentLength(export.bytes().length);
+        headers.setCacheControl("no-store");
+        return new ResponseEntity<>(export.bytes(), headers, HttpStatus.OK);
     }
 
     @GetMapping("/cherrytemplatenode/pdf/{templateNodeId}")

@@ -234,3 +234,18 @@ root.about.description=Freeware sürümü kullanmaktasınız.\
 Bu yazılım, CherryTree isimli masaüstü uygulamasına ait veritabanını, sadece veri okuyacak biçimde kullanır.\
 2024, Türker Öztürk
 ```
+
+
+## 2026-10-07 — Düğüm PDF servisi
+
+Kaynak: `src/main/java/com/turkerozturk/pdf/PdfFromHtmlController.java`
+
+Eski node endpoint gövdesi ayrı PDF servisine taşınırken kaldırılan yorumlar:
+
+```java
+// DATA (we are not using it for now, will use later)
+// TEMPLATE ENGINE
+// STRING HTML TO BYTE ARRAY PDF CONVERSION
+// PREPARATION FOR PDF FILE DOWNLOAD
+// SERVING PDF FILE
+```

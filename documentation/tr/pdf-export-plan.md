@@ -80,3 +80,53 @@ geniş ve çok sayfalı tablo, farklı görsel hizaları, Türkçe ve Latin dı�
 Üretilen PDF browser ve ayrı PDF okuyucuda açılır; linkler/TOC tıklanır, renk ve
 sayfa seçenekleri karşılaştırılır. Yeni yol kabul edilene kadar mevcut yolun
 çalıştığı sürümle karşılaştırma yapılır.
+
+
+## 2026-10-07 — İlk düğüm PDF yolu
+
+Başlangıç commit'i `cd268fe`. `/export-node-to-pdf/{nodeId}` artık
+`NodePdfExportService` → `NodePdfDocument` → `NodePdfRenderer` zincirini kullanır.
+Rich-text için mevcut `RichTextRenderingService.render` çağrılır; plain text ve
+syntax düğümleri bu aşamada kaçışlanmış düz metin olarak alınır. Shared ağaç ID'si
+master içerik ID'sine çözülür. Tenant guard ve yeni mobil/masaüstü linklerinin
+`_tenantView` token'ı uygulanır. Template PDF ve diğer eski PDF endpoint'leri
+bu aşamada değiştirilmez.
+
+Seçeneksiz varsayılan: A4 dikey, 18 mm marj, renkli metin ve düğüm adı başlık.
+Fontlar mevcut `openpdf-fonts-extra:2.0.5` içindeki Liberation Sans / Mono'nun
+regular, bold, italic ve bold-italic dosyalarından PDF'ye gömülür. Yeni TTF kopyası,
+sistem font taraması veya internetten font indirme yoktur. Font kaynak ve lisansı
+aynı JAR'ın `liberation/README`, `liberation/LICENSE` ve `META-INF/LICENSES.md`
+dosyalarındadır. Türkçe/Latin ilk kabul kapsamıdır; CJK, emoji ve karmaşık yazı
+shaping'i bu fontlarla garanti edilmez.
+
+Satır sonları açık `br` olarak hazırlanır; format, paragraf hizası ve güvenli
+HTTP(S) linkler korunur. PNG'ler parser'ın veritabanı snapshot'ından alınır,
+en-boy oranıyla kullanılabilir sayfa alanına sığacak açık ölçüler verilir.
+Temel tablo kenarlıkları ve monospace codebox yerleşimi vardır. Sayfa içi anchor
+hedefleri korunur; dekoratif çapa ve ataç karakterleri PDF'ye eklenmez. Attachment
+adı metin olarak kalır; tenant token'lı dosya indirme adresleri PDF'ye taşınmaz.
+
+Kaynak erişimi: yalnız gömülü PNG, izin listesindeki sekiz Liberation fontu ve
+renderer'ın kendi classpath XHTML varsayılan CSS'i açılır. Başka URL/file/CSS
+kaynağı açılmaz; dış bağlantı hedefi PDF üretirken ziyaret edilmez. XML güvenli
+DOM olarak hazırlanır. Harici görsel kaynakları metin işaretiyle belirtilir.
+Tek uygulamada bir eşzamanlı PDF; fazlası 429. Metin 8 Mi karakter, hazırlanmış
+HTML 64 Mi karakter, toplam PNG 48 MiB, tek resim 40 milyon piksel üst sınırı.
+Bu ilk sınırlar henüz ayar ekranına bağlı değildir. Oluşturma hatası boş PDF
+indirmek yerine hata yanıtıyla sonuçlanır. Dosya adı UTF-8 attachment `.pdf` ve
+`Cache-Control: no-store` ile indirilir.
+
+Henüz tamamlanmayanlar: seçenek ekranı, geniş tablo/çok uzun kesintisiz kod ve URL
+sarma, codebox syntax rengi, ayrıntılı görsel hizası, TOC/outline, header/footer,
+font fallback ve Latin dışı diller. Normal sözcük aralarında satır sarma vardır.
+Bunlar sonraki aşamalarda örnek içerikle karşılaştırılacaktır.
+
+Kabul: `mvnw.cmd clean package`; desktop/mobile düğüm PDF, shared düğüm, boş/plain
+text, demo 53 ve araya metin giren çoklu resim. Türkçe harfleri, format birleşimini,
+link tıklamayı, satır sonlarını ve resimlerin üst üste binmediğini kontrol edin.
+`NodePdfExportTest` bu yolun temel üretim, font embedding, Unicode, bağlantı,
+resim ayrımı, kaynak kısıtı, shared çözümleme ve download header kontrolleridir.
+Burada tam Maven çalıştırılmadı; iki renderer sınıfı Java 17/ECJ ile derlenerek
+ayrı harness'te PDF üretimi doğrulandı. Üretilen örnekte Türkçe metin, gömülü
+fontlar, URI annotation'ı ve birbirinden ayrı iki resim alanı incelendi.
