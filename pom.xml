@@ -62,8 +62,8 @@
 		<sweetcherry.htmx.version>4.0.0</sweetcherry.htmx.version>
 		<sweetcherry.sqlite-jdbc.version>3.53.4.0</sweetcherry.sqlite-jdbc.version>
 		<sweetcherry.mysql-connector.version>9.0.0</sweetcherry.mysql-connector.version>
-		<sweetcherry.openpdf.version>2.0.2</sweetcherry.openpdf.version>
-		<sweetcherry.flying-saucer.version>9.7.1</sweetcherry.flying-saucer.version>
+		<sweetcherry.openpdf.version>2.0.5</sweetcherry.openpdf.version>
+		<sweetcherry.flying-saucer.version>9.13.3</sweetcherry.flying-saucer.version>
 		<sweetcherry.jsoup.version>1.23.2</sweetcherry.jsoup.version>
 		<sweetcherry.bootstrap.version>5.3.8</sweetcherry.bootstrap.version>
 		<sweetcherry.jquery-ui.version>1.14.2+1</sweetcherry.jquery-ui.version>

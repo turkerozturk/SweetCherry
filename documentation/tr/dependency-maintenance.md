@@ -36,8 +36,8 @@ Bu tablo `9908748` commit’indeki POM ile eşleştirilmiştir. “Korundu” if
 | SQLite JDBC | 3.53.4.0 | 2026-10-06 tarihinde güncellendi; 258 test başarılı. Native sürücü için Olmayan CTB'nin oluşturulmaması, pool kapatma, dosya kilidinin bırakılması, rich-text nesne kayıtları ve transaction rollback Windows/Raspberry Pi'de test edilmeli. |
 | MySQL JDBC | 9.0.0 | Boot yönetimindeki sürümle uyumluluk ve MySQL/MariaDB kullanım kapsamı ayrıca incelenir. Gerçek sunucu bağlantısı test edilmeden “uyumlu” sayılmaz. |
 | PDFBox | 3.0.8 (önce 3.0.1) | İkinci grupta 3.0.8 seçildi. Güvenlik sayfasındaki 2026 path-traversal duyuruları `examples` modülünü ilgilendirir; core kullanımımız otomatik olarak bu açık sayılmaz. Font/görsel/PDF çıktısı ayrı test grubu. |
-| OpenPDF ve extra fonts | 2.0.2 / 2.0.2 | Birlikte tutulur. 2.0.x Java 17; 2.1.x ve sonrası Java 21 ister. Yeni ana sürümler paket adı değişikliği de içerir. Java 17 dağıtımı korunurken doğrudan en yeni ana sürüme geçilmez. |
-| Flying Saucer PDF | 9.7.1 | OpenPDF ile çözülen transitif sürüm ve kullanılan HTML→PDF API'leri birlikte incelenir. |
+| OpenPDF ve extra fonts | 2.0.5 / 2.0.5 | Birlikte tutulur. 2.0.x Java 17; 2.1.x ve sonrası Java 21 ister. Yeni ana sürümler paket adı değişikliği de içerir. Java 17 dağıtımı korunurken doğrudan en yeni ana sürüme geçilmez. |
+| Flying Saucer PDF | 9.13.3 | OpenPDF ile çözülen transitif sürüm ve kullanılan HTML→PDF API'leri birlikte incelenir. |
 | jsoup | 1.23.2 | 2026-10-06 tarihinde güncellendi; 258 test başarılı. XML/HTML serileştirme davranışı rich-text okuma/önizleme/rendering çıktılarını etkileyebilir; node 53 ve boş/alias/plain-text senaryoları karşılaştırılır. |
 | Thymeleaf layout | 3.3.0 | Yerleşim ve fragment davranışlarıyla ayrı kontrol. |
 | Thymeleaf security extras | 3.1.1.RELEASE | Eski yorumda geçici bug override'ı var. Boot BOM'da 3.1.5.RELEASE görülüyor; admin/user görünürlük ve sunucu yetki testleriyle ayrı güncelleme adayı. Eski yorum ancak neden çözüldüğü doğrulanınca arşivlenerek değiştirilir. |
@@ -278,3 +278,46 @@ kabul sonucu bildirilmemiştir; önceki sonuçlar otomatik olarak yeni sete akta
 - Java 17 Windows bundle, PDFBox örneği ve düğüm PDF çıktısı için önceki kabul listeleri.
 
 Bu belge güncellemesi POM'a veya uygulama koduna müdahale etmez.
+
+
+## 2026-10-07 PDF bağımlılık grubu
+
+Başlangıç commit'i `0bebdf6`. OpenPDF / extra fonts 2.0.2 → 2.0.5 ve
+Flying Saucer 9.7.1 → 9.13.3 olarak eşleştirilir. PDFBox 3.0.8 korunur.
+Bu satırlar 2026-10-06 POM sürüm kaydının ardından gelen yeni gruptur.
+
+Maven Central metadata'da yayımlanan son 2.0.x OpenPDF/font paketi 2.0.5,
+son 9.x Flying Saucer PDF 9.13.3'tür. Yayımlanmış parent POM'ları Java 17
+hedefini doğrular; Flying Saucer parent 9.13.3 `openpdf.version=2.0.5` kullanır.
+OpenPDF 2.1+ ve Flying Saucer 10+ Java 21 istediği için bu gruba alınmaz.
+Bu seçim “Java 17'ye uygun son yayımlanmış sürüm”dür; ilgili eski dal için
+gelecekte güvenlik backport garantisi veya tam güvenlik onayı anlamına gelmez.
+
+Flying Saucer 9.12.1 sürüm notları XMLResource'ta dış entity erişiminin
+kapatıldığını kaydeder; 9.13.3 bu düzeltmeyi içerir. 10.4.0'da ayrıca
+DocumentBuilderFactory sertleştirmesi vardır; Java 17 dalına aynı düzeltmenin
+backport edildiği varsayılmaz. Yeni PDF yolunda kendi güvenli DOM hazırlığımız
+ve kapalı kaynak erişim politikamız gerekir. Transitive advisory taraması
+release kabulünün ayrı adımıdır.
+
+`PdfLibraryCompatibilityTest`, Flying Saucer → OpenPDF üretiminin PDFBox ile
+okunabildiğini, sayfa/metin ve dış bağlantı annotation'ını kontrol eder.
+Bu test henüz Unicode font, resim, TOC veya tam node export testi değildir.
+Mevcut HTMLWorker endpoint'i bu yamada değiştirilmez. Hiçbir PDF kütüphanesi
+silinmez veya comment edilmez; mevcut Java kodu onları hâlâ kullanır.
+
+Kabul: `mvnw.cmd clean package`, `mvnw.cmd -Preports compile`; ağaçta
+OpenPDF 2.0.5, extra fonts 2.0.5, Flying Saucer core/pdf 9.13.3 ve PDFBox
+3.0.8 seçildiğini kontrol edin. Mevcut düğüm PDF ve `/download-pdf` örneğini,
+Java 17 Windows bundle açılışını da deneyin. Bu grupta burada Maven çalıştırılmadı.
+
+Kaynaklar:
+- https://repo.maven.apache.org/maven2/com/github/librepdf/openpdf/maven-metadata.xml
+- https://repo.maven.apache.org/maven2/com/github/librepdf/openpdf-fonts-extra/maven-metadata.xml
+- https://repo.maven.apache.org/maven2/com/github/librepdf/openpdf-parent/2.0.5/openpdf-parent-2.0.5.pom
+- https://repo.maven.apache.org/maven2/org/xhtmlrenderer/flying-saucer-pdf/maven-metadata.xml
+- https://repo.maven.apache.org/maven2/org/xhtmlrenderer/flying-saucer-parent/9.13.3/flying-saucer-parent-9.13.3.pom
+- https://github.com/flyingsaucerproject/flyingsaucer/blob/main/CHANGELOG.md
+- https://github.com/flyingsaucerproject/flyingsaucer (Java gereksinimleri)
+- https://pdfbox.apache.org/security.html
+- [PDF dışa aktarma geliştirme planı](pdf-export-plan.md)
