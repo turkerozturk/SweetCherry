@@ -76,10 +76,10 @@ class NodePdfExportTest {
         when(children.findById(72L)).thenReturn(occurrence); when(occurrence.getMasterId()).thenReturn(53L);
         when(nodes.findById(53L)).thenReturn(master); when(master.getName()).thenReturn("Master");
         when(master.getTxt()).thenReturn("<node><rich_text>Hello</rich_text></node>");
-        when(master.getSyntax()).thenReturn("custom-colors"); when(rich.render(master, "")).thenReturn("<div>Hello</div>");
+        when(master.getSyntax()).thenReturn("custom-colors"); when(rich.renderForPdf(master, "")).thenReturn("<div>Hello</div>");
         when(renderer.render(any())).thenReturn(new byte[]{1});
         assertThat(new NodePdfExportService(children, nodes, rich, renderer).export(72).title()).isEqualTo("Master");
-        verify(rich).render(master, ""); verify(nodes, never()).findById(72L);
+        verify(rich).renderForPdf(master, ""); verify(nodes, never()).findById(72L);
     }
 
     @Test void handlesPlainTextAndReleasesPermitAfterMissingNode() {

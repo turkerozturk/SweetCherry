@@ -81,14 +81,14 @@ public class PdfFromHtmlController {
     @GetMapping("/export-node-to-pdf/{nodeId}")
     public ResponseEntity<byte[]> exportNodeAsPdf(@PathVariable long nodeId, HttpServletRequest request) {
         var export = nodePdfExportService.export(nodeId);
-        String filename = export.title() == null ? "Node-" + nodeId : export.title();
-        filename = filename.replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "_").strip();
-        if (filename.isBlank()) filename = "Node-" + nodeId;
-        if (filename.length() > 120) filename = filename.substring(0, 120);
+        return downloadResponse(export, nodeId);
+    }
+
+    static ResponseEntity<byte[]> downloadResponse(NodePdfExportService.Export export, long nodeId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDisposition(org.springframework.http.ContentDisposition.attachment()
-                .filename(filename + ".pdf", java.nio.charset.StandardCharsets.UTF_8).build());
+                .filename(PdfFilename.create(export.title(), nodeId), java.nio.charset.StandardCharsets.UTF_8).build());
         headers.setContentLength(export.bytes().length);
         headers.setCacheControl("no-store");
         return new ResponseEntity<>(export.bytes(), headers, HttpStatus.OK);

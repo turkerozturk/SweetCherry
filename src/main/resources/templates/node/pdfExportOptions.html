@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{pdf.options.title}"></title></head>
+<body><section layout:fragment="content">
+<h1 th:text="#{pdf.options.title}"></h1><p th:text="${nodeName}"></p>
+<p class="text-muted" th:text="#{pdf.options.remember}"></p>
+<div class="card"><div class="card-body">
+<form th:action="@{/nodes/pdf/{id}(id=${nodeId})}" method="post">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div class="row g-3 mb-3">
+<div class="col-sm-6"><label class="form-label" for="paper" th:text="#{pdf.options.paper}"></label>
+<select class="form-select" id="paper" name="paper"><option value="A4" th:selected="${options.paper == 'A4'}">A4</option><option value="Letter" th:selected="${options.paper == 'Letter'}">Letter</option></select></div>
+<div class="col-sm-6"><label class="form-label" for="orientation" th:text="#{pdf.options.orientation}"></label>
+<select class="form-select" id="orientation" name="orientation"><option value="portrait" th:selected="${options.orientation == 'portrait'}" th:text="#{pdf.options.portrait}"></option><option value="landscape" th:selected="${options.orientation == 'landscape'}" th:text="#{pdf.options.landscape}"></option></select></div></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="colors" id="colors" value="true" th:checked="${options.colors}"><label class="form-check-label" for="colors" th:text="#{pdf.options.colors}"></label></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="nodeTitle" id="nodeTitle" value="true" th:checked="${options.nodeTitle}"><label class="form-check-label" for="nodeTitle" th:text="#{pdf.options.nodeTitle}"></label></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="outline" id="outline" value="true" th:checked="${options.outline}"><label class="form-check-label" for="outline" th:text="#{pdf.options.outline}"></label></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="filenameHeader" id="filenameHeader" value="true" th:checked="${options.filenameHeader}"><label class="form-check-label" for="filenameHeader" th:text="#{pdf.options.filenameHeader}"></label></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="pageNumbers" id="pageNumbers" value="true" th:checked="${options.pageNumbers}"><label class="form-check-label" for="pageNumbers" th:text="#{pdf.options.pageNumbers}"></label></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="metadata" id="metadata" value="true" th:checked="${options.metadata}"><label class="form-check-label" for="metadata" th:text="#{pdf.options.metadata}"></label></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="sourceName" id="sourceName" value="true" th:checked="${options.sourceName}"><label class="form-check-label" for="sourceName" th:text="#{pdf.options.sourceName}"></label></div>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="sourceAddress" id="sourceAddress" value="true" th:checked="${options.sourceAddress}"><label class="form-check-label" for="sourceAddress" th:text="#{pdf.options.sourceAddress}"></label></div>
+<p class="form-text" th:text="#{pdf.options.metadataHelp}"></p>
+<button type="submit" class="btn btn-primary" th:text="#{pdf.options.download}"></button>
+<a class="btn btn-outline-secondary" th:href="@{/nodes/{id}(id=${nodeId},_tenantView=${tenantViewToken})}" th:text="#{pdf.options.back}"></a>
+</form></div></div></section></body></html>

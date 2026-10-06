@@ -18,6 +18,10 @@ public final class RichTextHtmlRenderer {
 
     /** Resolves only HTTP(S), numeric node links and encoded anchor fragments. */
     public String renderContent(RichTextDocument document, String tenantView) {
+        return renderContent(document, tenantView, false);
+    }
+
+    public String renderContent(RichTextDocument document, String tenantView, boolean pdfHeadings) {
         var html = new StringBuilder();
         for (var run : document.runs()) {
             var attributes = run.attributes();
@@ -43,7 +47,10 @@ public final class RichTextHtmlRenderer {
             if (href != null) html.append("<a href=\"").append(escape(href))
                     .append("\" target=\"_blank\" rel=\"noopener noreferrer\">");
             if (href != null) css.append("color:#3584e4;");
-            html.append("<span style=\"").append(css).append("\">").append(escape(run.text())).append("</span>");
+            html.append("<span style=\"").append(css).append("\"");
+            String heading = attributes.getOrDefault("scale", "");
+            if (pdfHeadings && heading.matches("h[1-6]")) html.append(" data-pdf-heading=\"").append(heading).append("\"");
+            html.append('>').append(escape(run.text())).append("</span>");
             if (href != null) html.append("</a>");
         }
         return html.toString();

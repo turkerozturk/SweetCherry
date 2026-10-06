@@ -114,6 +114,20 @@ class TenantRequiredInterceptorTest {
         }
     }
 
+    @Test
+    void pdfDownloadRequiresCurrentTenantView() throws Exception {
+        TenantContext.setCurrentTenant("Demo");
+        var session = new MockHttpSession();
+        session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN, "current");
+        var request = new MockHttpServletRequest("POST", "/nodes/pdf/53");
+        request.setSession(session);
+        assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isFalse();
+        request.setParameter("_tenantView", "old");
+        assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isFalse();
+        request.setParameter("_tenantView", "current");
+        assertThat(interceptor.preHandle(request, new MockHttpServletResponse(), handlerMethod("publicPage"))).isTrue();
+    }
+
     private HandlerMethod handlerMethod(String methodName) throws NoSuchMethodException {
         return new HandlerMethod(new TestHandler(), TestHandler.class.getMethod(methodName));
     }

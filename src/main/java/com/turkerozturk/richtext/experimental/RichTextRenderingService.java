@@ -16,6 +16,15 @@ public class RichTextRenderingService {
     /** Loads object snapshots and produces escaped HTML without invoking the legacy parser. */
     @Transactional(readOnly = true)
     public String render(Node node, String tenantView) {
+        return render(node, tenantView, false);
+    }
+
+    @Transactional(readOnly = true)
+    public String renderForPdf(Node node, String tenantView) {
+        return render(node, tenantView, true);
+    }
+
+    private String render(Node node, String tenantView, boolean pdfHeadings) {
         long contentId = node.getNodeId();
             var references = new CtbObjectReferences();
             var adapter = new EmbeddedContentAdapter();
@@ -27,7 +36,7 @@ public class RichTextRenderingService {
             for (var table : node.getGrids()) add(payloads, references.fromTable(table), adapter.fromTable(table));
             var document = new RichTextXmlReader().read(node.getTxt());
             var layout = new RichTextLayoutBuilder().build(document, new java.util.ArrayList<>(payloads.keySet()));
-        return new RichTextObjectHtmlRenderer().render(layout, payloads, tenantView);
+        return new RichTextObjectHtmlRenderer(pdfHeadings).render(layout, payloads, tenantView);
     }
 
     /** Keeps existing image zoom endpoints and turns same-node anchors into in-page links. */

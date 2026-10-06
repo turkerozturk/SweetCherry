@@ -130,3 +130,56 @@ resim ayrımı, kaynak kısıtı, shared çözümleme ve download header kontrol
 Burada tam Maven çalıştırılmadı; iki renderer sınıfı Java 17/ECJ ile derlenerek
 ayrı harness'te PDF üretimi doğrulandı. Üretilen örnekte Türkçe metin, gömülü
 fontlar, URI annotation'ı ve birbirinden ayrı iki resim alanı incelendi.
+
+
+## 2026-10-07 — Seçenek ekranı, outline ve metadata
+
+Başlangıç commit'i `21e593c`. Yeni mobil/masaüstü PDF düğmesi
+`/nodes/pdf/{nodeId}` seçenek ekranına gider. Aynı adrese POST başarılı PDF
+indirmesi üretir; CSRF ve zorunlu `_tenantView` kontrolü uygulanır. Eski doğrudan
+`/export-node-to-pdf/{nodeId}` adresi varsayılanlarla çalışmaya devam eder.
+
+Seçenekler: A4/Letter, dikey/yatay, renkli/gri tonlama (resimler dahil), düğüm
+adını başlıkta gösterme, PDF okuyucunun sol başlık paneli, dosya adı üst bilgisi,
+sayfa numarası/toplam sayfa alt bilgisi ve uygulama/kaynak metadata'sı.
+Başlık paneli PDF outline/bookmarks'tır; içeriğe içindekiler sayfası eklenmez.
+Rich-text h1–h6 ölçekleri yalnız PDF yolunda semantik bilgiyle işaretlenir;
+small/sub/sup ile h5'in aynı puntoyu kullanması yanlış başlık üretmez.
+Başlık satırının sayfa sınırında bölünmesi engellenerek hedef konumu korunur.
+Okuma sayfalarının HTML çıktısı değişmez.
+
+Varsayılanlar: A4 dikey, renkli, düğüm adı ve outline açık; üst/alt bilgi ile
+uygulama/kaynak metadata'sı kapalı. Başarılı indirmeden sonra `NODE_PDF_OPTIONS`
+oturum değeri yalnız seçimleri saklar. Düğüm ID'si, kaynak adı, bağlantı veya
+PDF içeriği oturum tercihinde saklanmaz. Diğer düğümün seçenek ekranı bu
+tercihleri getirir; yeni oturum varsayılanlara döner. Hatalı indirme mevcut
+tercihi değiştirmez. Veri kaynağı bilgisi her indirmede aktif tenant'tan alınır.
+
+Metadata açıkken Creator=SweetCherry ve node Title yazılır. İsteğe bağlı
+`SweetCherrySource` görünen tenant adını; `SweetCherryConnection` temizlenmiş
+bağlantı bilgisini taşır. Metadata kapalıysa bu alanlar, Creator, Title, Author,
+Subject ve Keywords eklenmez/kaldırılır. PDF üretici kütüphanesinin standart
+Producer (OpenPDF), tarih, font ve PDF yapısal bilgileri bundan ayrı kalır.
+Bu seçim içerikteki kullanıcı metnini veya seçilmiş görünür header'ı silmez.
+
+Temizleme yalnız bilinen JDBC biçimlerini kabul eder: SQLite'ta klasörler ve
+parametreler kaldırılarak dosya adı; MySQL/MariaDB/PostgreSQL'de yalnız sunucu ve
+port kalır. Kullanıcı adı, şifre, query, fragment ve sunucu veritabanı yolu
+aktarılmaz. Bilinmeyen/bozuk biçimde bağlantı alanı eklenmez. Kaynak seçenekleri
+uygulama metadata'sı kapalıysa kapalı kabul edilir. Dosya adı/sunucu bilgisi de
+özel olabilir: kaynak seçenekleri varsayılan kapalıdır ve ekran PDF alıcısının
+bunları görebileceğini açıklar. Ham JDBC string veya credentials asla PDF'ye,
+ekran modeline veya oturum tercihine eklenmez.
+
+Kabul: `mvnw.cmd clean package`; seçenekleri değiştirerek ikinci düğüme geçin,
+oturum boyunca hatırlandığını kontrol edin. A4/Letter yönlerini, çok sayfalı
+header/footer'ı, resim/metin gri tonlamayı, h1–h6 outline hedeflerini (özellikle
+h5/small ayrımını) ve PDF properties/metadata alanlarını karşılaştırın. Metadata
+kapalı ve kaynak seçenekleri açık gönderilse bile kaynak alanları oluşmamalı.
+Shared düğümün kendi ağaç ID'si korunur; PDF içeriği master'dan alınır.
+
+Tam Maven burada çalıştırılmadı. Ayrı Java 17/ECJ renderer denemesi; dört kâğıt/yön
+kombinasyonunda ölçü, çok sayfalı outline hedefi, sayfa counter'ları, gömülü font,
+metadata açık/kapalı ve gri tonlama üretimini doğruladı. Poppler raster çıktısı
+üst/alt bilgi ve metin yerleşimi için gözle incelendi. Uzun kesintisiz kod/URL
+sarma, codebox syntax rengi ve Latin dışı font fallback sonraki aşamalardır.

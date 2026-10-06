@@ -39,9 +39,28 @@ public class NodePdfRenderer {
             renderer.layout();
             var output = new ByteArrayOutputStream();
             renderer.createPDF(output);
-            return output.toByteArray();
+            try (var pdf = org.apache.pdfbox.Loader.loadPDF(output.toByteArray())) {
+                var info = pdf.getDocumentInformation();
+                boolean enabled = "true".equals(meta(document, "sc-pdf-metadata"));
+                info.setCreator(enabled ? "SweetCherry" : null);
+                if (!enabled) { info.setTitle(null); info.setAuthor(null); info.setSubject(null); info.setKeywords(null); }
+                info.setCustomMetadataValue("SweetCherrySource", enabled ? meta(document, "sc-source-name") : null);
+                info.setCustomMetadataValue("SweetCherryConnection", enabled ? meta(document, "sc-source-address") : null);
+                var result = new ByteArrayOutputStream();
+                pdf.save(result);
+                return result.toByteArray();
+            }
         } catch (Exception error) {
             throw new IllegalStateException("Node PDF rendering failed", error);
         }
     }
+    private String meta(org.w3c.dom.Document document, String name) {
+        var elements = document.getElementsByTagName("meta");
+        for (int i = 0; i < elements.getLength(); i++) {
+            var element = (org.w3c.dom.Element) elements.item(i);
+            if (name.equals(element.getAttribute("name"))) return element.getAttribute("content");
+        }
+        return null;
+    }
+
 }

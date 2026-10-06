@@ -23,6 +23,21 @@ public class NodePdfExportService {
 
     @Transactional(readOnly = true)
     public Export export(long occurrenceId) {
+        return export(occurrenceId, PdfExportOptions.defaults(), null);
+    }
+
+    @Transactional(readOnly = true)
+    public String title(long occurrenceId) {
+        var occurrence = children.findById(occurrenceId);
+        if (occurrence == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        long contentId = occurrence.getMasterId() == null || occurrence.getMasterId() == 0 ? occurrenceId : occurrence.getMasterId();
+        var node = nodes.findById(contentId);
+        if (node == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return node.getName();
+    }
+
+    @Transactional(readOnly = true)
+    public Export export(long occurrenceId, PdfExportOptions options, PdfSourceMetadata.Source source) {
         if (!permit.tryAcquire()) throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         try {
             var occurrence = children.findById(occurrenceId);
@@ -34,14 +49,14 @@ public class NodePdfExportService {
             String text = node.getTxt() == null ? "" : node.getTxt();
             if (text.length() > 8 * 1024 * 1024) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
             String html;
-            if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = richText.render(node, "");
+            if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = richText.renderForPdf(node, "");
             else {
                 var fragment = org.jsoup.Jsoup.parseBodyFragment("");
                 fragment.body().appendElement("div").text(text);
                 fragment.outputSettings().prettyPrint(false);
                 html = fragment.body().html();
             }
-            return new Export(node.getName(), renderer.render(new NodePdfDocument().prepare(node.getName(), html, contentId)));
+            return new Export(node.getName(), renderer.render(new NodePdfDocument().prepare(node.getName(), html, contentId, options, source, PdfFilename.create(node.getName(), occurrenceId))));
         } finally { permit.release(); }
     }
 }

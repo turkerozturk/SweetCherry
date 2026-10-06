@@ -10,6 +10,9 @@ import com.turkerozturk.richtext.experimental.RichTextLayout.*;
 /** Experimental HTML composition. Missing or mismatched payloads fail visibly instead of dropping objects. */
 public final class RichTextObjectHtmlRenderer {
     private final RichTextHtmlRenderer textRenderer = new RichTextHtmlRenderer();
+    private final boolean pdfHeadings;
+    public RichTextObjectHtmlRenderer() { this(false); }
+    public RichTextObjectHtmlRenderer(boolean pdfHeadings) { this.pdfHeadings = pdfHeadings; }
 
     /** Requires a tenant-view token for download links; images are embedded PNG snapshots. */
     public String render(RichTextLayout layout, Map<EmbeddedObject, EmbeddedContent> contents, String tenantView) {
@@ -31,7 +34,7 @@ public final class RichTextObjectHtmlRenderer {
                     if (!lines[i].isEmpty()) {
                         alignment = align;
                         var fragment = new RichTextDocument.TextRun(lines[i], run.attributes(), 0);
-                        paragraph.append(textRenderer.renderContent(new RichTextDocument(List.of(fragment)), tenantView));
+                        paragraph.append(textRenderer.renderContent(new RichTextDocument(List.of(fragment)), tenantView, pdfHeadings));
                     }
                     if (i < lines.length - 1) {
                         appendParagraph(html, paragraph, alignment, true);

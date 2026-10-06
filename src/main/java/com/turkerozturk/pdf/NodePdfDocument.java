@@ -28,16 +28,37 @@ public final class NodePdfDocument {
         """;
 
     public org.w3c.dom.Document prepare(String title, String html, long contentId) {
+        return prepare(title, html, contentId, PdfExportOptions.defaults(), null);
+    }
+
+    public org.w3c.dom.Document prepare(String title, String html, long contentId,
+            PdfExportOptions options, PdfSourceMetadata.Source source) {
+        return prepare(title, html, contentId, options, source, PdfFilename.create(title, contentId));
+    }
+
+    public org.w3c.dom.Document prepare(String title, String html, long contentId,
+            PdfExportOptions options, PdfSourceMetadata.Source source, String filename) {
         if (html.length() > 64 * 1024 * 1024) throw new IllegalArgumentException("PDF content too large");
         var page = Jsoup.parse("<html xmlns='http://www.w3.org/1999/xhtml'><head><meta charset='UTF-8'/></head><body></body></html>");
         page.head().appendElement("title").text(title == null ? "SweetCherry" : title);
-        page.head().appendElement("style").text(fontFaces() + CSS);
-        page.body().appendElement("h1").addClass("node-title").text(title == null ? "" : title);
+        String css = CSS.replace("size: A4 portrait", "size: " + options.paper() + " " + options.orientation());
+        if (!options.colors()) css = css.replace("#3584e4", "#111");
+        if (options.filenameHeader()) css += "@page { @top-center { content: element(pdf-header); } } .pdf-header { position: running(pdf-header); font-size: 8pt; text-align: center; }";
+        if (options.pageNumbers()) css += "@page { @bottom-center { content: counter(page) ' / ' counter(pages); font-family: 'Liberation Sans'; font-size: 8pt; } }";
+        page.head().appendElement("style").text(fontFaces() + css);
+        if (!options.outline()) page.selectFirst("html").attr("data-pdf-bookmark", "exclude");
+        page.head().appendElement("meta").attr("name", "sc-pdf-metadata").attr("content", Boolean.toString(options.metadata()));
+        if (options.metadata() && source != null) {
+            if (options.sourceName() && source.name() != null) page.head().appendElement("meta").attr("name", "sc-source-name").attr("content", source.name());
+            if (options.sourceAddress() && source.address() != null) page.head().appendElement("meta").attr("name", "sc-source-address").attr("content", source.address());
+        }
+        if (options.filenameHeader()) page.body().appendElement("div").addClass("pdf-header").text(filename);
+        if (options.nodeTitle()) page.body().appendElement("h1").addClass("node-title").attr("data-pdf-bookmark", "1").text(title == null ? "" : title);
         var content = Jsoup.parseBodyFragment(html);
         content.select("script,style,link,iframe,object,embed,form,input,button").remove();
         for (var element : content.body().getAllElements()) {
             for (var attribute : new java.util.ArrayList<>(element.attributes().asList())) {
-                if (!java.util.Set.of("style", "href", "src", "id", "class", "colspan", "rowspan", "alt").contains(attribute.getKey()))
+                if (!java.util.Set.of("style", "href", "src", "id", "class", "colspan", "rowspan", "alt", "data-pdf-heading").contains(attribute.getKey()))
                     element.removeAttr(attribute.getKey());
             }
             // Only parser-generated CSS is retained; never allow resource-fetching CSS.
@@ -52,7 +73,19 @@ public final class NodePdfDocument {
                         && value.matches("[#a-zA-Z0-9 .%_-]+")) safe.append(key).append(':').append(value).append(';');
                 if ("font-family".equals(key)) safe.append("font-family:'Liberation Mono';");
             }
-            element.attr("style", safe.toString());
+            String cleaned = safe.toString();
+            if (!options.colors()) cleaned = cleaned.replaceAll("(?i)(^|;)(color):[^;]*", "$1$2:#111")
+                    .replaceAll("(?i)(^|;)(background-color):[^;]*", "$1$2:#fff");
+            element.attr("style", cleaned);
+            String heading = element.attr("data-pdf-heading");
+            if (options.outline() && heading.matches("h[1-6]")) {
+                var line = element.closest("div");
+                if (line != null && line.tagName().equals("div") && !line.hasAttr("data-pdf-bookmark")) {
+                    line.attr("data-pdf-bookmark", Integer.toString(Integer.parseInt(heading.substring(1)) + (options.nodeTitle() ? 1 : 0)));
+                    line.attr("style", line.attr("style") + "page-break-inside:avoid;");
+                }
+            }
+            element.removeAttr("data-pdf-heading");
         }
         content.select(".rich-text-attachment span").remove();
         for (var anchor : content.select(".rich-text-anchor")) anchor.text("");
@@ -78,7 +111,24 @@ public final class NodePdfDocument {
             if (totalImageBytes > 48 * 1024 * 1024) throw new IllegalArgumentException("PDF images too large");
             int[] size = imageSize(bytes);
             // Fix explicit dimensions before layout: max-width alone is insufficient in this renderer.
-            double scale = Math.min(1, Math.min(657.0 / size[0], 950.0 / size[1]));
+            double width = options.paper().equals("A4") ? 793.7 : 816;
+            double height = options.paper().equals("A4") ? 1122.5 : 1056;
+            if (options.orientation().equals("landscape")) { double swap = width; width = height; height = swap; }
+            double scale = Math.min(1, Math.min((width - 144) / size[0], (height - 160) / size[1]));
+            if (!options.colors()) {
+                try {
+                    var bitmap = ImageIO.read(new ByteArrayInputStream(bytes));
+                    var gray = new java.awt.image.BufferedImage(size[0], size[1], java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                    for (int y = 0; y < size[1]; y++) for (int x = 0; x < size[0]; x++) {
+                        int pixel = bitmap.getRGB(x, y);
+                        int value = (int)(.299 * ((pixel >> 16) & 255) + .587 * ((pixel >> 8) & 255) + .114 * (pixel & 255));
+                        gray.setRGB(x, y, (pixel & 0xff000000) | (value << 16) | (value << 8) | value);
+                    }
+                    var output = new java.io.ByteArrayOutputStream();
+                    ImageIO.write(gray, "png", output);
+                    image.attr("src", "data:image/png;base64," + Base64.getEncoder().encodeToString(output.toByteArray()));
+                } catch (java.io.IOException error) { throw new IllegalArgumentException("PDF image conversion failed", error); }
+            }
             image.attr("style", "width:" + Math.max(1, (int)(size[0] * scale)) + "px;height:"
                     + Math.max(1, (int)(size[1] * scale)) + "px;");
         }

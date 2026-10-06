@@ -40,4 +40,11 @@ class RichTextRenderingServiceTest {
         when(images.getImagesByNodeId(53L)).thenReturn(List.of(image));
         assertThat(service.renderLive(node, "token")).contains("/images/53/1?_tenantView=token", "max-width:100%").doesNotContain("data:image/png");
     }
+    @Test void pdfHeadingsDistinguishH5FromSmallWithoutChangingLiveHtml() {
+        var node = node("<node><rich_text scale='h5'>Heading</rich_text><rich_text scale='small'>Small</rich_text></node>");
+        assertThat(service.renderForPdf(node, "")).contains("data-pdf-heading=\"h5\"");
+        assertThat(service.render(node, "")).doesNotContain("data-pdf-heading");
+        assertThat(service.renderForPdf(node, "").split("data-pdf-heading", -1)).hasSize(2);
+    }
+
 }
