@@ -1,8 +1,10 @@
 # Maven bağımlılık bakımı ve release doğrulaması
 
-İnceleme tarihi: 2026-10-05. Başlangıç commit'i: `dded6a0`.
+İlk inceleme: 2026-10-05 (`dded6a0`). Son sürüm kaydı: 2026-10-06, `pom.xml` commit'i `9908748d625bc5e0f93e2407abf1917fcac26d78`.
 
-Bu belge doğrudan `pom.xml` bağımlılıklarının, ilgili resmi sürüm/güvenlik duyurularının ve bazı transitif sürüm ilişkilerinin ilk incelemesini kaydeder. **Tam bir CVE taraması veya güvenlik sertifikasyonu değildir.** Eski sürüm kullanmak tek başına bir açığın uygulamada tetiklenebildiğini göstermez. Maven'ın çözdüğü transitif ağacın ve dağıtılan JAR'ın ayrıca incelenmesi gerekir. Buradaki yeni sürümler, yayın kabul testleri tamamlanana kadar adaydır.
+Güncel sürüm tablosu aşağıdaki POM durumunu gösterir; sonraki tarihsel bölümler önceki güncelleme adımlarını korur.
+
+Bu belge doğrudan `pom.xml` bağımlılıklarının, ilgili resmi sürüm/güvenlik duyurularının ve bazı transitif sürüm ilişkilerinin ilk incelemesini kaydeder. **Tam bir CVE taraması veya güvenlik sertifikasyonu değildir.** Eski sürüm kullanmak tek başına bir açığın uygulamada tetiklenebildiğini göstermez. Maven'ın çözdüğü transitif ağacın ve dağıtılan JAR'ın ayrıca incelenmesi gerekir. POM’da seçilmiş sürümler ile tamamlanmış kabul kontrolleri ayrı kaydedilir; bir sürümün tabloda bulunması bütün platformlarda doğrulandığı anlamına gelmez.
 
 ## Sürümleme ve POM bilgileri
 
@@ -14,7 +16,7 @@ Bu belge doğrudan `pom.xml` bağımlılıklarının, ilgili resmi sürüm/güve
 
 ## İlk güncelleme grubu
 
-| Bileşen | Önce | Aday sürüm | Gerekçe ve kontrol |
+| Bileşen | Önce | POM sürümü | Gerekçe ve kontrol |
 |---|---|---|---|
 | Commons Lang | 3.14.0 | 3.21.0 | 3.18.0'da `ClassUtils.getClass` için aşırı uzun girdide recursion/StackOverflow düzeltmesi var (CVE-2025-48924 ile ilgili). Daha güncel 3.x bakım sürümü seçildi. Kullanılan EnumUtils ve HTML escaping yolları test edilmeli. |
 | Commons IO | 2.15.1 | 2.21.0 | POI 5.5.1'in ilan ettiği sürümle eşleştirildi. CVE-2024-47554 için resmi etkilenen aralık 2.14.0 öncesidir; eski 2.15.1'i bu açıkla ilişkilendirmiyoruz. |
@@ -22,25 +24,25 @@ Bu belge doğrudan `pom.xml` bağımlılıklarının, ilgili resmi sürüm/güve
 | POI ve POI OOXML | 5.2.5 | 5.5.1 | İki modül aynı property kullanır. OOXML okurken yinelenen ZIP entry adlarıyla ilgili CVE-2025-31672, 5.4.0 öncesini etkiler. Mevcut XLSX yolu üretim içindir; bu bilgi uygulamanın açığa karşı sömürülebilir olduğunu kanıtlamaz. |
 | PostgreSQL JDBC | 42.7.3 | 42.7.12 | Bakım güncellemesi. `channelBinding=require` için CVE-2026-54291 düzeltmesi 42.7.12'de. 42.7.3 bu duyurudaki etkilenen 42.7.4–42.7.11 aralığında değildir. Boot 3.5.16'nın 42.7.11 sürümüne körlemesine dönülmez. |
 
-Maven Central'da aday sürümlerin POM dosyalarının mevcut olduğu kontrol edildi. Bu, uygulama uyumluluk testinin yerine geçmez. POI POM'ları Commons IO 2.21.0 ve Commons Codec 1.20.0 kullanır; doğrudan bağımlılıklar ve Boot dependency management bu gereksinimleri eski sürümlere çekmemelidir.
+İlk grup incelemesinde Maven Central'da seçilen sürümlerin POM dosyalarının mevcut olduğu kontrol edildi. Bu, uygulama uyumluluk testinin yerine geçmez. POI POM'ları Commons IO 2.21.0 ve Commons Codec 1.20.0 kullanır; doğrudan bağımlılıklar ve Boot dependency management bu gereksinimleri eski sürümlere çekmemelidir.
 
-## Diğer doğrudan bağımlılıklar ve sonraki gruplar
+## Güncel diğer doğrudan bağımlılıklar ve kalan kontroller
 
-Aşağıdaki “korundu” ifadesi güvenlik onayı değil, bu yamada sürümün değiştirilmediği anlamına gelir. Önce ilk grubun kabul testleri tamamlanır; sonraki gruplar ayrı yamalarda ele alınır.
+Bu tablo `9908748` commit’indeki POM ile eşleştirilmiştir. “Korundu” ifadesi güvenlik onayı değil, ilgili güncelleme grubunda sürümün değiştirilmediği anlamına gelir. Son test ve manuel kontrol durumu aşağıdaki 2026-10-06 kaydındadır.
 
 | Grup | Mevcut sürümler | Sonraki işlem |
 |---|---|---|
 | Spring Boot ve yönetilen modüller | Parent 3.5.16; web, JPA, security, validation, actuator, test, cache, mail, websocket, devtools | Spring/Hibernate sürümlerini ayrı ayrı yükseltmeyin. Parent/BOM güncellemesi ayrı test grubu; güvenlik duyuruları ve destek durumu yayın günü tekrar kontrol edilir. |
-| SQLite JDBC | 3.44.1.0 | Native sürücü güncellemesi ayrı grup. Olmayan CTB'nin oluşturulmaması, pool kapatma, dosya kilidinin bırakılması, rich-text nesne kayıtları ve transaction rollback Windows/Raspberry Pi'de test edilmeli. |
+| SQLite JDBC | 3.53.4.0 | 2026-10-06 tarihinde güncellendi; 258 test başarılı. Native sürücü için Olmayan CTB'nin oluşturulmaması, pool kapatma, dosya kilidinin bırakılması, rich-text nesne kayıtları ve transaction rollback Windows/Raspberry Pi'de test edilmeli. |
 | MySQL JDBC | 9.0.0 | Boot yönetimindeki sürümle uyumluluk ve MySQL/MariaDB kullanım kapsamı ayrıca incelenir. Gerçek sunucu bağlantısı test edilmeden “uyumlu” sayılmaz. |
 | PDFBox | 3.0.8 (önce 3.0.1) | İkinci grupta 3.0.8 seçildi. Güvenlik sayfasındaki 2026 path-traversal duyuruları `examples` modülünü ilgilendirir; core kullanımımız otomatik olarak bu açık sayılmaz. Font/görsel/PDF çıktısı ayrı test grubu. |
 | OpenPDF ve extra fonts | 2.0.2 / 2.0.2 | Birlikte tutulur. 2.0.x Java 17; 2.1.x ve sonrası Java 21 ister. Yeni ana sürümler paket adı değişikliği de içerir. Java 17 dağıtımı korunurken doğrudan en yeni ana sürüme geçilmez. |
 | Flying Saucer PDF | 9.7.1 | OpenPDF ile çözülen transitif sürüm ve kullanılan HTML→PDF API'leri birlikte incelenir. |
-| jsoup | 1.17.2 | Resmi 1.23.2 adayı mevcut. XML/HTML serileştirme davranışı rich-text okuma/önizleme/rendering çıktılarını etkileyebilir; node 53 ve boş/alias/plain-text senaryoları karşılaştırılır. |
+| jsoup | 1.23.2 | 2026-10-06 tarihinde güncellendi; 258 test başarılı. XML/HTML serileştirme davranışı rich-text okuma/önizleme/rendering çıktılarını etkileyebilir; node 53 ve boş/alias/plain-text senaryoları karşılaştırılır. |
 | Thymeleaf layout | 3.3.0 | Yerleşim ve fragment davranışlarıyla ayrı kontrol. |
 | Thymeleaf security extras | 3.1.1.RELEASE | Eski yorumda geçici bug override'ı var. Boot BOM'da 3.1.5.RELEASE görülüyor; admin/user görünürlük ve sunucu yetki testleriyle ayrı güncelleme adayı. Eski yorum ancak neden çözüldüğü doğrulanınca arşivlenerek değiştirilir. |
-| WebJars | locator 0.52; Bootstrap 5.3.3; bootstrap-select 1.13.18; Popper 2.11.7; jQuery 3.7.1; jQuery UI 1.13.2; Font Awesome 6.5.2; htmx 1.9.12; hyperscript 2.0.2 | Kullanılan template/API yollarını belirleyip güncelleyin; eski dashboard/help yolları da kontrol edilir. Büyük sürüm geçişleri otomatik yapılmaz. |
-| Astronomi ve zaman | commons-suncalc 3.10; time4j-base/sqlxml 5.9.1; time4j-tzdata 5.0-2022a | Paketli zaman dilimi verisi eski. Gerçekte kullanılan provider ve Java runtime tzdata ilişkisi incelenmeden yalnız artifact adına göre güncelleme yapılmaz. Kutup yazı ve timezone testleri korunur. |
+| WebJars | locator 0.52; Bootstrap 5.3.8; bootstrap-select 1.13.18; Popper 2.11.7; jQuery 3.7.1; jQuery UI 1.14.2+1; Font Awesome 7.3.0; htmx 4.0.0; hyperscript 2.0.2 | 2026-10-06 güncellemeleri ve genel sayfa kontrolü kaydedildi. Gerçekte yüklenen WebJar/statik dosya yolları ve etkileşimler ayrıca kontrol edilir; genel gezinme tüm yeni API’lerin kullanıldığını kanıtlamaz. |
+| Astronomi ve zaman | commons-suncalc 3.11; time4j-base/sqlxml 5.9.4; time4j-tzdata 5.0-2026b | 2026-10-06 tarihinde güncellendi; 258 test başarılı. Gerçekte kullanılan provider ve Java runtime tzdata ilişkisi ayrı incelenir. Kutup yazı ve timezone testleri korunur. |
 | OpenAPI | springdoc 2.8.13 | Spring Boot 3.x uyumluluğu ve endpoint erişim politikasıyla kontrol edilir. |
 
 POM dışındaki `src/main/resources/static` altında bulunan JavaScript/CSS kopyaları WebJar yükseltilince kendiliğinden güncellenmez. Ayrı envanter ve lisans kontrolü gerekir.
@@ -227,3 +229,52 @@ Kaynaklar:
 - https://github.com/LibrePDF/OpenPDF (Java ve paket adı gereksinimleri)
 - https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
 - https://docs.renovatebot.com/key-concepts/automerge/
+
+
+## 2026-10-06 sürüm güncellemeleri ve doğrulama kaydı
+
+Kaynak POM commit'leri:
+- https://github.com/turkerozturk/SweetCherry/commit/638d95921173cbc54abf4c594a90297110584ace
+- https://github.com/turkerozturk/SweetCherry/commit/9908748d625bc5e0f93e2407abf1917fcac26d78
+
+| Bağımlılık | Önce | Güncel POM sürümü | Property |
+|---|---|---|---|
+| htmx.org | 1.9.12 | 4.0.0 | `sweetcherry.htmx.version` |
+| sqlite-jdbc | 3.44.1.0 | 3.53.4.0 | `sweetcherry.sqlite-jdbc.version` |
+| jsoup | 1.17.2 | 1.23.2 | `sweetcherry.jsoup.version` |
+| jquery-ui | 1.13.2 | 1.14.2+1 | `sweetcherry.jquery-ui.version` |
+| font-awesome | 6.5.2 | 7.3.0 | `sweetcherry.font-awesome.version` |
+| commons-suncalc | 3.10 | 3.11 | `sweetcherry.suncalc.version` |
+| time4j-base | 5.9.1 | 5.9.4 | `sweetcherry.time4j.version` |
+| time4j-sqlxml | 5.9.1 | 5.9.4 | `sweetcherry.time4j.version` |
+| time4j-tzdata | 5.0-2022a | 5.0-2026b | `sweetcherry.time4j-tzdata.version` |
+| bootstrap | 5.3.3 | 5.3.8 | `sweetcherry.bootstrap.version` |
+
+POM'daki artifact adı `time4j-sqlxml`’dir. jQuery UI sürümündeki `+1` eki
+WebJar sürümünün parçasıdır ve tabloda aynen korunmuştur.
+
+### Bildirilen sonuçlar
+
+Kullanıcı bu güncellemeleri push etmiş ve her iki aşama için de
+`Tests run: 258, Failures: 0, Errors: 0, Skipped: 0` sonucunu bildirmiştir.
+Uygulama sayfalarında genel gezinme yapılmış, görünür bir problem gözlenmemiştir.
+Bu sonuçlar build/test ve genel gezinme doğrulamasıdır; her frontend etkileşiminin,
+PDF çıktısının veya native sürücünün bütün platformlarda sınandığı anlamına gelmez.
+
+İlk güncelleme grubu için daha önce bildirilen Windows x64 bundled distribution,
+rich-text düzenleme ve XLSX dışa aktarma başarıları tarihsel olarak korunur.
+Bu son sürüm seti için yeni Windows bundle / Raspberry Pi, PDF veya uzak veritabanı
+kabul sonucu bildirilmemiştir; önceki sonuçlar otomatik olarak yeni sete aktarılmaz.
+
+### Release öncesinde kalan hedefli kontroller
+
+- Yeni `dependency-tree` raporunda seçilen sürümleri ve transitif çakışmaları kontrol edin.
+- SQLite: CTB açma, rich-text nesne kaydı, rollback, kaynağı kapattıktan sonra dosya
+  kilidinin bırakılması ve olmayan dosyanın oluşturulmaması; Windows ve Raspberry Pi.
+- jsoup: node 53 okuma/düzenleme/kaydetme, HTML yapıştırma, link/resim/tablo ve boş içerik.
+- Web arayüzü: gerçekten yüklenen dosya sürümleri, mobil/masaüstü menüler, editör,
+  jQuery UI kullanılan ekranlar ve Font Awesome ikonları. Statik kopyalar POM ile değişmez.
+- Astronomi: widget, kutup senaryoları, saat dilimi ve tarih/saat gösterimi.
+- Java 17 Windows bundle, PDFBox örneği ve düğüm PDF çıktısı için önceki kabul listeleri.
+
+Bu belge güncellemesi POM'a veya uygulama koduna müdahale etmez.
