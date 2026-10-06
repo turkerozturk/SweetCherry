@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"><body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
 <section>
     <p th:unless="${astronomyEnabled}" th:text="#{astronomy.disabled}"></p>
     <th:block th:if="${astronomyEnabled}">

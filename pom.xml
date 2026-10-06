@@ -65,7 +65,7 @@
 		<sweetcherry.openpdf.version>2.0.2</sweetcherry.openpdf.version>
 		<sweetcherry.flying-saucer.version>9.7.1</sweetcherry.flying-saucer.version>
 		<sweetcherry.jsoup.version>1.23.2</sweetcherry.jsoup.version>
-		<sweetcherry.bootstrap.version>5.3.3</sweetcherry.bootstrap.version>
+		<sweetcherry.bootstrap.version>5.3.8</sweetcherry.bootstrap.version>
 		<sweetcherry.jquery-ui.version>1.14.2+1</sweetcherry.jquery-ui.version>
 		<sweetcherry.font-awesome.version>7.3.0</sweetcherry.font-awesome.version>
 		<!-- https://shredzone.org/maven/commons-suncalc/index.html -->
