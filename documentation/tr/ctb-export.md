@@ -106,3 +106,35 @@ Bağlantı tanım dosyalarını `allTenants` klasörüne yüklemek için SweetCh
 ## Freeplane / FreeMind dışa aktarma
 
 Yeni masaüstü ve mobil düğüm sayfalarının Export menüsünde **Freeplane / FreeMind (.mm)** bulunur. Ortak sayfa şablonundaki `/mindmap-export?nodeId=<ağaç-kimliği>` formu ID alanını doldurur; doğrudan açıldığında kimlik elle girilebilir. Tenant kapalıysa önce veri kaynağı seçimi gerekir. Görünüm token'ı ve POST CSRF kontrolü korunur. Paylaşımlı düğümde ID, shared occurrence'ın kendi kimliğidir; görünen ad/stiller master'dan okunur. Shared occurrence bir yapraktır; master'ın çocukları onun alt ağacı gibi dışa aktarılmaz. İkonlar seçilirse `.mm` dosyasının yanında eşleşen PNG ikonları içeren `ctbicons` klasörü gerekir.
+
+
+## Düşünce Haritası menüsü ve ikon paketi
+
+Yeni masaüstü ve mobil düğüm sayfalarında Düşünce Haritası menüsü sırasıyla
+Markmap, Mermaid ve Freeplane / FreeMind (.mm) seçeneklerini içerir.
+Freeplane bağlantısı Export grubundan bu gruba taşınmıştır. Paylaşımlı düğüm
+bağlantıları kendi ağaç kimliğini kullanır.
+
+`/mindmap-export` sayfasında düğüm ID’si boş bırakılırsa tüm veritabanı aktarılır.
+Veritabanı adı sanal kök (`ID_0`) olur; `father_id=0` kayıtları altında sıralı
+olarak yer alır. Veritabanı boşsa yalnız bu kök oluşur. ID girilirse önceki gibi
+ilgili dal aktarılır. Paylaşımlı düğüm master içeriğini gösterir; master'ın alt
+ağacı o paylaşımlı konumda genişletilmez. Seviye 0 yalnız kökü verir; tüm
+veritabanı aktarımında üst düzey gerçek düğümler seviye 1'dir.
+
+CherryTree ikonları varsayılan olarak dahil edilmez; indirme yalnız `.mm` olur.
+Dahil edilirse istek sırasında `.zip` oluşturulur: kökte `.mm`, yanında
+`ctbicons/` altında paketli PNG ikonları ve İngilizce `readme.txt` bulunur.
+İkonlar kaynak ağacına veya disk üzerindeki sabit geliştirme yoluna ihtiyaç
+olmadan, çalışmakta olan JAR'ın classpath kaynaklarından alınır. Kaynak ikon
+klasörüne readme yazılmaz; açıklama yalnız indirme arşivinde oluşturulur.
+
+İlk ikonlu harita için ZIP’i açıp `.mm` dosyasını o klasörden Freeplane ile açın.
+Sonraki ikonlu dışa aktarımların ZIP içindeki `.mm` dosyasını aynı klasöre
+koyabilirsiniz. İkonları dahil etmeden indirilen `.mm` ikon referansı içermez;
+mevcut ikon klasöründen otomatik ikon eklemez. Yeni uygulama sürümlerinde ikon
+seti değişirse ZIP'teki ikon klasörünü de yenileyin.
+
+Manuel kabul: masaüstü/mobil menü sırası, tek dal ve shared dal, boş ID ile tüm
+veritabanı ve boş veritabanı, level 0/1, ikonlu ZIP’i Freeplane'de açma ve ikonları
+harita yanında tutma. Paketli Windows dağıtımında da ZIP indirmesi denenmelidir.

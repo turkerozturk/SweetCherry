@@ -8,7 +8,7 @@
 <form th:action="@{/mindmap-export}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <div class="mb-3"><label class="form-label" for="nodeId" th:text="#{mindmap.export.root}"></label>
-<input class="form-control" type="number" name="nodeId" id="nodeId" min="1" step="1" required th:value="${nodeId}">
+<input class="form-control" type="number" name="nodeId" id="nodeId" min="1" step="1" th:value="${nodeId}">
 <div class="form-text" th:text="#{mindmap.export.rootHelp}"></div></div>
 <div class="mb-3"><label class="form-label" for="level" th:text="#{mindmap.export.level}"></label>
 <input class="form-control" type="number" name="level" id="level" min="0" step="1" th:placeholder="#{mindmap.export.allLevels}">

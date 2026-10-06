@@ -19,6 +19,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import com.turkerozturk.multipledatabases.TenantContext;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashSet;
@@ -60,7 +62,7 @@ public class MindMapExportController {
 
     @PostMapping("/mindmap-export")
     public ResponseEntity<byte[]> exportMindMap(
-            @RequestParam("nodeId") long nodeId,
+            @RequestParam(name = "nodeId", defaultValue = "0") long nodeId,
             @RequestParam(
                     name = "level",
                     required = false
@@ -77,8 +79,9 @@ public class MindMapExportController {
                     name = "includeColors",
                     defaultValue = "true"
             ) boolean includeColors
-    ) throws XMLStreamException {
+    ) throws XMLStreamException, IOException {
 
+        if (nodeId < 0) throw new ResponseStatusException(BAD_REQUEST);
         if (maximumLevel != null && maximumLevel < 0) {
             throw new ResponseStatusException(
                     BAD_REQUEST,
@@ -90,34 +93,16 @@ public class MindMapExportController {
                 foldModeValue
         );
 
-        Children rootChildren =
-                childrenRepository.findByNodeId(nodeId);
-
-        if (rootChildren == null) {
-            throw new ResponseStatusException(
-                    NOT_FOUND,
-                    "Children tablosunda nodeId bulunamadı: "
-                            + nodeId
-            );
+        Children rootChildren = nodeId == 0 ? null : childrenRepository.findByNodeId(nodeId);
+        if (nodeId != 0 && rootChildren == null) throw new ResponseStatusException(NOT_FOUND);
+        String rootName = nodeId == 0 ? databaseName() : findDisplayNode(rootChildren).getName();
+        byte[] mindMapContent = createMindMap(rootChildren, rootName, maximumLevel,
+                foldMode, includeIcons, includeColors);
+        String filename = sanitizeFilename(rootName) + "-" + nodeId + ".mm";
+        if (includeIcons) {
+            mindMapContent = new MindMapIconArchive().create(filename, mindMapContent);
+            filename = filename.substring(0, filename.length() - 3) + ".zip";
         }
-
-        Node rootDisplayNode = findDisplayNode(rootChildren);
-
-        byte[] mindMapContent = createMindMap(
-                rootChildren,
-                maximumLevel,
-                foldMode,
-                includeIcons,
-                includeColors
-        );
-
-        String rootName = rootDisplayNode.getName();
-
-        String filename =
-                sanitizeFilename(rootName)
-                        + "-"
-                        + nodeId
-                        + ".mm";
 
         ContentDisposition disposition =
                 ContentDisposition.attachment()
@@ -134,15 +119,22 @@ public class MindMapExportController {
                 )
                 .contentType(
                         MediaType.parseMediaType(
-                                "application/x-freemind"
+                                includeIcons ? "application/zip" : "application/x-freemind"
                         )
                 )
                 .contentLength(mindMapContent.length)
                 .body(mindMapContent);
     }
 
+    /** Returns the active tenant display name for the synthetic database root. */
+    private String databaseName() {
+        String name = TenantContext.getCurrentTenant();
+        return name == null || name.isBlank() ? "Database" : name;
+    }
+
     private byte[] createMindMap(
             Children root,
+            String rootName,
             Integer maximumLevel,
             FoldMode foldMode,
             boolean includeIcons,
@@ -186,16 +178,26 @@ public class MindMapExportController {
 
             Set<Long> visitedNodeIds = new HashSet<>();
 
-            writeNodeRecursively(
-                    writer,
-                    root,
-                    0,
-                    maximumLevel,
-                    foldMode,
-                    includeIcons,
-                    includeColors,
-                    visitedNodeIds
-            );
+            if (root == null) {
+                writer.writeStartElement("node");
+                writer.writeAttribute("TEXT", rootName);
+                writer.writeAttribute("ID", "ID_0");
+                writer.writeAttribute("FOLDED", "false");
+                writer.writeAttribute("STYLE", "oval");
+                writeFontElement(writer, true, false);
+                writeMapStyleHook(writer);
+                visitedNodeIds.add(0L);
+                if (maximumLevel == null || maximumLevel > 0) {
+                    for (Children child : childrenRepository.findByFatherIdOrderBySequenceAsc(0L)) {
+                        writeNodeRecursively(writer, child, 1, maximumLevel, foldMode,
+                                includeIcons, includeColors, visitedNodeIds);
+                    }
+                }
+                writer.writeEndElement();
+            } else {
+                writeNodeRecursively(writer, root, 0, maximumLevel, foldMode,
+                        includeIcons, includeColors, visitedNodeIds);
+            }
 
             writer.writeCharacters("\n");
             writer.writeEndElement();
@@ -442,6 +444,7 @@ public class MindMapExportController {
 
         String sanitized = name
                 .replaceAll("[\\\\/:*?\"<>|]", "_")
+                .replaceAll("[\\p{Cntrl}]", "_")
                 .replaceAll("\\s+", " ")
                 .trim();
 

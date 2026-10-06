@@ -36,8 +36,7 @@
 <th:block th:replace="~{common/header :: header}"></th:block>
 <div th:if="${node != null}">
         <div class="workspace-toolbar">
-            <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" th:href="@{/quick-mind-map/{id}(id=${node.nodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.mermaid}"><i class="fas fa-project-diagram"></i> Mermaid</a>
-            <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" th:href="@{/markmap-quick-mind-map/{id}(id=${node.nodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.markmap}"><i class="fas fa-sitemap"></i> Markmap</a>
+            <th:block th:replace="~{node/nodeMindMapFragment :: mindMapControls}"></th:block>
             <a class="btn btn-sm btn-outline-secondary" th:href="@{/export-node-to-pdf/{id}(id=${node.nodeId})}" th:title="#{search.downloadAsPdf}"><i class="fas fa-file-pdf"></i> PDF</a>
             <div class="dropdown">
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{tree.export}">Export</span></button>
@@ -62,7 +61,6 @@
                         <input type="hidden" name="includeDescendants" value="true"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
                     </form>
-                    <a class="dropdown-item" th:href="@{/mindmap-export(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{mindmap.export.menu}"></a>
                 </div>
             </div>
             <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>

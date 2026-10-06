@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<div th:fragment="mindMapControls" class="dropdown">
+    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-sitemap"></i> <span th:text="#{tree.mindMap}">Mind Map</span></button>
+    <div class="dropdown-menu">
+        <a class="dropdown-item" target="_blank" rel="noopener noreferrer" th:href="@{/markmap-quick-mind-map/{id}(id=${requestedNodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.markmap}">Markmap</a>
+        <a class="dropdown-item" target="_blank" rel="noopener noreferrer" th:href="@{/quick-mind-map/{id}(id=${requestedNodeId},level=3,icons=true,colors=true,foldChat=true)}" th:title="#{tree.mermaid}">Mermaid</a>
+        <a class="dropdown-item" th:href="@{/mindmap-export(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{mindmap.export.menu}"></a>
+    </div>
+</div>
+</body></html>
