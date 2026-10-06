@@ -59,18 +59,20 @@
 		<pdfbox.version>3.0.8</pdfbox.version>
 		<!-- Project-specific pins; these names do not override Spring Boot BOM properties. -->
 		<sweetcherry.thymeleaf-layout.version>3.3.0</sweetcherry.thymeleaf-layout.version>
-		<sweetcherry.htmx.version>1.9.12</sweetcherry.htmx.version>
-		<sweetcherry.sqlite-jdbc.version>3.44.1.0</sweetcherry.sqlite-jdbc.version>
+		<sweetcherry.htmx.version>4.0.0</sweetcherry.htmx.version>
+		<sweetcherry.sqlite-jdbc.version>3.53.4.0</sweetcherry.sqlite-jdbc.version>
 		<sweetcherry.mysql-connector.version>9.0.0</sweetcherry.mysql-connector.version>
 		<sweetcherry.openpdf.version>2.0.2</sweetcherry.openpdf.version>
 		<sweetcherry.flying-saucer.version>9.7.1</sweetcherry.flying-saucer.version>
-		<sweetcherry.jsoup.version>1.17.2</sweetcherry.jsoup.version>
+		<sweetcherry.jsoup.version>1.23.2</sweetcherry.jsoup.version>
 		<sweetcherry.bootstrap.version>5.3.3</sweetcherry.bootstrap.version>
-		<sweetcherry.jquery-ui.version>1.13.2</sweetcherry.jquery-ui.version>
-		<sweetcherry.font-awesome.version>6.5.2</sweetcherry.font-awesome.version>
-		<sweetcherry.suncalc.version>3.10</sweetcherry.suncalc.version>
-		<sweetcherry.time4j.version>5.9.1</sweetcherry.time4j.version>
-		<sweetcherry.time4j-tzdata.version>5.0-2022a</sweetcherry.time4j-tzdata.version>
+		<sweetcherry.jquery-ui.version>1.14.2+1</sweetcherry.jquery-ui.version>
+		<sweetcherry.font-awesome.version>7.3.0</sweetcherry.font-awesome.version>
+		<!-- https://shredzone.org/maven/commons-suncalc/index.html -->
+		<!-- https://codefloe.com/shred/commons-suncalc -->
+		<sweetcherry.suncalc.version>3.11</sweetcherry.suncalc.version>
+		<sweetcherry.time4j.version>5.9.4</sweetcherry.time4j.version>
+		<sweetcherry.time4j-tzdata.version>5.0-2026b</sweetcherry.time4j-tzdata.version>
 		<sweetcherry.springdoc.version>2.8.13</sweetcherry.springdoc.version>
 	</properties>
 	<dependencies>
