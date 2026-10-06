@@ -78,9 +78,19 @@ public class MindMapExportController {
             @RequestParam(
                     name = "includeColors",
                     defaultValue = "true"
-            ) boolean includeColors
+            ) boolean includeColors,
+            @RequestParam(name = "iconMode", required = false) String iconMode
     ) throws XMLStreamException, IOException {
 
+        boolean bundleIcons = includeIcons;
+        if (iconMode != null && !iconMode.isBlank()) {
+            switch (iconMode) {
+                case "none" -> { includeIcons = false; bundleIcons = false; }
+                case "references" -> { includeIcons = true; bundleIcons = false; }
+                case "bundle" -> { includeIcons = true; bundleIcons = true; }
+                default -> throw new ResponseStatusException(BAD_REQUEST, "Invalid icon mode");
+            }
+        }
         if (nodeId < 0) throw new ResponseStatusException(BAD_REQUEST);
         if (maximumLevel != null && maximumLevel < 0) {
             throw new ResponseStatusException(
@@ -99,7 +109,7 @@ public class MindMapExportController {
         byte[] mindMapContent = createMindMap(rootChildren, rootName, maximumLevel,
                 foldMode, includeIcons, includeColors);
         String filename = sanitizeFilename(rootName) + "-" + nodeId + ".mm";
-        if (includeIcons) {
+        if (bundleIcons) {
             mindMapContent = new MindMapIconArchive().create(filename, mindMapContent);
             filename = filename.substring(0, filename.length() - 3) + ".zip";
         }
@@ -119,11 +129,18 @@ public class MindMapExportController {
                 )
                 .contentType(
                         MediaType.parseMediaType(
-                                includeIcons ? "application/zip" : "application/x-freemind"
+                                bundleIcons ? "application/zip" : "application/x-freemind"
                         )
                 )
                 .contentLength(mindMapContent.length)
                 .body(mindMapContent);
+    }
+
+    /** Retains the original Java-call contract: including icons also bundles their files. */
+    public ResponseEntity<byte[]> exportMindMap(long nodeId, Integer maximumLevel,
+            String foldModeValue, boolean includeIcons, boolean includeColors)
+            throws XMLStreamException, IOException {
+        return exportMindMap(nodeId, maximumLevel, foldModeValue, includeIcons, includeColors, null);
     }
 
     /** Returns the active tenant display name for the synthetic database root. */
@@ -154,12 +171,6 @@ public class MindMapExportController {
                 );
 
         try {
-            writer.writeStartDocument(
-                    StandardCharsets.UTF_8.name(),
-                    "1.0"
-            );
-            writer.writeCharacters("\n");
-
             writer.writeStartElement("map");
             writer.writeAttribute(
                     "version",
@@ -167,6 +178,7 @@ public class MindMapExportController {
             );
             writer.writeCharacters("\n");
 
+            writer.writeComment("Exported by SweetCherry: https://github.com/turkerozturk/SweetCherry");
             writer.writeComment(
                     "To view this file, download free mind mapping software "
                             + "Freeplane from https://www.freeplane.org"

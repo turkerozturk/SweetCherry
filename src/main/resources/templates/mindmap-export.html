@@ -19,8 +19,11 @@
 <div class="form-text" th:text="#{mindmap.export.foldHelp}"></div></div>
 <div class="mb-3"><label class="form-label" for="includeColors" th:text="#{mindmap.export.colors}"></label>
 <select class="form-select" name="includeColors" id="includeColors"><option value="true" selected th:text="#{mindmap.export.include}"></option><option value="false" th:text="#{mindmap.export.exclude}"></option></select></div>
-<div class="mb-3"><label class="form-label" for="includeIcons" th:text="#{mindmap.export.icons}"></label>
-<select class="form-select" name="includeIcons" id="includeIcons"><option value="false" selected th:text="#{mindmap.export.exclude}"></option><option value="true" th:text="#{mindmap.export.include}"></option></select>
+<div class="mb-3"><label class="form-label" for="iconMode" th:text="#{mindmap.export.icons}"></label>
+<select class="form-select" name="iconMode" id="iconMode">
+<option value="none" selected th:text="#{mindmap.export.iconsNone}"></option>
+<option value="references" th:text="#{mindmap.export.iconsReferences}"></option>
+<option value="bundle" th:text="#{mindmap.export.iconsBundle}"></option></select>
 <div class="form-text" th:text="#{mindmap.export.iconsHelp}"></div></div>
 <button class="btn btn-primary" type="submit" th:text="#{mindmap.export.download}"></button>
 </form></div></div>

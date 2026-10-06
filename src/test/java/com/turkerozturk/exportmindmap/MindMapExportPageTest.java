@@ -95,4 +95,34 @@ class MindMapExportPageTest {
                 .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
         verifyNoInteractions(children,nodes);
     }
+
+    @Test void referenceModeReturnsOnlyMapWithFreeplaneRecognizableStart() throws Exception {
+        var children=mock(ChildrenRepository.class); var nodes=mock(NodeRepository.class);
+        var occurrence=new Children().setNodeId(1).setFatherId(0);
+        var node=mock(Node.class);
+        when(node.getName()).thenReturn("Icon node");
+        when(node.getNodeIcon()).thenReturn(java.util.Arrays.stream(com.turkerozturk.helpers.NodeIcon.values())
+                .filter(icon -> icon.getIconName()!=null && !"zero".equals(icon.getIconName())).findFirst().orElseThrow());
+        when(children.findByNodeId(1L)).thenReturn(occurrence);
+        when(children.findByFatherIdOrderBySequenceAsc(1L)).thenReturn(java.util.List.of());
+        when(nodes.findById(1L)).thenReturn(node);
+        var controller=new MindMapExportController(children,nodes);
+        var response=controller.exportMindMap(1,null,"chat",false,true,"references");
+        assertThat(response.getHeaders().getContentType().toString()).isEqualTo("application/x-freemind");
+        assertThat(response.getHeaders().getContentDisposition().getFilename()).endsWith(".mm");
+        String xml=new String(response.getBody(),java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(xml).startsWith("<map version=\"freeplane ").contains("URI=\"ctbicons/", "Exported by SweetCherry");
+        javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .parse(new java.io.ByteArrayInputStream(response.getBody()));
+        String noIcons=new String(controller.exportMindMap(1,null,"chat",true,true,"none").getBody(),java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(noIcons).doesNotContain("URI=\"ctbicons/");
+    }
+
+    @Test void unknownIconModeIsRejectedBeforeQueryingDatabase() {
+        var children=mock(ChildrenRepository.class); var nodes=mock(NodeRepository.class);
+        assertThatThrownBy(()->new MindMapExportController(children,nodes)
+                .exportMindMap(0,null,"chat",false,true,"invalid"))
+                .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+        verifyNoInteractions(children,nodes);
+    }
 }

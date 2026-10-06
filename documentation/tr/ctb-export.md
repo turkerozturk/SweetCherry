@@ -123,18 +123,47 @@ ağacı o paylaşımlı konumda genişletilmez. Seviye 0 yalnız kökü verir; t
 veritabanı aktarımında üst düzey gerçek düğümler seviye 1'dir.
 
 CherryTree ikonları varsayılan olarak dahil edilmez; indirme yalnız `.mm` olur.
-Dahil edilirse istek sırasında `.zip` oluşturulur: kökte `.mm`, yanında
+İkon seçimi üç ayrı indirme biçimi sunar:
+
+| Seçenek | İndirme | XML içinde ikon referansı |
+|---|---|---|
+| İkonsuz (.mm) | Yalnız `.mm` | Yok |
+| İkon referanslı (.mm) | Yalnız `.mm` | Var; `ctbicons/` yanında olmalı |
+| İkonlarla birlikte (.zip) | `.mm` + ikon klasörü | Var |
+
+ZIP seçilirse istek sırasında `.zip` oluşturulur: kökte `.mm`, yanında
 `ctbicons/` altında paketli PNG ikonları ve İngilizce `readme.txt` bulunur.
 İkonlar kaynak ağacına veya disk üzerindeki sabit geliştirme yoluna ihtiyaç
 olmadan, çalışmakta olan JAR'ın classpath kaynaklarından alınır. Kaynak ikon
 klasörüne readme yazılmaz; açıklama yalnız indirme arşivinde oluşturulur.
 
 İlk ikonlu harita için ZIP’i açıp `.mm` dosyasını o klasörden Freeplane ile açın.
-Sonraki ikonlu dışa aktarımların ZIP içindeki `.mm` dosyasını aynı klasöre
-koyabilirsiniz. İkonları dahil etmeden indirilen `.mm` ikon referansı içermez;
+Sonraki dışa aktarımlarda **İkon referanslı (.mm)** seçip indirilen dosyayı
+aynı klasöre koyabilirsiniz; ikonları tekrar indirmeniz gerekmez. İkonları dahil etmeden indirilen `.mm` ikon referansı içermez;
 mevcut ikon klasöründen otomatik ikon eklemez. Yeni uygulama sürümlerinde ikon
 seti değişirse ZIP'teki ikon klasörünü de yenileyin.
 
 Manuel kabul: masaüstü/mobil menü sırası, tek dal ve shared dal, boş ID ile tüm
 veritabanı ve boş veritabanı, level 0/1, ikonlu ZIP’i Freeplane'de açma ve ikonları
 harita yanında tutma. Paketli Windows dağıtımında da ZIP indirmesi denenmelidir.
+
+
+### Freeplane biçim tanıma
+
+Freeplane kaynak kodundaki `MFileManager.loadTreeImpl` dosyanın başlangıcını
+`MapVersionInterpreter.getVersionInterpreter` metoduna iletir. Tanıma,
+`<map version="...` önekiyle `startsWith` karşılaştırması yapar. XML bildirimi
+önce geldiğinde geçerli XML olsa bile “unknown program” uyarısı oluşabilir.
+Dışa aktarma XML bildirimi olmadan doğrudan `<map version="freeplane 1.12.15">`
+ile başlar. SweetCherry üretici bilgisi map içindeki açıklama yorumundadır;
+Freeplane tarafından üretildiği iddia edilmez.
+
+Kaynak incelemesi: https://github.com/freeplane/freeplane
+- `freeplane/src/main/java/org/freeplane/features/url/mindmapmode/MFileManager.java`
+- `freeplane/src/main/java/org/freeplane/features/url/MapVersionInterpreter.java`
+
+Kabul: yeni indirilen `.mm` ve ZIP içindeki `.mm` ilk kez açılırken unknown-program
+uyarısını kontrol edin; eski dosyalar yeniden dışa aktarılmalıdır. Üç ikon seçeneği
+tek düğüm, shared düğüm ve tüm veritabanı aktarımında kullanılabilir. Eski
+`includeIcons=true` isteği uyumluluk için ZIP davranışını korur; yeni form
+`iconMode=none/references/bundle` kullanır.
