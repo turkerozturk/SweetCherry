@@ -33,4 +33,22 @@ class TenantConfigDownloadControllerTest {
         assertThatThrownBy(() -> controller("../secret.txt").download("Demo")).isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(() -> controller("missing.txt").download("Demo")).isInstanceOf(ResponseStatusException.class);
     }
+
+    @Test void directGetShowsConfirmationWithoutReturningSecrets() throws Exception {
+        Files.writeString(directory.resolve("demo.txt"), "datasource.password=secret");
+        var model = new org.springframework.ui.ExtendedModelMap();
+        assertThat(controller("demo.txt").confirm("Demo", model)).isEqualTo("tenantConfigDownloadConfirm");
+        assertThat(model).containsEntry("tenant", "Demo").containsEntry("fileName", "demo.txt");
+        assertThat(model.toString()).doesNotContain("secret");
+    }
+
+    @Test void authenticationIndicatorUsesConfiguredCredentials() {
+        var tenant = new TenantForm();
+        assertThat(tenant.isAuthenticationConfigured()).isFalse();
+        tenant.setUsername("admin");
+        assertThat(tenant.isAuthenticationConfigured()).isTrue();
+        tenant.setUsername("");
+        tenant.setPassword("secret");
+        assertThat(tenant.isAuthenticationConfigured()).isTrue();
+    }
 }

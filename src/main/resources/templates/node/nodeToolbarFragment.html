@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
+<div th:fragment="controls(view)" class="workspace-toolbar">
+<button class="btn btn-sm btn-outline-secondary" type="button" th:attr="data-bs-toggle=${view == 'reader' ? 'collapse' : 'offcanvas'}" data-bs-target="#offcanvasScrolling" th:title="#{node.meta.header}"><i class="fas fa-info-circle"></i> <span th:text="#{tree.info}"></span></button>
+<a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
+<div class="dropdown" th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')">
+<button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" th:text="#{tree.edit}"></button>
+<div class="dropdown-menu">
+<a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="dropdown-item" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="#{tree.edit}"></span></a>
+<a th:if="${canDeleteNode == true and isSharedNode != true and node != null and (node.syntax == 'plain-text' or node.syntax == 'custom-colors') and node.isReadOnly16bit % 2 == 0}" sec:authorize="hasRole('ADMIN')" class="dropdown-item" th:href="@{/nodes/richtext/edit/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:title="#{richtext.edit.title}"><i class="fas fa-bold"></i> <span th:text="#{richtext.edit.short}"></span></a>
+<hr class="dropdown-divider">
+<th:block th:replace="~{node/nodeDuplicateFragment :: duplicateItems(${view},false)}"></th:block>
+</div></div>
+<th:block th:replace="~{node/nodeMoveFragment :: moveControls(${view})}"></th:block>
+<div class="dropdown">
+<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">PDF</button>
+<div class="dropdown-menu">
+<a class="dropdown-item" th:href="@{/nodes/pdf/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{toolbar.pdfSingle}"></a>
+<button class="dropdown-item" type="button" disabled th:text="#{toolbar.pdfBranch}" th:title="#{toolbar.planned}"></button>
+</div></div>
+            <div class="dropdown">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{toolbar.ctb}">Export</span></button>
+                <div class="dropdown-menu p-1">
+                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="false"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionSingle}"></button>
+                    </form>
+                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="true"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionBranch}"></button>
+                    </form>
+                    <hr class="dropdown-divider">
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="false"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateSingle}"></button>
+                    </form>
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+                        <input type="hidden" name="includeDescendants" value="true"/>
+                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
+                    </form>
+                </div>
+            </div>
+
+<th:block th:replace="~{node/nodeMindMapFragment :: mindMapControls}"></th:block>
+<div class="dropdown" th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')">
+<button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" th:text="#{toolbar.add}"></button>
+<div class="dropdown-menu">
+<form th:action="@{/nodes/siblings/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="dropdown-item" type="submit" th:text="#{toolbar.sibling}"></button>
+</form>
+<form th:if="${isSharedNode != true}" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="dropdown-item" type="submit" th:text="#{toolbar.child}"></button>
+</form>
+<th:block th:replace="~{node/nodeBookmarkFragment :: addBookmark(${view})}"></th:block>
+<hr class="dropdown-divider">
+<th:block th:replace="~{node/nodeDuplicateFragment :: duplicateItems(${view},true)}"></th:block>
+</div></div>
+<a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
+</div></body></html>

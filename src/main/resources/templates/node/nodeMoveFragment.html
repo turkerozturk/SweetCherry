@@ -9,10 +9,10 @@
 <input type="hidden" name="direction" value="">
 <input type="hidden" name="view" th:value="${view}">
 <span class="small" th:text="#{node.move.title}"></span>
-<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="UP" disabled th:title="#{node.move.up}" th:attr="aria-label=#{node.move.up}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
-<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="DOWN" disabled th:title="#{node.move.down}" th:attr="aria-label=#{node.move.down}"><i class="fas fa-arrow-down" aria-hidden="true"></i></button>
-<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="LEFT" disabled th:title="#{node.move.left}" th:attr="aria-label=#{node.move.left}"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
-<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="RIGHT" disabled th:title="#{node.move.right}" th:attr="aria-label=#{node.move.right}"><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="UP" disabled th:title="#{node.move.up} + ' (Alt + Shift + ↑)'" th:attr="aria-label=#{node.move.up}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="DOWN" disabled th:title="#{node.move.down} + ' (Alt + Shift + ↓)'" th:attr="aria-label=#{node.move.down}"><i class="fas fa-arrow-down" aria-hidden="true"></i></button>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="LEFT" disabled th:title="#{node.move.left} + ' (Alt + Shift + ←)'" th:attr="aria-label=#{node.move.left}"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+<button type="submit" class="btn btn-sm btn-outline-secondary" data-move="RIGHT" disabled th:title="#{node.move.right} + ' (Alt + Shift + →)'" th:attr="aria-label=#{node.move.right}"><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
 <span data-move-error class="small text-danger" role="status"></span>
 </form>
 </body></html>

@@ -35,47 +35,8 @@
 <div class="offcanvas-body">
 <th:block th:replace="~{common/header :: header}"></th:block>
 <div th:if="${node != null}">
-        <div class="workspace-toolbar">
-            <th:block th:replace="~{node/nodeMindMapFragment :: mindMapControls}"></th:block>
-            <a class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/pdf/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:title="#{search.downloadAsPdf}"><i class="fas fa-file-pdf"></i> PDF</a>
-            <div class="dropdown">
-                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{tree.export}">Export</span></button>
-                <div class="dropdown-menu p-1">
-                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
-                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-                        <input type="hidden" name="includeDescendants" value="false"/>
-                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionSingle}"></button>
-                    </form>
-                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
-                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-                        <input type="hidden" name="includeDescendants" value="true"/>
-                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionBranch}"></button>
-                    </form>
-                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
-                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-                        <input type="hidden" name="includeDescendants" value="false"/>
-                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateSingle}"></button>
-                    </form>
-                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
-                        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-                        <input type="hidden" name="includeDescendants" value="true"/>
-                        <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
-                    </form>
-                </div>
-            </div>
-            <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
-            <a th:if="${canDeleteNode == true and isSharedNode != true and node != null and (node.syntax == 'plain-text' or node.syntax == 'custom-colors') and node.isReadOnly16bit % 2 == 0}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/richtext/edit/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:title="#{richtext.edit.title}"><i class="fas fa-bold"></i> <span th:text="#{richtext.edit.short}"></span></a>
-            <a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="#{tree.edit}"></span></a>
-            <form th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
-                <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-                <button class="btn btn-sm btn-outline-primary" type="submit" th:title="#{tree.addChildTitle}"><i class="fas fa-plus"></i> <span th:text="#{tree.addChild}"></span></button>
-            </form>
-            <th:block th:replace="~{node/nodeBookmarkFragment :: addBookmark('reader')}"></th:block>
-            <th:block th:replace="~{node/nodeDuplicateFragment :: duplicateControls('reader')}"></th:block>
-            <th:block th:replace="~{node/nodeMoveFragment :: moveControls('reader')}"></th:block>
-            <a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
-        </div>
-<th:block th:replace="~{node/nodeMetaDataFragment :: nodeMetaDataFragment}"></th:block>
+        <th:block th:replace="~{node/nodeToolbarFragment :: controls('reader')}"></th:block>
+<div id="offcanvasScrolling" class="collapse show"><th:block th:replace="~{node/nodeMetaDataFragment :: nodeMetaDataFragment}"></th:block></div>
 <th:block th:replace="~{node/readerContextNavigation :: breadcrumbs}"></th:block>
 </div>
 <form th:if="${node == null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">

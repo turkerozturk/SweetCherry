@@ -94,4 +94,43 @@ class ChildNodeServiceTest {
         verify(childInsert).setParameter("parent", 0L);
         verify(childInsert).setParameter("sequence", 6L);
     }
+
+    @Test void createsSiblingImmediatelyAfterSharedOccurrence() {
+        NodePropertiesService properties = mock(NodePropertiesService.class);
+        when(properties.writable()).thenReturn(true);
+        EntityManager manager = mock(EntityManager.class);
+        Query occurrence = mock(Query.class), ids = mock(Query.class), sequence = mock(Query.class),
+                insert = mock(Query.class), child = mock(Query.class), shift = mock(Query.class), place = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(occurrence, ids, sequence, insert, child, shift, place);
+        for (Query query : new Query[]{occurrence, ids, sequence, insert, child, shift, place})
+            when(query.setParameter(anyString(), any())).thenReturn(query);
+        when(occurrence.getResultList()).thenReturn(java.util.Collections.singletonList(new Object[]{0L, 2L}));
+        when(ids.getSingleResult()).thenReturn(99L);
+        when(sequence.getSingleResult()).thenReturn(7L);
+        var service = new ChildNodeService(properties, new CustomPropertiesHolder());
+        ReflectionTestUtils.setField(service, "entityManager", manager);
+        assertThat(service.createSibling(72L)).isEqualTo(99L);
+        verify(properties, never()).realNode(72L);
+        verify(child).setParameter("parent", 0L);
+        verify(shift).setParameter("sequence", 2L);
+        verify(shift).setParameter("id", 99L);
+        verify(place).setParameter("sequence", 3L);
+        verify(place).executeUpdate();
+    }
+
+    @Test void siblingCreationRejectsMissingOccurrenceAndReadOnlyTenant() {
+        var properties = mock(NodePropertiesService.class);
+        var manager = mock(EntityManager.class);
+        var service = new ChildNodeService(properties, new CustomPropertiesHolder());
+        ReflectionTestUtils.setField(service, "entityManager", manager);
+        assertThatThrownBy(() -> service.createSibling(72L)).isInstanceOf(AccessDeniedException.class);
+        verifyNoInteractions(manager);
+        when(properties.writable()).thenReturn(true);
+        var query = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(query);
+        when(query.setParameter("id", 72L)).thenReturn(query);
+        when(query.getResultList()).thenReturn(java.util.List.of());
+        assertThatThrownBy(() -> service.createSibling(72L)).isInstanceOf(ResponseStatusException.class);
+        verify(query, never()).executeUpdate();
+    }
 }

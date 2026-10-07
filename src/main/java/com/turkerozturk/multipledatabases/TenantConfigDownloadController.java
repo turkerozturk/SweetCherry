@@ -27,6 +27,15 @@ public class TenantConfigDownloadController {
     /** Resolves the registered filename inside allTenants and returns a non-cacheable attachment. */
     @GetMapping("/tenants/config")
     @PreAuthorize("hasRole('ADMIN')")
+    public String confirm(@RequestParam String tenant, org.springframework.ui.Model model) throws IOException {
+        Path file = resolve(tenants, properties, directory, tenant);
+        model.addAttribute("tenant", tenant);
+        model.addAttribute("fileName", file.getFileName().toString());
+        return "tenantConfigDownloadConfirm";
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/tenants/config")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> download(@RequestParam String tenant) throws IOException {
         Path file = resolve(tenants, properties, directory, tenant);
         String name = file.getFileName().toString();

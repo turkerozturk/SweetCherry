@@ -18,4 +18,17 @@
 </ul></div>
 <span data-duplicate-error class="small text-danger" role="status"></span>
 </form>
+<form th:fragment="duplicateItems(view,sharedOnly)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')"
+      th:action="@{/nodes/duplicate/{id}(id=${requestedNodeId})}" method="post" data-node-duplicate
+      th:attr="data-state-url=@{/nodes/duplicate/{id}/state(id=${requestedNodeId})},data-error=#{node.duplicate.error},data-confirm-shared=#{node.duplicate.confirmShared},data-confirm-single=#{node.duplicate.confirmSingle},data-confirm-subtree=#{node.duplicate.confirmSubtree}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<input type="hidden" name="revision" value="">
+<input type="hidden" name="createShared" value="false">
+<input type="hidden" name="withSubnodes" value="false">
+<input type="hidden" name="view" th:value="${view}">
+<button th:if="${!sharedOnly}" type="submit" class="dropdown-item" data-duplicate="single" disabled th:text="#{node.duplicate.single}"></button>
+<button th:if="${!sharedOnly and isSharedNode != true}" type="submit" class="dropdown-item" data-duplicate="subtree" disabled th:text="#{node.duplicate.subtree}"></button>
+<button th:if="${sharedOnly}" type="submit" class="dropdown-item" data-duplicate="shared" disabled th:text="#{toolbar.shared}"></button>
+<span data-duplicate-error class="small text-danger" role="status"></span>
+</form>
 </body></html>

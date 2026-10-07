@@ -18,8 +18,7 @@
             <th th:text="#{tenants.data_sources_table.status}">Status</th>
             <th th:text="#{tenants.data_sources_table.human_friendly_name}">Name</th>
             <th th:text="#{tenants.data_sources_table.url}">URL</th>
-            <th th:text="#{tenants.data_sources_table.username}">Username</th>
-            <th th:text="#{tenants.data_sources_table.password}">Password</th>
+            <th th:text="#{tenant.authentication}">Authentication configured</th>
             <th th:text="#{tenants.data_sources_table.driver_class_name}">Driver Class Name</th>
             <th th:text="#{tenants.data_sources_table.file_name}">File Name</th>
             <th th:text="#{tenants.data_sources_table.isWritable}">Is Writable</th>
@@ -29,15 +28,14 @@
         <tbody>
         <tr th:each="tenant : ${tenants}">
             <td th:text="${tenant.tenantName == currentTenantName ? 'Active' : 'Passive'}"></td>
-            <td><a th:href="@{/tenants/config(tenant=${tenant.tenantName})}" th:title="${tenant.fileName}" download aria-label="Download tenant configuration">
+            <td><a th:href="@{/tenants/config(tenant=${tenant.tenantName})}" th:title="${tenant.fileName}" aria-label="Download tenant configuration">
                 <i class="fas fa-download" aria-hidden="true"></i></a>
                 <form th:action="@{/tenants/config/delete}" method="post" class="d-inline" th:attr="data-confirm-message=#{tenant.delete.confirm(${tenant.fileName})}">
                     <input type="hidden" name="tenant" th:value="${tenant.tenantName}">
                     <button type="submit" class="btn btn-sm btn-outline-danger" th:title="#{tenant.delete.title}" th:aria-label="#{tenant.delete.title}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                 </form> <i><b th:text="${tenant.tenantName}"></b></i></td>
             <td th:text="${tenant.url}"></td>
-            <td th:text="${tenant.username}"></td>
-            <td>••••••</td>
+            <td th:text="${tenant.authenticationConfigured} ? #{tenant.yes} : #{tenant.no}"></td>
             <td th:text="${tenant.driverClassName}"></td>
             <td th:text="${tenant.fileName}"></td>
             <td th:text="${tenant.isWritable}"></td>

@@ -88,4 +88,7 @@ public class TenantForm {
     public void setWritable(boolean writable) {
         isWritable = writable;
     }
+    public boolean isAuthenticationConfigured() {
+        return (username != null && !username.isBlank()) || (password != null && !password.isBlank());
+    }
 }

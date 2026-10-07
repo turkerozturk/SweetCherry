@@ -33,6 +33,27 @@ public class ChildNodeService {
         return createNode(0, true);
     }
 
+    @Transactional
+    public long createSibling(long occurrenceId) {
+        if (!properties.writable()) throw new AccessDeniedException("The selected CTB is read-only.");
+        var rows = entityManager.createNativeQuery(
+                "SELECT father_id, sequence FROM children WHERE node_id = :id")
+                .setParameter("id", occurrenceId).getResultList();
+        if (rows.isEmpty()) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND);
+        Object[] occurrence = (Object[]) rows.get(0);
+        long parent = ((Number) occurrence[0]).longValue();
+        long sequence = ((Number) occurrence[1]).longValue();
+        long id = createNode(parent, parent == 0);
+        entityManager.createNativeQuery("UPDATE children SET sequence = sequence + 1 "
+                + "WHERE father_id = :parent AND sequence > :sequence AND node_id <> :id")
+                .setParameter("parent", parent).setParameter("sequence", sequence)
+                .setParameter("id", id).executeUpdate();
+        entityManager.createNativeQuery("UPDATE children SET sequence = :sequence WHERE node_id = :id")
+                .setParameter("sequence", sequence + 1).setParameter("id", id).executeUpdate();
+        return id;
+    }
+
     private long createNode(long parentId, boolean topLevel) {
         if (!properties.writable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout}">
+<head><title th:text="#{tenant.download.title}"></title></head>
+<body><section layout:fragment="content">
+<h1 th:text="#{tenant.download.title}"></h1>
+<p th:text="${fileName}"></p>
+<p class="alert alert-warning" th:text="#{tenant.download.warning}"></p>
+<form th:action="@{/tenants/config}" method="post">
+<input type="hidden" name="tenant" th:value="${tenant}">
+<button type="submit" class="btn btn-primary" th:text="#{tenant.download.confirm}"></button>
+<a class="btn btn-outline-secondary" th:href="@{/tenants}" th:text="#{tenant.download.cancel}"></a>
+</form>
+</section></body></html>
