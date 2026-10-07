@@ -10,7 +10,7 @@ Yeni masaüstü ağaç görünümü ve mobil okuyucuda, admin kullanıcı writab
 
 Masaüstünde `Alt+Shift+Yön` seçili içerik düğümü için aynı işlemi yapar. Metin giriş alanlarında çalışmaz. Tarayıcı veya işletim sistemi kısayolu yakalarsa düğmeler kullanılabilir. Mobilde seçenekler işlemler panelindedir. Geçersiz yönler pasiftir; seçenekler yüklenemezse sayfayı yenileyin.
 
-Shared node kendi `children` kaydıyla taşınır; master ve diğer alias'lar taşınmaz. Shared node parent olamaz. Gerçek düğüm taşındığında alt ağacı ona bağlı kalır.
+Shared node kendi `children` kaydıyla taşınır; master ve diğer alias'lar taşınmaz. CherryTree’de shared node ebeveyn olabilir. SweetCherry’nin mevcut taşıma işlemi henüz bu hedefi desteklemez; bu bir uygulama kısıtıdır, CTB modelinin kuralı değildir. Gösterim ve aktarım bu tür alt düğümleri `shared-node-hierarchy.md` belgesinde anlatıldığı gibi işler. Gerçek düğüm taşındığında alt ağacı ona bağlı kalır.
 
 İşlem yalnızca `children.father_id` ve `children.sequence` alanlarını günceller. Etkilenen sibling gruplarında sıra 1'den başlayarak yeniden numaralanır. İçerik, bookmark, master bağlantısı ve içerik kayıt zamanları değişmez. Taşıma sonrasında aynı düğüm yeni görünümde açılır; ağaç yeniden yüklenir. Ek bir hedef seçerek taşıma yöntemi şimdilik planlanmıyor. Tek düğüm ve alt ağaç çoğaltma ayrı Çoğalt menüsündedir.
 

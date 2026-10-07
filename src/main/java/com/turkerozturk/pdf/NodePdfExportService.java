@@ -122,11 +122,9 @@ public class NodePdfExportService {
                 if (total > limits.getMaxHtmlCharacters()) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
                 parts.add(new SubtreePdfDocument.Part(occurrence.getNodeId(), contentId,
                         pending.depth(), node.getName(), html));
-                // Shared occurrences are leaves in the readers; do not expand the master's subtree.
-                if (!shared) {
-                    var list = byParent.getOrDefault(occurrence.getNodeId(), java.util.List.of());
-                    for (int n = list.size() - 1; n >= 0; n--) stack.push(new Pending(list.get(n), pending.depth() + 1));
-                }
+                // Follow the occurrence hierarchy; master_id only selects content.
+                var list = byParent.getOrDefault(occurrence.getNodeId(), java.util.List.of());
+                for (int n = list.size() - 1; n >= 0; n--) stack.push(new Pending(list.get(n), pending.depth() + 1));
             }
             return new Export(parts.get(0).title(), renderer.render(new SubtreePdfDocument(limits)
                     .prepare(parts, options, source, contents, contentsTitle)));

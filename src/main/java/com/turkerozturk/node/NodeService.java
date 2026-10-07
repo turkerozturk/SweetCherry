@@ -140,6 +140,14 @@ public class NodeService {
         return nodeList;
     }
 
+    /** Resolves content without changing the occurrence ID used for navigation. */
+    public Node findDisplayNode(long occurrenceId) {
+        Children occurrence = childrenRepository.findById(occurrenceId).orElse(null);
+        if (occurrence == null) return null;
+        Long master = occurrence.getMasterId();
+        return findById(master != null && master != 0 ? master : occurrenceId);
+    }
+
     /**
      *
      * @param nodeId
@@ -151,8 +159,8 @@ public class NodeService {
         Collections.reverse(fatherNodeIds);
         LinkedHashMap<Long, String> breadcrumbs = new LinkedHashMap<>();
         for (long fathetNodeId : fatherNodeIds) {
-            Node fatherNode = findById(fathetNodeId);
-            breadcrumbs.put(fathetNodeId, fatherNode.getName());
+            Node fatherNode = findDisplayNode(fathetNodeId);
+            if (fatherNode != null) breadcrumbs.put(fathetNodeId, fatherNode.getName());
         }
 
         return breadcrumbs;
@@ -173,7 +181,7 @@ public class NodeService {
         List<Long> nodeIds = new ArrayList<>();
         long currentNodeId = startNodeId;
 
-        while (currentNodeId != 0) {
+        while (currentNodeId != 0 && !nodeIds.contains(currentNodeId)) {
             nodeIds.add(currentNodeId);
             Children node = childrenRepository.findById(currentNodeId).orElse(null);
             if (node == null) {
@@ -195,8 +203,8 @@ public class NodeService {
 
             if (fatherId != 0) {
 
-                Optional<Node> fatherNode = Optional.ofNullable(nodeRepository.findById(fatherId));
-                node.setFatherNode(fatherNode.get());
+                Optional<Node> fatherNode = Optional.ofNullable(findDisplayNode(fatherId));
+                node.setFatherNode(fatherNode.orElse(null));
                 //System.out.println("FATHER: " + fatherNode.get().getName());
                // node.setFatherNode(fatherNode);
             }

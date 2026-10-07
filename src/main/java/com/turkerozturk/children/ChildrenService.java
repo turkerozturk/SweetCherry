@@ -84,7 +84,7 @@ public class ChildrenService {
             Long previous = i > 0 ? rows.get(i - 1).getNodeId() : null;
             Long next = i + 1 < rows.size() ? rows.get(i + 1).getNodeId() : null;
             result.add(new NaviNode(row.getNodeId(), display.getName(), display.getNodeIcon(),
-                    !shared && !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
+                    !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
                     display.getTitleColorAsHtmlHex(), display.isReadOnly(), display.isBoldnessBit(),
                     (int) row.getSequence(), previous, next));
         }

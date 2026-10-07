@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class ChildrenServiceSharedNodeTest {
-    @Test void twoReferencesToSameMasterKeepDistinctTreeIdsAndHaveNoChildren() {
+    @Test void twoReferencesToSameMasterKeepDistinctTreeIdsAndOwnChildren() {
         ChildrenRepository children = mock(ChildrenRepository.class);
         NodeRepository nodes = mock(NodeRepository.class);
         ChildrenService service = new ChildrenService();
@@ -20,6 +20,8 @@ class ChildrenServiceSharedNodeTest {
         Children second = new Children().setNodeId(56).setSequence(2);
         second.setMasterId(10L);
         when(children.findByFatherId(0L)).thenReturn(List.of(second, first));
+        when(children.findByFatherId(55L)).thenReturn(List.of(new Children().setNodeId(57)));
+        when(children.findByFatherId(56L)).thenReturn(List.of());
         Node master = new Node();
         master.setNodeId(10);
         master.setName("Original");
@@ -29,6 +31,7 @@ class ChildrenServiceSharedNodeTest {
 
         assertThat(result).extracting(NaviNode::nodeId).containsExactly(55L, 56L);
         assertThat(result).extracting(NaviNode::name).containsExactly("Original", "Original");
-        assertThat(result).allMatch(item -> !item.hasChildren());
+        assertThat(result).extracting(NaviNode::hasChildren).containsExactly(true, false);
+        verify(children, never()).findByFatherId(10L);
     }
 }

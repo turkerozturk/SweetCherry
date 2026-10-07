@@ -29,7 +29,8 @@ class MindMapExportPageTest {
         assertThat(model.get("nodeId")).isEqualTo(12L); assertThat(model.get("rootName")).isEqualTo("Master");
         String xml=new String(controller.exportMindMap(12,null,"all-unfolded",false,true).getBody(),java.nio.charset.StandardCharsets.UTF_8);
         assertThat(xml).contains("ID_12", "TEXT=\"Master\"");
-        verify(children,never()).findByFatherIdOrderBySequenceAsc(anyLong());
+        verify(children).findByFatherIdOrderBySequenceAsc(12L);
+        verify(children,never()).findByFatherIdOrderBySequenceAsc(1L);
     }
     @Test void pageWithoutIdAllowsManualSelection() {
         var children=mock(ChildrenRepository.class); var nodes=mock(NodeRepository.class);
@@ -55,7 +56,7 @@ class MindMapExportPageTest {
         assertThat(document.getElementsByTagName("node").getLength()).isEqualTo(3);
         assertThat(new String(response.getBody(),java.nio.charset.StandardCharsets.UTF_8)).contains("ID_12");
         verify(children,never()).findByNodeId(0L);
-        verify(children,never()).findByFatherIdOrderBySequenceAsc(12L);
+        verify(children).findByFatherIdOrderBySequenceAsc(12L);
     }
 
     @Test void blankIdPostExportsEmptyDatabaseAtLevelZero() throws Exception {

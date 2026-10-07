@@ -261,3 +261,15 @@ Kaynak: `src/main/java/com/turkerozturk/pdf/PdfFromHtmlController.java`
 // PREPARATION FOR PDF FILE DOWNLOAD
 // SERVING PDF FILE
 ```
+
+## Paylaşımlı düğüm gösterimi düzeltmesi — 2026-10-07
+
+Dosya: `src/main/java/com/turkerozturk/pdf/NodePdfExportService.java`
+
+Kaldırılan, yanlış varsayımı anlatan yorum:
+
+```java
+// Shared occurrences are leaves in the readers; do not expand the master's subtree.
+```
+
+Master’ın alt ağacını ödünç almama kuralı korunmuştur; paylaşımlı konumun kendi çocukları artık gösterilir.

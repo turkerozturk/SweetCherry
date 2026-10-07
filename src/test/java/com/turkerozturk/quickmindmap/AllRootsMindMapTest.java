@@ -26,15 +26,18 @@ class AllRootsMindMapTest {
         Children alias = new Children().setNodeId(55).setFatherId(0);
         alias.setMasterId(10L);
         when(children.findByFatherIdOrderBySequenceAsc(0)).thenReturn(List.of(real, alias));
+        var ownChild = new Children().setNodeId(56).setFatherId(55);
+        when(children.findByFatherIdOrderBySequenceAsc(55)).thenReturn(List.of(ownChild));
+        when(nodes.findById(56L)).thenReturn(displayNode());
         when(children.findByNodeId(10L)).thenReturn(real);
         when(nodes.findById(10L)).thenReturn(displayNode());
 
         QuickMindMapController mermaid = new QuickMindMapController(children, nodes);
         ExtendedModelMap mermaidModel = new ExtendedModelMap();
-        assertThat(mermaid.showAllRoots(1, false, false, false, mermaidModel))
+        assertThat(mermaid.showAllRoots(3, false, false, false, mermaidModel))
                 .isEqualTo("quick-mind-map");
         assertThat((String) mermaidModel.get("mermaidDefinition"))
-                .contains("Demo Database", "ctb_10", "ctb_55");
+                .contains("Demo Database", "ctb_10", "ctb_55", "ctb_56");
         ExtendedModelMap singleMermaid = new ExtendedModelMap();
         mermaid.showQuickMindMap(10, 0, false, false, false, singleMermaid);
         assertThat(singleMermaid.get("rootParentNodeId")).isEqualTo(0L);
@@ -42,13 +45,14 @@ class AllRootsMindMapTest {
         MarkmapQuickMindMapController markmap = new MarkmapQuickMindMapController(
                 children, nodes, new ObjectMapper());
         ExtendedModelMap markmapModel = new ExtendedModelMap();
-        assertThat(markmap.showAllRoots(1, false, false, false, markmapModel))
+        assertThat(markmap.showAllRoots(3, false, false, false, markmapModel))
                 .isEqualTo("markmap-quick-mind-map");
         var json = new ObjectMapper().readTree((String) markmapModel.get("markmapDataJson"));
         assertThat(json.get("content").asText()).isEqualTo("Demo Database");
         assertThat(json.get("children").size()).isEqualTo(2);
         assertThat(json.get("children").get(1).get("payload").get("nodeId").asLong())
                 .isEqualTo(55L);
+        assertThat(json.get("children").get(1).get("children").get(0).get("payload").get("nodeId").asLong()).isEqualTo(56L);
         ExtendedModelMap singleMarkmap = new ExtendedModelMap();
         markmap.showMarkmapQuickMindMap(10, 0, false, false, false, singleMarkmap);
         assertThat(singleMarkmap.get("rootParentNodeId")).isEqualTo(0L);

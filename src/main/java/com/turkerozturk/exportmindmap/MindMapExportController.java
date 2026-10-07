@@ -306,7 +306,7 @@ public class MindMapExportController {
                 maximumLevel == null
                         || currentLevel < maximumLevel;
 
-        if (mayWriteChildren && (treeNode.getMasterId() == null || treeNode.getMasterId() == 0)) {
+        if (mayWriteChildren) {
             List<Children> children =
                     childrenRepository
                             .findByFatherIdOrderBySequenceAsc(

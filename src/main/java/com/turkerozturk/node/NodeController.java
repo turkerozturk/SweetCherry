@@ -530,10 +530,6 @@ public class NodeController {
 
 
 
-            List<NaviNode> childNodes = childrenService.getNaviNodesByFatherId(nodeId);
-            if(!childNodes.isEmpty()) {
-                model.addAttribute("childNodes", childNodes);
-            }
 
 
             if(node.getTxtAsHtml() != null && NodeContentParserService.isHtmlContentEmpty(node.getTxtAsHtml())) {
@@ -593,7 +589,7 @@ public class NodeController {
             node.setMasterNode(false);
 
             long parentNodeId = nodeInChildrenTable.getFatherId();
-            Node parent = parentNodeId == 0 ? null : nodeService.findById(parentNodeId);
+            Node parent = parentNodeId == 0 ? null : nodeService.findDisplayNode(parentNodeId);
             if (parentNodeId != 0 && parent == null) {
                 parentNodeId = 0;
             }
@@ -604,7 +600,10 @@ public class NodeController {
             breadcrumbs.put(nodeId, node.getName());
             node.setBreadcrumbs(breadcrumbs);
 
-            node.setTxtAsHtml("<a href=\"/nodes/" + nodeInChildrenTable.getMasterId() + "\">Gerçek node için tıklayınız: " + nodeInChildrenTable.getMasterId() + "</a>");
+            if (!("custom-colors".equals(node.getSyntax()) && ("reader".equals(viewMode)
+                    || Boolean.TRUE.equals(request.getAttribute("newRichTextView"))))) {
+                node = nodeContentParserService.parseNodeContent(node, request);
+            }
 
             model.addAttribute("node", node);
 
@@ -645,6 +644,8 @@ public class NodeController {
                 contentNode.setTxtAsHtml(richTextRenderingService.renderLive(contentNode, token));
             }
         }
+
+        model.addAttribute("childNodes", childrenService.getNaviNodesByFatherId(nodeId));
 
         model.addAttribute("viewMode", viewMode);
 

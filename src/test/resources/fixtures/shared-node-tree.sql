@@ -1,0 +1,44 @@
+-- Shared occurrence hierarchy fixture. No deletion semantics are asserted.
+BEGIN;
+CREATE TABLE bookmark (node_id INTEGER UNIQUE,sequence INTEGER);
+CREATE TABLE children (node_id INTEGER UNIQUE,father_id INTEGER,sequence INTEGER,master_id INTEGER);
+CREATE TABLE codebox (node_id INTEGER,offset INTEGER,justification TEXT,txt TEXT,syntax TEXT,width INTEGER,height INTEGER,is_width_pix INTEGER,do_highl_bra INTEGER,do_show_linenum INTEGER);
+CREATE TABLE grid (node_id INTEGER,offset INTEGER,justification TEXT,txt TEXT,col_min INTEGER,col_max INTEGER);
+CREATE TABLE image (node_id INTEGER,offset INTEGER,justification TEXT,anchor TEXT,png BLOB,filename TEXT,link TEXT,time INTEGER);
+CREATE TABLE node (node_id INTEGER UNIQUE,name TEXT,txt TEXT,syntax TEXT,tags TEXT,is_ro INTEGER,is_richtxt INTEGER,has_codebox INTEGER,has_table INTEGER,has_image INTEGER,level INTEGER,ts_creation INTEGER,ts_lastsave INTEGER);
+INSERT INTO children VALUES (1,0,1,0);
+INSERT INTO children VALUES (2,0,2,0);
+INSERT INTO children VALUES (3,2,1,0);
+INSERT INTO children VALUES (4,0,3,0);
+INSERT INTO children VALUES (5,0,4,0);
+INSERT INTO children VALUES (6,0,5,0);
+INSERT INTO children VALUES (7,16,1,0);
+INSERT INTO children VALUES (8,16,2,0);
+INSERT INTO children VALUES (9,0,7,0);
+INSERT INTO children VALUES (10,0,8,1);
+INSERT INTO children VALUES (11,0,9,2);
+INSERT INTO children VALUES (12,11,1,0);
+INSERT INTO children VALUES (13,11,2,0);
+INSERT INTO children VALUES (14,13,1,0);
+INSERT INTO children VALUES (15,13,2,0);
+INSERT INTO children VALUES (16,0,6,6);
+INSERT INTO children VALUES (17,9,1,8);
+INSERT INTO node VALUES (1, 'Node 1', 'Content of master 1. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (2, 'Node 2', 'Content of master 2. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (3, 'Node 3', 'Content of master 3. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (4, 'Node 4', 'Content of master 4. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (5, 'Node 5', 'Content of master 5. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (6, 'Node 6', 'Content of master 6. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (7, 'Node 7', 'Content of master 7. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (8, 'Node 8', 'Content of master 8. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (9, 'Node 9', 'Content of master 9. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (12, 'Node 12', 'Content of master 12. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (13, 'Node 13', 'Content of master 13. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (14, 'Node 14', 'Content of master 14. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO node VALUES (15, 'Node 15', 'Content of master 15. Hierarchy follows the occurrence ID.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+-- A shared child of a shared parent; content reference is still direct to a real master.
+INSERT INTO children VALUES (18, 11, 3, 1);
+-- A real child below that nested shared occurrence.
+INSERT INTO children VALUES (19, 18, 1, 0);
+INSERT INTO node VALUES (19, 'Node 19', 'Child of shared occurrence 18.', 'plain-text', '', 0, 0, 0, 0, 0, 0, 0, 0);
+COMMIT;

@@ -11,7 +11,7 @@ Sayfa boyutu, yönü, renkler, düğüm adını gösterme, header/footer ve güv
 
 ## Paylaşımlı düğümler
 
-Paylaşımlı düğüm master’ın içeriğini kullanır; PDF başlığının konumu ve bağlantı kimliği kendi ağaç kaydına aittir. Mevcut okuyucularla aynı şekilde yaprak olarak işlenir. Master’ın alt ağacı veya paylaşımlı düğüm altında veritabanında bulunabilecek gizli kayıtlar genişletilmez. Aynı içeriğin farklı ağaç konumları PDF’de ayrı bölümlerdir. Sayfa içi çapa kimlikleri bu bölümler arasında çakışmayacak şekilde ayrılır.
+Paylaşımlı düğüm master’ın içeriğini kullanır; PDF başlığının konumu ve bağlantı kimliği kendi ağaç kaydına aittir. Alt düğümler kendi `children.node_id` kaydına bağlı `father_id` ilişkilerinden okunur. Master’ın alt ağacı ödünç alınmaz; paylaşımlı düğümün kendi çocukları ve torunları genişletilir. Aynı içeriğin farklı ağaç konumları PDF’de ayrı bölümlerdir. Sayfa içi çapa kimlikleri bu bölümler arasında çakışmayacak şekilde ayrılır.
 
 ## Sınırlar
 

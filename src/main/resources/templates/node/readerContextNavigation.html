@@ -17,7 +17,7 @@
 <img th:src="@{/img/icons/{icon}.svg(icon=${item.nodeIcon.iconName})}" alt=""/>
 <span th:text="${item.name}" th:style="${item.titleColorAsHtmlHex != null ? 'color:' + item.titleColorAsHtmlHex : ''}" th:classappend="${item.boldnessBit ? 'boldTitle' : ''}"></span>
 </a>
-<ul th:if="${item.nodeId == requestedNodeId and isSharedNode != true and childNodes != null}">
+<ul th:if="${item.nodeId == requestedNodeId and childNodes != null}">
 <li th:each="child : ${childNodes}"><a th:href="@{/nodes/{id}(id=${child.nodeId})}">
 <img th:if="${child.isReadOnly}" th:src="@{/img/icons/ct_locked.svg}" alt=""/>
 <img th:src="@{/img/icons/{icon}.svg(icon=${child.nodeIcon.iconName})}" alt=""/>

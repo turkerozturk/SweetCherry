@@ -52,29 +52,30 @@ class SubtreePdfExportTest {
         }
     }
 
-    @Test void traversalKeepsSiblingOrderAndSharedOccurrencesAreLeaves() {
+    @Test void traversalKeepsSiblingOrderAndSharedOccurrencesOwnTheirChildren() {
         var children = mock(ChildrenService.class); var nodes = mock(NodeService.class);
         var rich = mock(RichTextRenderingService.class); var renderer = mock(NodePdfRenderer.class);
         var root = occurrence(1,0,1,0); var child = occurrence(2,1,1,0);
         var shared = occurrence(72,1,2,2); var hidden = occurrence(99,72,1,0);
         when(children.findById(1L)).thenReturn(root);
         when(children.getChildren()).thenReturn(List.of(hidden, shared, root, child));
-        for (long id : new long[]{1,2}) {
+        for (long id : new long[]{1,2,99}) {
             var node = mock(Node.class); when(node.getName()).thenReturn("Node " + id);
             when(node.getTxt()).thenReturn("Text " + id); when(nodes.findById(id)).thenReturn(node);
         }
         when(renderer.render(any())).thenAnswer(call -> {
             org.w3c.dom.Document doc = call.getArgument(0);
             var titles = doc.getElementsByTagName("h1");
-            assertThat(titles.getLength()).isEqualTo(3);
+            assertThat(titles.getLength()).isEqualTo(4);
             assertThat(((org.w3c.dom.Element)titles.item(0)).getAttribute("id")).isEqualTo("sc-node-1");
             assertThat(((org.w3c.dom.Element)titles.item(1)).getAttribute("id")).isEqualTo("sc-node-2");
             assertThat(((org.w3c.dom.Element)titles.item(2)).getAttribute("id")).isEqualTo("sc-node-72");
+            assertThat(((org.w3c.dom.Element)titles.item(3)).getAttribute("id")).isEqualTo("sc-node-99");
             return new byte[]{1};
         });
         var service = new NodePdfExportService(children, nodes, rich, renderer);
         assertThat(service.exportSubtree(1, PdfExportOptions.defaults(), null, false, "Contents").bytes()).containsExactly((byte)1);
-        verify(nodes, never()).findById(99L);
+        verify(nodes).findById(99L);
         verify(nodes, times(2)).findById(2L);
     }
 
