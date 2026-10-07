@@ -99,4 +99,21 @@ class PdfExportOptionsTest {
         }
     }
 
+
+    @org.junit.jupiter.api.Test void subtreeUsesSamePreferencesAndRemembersContentsAfterSuccess() {
+        var service = org.mockito.Mockito.mock(NodePdfExportService.class);
+        var sources = org.mockito.Mockito.mock(PdfSourceMetadata.class);
+        var controller = new NodePdfOptionsController(service, sources);
+        var session = new org.springframework.mock.web.MockHttpSession();
+        org.mockito.Mockito.when(service.exportSubtree(org.mockito.ArgumentMatchers.eq(53L),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.eq(true), org.mockito.ArgumentMatchers.anyString()))
+                .thenReturn(new NodePdfExportService.Export("Root", new byte[]{1}));
+        controller.subtreeDownload(53, session, "A4", "portrait", true, true, true,
+                false, false, false, false, false, true, java.util.Locale.ENGLISH);
+        var model = new org.springframework.ui.ExtendedModelMap();
+        controller.subtreePage(25, session, model);
+        org.assertj.core.api.Assertions.assertThat(model).containsEntry("includeDescendants", true).containsEntry("contents", true);
+        org.assertj.core.api.Assertions.assertThat(model.get("options")).isEqualTo(PdfExportOptions.defaults());
+    }
 }

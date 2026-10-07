@@ -5,7 +5,7 @@ Bilgi → Özellikler → Düzenle → Taşıma okları → PDF → CTB → Hari
 
 Düzenle menüsünde mevcut metin ve zengin metin düzenleyicileri, ayrıca daha önceki tek düğüm/alt ağaç çoğaltma işlemleri korunur. Ekle menüsü kardeş düğüm, alt düğüm, yer işareti ve paylaşımlı düğüm oluşturmayı içerir. Kardeş düğüm, seçilen ağaç kaydının hemen sonrasına eklenir; paylaşımlı düğüm seçilmişse onun ağaç konumu kullanılır. Paylaşımlı bir düğümün altına düğüm ekleme sınırı korunur.
 
-Taşıma oklarının açıklamaları Alt + Shift + yön tuşu kısayolunu gösterir. PDF alt düğümler seçeneği henüz uygulanmamıştır ve pasiftir. Yetki, salt okunur veri kaynağı ve düğüm türüne göre önceki görünürlük kuralları sürer.
+Taşıma oklarının açıklamaları Alt + Shift + yön tuşu kısayolunu gösterir. PDF alt düğümler seçeneği, aynı sihirbaz üzerinden alt ağaç PDF aktarımını açar. Yetki, salt okunur veri kaynağı ve düğüm türüne göre önceki görünürlük kuralları sürer.
 
 ## Tenant config indirme
 

@@ -36,6 +36,31 @@ public class NodePdfOptionsController {
         session.setAttribute(PREFERENCES, options);
         return PdfFromHtmlController.downloadResponse(exported, nodeId);
     }
+
+    @GetMapping("/nodes/pdf/{nodeId}/subtree")
+    public String subtreePage(@PathVariable long nodeId, HttpSession session, Model model) {
+        page(nodeId, session, model);
+        model.addAttribute("includeDescendants", true);
+        model.addAttribute("contents", Boolean.TRUE.equals(session.getAttribute("NODE_PDF_CONTENTS")));
+        return "node/pdfExportOptions";
+    }
+
+    @PostMapping("/nodes/pdf/{nodeId}/subtree")
+    public ResponseEntity<byte[]> subtreeDownload(@PathVariable long nodeId, HttpSession session,
+            @RequestParam(defaultValue="A4") String paper, @RequestParam(defaultValue="portrait") String orientation,
+            @RequestParam(defaultValue="false") boolean colors, @RequestParam(defaultValue="false") boolean nodeTitle,
+            @RequestParam(defaultValue="false") boolean outline, @RequestParam(defaultValue="false") boolean filenameHeader,
+            @RequestParam(defaultValue="false") boolean pageNumbers, @RequestParam(defaultValue="false") boolean metadata,
+            @RequestParam(defaultValue="false") boolean sourceName, @RequestParam(defaultValue="false") boolean sourceAddress,
+            @RequestParam(defaultValue="false") boolean contents, java.util.Locale locale) {
+        var options = new PdfExportOptions(paper, orientation, colors, nodeTitle, outline,
+                filenameHeader, pageNumbers, metadata, sourceName, sourceAddress);
+        String contentsTitle = java.util.ResourceBundle.getBundle("messages", locale).getString("pdf.options.contents");
+        var exported = service.exportSubtree(nodeId, options, sources.current(options), contents, contentsTitle);
+        session.setAttribute(PREFERENCES, options);
+        session.setAttribute("NODE_PDF_CONTENTS", contents);
+        return PdfFromHtmlController.downloadResponse(exported, nodeId);
+    }
     static PdfExportOptions remembered(HttpSession session) {
         var value = session.getAttribute(PREFERENCES);
         return value instanceof PdfExportOptions options ? options : PdfExportOptions.defaults();

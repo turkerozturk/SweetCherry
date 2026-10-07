@@ -5,7 +5,7 @@
 <h1 th:text="#{pdf.options.title}"></h1><p th:text="${nodeName}"></p>
 <p class="text-muted" th:text="#{pdf.options.remember}"></p>
 <div class="card"><div class="card-body">
-<form th:action="@{/nodes/pdf/{id}(id=${nodeId})}" method="post">
+<form th:action="${includeDescendants == true} ? @{/nodes/pdf/{id}/subtree(id=${nodeId})} : @{/nodes/pdf/{id}(id=${nodeId})}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <div class="row g-3 mb-3">
 <div class="col-sm-6"><label class="form-label" for="paper" th:text="#{pdf.options.paper}"></label>
@@ -15,6 +15,7 @@
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="colors" id="colors" value="true" th:checked="${options.colors}"><label class="form-check-label" for="colors" th:text="#{pdf.options.colors}"></label></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="nodeTitle" id="nodeTitle" value="true" th:checked="${options.nodeTitle}"><label class="form-check-label" for="nodeTitle" th:text="#{pdf.options.nodeTitle}"></label></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="outline" id="outline" value="true" th:checked="${options.outline}"><label class="form-check-label" for="outline" th:text="#{pdf.options.outline}"></label></div>
+<div th:if="${includeDescendants == true}" class="form-check mb-2"><input class="form-check-input" type="checkbox" name="contents" id="contents" value="true" th:checked="${contents}"><label class="form-check-label" for="contents" th:text="#{pdf.options.contents}"></label></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="filenameHeader" id="filenameHeader" value="true" th:checked="${options.filenameHeader}"><label class="form-check-label" for="filenameHeader" th:text="#{pdf.options.filenameHeader}"></label></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="pageNumbers" id="pageNumbers" value="true" th:checked="${options.pageNumbers}"><label class="form-check-label" for="pageNumbers" th:text="#{pdf.options.pageNumbers}"></label></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="metadata" id="metadata" value="true" th:checked="${options.metadata}"><label class="form-check-label" for="metadata" th:text="#{pdf.options.metadata}"></label></div>

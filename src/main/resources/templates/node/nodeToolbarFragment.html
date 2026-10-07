@@ -16,7 +16,7 @@
 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">PDF</button>
 <div class="dropdown-menu">
 <a class="dropdown-item" th:href="@{/nodes/pdf/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{toolbar.pdfSingle}"></a>
-<button class="dropdown-item" type="button" disabled th:text="#{toolbar.pdfBranch}" th:title="#{toolbar.planned}"></button>
+<a class="dropdown-item" th:href="@{/nodes/pdf/{id}/subtree(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{toolbar.pdfBranch}"></a>
 </div></div>
             <div class="dropdown">
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{toolbar.ctb}">Export</span></button>

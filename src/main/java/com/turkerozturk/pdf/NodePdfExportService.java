@@ -59,4 +59,59 @@ public class NodePdfExportService {
             return new Export(node.getName(), renderer.render(new NodePdfDocument().prepare(node.getName(), html, contentId, options, source, PdfFilename.create(node.getName(), occurrenceId))));
         } finally { permit.release(); }
     }
+
+    @Transactional(readOnly = true)
+    public Export exportSubtree(long occurrenceId, PdfExportOptions options,
+            PdfSourceMetadata.Source source, boolean contents, String contentsTitle) {
+        if (!permit.tryAcquire()) throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
+        try {
+            var root = children.findById(occurrenceId);
+            if (root == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            var byParent = new java.util.HashMap<Long, java.util.List<com.turkerozturk.children.Children>>();
+            for (var child : children.getChildren())
+                byParent.computeIfAbsent(child.getFatherId(), ignored -> new java.util.ArrayList<>()).add(child);
+            for (var list : byParent.values()) list.sort(java.util.Comparator
+                    .comparingLong(com.turkerozturk.children.Children::getSequence)
+                    .thenComparingLong(com.turkerozturk.children.Children::getNodeId));
+            record Pending(com.turkerozturk.children.Children occurrence, int depth) {}
+            var stack = new java.util.ArrayDeque<Pending>();
+            stack.push(new Pending(root, 0));
+            var seen = new java.util.HashSet<Long>();
+            var parts = new java.util.ArrayList<SubtreePdfDocument.Part>();
+            long total = 0;
+            while (!stack.isEmpty()) {
+                var pending = stack.pop(); var occurrence = pending.occurrence();
+                if (!seen.add(occurrence.getNodeId()))
+                    throw new ResponseStatusException(HttpStatus.CONFLICT);
+                if (parts.size() >= 512 || pending.depth() > 64)
+                    throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
+                boolean shared = occurrence.getMasterId() != null && occurrence.getMasterId() != 0;
+                long contentId = shared ? occurrence.getMasterId() : occurrence.getNodeId();
+                var node = nodes.findById(contentId);
+                if (node == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                String text = node.getTxt() == null ? "" : node.getTxt();
+                if (text.length() > 8 * 1024 * 1024)
+                    throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
+                String html;
+                if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = richText.renderForPdf(node, "");
+                else {
+                    var fragment = org.jsoup.Jsoup.parseBodyFragment("");
+                    fragment.outputSettings().prettyPrint(false);
+                    fragment.body().appendElement("div").text(text);
+                    html = fragment.body().html();
+                }
+                total += html.length();
+                if (total > 64 * 1024 * 1024) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
+                parts.add(new SubtreePdfDocument.Part(occurrence.getNodeId(), contentId,
+                        pending.depth(), node.getName(), html));
+                // Shared occurrences are leaves in the readers; do not expand the master's subtree.
+                if (!shared) {
+                    var list = byParent.getOrDefault(occurrence.getNodeId(), java.util.List.of());
+                    for (int n = list.size() - 1; n >= 0; n--) stack.push(new Pending(list.get(n), pending.depth() + 1));
+                }
+            }
+            return new Export(parts.get(0).title(), renderer.render(new SubtreePdfDocument()
+                    .prepare(parts, options, source, contents, contentsTitle)));
+        } finally { permit.release(); }
+    }
 }
