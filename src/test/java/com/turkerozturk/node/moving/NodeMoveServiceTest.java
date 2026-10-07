@@ -42,13 +42,26 @@ class NodeMoveServiceTest {
     @Test void leftPlacesNodeImmediatelyAfterParent() throws Exception {
         move(4,NodeMoveService.Direction.LEFT);location(4,0,2);location(2,0,3);
     }
-    @Test void aliasMovesOnlyItsOccurrenceAndCannotBecomeParent() throws Exception {
+    @Test void aliasMovesOnlyItsOccurrenceAndCanBecomeParent() throws Exception {
         move(9,NodeMoveService.Direction.UP);location(9,0,3);location(1,0,1);location(4,1,5);
         var state=NodeMoveService.state(NodeMoveService.read(connection),3);
-        assertThat(state.right()).isFalse();
-        assertThatThrownBy(()->move(3,NodeMoveService.Direction.RIGHT)).isInstanceOf(ResponseStatusException.class);
+        assertThat(state.right()).isTrue();
+        move(3,NodeMoveService.Direction.RIGHT);location(3,9,1);
         assertThat(NodeMoveService.read(connection).stream().filter(row->row.id()==9).findFirst().orElseThrow().master()).isEqualTo(1);
     }
+    @Test void sharedParentsSupportSiblingAndOutdentMovesWithoutChangingContentReferences() throws Exception {
+        try(var statement=connection.createStatement()) {
+            statement.execute("UPDATE children SET father_id=9 WHERE node_id=4");
+            statement.execute("INSERT INTO children VALUES(10,9,6,2),(11,10,1,3)");
+        }
+        move(10,NodeMoveService.Direction.UP);location(10,9,1);location(4,9,2);
+        move(10,NodeMoveService.Direction.DOWN);location(10,9,2);
+        move(11,NodeMoveService.Direction.LEFT);location(11,9,3);
+        move(9,NodeMoveService.Direction.UP);location(9,0,3);location(4,9,1);
+        move(4,NodeMoveService.Direction.LEFT);location(4,0,4);
+        assertThat(NodeMoveService.read(connection).stream().filter(row->row.id()==11).findFirst().orElseThrow().master()).isEqualTo(3);
+    }
+
     @Test void boundariesAndStaleSnapshotsRejectWithoutFurtherWrites() throws Exception {
         var state=NodeMoveService.state(NodeMoveService.read(connection),1);
         assertThat(state.up()).isFalse();assertThat(state.left()).isFalse();assertThat(state.right()).isFalse();

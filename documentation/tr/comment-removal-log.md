@@ -273,3 +273,21 @@ Kaldırılan, yanlış varsayımı anlatan yorum:
 ```
 
 Master’ın alt ağacını ödünç almama kuralı korunmuştur; paylaşımlı konumun kendi çocukları artık gösterilir.
+
+
+## Paylaşımlı ebeveynlerde taşıma seçenekleri — 2026-10-07
+
+Dosya: `src/main/java/com/turkerozturk/node/moving/NodeMoveService.java`
+
+```java
+/** Rejects broken parent chains and aliases with children before proposing a move. */
+// A real parent must exist in node, not just in the hierarchy table.
+```
+
+Dosya: `src/main/java/com/turkerozturk/node/duplication/NodeDuplicationService.java`
+
+```java
+/** Rejects a cyclic or missing parent chain and unsupported placement underneath a shared node. */
+```
+
+Bu yorumlar paylaşımlı ebeveyni geçersiz sayan eski varsayımı içeriyordu. Döngü, eksik ebeveyn ve eksik master içeriği korumaları devam eder.

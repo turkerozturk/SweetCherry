@@ -53,7 +53,7 @@ public class NodeMoveService {
         return result;
     }
 
-    /** Rejects broken parent chains and aliases with children before proposing a move. */
+    /** Rejects broken or cyclic occurrence parent chains before proposing a move. */
     private static void validate(List<Row> rows) {
         var index = new HashMap<Long, Row>();
         for (var row : rows) if (row.id <= 0 || index.put(row.id, row) != null) throw conflict();
@@ -66,7 +66,7 @@ public class NodeMoveService {
                 if (item == null || !path.add(id)) throw conflict();
                 if (item.parent != 0) {
                     var parent = index.get(item.parent);
-                    if (parent == null || parent.master != 0) throw conflict();
+                    if (parent == null) throw conflict();
                 }
                 id = item.parent;
             }
@@ -85,7 +85,7 @@ public class NodeMoveService {
         validate(rows);
         var node = selected(rows,id); var siblings = siblings(rows,node.parent); int at = siblings.indexOf(node);
         return new State(revision(rows), at > 0, at < siblings.size()-1, node.parent != 0,
-                at > 0 && siblings.get(at-1).master == 0);
+                at > 0);
     }
 
     /** Renumbers only affected sibling groups, preserving subtree and master references. */
@@ -109,9 +109,10 @@ public class NodeMoveService {
                 var parent = selected(rows,node.parent); targetParent = parent.parent;
                 target = siblings(rows,targetParent); insertAt = target.indexOf(parent)+1;
             }
-            // A real parent must exist in node, not just in the hierarchy table.
+            // A shared parent has no node row of its own; validate its master content.
             if (targetParent != 0) try (var query = connection.prepareStatement("SELECT node_id FROM node WHERE node_id = ?")) {
-                query.setLong(1,targetParent);
+                var parent = selected(rows,targetParent);
+                query.setLong(1,parent.master == 0 ? parent.id : parent.master);
                 try (var result = query.executeQuery()) { if (!result.next()) throw conflict(); }
             }
             source.remove(at); target.add(insertAt,node);

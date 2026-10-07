@@ -86,14 +86,31 @@ class NodeDuplicationServiceTest {
         assertThatThrownBy(()->NodeDuplicationService.duplicate(connection,1,true,revision,1000)).isInstanceOf(ResponseStatusException.class);
         assertThat(number("SELECT COUNT(*) FROM node")).isEqualTo(3);
     }
-    @Test void sharedParentAndMalformedSubtreesAreRejectedWithoutOrphans() throws Exception {
-        try(var statement=connection.createStatement()){statement.execute("UPDATE children SET father_id=10 WHERE node_id=3");}
-        assertThat(NodeDuplicationService.state(NodeDuplicationService.read(connection),1).subtreeCount()).isZero();
+    @Test void missingParentIsRejectedWithoutOrphans() throws Exception {
+        try(var statement=connection.createStatement()){statement.execute("UPDATE children SET father_id=99 WHERE node_id=1");}
+        assertThatThrownBy(()->NodeDuplicationService.state(NodeDuplicationService.read(connection),1)).isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(()->duplicate(1,true)).isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(()->duplicate(3,false)).isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(()->duplicate(10,false)).isInstanceOf(ResponseStatusException.class);
         assertThat(number("SELECT COUNT(*) FROM node")).isEqualTo(3);
     }
+    @Test void statesAndSingleCopiesAcceptSharedParentsAndSharedOccurrencesWithChildren() throws Exception {
+        try(var statement=connection.createStatement()) {
+            statement.execute("UPDATE children SET father_id=10 WHERE node_id=3");
+        }
+        var snapshot=NodeDuplicationService.read(connection);
+        for(long id:new long[]{1,2,3,10,11,12})
+            assertThat(NodeDuplicationService.state(snapshot,id).revision()).isNotBlank();
+        // Subtree copying through a shared parent remains deferred; ordinary controls still load.
+        assertThat(NodeDuplicationService.state(snapshot,1).subtreeCount()).isZero();
+        long copy=duplicate(3,false);
+        assertThat(number("SELECT father_id FROM children WHERE node_id="+copy)).isEqualTo(10);
+        long alias=duplicate(10,false);
+        assertThat(number("SELECT master_id FROM children WHERE node_id="+alias)).isEqualTo(3);
+        assertThat(number("SELECT COUNT(*) FROM children WHERE father_id="+alias)).isZero();
+        assertThat(number("SELECT father_id FROM children WHERE node_id=3")).isEqualTo(10);
+    }
+
     @Test void identifierExhaustionRefusesWrite() throws Exception {
         try(var statement=connection.createStatement()){statement.execute("UPDATE children SET node_id=9223372036854775807 WHERE node_id=12");}
         assertThatThrownBy(()->duplicate(1,true)).isInstanceOf(ResponseStatusException.class);

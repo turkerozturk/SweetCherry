@@ -10,7 +10,7 @@ Kaynak: https://github.com/giuspen/cherrytree/blob/master/src/ct/ct_storage_sqli
 
 2026-10-07 tarihinde incelenen SQLite yükleme akışında, `f_nodes_from_db` düğümü `(node_id, master_id)` ile yükler ve çocuklarını `_get_children_node_ids_from_db(node_id)` ile alır. Bu sorgu `father_id` üzerinden ve `sequence` sırasıyla çalışır. `_node_from_db` ise paylaşımlı düğümün içerik özelliklerini master üzerinden okur. Bu, içerik referansı ile ebeveyn ilişkisinin ayrı olduğunu doğrular. SweetCherry değişikliği bu davranışın bağımsız uygulamasıdır; CherryTree kodu kopyalanmamıştır.
 
-Bu inceleme silme, taşıma veya çoğaltmanın tüm kurallarını doğrulamaz. Bu yamada bu işlemler değiştirilmemiştir. Paylaşımlı düğüm altında oluşturma/taşıma, CTB kopyalama ve silme korumaları sonraki uyumluluk adımında ele alınacaktır. Özellikle alt düğümü bulunan paylaşımlı düğümü silme işlemini henüz uyumlu kabul etmeyin.
+Bu inceleme silme, taşıma veya çoğaltmanın tüm kurallarını doğrulamaz. Gösterim düzeltmesinin devamında taşıma ve çoğaltma seçeneklerinin geçerli paylaşımlı ebeveynleri reddetmesi giderilmiştir. Yönlü taşıma paylaşımlı ebeveynlerde de desteklenir. Tek düğüm/referans kopyalama kendi ebeveyni altında yapılabilir. Paylaşımlı çocuklar içeren alt ağacın çoğaltılması, paylaşımlı düğüm altında yeni alt düğüm oluşturma, CTB kopyalama ve silme korumaları sonraki uyumluluk adımlarında ele alınacaktır. Özellikle alt düğümü bulunan paylaşımlı düğümü silme işlemini henüz uyumlu kabul etmeyin.
 
 ## Okunabilir test verisi
 

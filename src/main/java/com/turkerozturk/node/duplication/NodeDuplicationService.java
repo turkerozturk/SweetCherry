@@ -100,20 +100,25 @@ public class NodeDuplicationService {
         return snapshot.rows.stream().filter(row->row.id==id).findFirst().orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,"Tree node not found"));
     }
-    /** Rejects a cyclic or missing parent chain and unsupported placement underneath a shared node. */
+    /** Rejects a cyclic or missing occurrence parent chain and broken content references. */
     private static void validateAncestors(Snapshot snapshot,Row root) {
         var index=index(snapshot);var visited=new HashSet<Long>();Row row=root;
         while(true) {
             if(!visited.add(row.id)) throw conflict();
             if(row.parent==0) break;
             row=index.get(row.parent);
-            if(row==null || row.master!=0 || !snapshot.realIds.contains(row.id)) throw conflict();
+            if(row==null) throw conflict();
+            validateContentReference(snapshot,row);
         }
     }
     private static Map<Long,Row> index(Snapshot snapshot) {
         var result=new HashMap<Long,Row>();
         for(var row:snapshot.rows) if(row.id<=0 || result.put(row.id,row)!=null) throw conflict();
         return result;
+    }
+    private static void validateContentReference(Snapshot snapshot,Row row) {
+        if(row.master==0 ? !snapshot.realIds.contains(row.id)
+                : snapshot.realIds.contains(row.id) || !snapshot.realIds.contains(row.master)) throw conflict();
     }
     /** Includes aliases in the branch but never follows their master as a hierarchy edge. */
     private static List<Row> branch(Snapshot snapshot,Row root,boolean descendants) {
@@ -124,9 +129,9 @@ public class NodeDuplicationService {
         while(!pending.isEmpty()) {
             var row=pending.removeFirst();
             if(!seen.add(row.id)) throw conflict();
-            if(row.master==0 ? !snapshot.realIds.contains(row.id) : snapshot.realIds.contains(row.id) || !snapshot.realIds.contains(row.master)) throw conflict();
+            validateContentReference(snapshot,row);
             var below=children.getOrDefault(row.id,List.of());
-            if(row.master!=0 && !below.isEmpty()) throw conflict();
+            if(descendants && row.master!=0 && !below.isEmpty()) throw conflict();
             result.add(row);
             if(descendants) pending.addAll(below);
         }
