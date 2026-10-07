@@ -22,6 +22,7 @@ package com.turkerozturk.pdf;
 
 import com.turkerozturk.helpers.DateTimeHelper;
 import com.turkerozturk.helpers.PDFFromHTMLHelper;
+import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.*;
 import com.turkerozturk.node.filter.FormSearch;
 import jakarta.servlet.http.HttpServletRequest;
@@ -94,33 +95,13 @@ public class PdfFromHtmlController {
         return new ResponseEntity<>(export.bytes(), headers, HttpStatus.OK);
     }
 
+    @Autowired
+    private TemplatePdfExportService templatePdfExportService;
+
+    @RequiresTenant
     @GetMapping("/cherrytemplatenode/pdf/{templateNodeId}")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable long templateNodeId) {
-
-        // DATA (we are not using it for now, will use later)
-        TemplateNode templateNode = templateService.getTemplateNode(templateNodeId);
-
-        // TEMPLATE ENGINE
-        Context context = new Context();
-        context.setVariable("degisken1", "Bu metin bir Thymeleaf Context değişkeninin, " +
-                "Tyhmeleaf Template Engine tarafından process edilmesiyle HTML şablonda yerine yerleşti.");
-
-        context.setVariable("cherryTemplateNode", templateNode);
-
-        String sourceHTMLContent = templateEngine.process("cherrytemplatenode-pdf", context);
-
-        // STRING HTML TO BYTE ARRAY PDF CONVERSION
-        byte[] pdfBytes = pdfFromHTMLHelper.createPdfFromHtml(sourceHTMLContent);
-
-        // PREPARATION FOR PDF FILE DOWNLOAD
-        String targetPdfFileName = templateNode.getName();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("filename", targetPdfFileName);
-        headers.setContentLength(pdfBytes.length);
-
-        // SERVING PDF FILE
-        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        return downloadResponse(templatePdfExportService.export(templateNodeId), templateNodeId);
     }
 
     private TemplateEngine initializeTemplateEngine() {

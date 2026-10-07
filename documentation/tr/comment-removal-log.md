@@ -249,3 +249,15 @@ Eski node endpoint gövdesi ayrı PDF servisine taşınırken kaldırılan yorum
 // PREPARATION FOR PDF FILE DOWNLOAD
 // SERVING PDF FILE
 ```
+
+## Şablon PDF yenilemesi
+
+Kaynak: `src/main/java/com/turkerozturk/pdf/PdfFromHtmlController.java`
+
+```java
+// DATA (we are not using it for now, will use later)
+// TEMPLATE ENGINE
+// STRING HTML TO BYTE ARRAY PDF CONVERSION
+// PREPARATION FOR PDF FILE DOWNLOAD
+// SERVING PDF FILE
+```

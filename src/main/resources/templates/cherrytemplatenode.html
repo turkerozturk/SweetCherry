@@ -182,7 +182,7 @@
                                         <img th:src="@{/img/icons/CT_LIFEBUOY.svg}" class="childiconcss"/>
                                         Download as PDF File
                                     </th>
-                                    <td><a th:href="@{'/cherrytemplatenode/pdf/' + ${cherryTemplateNode.nodeId}}"><span
+                                    <td><a th:href="@{/cherrytemplatenode/pdf/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}"><span
                                             th:text="${cherryTemplateNode.name}"></span></a></td>
                                 </tr>
                                 -->
@@ -243,7 +243,7 @@
 
 
 
-                        <a th:href="@{'/cherrytemplatenode/pdf/' + ${cherryTemplateNode.nodeId}}"
+                        <a th:href="@{/cherrytemplatenode/pdf/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}"
                            th:title="#{cherrytemplate.download_as_pdf_document}"
                            class="link-danger"
                            style="text-decoration: none;"
