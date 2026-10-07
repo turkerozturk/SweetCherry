@@ -10,7 +10,7 @@ Gerçek düğümün içeriği `node` tablosundadır. Paylaşımlı düğüm (sha
 
 Eski yardım notlarında CherryTree 1.1.0 ile paylaşımlı düğüm desteği ve düğüm özelliklerinde gerçek/paylaşımlı kimliklerin görüntülenmesi anlatılıyordu. Bu tarihsel not burada korundu. SweetCherry açısından asıl ayrım, içerik kimliği ile ağaçta seçilen referans kimliğidir: bağlantılar ve bookmark’lar referansın kendi ID’sini korumalıdır.
 
-Gerçek düğümün silinmesi ile tek bir paylaşımlı referansın silinmesi farklı işlemlerdir. Paylaşımlı düğümlerin altında kayıt bulunmasıyla ilgili uyumluluk uyarısı için `node-movement.md` belgesine bakın.
+Gerçek düğümün silinmesi ile tek bir paylaşımlı referansın silinmesi farklı işlemlerdir. Paylaşımlı ebeveynler ve silme sırasında kalan bir referansın yeni master olması için `shared-node-operations.md` belgesine bakın.
 
 ## Etiketler ve sonraki işler
 

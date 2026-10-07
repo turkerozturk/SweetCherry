@@ -1,82 +1,136 @@
 package com.turkerozturk.node;
 
-import com.turkerozturk.children.Children;
-import com.turkerozturk.children.ChildrenRepository;
-import com.turkerozturk.children.ChildrenService;
 import com.turkerozturk.multipledatabases.CustomPropertiesHolder;
 import com.turkerozturk.multipledatabases.TenantContext;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.sql.*;
 import java.util.Map;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class NodeDeletionServiceTest {
-    private final NodeRepository nodes = mock(NodeRepository.class);
-    private final ChildrenRepository children = mock(ChildrenRepository.class);
-    private final ChildrenService tree = mock(ChildrenService.class);
-    private final EntityManager manager = mock(EntityManager.class);
-    private final Query query = mock(Query.class);
-    private NodeDeletionService deletion;
-
-    @BeforeEach void setUp() {
-        TenantContext.setCurrentTenant("test");
-        CustomPropertiesHolder properties = new CustomPropertiesHolder();
-        properties.addCustomProperties("test", Map.of("custom.isWritable", "true"));
-        deletion = new NodeDeletionService(properties, nodes, children, tree);
-        ReflectionTestUtils.setField(deletion, "entityManager", manager);
-        when(manager.createNativeQuery(anyString())).thenReturn(query);
-        when(query.setParameter(anyString(), anyLong())).thenReturn(query);
+    private Connection connection;
+    @BeforeEach void setup() throws Exception {
+        connection=DriverManager.getConnection("jdbc:sqlite::memory:");
+        try(var script=getClass().getResourceAsStream("/fixtures/shared-node-tree.sql");var statement=connection.createStatement()) {
+            String sql=new String(script.readAllBytes(),StandardCharsets.UTF_8).replaceAll("(?m)^--.*$", "");
+            for(String part:sql.split(";")) if(!part.isBlank()) statement.execute(part);
+            statement.execute("INSERT INTO bookmark VALUES(6,1),(16,2),(8,3),(17,4),(7,5)");
+            statement.execute("ALTER TABLE image ADD COLUMN extra BLOB");
+            statement.execute("INSERT INTO image VALUES(6,1,'left','',X'0001FF80','file.bin','webs https://example.test',77,X'ABCD')");
+            statement.execute("INSERT INTO image VALUES(6,2,'right','anchor',NULL,NULL,'',NULL,NULL)");
+            statement.execute("INSERT INTO grid VALUES(6,3,'center','<table><row><cell>Cell</cell></row></table>',80,90)");
+            statement.execute("INSERT INTO codebox VALUES(6,4,'right','print(1)','python',100,50,1,1,1)");
+        }
+        connection.setAutoCommit(false);
     }
-
-    @AfterEach void clearTenant() { TenantContext.clear(); }
-
-    @Test void sharedReferenceDeletionDoesNotTouchMaster() {
-        Children alias = new Children().setNodeId(20);
-        alias.setMasterId(10L);
-        when(children.findByNodeId(20L)).thenReturn(alias);
-        when(children.findByFatherId(20L)).thenReturn(List.of());
-        deletion.deleteNodeWithSubNodes(20);
-        verify(manager).createNativeQuery("DELETE FROM bookmark WHERE node_id = :nodeId");
-        verify(manager).createNativeQuery("DELETE FROM children WHERE node_id = :nodeId");
-        verify(query, times(2)).setParameter("nodeId", 20L);
-        verify(manager, times(2)).createNativeQuery(anyString());
-        verifyNoInteractions(nodes, tree);
+    @AfterEach void close() throws Exception {connection.close();TenantContext.clear();}
+    private long number(String sql) throws Exception {
+        try(var statement=connection.createStatement();var result=statement.executeQuery(sql)) {
+            assertThat(result.next()).isTrue();return result.getLong(1);
+        }
     }
-
-    @Test void realNodeDeletionRemovesOutsideReferenceAndBookmarkBeforeNode() {
-        Children original = new Children().setNodeId(10);
-        Children alias = new Children().setNodeId(20);
-        alias.setMasterId(10L);
-        when(children.findByNodeId(10L)).thenReturn(original);
-        when(tree.findAllSubChildren(10L)).thenReturn(List.of(original));
-        when(children.findByMasterId(10L)).thenReturn(List.of(alias));
-        when(children.findByFatherId(20L)).thenReturn(List.of());
-        when(nodes.existsById(10L)).thenReturn(true);
-        deletion.deleteNodeWithSubNodes(10);
-        var order = inOrder(manager);
-        order.verify(manager).createNativeQuery("DELETE FROM bookmark WHERE node_id = :nodeId");
-        order.verify(manager).createNativeQuery("DELETE FROM children WHERE node_id = :nodeId");
-        order.verify(manager).createNativeQuery("DELETE FROM bookmark WHERE node_id = :nodeId");
-        order.verify(manager).createNativeQuery("DELETE FROM codebox WHERE node_id = :nodeId");
-        order.verify(manager).createNativeQuery("DELETE FROM image WHERE node_id = :nodeId");
-        order.verify(manager).createNativeQuery("DELETE FROM grid WHERE node_id = :nodeId");
-        order.verify(manager).createNativeQuery("DELETE FROM children WHERE node_id = :nodeId");
-        order.verify(manager).createNativeQuery("DELETE FROM node WHERE node_id = :nodeId");
+    private void validReferences() throws Exception {
+        assertThat(number("SELECT COUNT(*) FROM children c LEFT JOIN children p ON p.node_id=c.father_id WHERE c.father_id!=0 AND p.node_id IS NULL")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM children c LEFT JOIN node n ON n.node_id=CASE WHEN c.master_id=0 THEN c.node_id ELSE c.master_id END WHERE n.node_id IS NULL")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM bookmark b LEFT JOIN children c ON c.node_id=b.node_id WHERE c.node_id IS NULL")).isZero();
     }
-
-    @Test void refusesToOrphanChildrenOfSharedReference() {
-        Children alias = new Children().setNodeId(20);
-        alias.setMasterId(10L);
-        when(children.findByNodeId(20L)).thenReturn(alias);
-        when(children.findByFatherId(20L)).thenReturn(List.of(new Children().setNodeId(30)));
-        assertThatThrownBy(() -> deletion.deleteNodeWithSubNodes(20)).hasMessageContaining("child rows");
+    @Test void deletesSharedSubtreeAndPromotesDescendantMasterOutsideIt() throws Exception {
+        NodeDeletionSql.delete(connection,16);
+        assertThat(number("SELECT COUNT(*) FROM children WHERE node_id IN(16,7,8)")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=6")).isEqualTo(1);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=17")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=17 AND name='Node 8'")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM bookmark WHERE node_id=17")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM bookmark WHERE node_id IN(16,7,8)")).isZero();
+        validReferences();
+    }
+    @Test void deletingMasterPromotesSurvivorAndPreservesItsChildrenObjectsAndBookmark() throws Exception {
+        NodeDeletionSql.delete(connection,6);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=16")).isZero();
+        assertThat(number("SELECT father_id FROM children WHERE node_id=7")).isEqualTo(16);
+        assertThat(number("SELECT father_id FROM children WHERE node_id=8")).isEqualTo(16);
+        assertThat(number("SELECT COUNT(*) FROM bookmark WHERE node_id=16")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM bookmark WHERE node_id=6")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=16 AND name='Node 6'")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM grid WHERE node_id=16 AND col_max=90")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM codebox WHERE node_id=16 AND txt='print(1)' AND do_show_linenum=1")).isEqualTo(1);
+        try(var statement=connection.createStatement();var result=statement.executeQuery("SELECT png,extra,time FROM image WHERE node_id=16 AND offset=1")) {
+            assertThat(result.next()).isTrue();assertThat(result.getBytes(1)).containsExactly((byte)0,(byte)1,(byte)255,(byte)128);
+            assertThat(result.getBytes(2)).containsExactly((byte)171,(byte)205);assertThat(result.getLong(3)).isEqualTo(77);
+        }
+        assertThat(number("SELECT COUNT(*) FROM image WHERE node_id=16 AND offset=2 AND png IS NULL AND filename IS NULL AND time IS NULL AND extra IS NULL")).isEqualTo(1);
+        validReferences();
+    }
+    @Test void removesOnlyTheSelectedHierarchyAndRetargetsOtherSurvivors() throws Exception {
+        NodeDeletionSql.delete(connection,1);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=10")).isZero();
+        assertThat(number("SELECT master_id FROM children WHERE node_id=18")).isEqualTo(10);
+        assertThat(number("SELECT father_id FROM children WHERE node_id=19")).isEqualTo(18);
+        validReferences();
+    }
+    @Test void sharedRootWithNestedSharedChildrenDoesNotDeleteTheirOutsideMasters() throws Exception {
+        NodeDeletionSql.delete(connection,11);
+        assertThat(number("SELECT COUNT(*) FROM children WHERE node_id IN(11,12,13,14,15,18,19)")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id IN(1,2,3)")).isEqualTo(3);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=10")).isEqualTo(1);
+        validReferences();
+    }
+    @Test void allGroupMembersInsideDeletedSubtreeRemoveThePayloadCompletely() throws Exception {
+        try(var statement=connection.createStatement()) {
+            statement.execute("INSERT INTO node VALUES(100,'Delete group','content','plain-text','',0,0,0,0,0,0,0,0)");
+            statement.execute("INSERT INTO children VALUES(100,0,20,0)");
+            statement.execute("UPDATE children SET father_id=100 WHERE node_id IN(1,10,18)");
+        }
+        NodeDeletionSql.delete(connection,100);
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=1")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM children WHERE node_id IN(1,10,18,19,100)")).isZero();
+        validReferences();
+    }
+    @Test void aliasBelowItsOwnMasterCanBeDeletedWithoutRemovingMaster() throws Exception {
+        try(var statement=connection.createStatement()) {statement.execute("UPDATE children SET father_id=1 WHERE node_id=10");}
+        NodeDeletionSql.delete(connection,10);
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=1")).isEqualTo(1);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=18")).isEqualTo(1);
+        validReferences();
+    }
+    @Test void sharedParentCanContainItsOwnMasterWithoutFollowingTheReferenceAsATreeEdge() throws Exception {
+        try(var statement=connection.createStatement()) {
+            statement.execute("UPDATE children SET father_id=17 WHERE node_id=8");
+        }
+        NodeDeletionSql.delete(connection,17);
+        assertThat(number("SELECT COUNT(*) FROM children WHERE node_id IN(8,17)")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=8")).isZero();
+        validReferences();
+    }
+    @Test void malformedHierarchyRejectsBeforeAnyDeletionOrPromotion() throws Exception {
+        try(var statement=connection.createStatement()) {statement.execute("UPDATE children SET father_id=7 WHERE node_id=16");}
+        assertThatThrownBy(()->NodeDeletionSql.delete(connection,6)).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=6")).isEqualTo(1);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=16")).isEqualTo(6);
+    }
+    @Test void failedPromotionCanRollBackPayloadAndHierarchyTogether() throws Exception {
+        connection.commit();
+        try(var statement=connection.createStatement()) {
+            statement.execute("CREATE TRIGGER fail_promotion BEFORE UPDATE OF node_id ON image BEGIN SELECT RAISE(ABORT,'test'); END");
+        }
+        assertThatThrownBy(()->NodeDeletionSql.delete(connection,6)).isInstanceOf(SQLException.class);
+        connection.rollback();
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=6")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=16")).isZero();
+        assertThat(number("SELECT master_id FROM children WHERE node_id=16")).isEqualTo(6);
+        validReferences();
+    }
+    @Test void readOnlyServiceDoesNotOpenTheTransactionConnection() {
+        TenantContext.setCurrentTenant("readonly");var properties=new CustomPropertiesHolder();
+        properties.addCustomProperties("readonly",Map.of("custom.isWritable","false"));
+        var service=new NodeDeletionService(properties,mock(NodeRepository.class),
+                mock(com.turkerozturk.children.ChildrenRepository.class),mock(com.turkerozturk.children.ChildrenService.class));
+        var manager=mock(jakarta.persistence.EntityManager.class);ReflectionTestUtils.setField(service,"entityManager",manager);
+        assertThatThrownBy(()->service.deleteNodeWithSubNodes(6)).isInstanceOf(AccessDeniedException.class);
         verifyNoInteractions(manager);
     }
 }

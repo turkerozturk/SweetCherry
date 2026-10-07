@@ -10,7 +10,8 @@
 
     <h1 th:text="#{node.delete.title}">Delete node</h1>
     <p th:if="${!sharedNode}" th:text="#{node.delete.warning}">This will permanently delete the selected node and its descendants.</p>
-    <p th:if="${sharedNode}" th:text="#{node.delete.sharedWarning}">Only this shared reference will be removed. Its original node remains.</p>
+    <p th:if="${sharedNode}" th:text="#{node.delete.sharedWarning}">This shared occurrence and its own descendants will be permanently deleted.</p>
+    <p th:text="#{node.delete.survivors}"></p>
     <p><strong th:text="${node.name}">Node</strong></p>
     <form th:action="@{/nodes/delete/{nodeId}(nodeId=${selectedNodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>

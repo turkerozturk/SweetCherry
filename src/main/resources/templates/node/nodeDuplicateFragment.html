@@ -12,7 +12,7 @@
 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" th:title="#{node.duplicate.title}"><i class="fas fa-copy" aria-hidden="true"></i> <span th:text="#{node.duplicate.title}"></span></button>
 <ul class="dropdown-menu">
 <li><button type="submit" class="dropdown-item" data-duplicate="single" disabled th:text="#{node.duplicate.single}"></button></li>
-<li th:if="${isSharedNode != true}"><button type="submit" class="dropdown-item" data-duplicate="subtree" disabled th:text="#{node.duplicate.subtree}"></button></li>
+<li><button type="submit" class="dropdown-item" data-duplicate="subtree" disabled th:text="#{node.duplicate.subtree}"></button></li>
 <li><hr class="dropdown-divider"></li>
 <li><button type="submit" class="dropdown-item" data-duplicate="shared" disabled th:text="#{node.duplicate.shared}"></button></li>
 </ul></div>
@@ -27,7 +27,7 @@
 <input type="hidden" name="withSubnodes" value="false">
 <input type="hidden" name="view" th:value="${view}">
 <button th:if="${!sharedOnly}" type="submit" class="dropdown-item" data-duplicate="single" disabled th:text="#{node.duplicate.single}"></button>
-<button th:if="${!sharedOnly and isSharedNode != true}" type="submit" class="dropdown-item" data-duplicate="subtree" disabled th:text="#{node.duplicate.subtree}"></button>
+<button th:if="${!sharedOnly}" type="submit" class="dropdown-item" data-duplicate="subtree" disabled th:text="#{node.duplicate.subtree}"></button>
 <button th:if="${sharedOnly}" type="submit" class="dropdown-item" data-duplicate="shared" disabled th:text="#{toolbar.shared}"></button>
 <span data-duplicate-error class="small text-danger" role="status"></span>
 </form>

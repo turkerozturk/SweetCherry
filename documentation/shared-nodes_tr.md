@@ -15,14 +15,13 @@ düğüme sıfır veya daha çok paylaşılan düğüm bağlanabilir.
 Yazma izni `allTenants` altındaki ilgili tanımda `custom.isWritable=true` olarak
 açıldığında silme işleminin hedefi şu şekilde belirlenir:
 
-- Paylaşılan düğüm seçilirse yalnızca o `children` kaydı silinir. Asıl düğüm,
-  onun içeriği, diğer paylaşılan başvurular ve onların bookmark kayıtları korunur.
-  Silinen paylaşılan düğümün kendi bookmark kaydı da silinir.
-- Gerçek düğüm seçilirse düğümün alt ağacı, içerik tablolarındaki kayıtları ve
-  silinen gerçek düğümlere başka dallardan bağlı paylaşılan başvurular silinir.
-- Altında `father_id` üzerinden çocuk bulunan bir paylaşılan düğüm saptanırsa
-  işlem iptal edilir. Bu durumda çocukların nasıl korunacağına ilişkin açık bir
-  kural belirlenmeden silmek ağaçta sahipsiz kayıt bırakabilir.
+- Gerçek veya paylaşımlı düğüm seçilirse yalnız seçilen konum ve kendi alt ağacı silinir. Master bağlantısı bir ağaç kenarı değildir.
+- Silinen alt ağaç dışında kalan referanslar ve onların alt düğümleri korunur.
+- Silinen bir gerçek düğümün dışarıda referansları varsa biri yeni gerçek düğüm/master olur. İçerik ve tüm nesne satırları onun kimliğine taşınır; diğer referanslar ona bağlanır.
+- Silinen konumların bookmark’ları kaldırılır; kalan konumların bookmark’ları korunur.
+- Döngü, eksik parent veya bozuk içerik referansı varsa herhangi bir yazmadan önce işlem reddedilir.
+
+Örnekler ve test listesi: [Paylaşımlı düğüm işlemleri](tr/shared-node-operations.md).
 
 İşlem tek veritabanı transaction'ında yürütülür. Denemeler için gerçek not
 arşivi yerine CTB dosyasının bir kopyasını kullanın. Bu açıklama CherryTree

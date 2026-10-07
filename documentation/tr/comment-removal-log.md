@@ -291,3 +291,23 @@ Dosya: `src/main/java/com/turkerozturk/node/duplication/NodeDuplicationService.j
 ```
 
 Bu yorumlar paylaşımlı ebeveyni geçersiz sayan eski varsayımı içeriyordu. Döngü, eksik ebeveyn ve eksik master içeriği korumaları devam eder.
+
+
+## Paylaşımlı alt ağaç işlemleri — 2026-10-08
+
+Dosya: `src/main/java/com/turkerozturk/node/NodeDeletionService.java`
+
+```java
+// A shared node is only a reference. Deleting it must never delete its master.
+// References to deleted real nodes may live outside the selected subtree.
+// Validate first: a shared node with children needs an explicit migration policy.
+// findAllSubChildren lists parents before descendants; delete in reverse order.
+// Native bulk deletes avoid keeping a managed Node with a now-deleted Bookmark reference.
+// The table name is supplied only by the fixed calls above; the node id is bound.
+```
+
+Dosya: `src/test/java/com/turkerozturk/node/duplication/NodeDuplicationServiceTest.java`
+
+```java
+// Subtree copying through a shared parent remains deferred; ordinary controls still load.
+```

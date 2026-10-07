@@ -14,7 +14,7 @@
             if(typeof state.revision!=='string' || typeof state.shared!=='boolean' || !Number.isInteger(state.subtreeCount)) throw new Error('Invalid duplicate state');
             form.elements.revision.value=state.revision;
             form.dataset.subtreeCount=String(state.subtreeCount);
-            form.querySelectorAll('[data-duplicate]').forEach(button=>{button.disabled=button.dataset.duplicate==='subtree' && (state.shared || state.subtreeCount<1);});
+            form.querySelectorAll('[data-duplicate]').forEach(button=>{button.disabled=button.dataset.duplicate==='subtree' && state.subtreeCount<1;});
             form.dataset.duplicateReady='ready';
         } catch(error) {
             form.dataset.duplicateReady='failed';form.querySelector('[data-duplicate-error]').textContent=form.dataset.error;

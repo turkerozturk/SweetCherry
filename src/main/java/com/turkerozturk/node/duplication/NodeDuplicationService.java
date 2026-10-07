@@ -92,8 +92,7 @@ public class NodeDuplicationService {
         branch(snapshot,root,false);
         // A malformed descendant prevents only subtree duplication; a single real-node copy remains possible.
         int count=0;
-        if(root.master==0) try {count=branch(snapshot,root,true).size();} catch(ResponseStatusException ignored) { }
-        else branch(snapshot,root,false);
+        try {count=branch(snapshot,root,true).size();} catch(ResponseStatusException ignored) { }
         return new State(revision(snapshot),root.master!=0,count);
     }
     private static Row selected(Snapshot snapshot,long id) {
@@ -131,7 +130,6 @@ public class NodeDuplicationService {
             if(!seen.add(row.id)) throw conflict();
             validateContentReference(snapshot,row);
             var below=children.getOrDefault(row.id,List.of());
-            if(descendants && row.master!=0 && !below.isEmpty()) throw conflict();
             result.add(row);
             if(descendants) pending.addAll(below);
         }
@@ -142,7 +140,6 @@ public class NodeDuplicationService {
     static long duplicate(Connection connection,long id,boolean withSubnodes,String expected,long timestamp) throws SQLException {
         var snapshot=read(connection);var root=selected(snapshot,id);validateAncestors(snapshot,root);
         if(!revision(snapshot).equals(expected)) throw conflict();
-        if(withSubnodes && root.master!=0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"A shared node has no subtree to duplicate.");
         var branch=branch(snapshot,root,withSubnodes);
         long highest=snapshot.realIds.stream().mapToLong(Long::longValue).max().orElse(0);
         highest=Math.max(highest,snapshot.rows.stream().mapToLong(Row::id).max().orElse(0));
@@ -169,7 +166,7 @@ public class NodeDuplicationService {
             for(var row:branch) {
                 long parent=row.id==id?root.parent:mapping.get(row.parent);
                 long sequence=row.id==id?insertAt+1L:nextSequence.merge(parent,1L,Long::sum);
-                long master=row.master==0?0:mapping.getOrDefault(row.master,row.master);
+                long master=row.master;
                 statement.setLong(1,mapping.get(row.id));statement.setLong(2,parent);statement.setLong(3,sequence);statement.setLong(4,master);
                 if(statement.executeUpdate()!=1) throw conflict();
             }

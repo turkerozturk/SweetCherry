@@ -61,11 +61,11 @@ class NodeDuplicationServiceTest {
         assertThat(number("SELECT COUNT(*) FROM grid WHERE node_id=13 AND offset=3 AND justification='center' AND col_min=80 AND col_max=90")).isEqualTo(1);
         assertThat(number("SELECT COUNT(*) FROM codebox WHERE node_id=13 AND offset=4 AND syntax='python' AND width=100 AND do_show_linenum=1")).isEqualTo(1);
     }
-    @Test void subtreeRemapsInternalAliasesAndPreservesExternalMasterAndOriginals() throws Exception {
+    @Test void subtreeCopiesRealNodesAndKeepsAliasesLinkedToOriginalMasters() throws Exception {
         assertThat(NodeDuplicationService.state(NodeDuplicationService.read(connection),1).subtreeCount()).isEqualTo(4);
         duplicate(1,true);
         assertThat(number("SELECT father_id FROM children WHERE node_id=14")).isEqualTo(13);
-        assertThat(number("SELECT master_id FROM children WHERE node_id=15")).isEqualTo(14);
+        assertThat(number("SELECT master_id FROM children WHERE node_id=15")).isEqualTo(3);
         assertThat(number("SELECT master_id FROM children WHERE node_id=16")).isEqualTo(2);
         assertThat(number("SELECT master_id FROM children WHERE node_id=12")).isEqualTo(1);
         assertThat(number("SELECT COUNT(*) FROM node WHERE node_id IN (13,14,15,16)")).isEqualTo(2);
@@ -78,7 +78,8 @@ class NodeDuplicationServiceTest {
         assertThat(number("SELECT father_id FROM children WHERE node_id="+id)).isEqualTo(1);
         assertThat(number("SELECT COUNT(*) FROM node")).isEqualTo(3);
         assertThat(number("SELECT COUNT(*) FROM image")).isEqualTo(2);
-        assertThatThrownBy(()->duplicate(10,true)).isInstanceOf(ResponseStatusException.class);
+        long subtree=duplicate(10,true);
+        assertThat(number("SELECT master_id FROM children WHERE node_id="+subtree)).isEqualTo(3);
     }
     @Test void staleTreeRejectsCopyBeforeAllocatingRows() throws Exception {
         String revision=NodeDuplicationService.state(NodeDuplicationService.read(connection),1).revision();
@@ -101,8 +102,8 @@ class NodeDuplicationServiceTest {
         var snapshot=NodeDuplicationService.read(connection);
         for(long id:new long[]{1,2,3,10,11,12})
             assertThat(NodeDuplicationService.state(snapshot,id).revision()).isNotBlank();
-        // Subtree copying through a shared parent remains deferred; ordinary controls still load.
-        assertThat(NodeDuplicationService.state(snapshot,1).subtreeCount()).isZero();
+        // An alias can parent its own master occurrence without a hierarchy cycle.
+        assertThat(NodeDuplicationService.state(snapshot,1).subtreeCount()).isEqualTo(4);
         long copy=duplicate(3,false);
         assertThat(number("SELECT father_id FROM children WHERE node_id="+copy)).isEqualTo(10);
         long alias=duplicate(10,false);
