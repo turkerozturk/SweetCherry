@@ -19,6 +19,10 @@ public class NodePdfExportService {
     public NodePdfExportService(ChildrenService children, NodeService nodes, RichTextRenderingService richText, NodePdfRenderer renderer) {
         this.children = children; this.nodes = nodes; this.richText = richText; this.renderer = renderer;
     }
+    private PdfExportLimits limits = new PdfExportLimits();
+    @org.springframework.beans.factory.annotation.Autowired
+    public void configureLimits(PdfExportLimits limits) { this.limits = limits; }
+
     public record Export(String title, byte[] bytes) {}
 
     @Transactional(readOnly = true)
@@ -38,6 +42,12 @@ public class NodePdfExportService {
 
     @Transactional(readOnly = true)
     public Export export(long occurrenceId, PdfExportOptions options, PdfSourceMetadata.Source source) {
+        return export(occurrenceId, options, source, com.turkerozturk.richtext.experimental.PdfObjectSelection.all());
+    }
+
+    @Transactional(readOnly = true)
+    public Export export(long occurrenceId, PdfExportOptions options, PdfSourceMetadata.Source source,
+            com.turkerozturk.richtext.experimental.PdfObjectSelection objects) {
         if (!permit.tryAcquire()) throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         try {
             var occurrence = children.findById(occurrenceId);
@@ -47,22 +57,30 @@ public class NodePdfExportService {
             var node = nodes.findById(contentId);
             if (node == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             String text = node.getTxt() == null ? "" : node.getTxt();
-            if (text.length() > 8 * 1024 * 1024) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
+            if (text.length() > limits.getMaxNodeTextCharacters()) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
             String html;
-            if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = richText.renderForPdf(node, "");
+            if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = renderRichText(node, objects);
             else {
                 var fragment = org.jsoup.Jsoup.parseBodyFragment("");
                 fragment.body().appendElement("div").text(text);
                 fragment.outputSettings().prettyPrint(false);
                 html = fragment.body().html();
             }
-            return new Export(node.getName(), renderer.render(new NodePdfDocument().prepare(node.getName(), html, contentId, options, source, PdfFilename.create(node.getName(), occurrenceId))));
+            return new Export(node.getName(), renderer.render(new NodePdfDocument(limits).prepare(node.getName(), html, contentId, options, source, PdfFilename.create(node.getName(), occurrenceId))));
         } finally { permit.release(); }
     }
 
     @Transactional(readOnly = true)
     public Export exportSubtree(long occurrenceId, PdfExportOptions options,
             PdfSourceMetadata.Source source, boolean contents, String contentsTitle) {
+        return exportSubtree(occurrenceId, options, source, contents, contentsTitle,
+                com.turkerozturk.richtext.experimental.PdfObjectSelection.all());
+    }
+
+    @Transactional(readOnly = true)
+    public Export exportSubtree(long occurrenceId, PdfExportOptions options,
+            PdfSourceMetadata.Source source, boolean contents, String contentsTitle,
+            com.turkerozturk.richtext.experimental.PdfObjectSelection objects) {
         if (!permit.tryAcquire()) throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         try {
             var root = children.findById(occurrenceId);
@@ -83,17 +101,17 @@ public class NodePdfExportService {
                 var pending = stack.pop(); var occurrence = pending.occurrence();
                 if (!seen.add(occurrence.getNodeId()))
                     throw new ResponseStatusException(HttpStatus.CONFLICT);
-                if (parts.size() >= 512 || pending.depth() > 64)
+                if (parts.size() >= limits.getMaxNodes() || pending.depth() > limits.getMaxDepth())
                     throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
                 boolean shared = occurrence.getMasterId() != null && occurrence.getMasterId() != 0;
                 long contentId = shared ? occurrence.getMasterId() : occurrence.getNodeId();
                 var node = nodes.findById(contentId);
                 if (node == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                 String text = node.getTxt() == null ? "" : node.getTxt();
-                if (text.length() > 8 * 1024 * 1024)
+                if (text.length() > limits.getMaxNodeTextCharacters())
                     throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
                 String html;
-                if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = richText.renderForPdf(node, "");
+                if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = renderRichText(node, objects);
                 else {
                     var fragment = org.jsoup.Jsoup.parseBodyFragment("");
                     fragment.outputSettings().prettyPrint(false);
@@ -101,7 +119,7 @@ public class NodePdfExportService {
                     html = fragment.body().html();
                 }
                 total += html.length();
-                if (total > 64 * 1024 * 1024) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
+                if (total > limits.getMaxHtmlCharacters()) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
                 parts.add(new SubtreePdfDocument.Part(occurrence.getNodeId(), contentId,
                         pending.depth(), node.getName(), html));
                 // Shared occurrences are leaves in the readers; do not expand the master's subtree.
@@ -110,8 +128,13 @@ public class NodePdfExportService {
                     for (int n = list.size() - 1; n >= 0; n--) stack.push(new Pending(list.get(n), pending.depth() + 1));
                 }
             }
-            return new Export(parts.get(0).title(), renderer.render(new SubtreePdfDocument()
+            return new Export(parts.get(0).title(), renderer.render(new SubtreePdfDocument(limits)
                     .prepare(parts, options, source, contents, contentsTitle)));
         } finally { permit.release(); }
+    }
+    private String renderRichText(com.turkerozturk.node.Node node,
+            com.turkerozturk.richtext.experimental.PdfObjectSelection objects) {
+        return objects.equals(com.turkerozturk.richtext.experimental.PdfObjectSelection.all())
+                ? richText.renderForPdf(node, "") : richText.renderForPdf(node, "", objects);
     }
 }

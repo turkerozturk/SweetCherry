@@ -24,19 +24,33 @@ public class RichTextRenderingService {
         return render(node, tenantView, true);
     }
 
+    @Transactional(readOnly = true)
+    public String renderForPdf(Node node, String tenantView, PdfObjectSelection objects) {
+        return render(node, tenantView, true, objects);
+    }
+
     private String render(Node node, String tenantView, boolean pdfHeadings) {
+        return render(node, tenantView, pdfHeadings, PdfObjectSelection.all());
+    }
+
+    private String render(Node node, String tenantView, boolean pdfHeadings, PdfObjectSelection objects) {
         long contentId = node.getNodeId();
             var references = new CtbObjectReferences();
             var adapter = new EmbeddedContentAdapter();
             var payloads = new LinkedHashMap<EmbeddedObject, EmbeddedContent>();
             for (var image : images.getImagesByNodeId(contentId)) {
-                add(payloads, references.fromImage(image), adapter.fromImage(image));
+                var ref = references.fromImage(image);
+                add(payloads, ref, pdfHeadings && !objects.images() && ref.kind() == RichTextLayout.ObjectKind.IMAGE
+                        ? new EmbeddedContent.PngImage(new byte[0], "", "") : adapter.fromImage(image));
             }
-            for (var box : node.getCodeBoxes()) add(payloads, references.fromCodeBox(box), adapter.fromCodeBox(box));
-            for (var table : node.getGrids()) add(payloads, references.fromTable(table), adapter.fromTable(table));
+            for (var box : node.getCodeBoxes()) add(payloads, references.fromCodeBox(box),
+                    pdfHeadings && !objects.codeboxes() ? new EmbeddedContent.CodeBox("", "") : adapter.fromCodeBox(box));
+            for (var table : node.getGrids()) add(payloads, references.fromTable(table),
+                    pdfHeadings && !objects.tables() ? new EmbeddedContent.Table(java.util.List.of(), java.util.Map.of())
+                            : adapter.fromTable(table));
             var document = new RichTextXmlReader().read(node.getTxt());
             var layout = new RichTextLayoutBuilder().build(document, new java.util.ArrayList<>(payloads.keySet()));
-        return new RichTextObjectHtmlRenderer(pdfHeadings).render(layout, payloads, tenantView);
+        return new RichTextObjectHtmlRenderer(pdfHeadings, objects).render(layout, payloads, tenantView);
     }
 
     /** Keeps existing image zoom endpoints and turns same-node anchors into in-page links. */

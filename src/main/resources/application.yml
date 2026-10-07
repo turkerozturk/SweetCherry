@@ -162,6 +162,14 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  pdf:
+    # PDF workload limits; increase deliberately for larger exports on stronger machines.
+    max-nodes: 512
+    max-depth: 64
+    max-node-text-characters: 8388608
+    max-html-characters: 67108864
+    max-image-bytes: 50331648
+    max-image-pixels: 40000000
   security:
     proxy-https-enabled: false
     proxy-https-port: 443

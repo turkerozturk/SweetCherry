@@ -68,3 +68,7 @@ Kaynaklar: https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Transp
 `myapp.debug=false` iken veri kaynağı klasör yolu, kayıt/custom property listesi, isWritable bilgileri, mevcut seçim, kapatma/yeniden yükleme ve exportedFiles klasör yolu gibi rutin INFO mesajları yazılmaz. `true` iken bu bilgiler yeniden görünür. Hikari havuzunun start/stop INFO mesajları da bu ayara uyar; `logging.level.com.zaxxer.hikari` açıkça tanımlanmışsa bu log seviyesi tercih edilir. Ayar uygulama yeniden başlatıldığında uygulanır.
 
 Gerçek WARN/ERROR mesajları ve login güvenlik kayıtları gizlenmez. Bütün Spring/Hibernate/Tomcat logları bu ayarın kapsamına alınmamıştır. Tenant klasörünün alt klasörleri taranmaz; SQLite dosya başlığı taşıyan dosyalar config olarak parse edilmeye çalışılmaz. Metin config dosyalarının adları ve uzantıları kayıt birleştirmede kullanılmaz. Aynı veritabanına ayrı name ve ayarlarla bağlanan tenantlar ayrı kalır.
+
+## PDF aktarımı
+
+`myapp.pdf.*` sınırları ve nesne seçimleri: [PDF sınırları ve nesne seçimleri](pdf-limits-and-objects.md).

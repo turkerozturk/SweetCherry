@@ -103,4 +103,34 @@ class RichTextObjectHtmlRendererTest {
                 .contains("id=\"capalink\"", "⚓");
     }
 
+
+    @Test void pdfExclusionReplacesEachKindWithoutRemovingAttachmentOrAnchor() {
+        var imageRef = new EmbeddedObject(ObjectKind.IMAGE, 53, 1);
+        var codeRef = new EmbeddedObject(ObjectKind.CODEBOX, 53, 2);
+        var tableRef = new EmbeddedObject(ObjectKind.TABLE, 53, 3);
+        var latexRef = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 4);
+        var fileRef = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 5);
+        var anchorRef = new EmbeddedObject(ObjectKind.ANCHOR, 53, 6);
+        var payloads = Map.<EmbeddedObject, EmbeddedContent>of(
+                imageRef, new EmbeddedContent.PngImage(new byte[]{1}, "", ""),
+                codeRef, new EmbeddedContent.CodeBox("secret code", "java"),
+                tableRef, new EmbeddedContent.Table(List.of(List.of("secret cell")), Map.of()),
+                latexRef, new EmbeddedContent.Attachment("__ct_special.tex"),
+                fileRef, new EmbeddedContent.Attachment("document.pdf"),
+                anchorRef, new EmbeddedContent.Anchor("anchor"));
+        var parts = new RichTextLayout(List.of(new ObjectPart(imageRef), new ObjectPart(codeRef),
+                new ObjectPart(tableRef), new ObjectPart(latexRef), new ObjectPart(fileRef), new ObjectPart(anchorRef)));
+        var pdfRenderer = new RichTextObjectHtmlRenderer(true, new PdfObjectSelection(false, false, false, false));
+        String html = pdfRenderer.render(parts, payloads, "");
+        assertThat(html).contains("&lt;image object: 53:1&gt;", "&lt;codebox object: 53:2&gt;",
+                "&lt;table object: 53:3&gt;", "&lt;latex object: 53:4&gt;", "document.pdf", "id=\"anchor\"")
+                .doesNotContain("secret code", "secret cell", "data:image", "__ct_special.tex");
+    }
+
+    @Test void defaultPdfSelectionKeepsLatexAttachmentRepresentation() {
+        var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 4);
+        assertThat(new RichTextObjectHtmlRenderer(true).render(layout(ref),
+                Map.of(ref, new EmbeddedContent.Attachment("__ct_special.tex")), ""))
+                .contains("__ct_special.tex").doesNotContain("latex object");
+    }
 }

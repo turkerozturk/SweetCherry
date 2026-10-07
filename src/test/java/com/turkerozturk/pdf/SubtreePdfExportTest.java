@@ -94,4 +94,22 @@ class SubtreePdfExportTest {
         var value = new Children().setNodeId(id).setFatherId(parent).setSequence(sequence);
         value.setMasterId(master); return value;
     }
+
+    @Test void configuredNodeLimitCanBeRaisedWithoutChangingExportCode() {
+        var children = mock(ChildrenService.class); var nodes = mock(NodeService.class);
+        var root = occurrence(1,0,1,0); var child = occurrence(2,1,1,0);
+        when(children.findById(1L)).thenReturn(root);
+        when(children.getChildren()).thenReturn(List.of(root, child));
+        var node = mock(Node.class); when(node.getName()).thenReturn("Node");
+        when(nodes.findById(anyLong())).thenReturn(node);
+        var renderer = mock(NodePdfRenderer.class); when(renderer.render(any())).thenReturn(new byte[]{1});
+        var service = new NodePdfExportService(children, nodes, mock(RichTextRenderingService.class), renderer);
+        var limits = new PdfExportLimits(); limits.setMaxNodes(1); service.configureLimits(limits);
+        assertThatThrownBy(() -> service.exportSubtree(1, PdfExportOptions.defaults(), null, false, "Contents"))
+                .isInstanceOfSatisfying(org.springframework.web.server.ResponseStatusException.class,
+                        error -> assertThat(error.getStatusCode().value()).isEqualTo(413));
+        limits.setMaxNodes(2);
+        assertThat(service.exportSubtree(1, PdfExportOptions.defaults(), null, false, "Contents").bytes())
+                .containsExactly((byte)1);
+    }
 }

@@ -14,6 +14,9 @@ import org.xml.sax.InputSource;
 
 /** Converts parser output to self-contained PDF XHTML; no browser scripts or external resources survive. */
 public final class NodePdfDocument {
+    private final PdfExportLimits limits;
+    public NodePdfDocument() { this(new PdfExportLimits()); }
+    public NodePdfDocument(PdfExportLimits limits) { this.limits = limits; }
     private static final String CSS = """
         @page { size: A4 portrait; margin: 18mm; }
         body { font-family: 'Liberation Sans'; font-size: 11pt; line-height: 1.35; color: #111; }
@@ -38,7 +41,7 @@ public final class NodePdfDocument {
 
     public org.w3c.dom.Document prepare(String title, String html, long contentId,
             PdfExportOptions options, PdfSourceMetadata.Source source, String filename) {
-        if (html.length() > 64 * 1024 * 1024) throw new IllegalArgumentException("PDF content too large");
+        if (html.length() > limits.getMaxHtmlCharacters()) throw tooLarge();
         var page = Jsoup.parse("<html xmlns='http://www.w3.org/1999/xhtml'><head><meta charset='UTF-8'/></head><body></body></html>");
         page.head().appendElement("title").text(title == null ? "SweetCherry" : title);
         String css = CSS.replace("size: A4 portrait", "size: " + options.paper() + " " + options.orientation());
@@ -87,7 +90,9 @@ public final class NodePdfDocument {
             }
             element.removeAttr("data-pdf-heading");
         }
-        content.select(".rich-text-attachment span").remove();
+        for (var icon : content.select(".rich-text-attachment span"))
+            icon.replaceWith(new Element("img").attr("src", PdfAttachmentIcon.URI).attr("alt", "")
+                    .attr("style", "width:12px;height:12px"));
         for (var anchor : content.select(".rich-text-anchor")) anchor.text("");
         for (var link : content.select("a[href]")) {
             String href = link.attr("href");
@@ -108,7 +113,7 @@ public final class NodePdfDocument {
             }
             byte[] bytes = Base64.getDecoder().decode(src.substring("data:image/png;base64,".length()));
             totalImageBytes += bytes.length;
-            if (totalImageBytes > 48 * 1024 * 1024) throw new IllegalArgumentException("PDF images too large");
+            if (totalImageBytes > limits.getMaxImageBytes()) throw tooLarge();
             int[] size = imageSize(bytes);
             // Fix explicit dimensions before layout: max-width alone is insufficient in this renderer.
             double width = options.paper().equals("A4") ? 793.7 : 816;
@@ -182,9 +187,12 @@ public final class NodePdfDocument {
             try {
                 reader.setInput(input);
                 int width = reader.getWidth(0), height = reader.getHeight(0);
-                if (width <= 0 || height <= 0 || (long)width * height > 40_000_000) throw new IllegalArgumentException("PDF image dimensions too large");
+                if (width <= 0 || height <= 0 || (long)width * height > limits.getMaxImagePixels()) throw tooLarge();
                 return new int[]{width, height};
             } finally { reader.dispose(); }
         } catch (java.io.IOException error) { throw new IllegalArgumentException("Unreadable PDF image", error); }
+    }
+    private org.springframework.web.server.ResponseStatusException tooLarge() {
+        return new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE);
     }
 }

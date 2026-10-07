@@ -12,7 +12,11 @@ public final class RichTextObjectHtmlRenderer {
     private final RichTextHtmlRenderer textRenderer = new RichTextHtmlRenderer();
     private final boolean pdfHeadings;
     public RichTextObjectHtmlRenderer() { this(false); }
-    public RichTextObjectHtmlRenderer(boolean pdfHeadings) { this.pdfHeadings = pdfHeadings; }
+    private final PdfObjectSelection objects;
+    public RichTextObjectHtmlRenderer(boolean pdfHeadings) { this(pdfHeadings, PdfObjectSelection.all()); }
+    public RichTextObjectHtmlRenderer(boolean pdfHeadings, PdfObjectSelection objects) {
+        this.pdfHeadings = pdfHeadings; this.objects = objects;
+    }
 
     /** Requires a tenant-view token for download links; images are embedded PNG snapshots. */
     public String render(RichTextLayout layout, Map<EmbeddedObject, EmbeddedContent> contents, String tenantView) {
@@ -67,6 +71,11 @@ public final class RichTextObjectHtmlRenderer {
 
     /** Applies kind-specific rendering; stored text, filenames and anchors are always HTML-escaped. */
     private String renderObject(EmbeddedObject ref, EmbeddedContent payload, String tenantView) {
+        if (pdfHeadings && !objects.includes(ref, payload)) {
+            String tag = ref.kind() == ObjectKind.CODEBOX || ref.kind() == ObjectKind.TABLE ? "div" : "span";
+            return "<" + tag + " class=\"pdf-object-placeholder\">" + escape("<" + objects.kind(ref, payload)
+                    + " object: " + ref.nodeId() + ":" + ref.bufferOffset() + ">") + "</" + tag + ">";
+        }
         return switch (ref.kind()) {
             case IMAGE -> {
                 if (!(payload instanceof EmbeddedContent.PngImage image)) throw mismatch(ref);

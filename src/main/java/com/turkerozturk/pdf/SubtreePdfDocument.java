@@ -5,13 +5,16 @@ import org.w3c.dom.Element;
 
 /** Combines independently sanitized node content without merging occurrence/anchor identities. */
 public final class SubtreePdfDocument {
+    private final PdfExportLimits limits;
+    public SubtreePdfDocument() { this(new PdfExportLimits()); }
+    public SubtreePdfDocument(PdfExportLimits limits) { this.limits = limits; }
     public record Part(long occurrenceId, long contentId, int depth, String title, String html) {}
 
     public org.w3c.dom.Document prepare(List<Part> parts, PdfExportOptions options,
             PdfSourceMetadata.Source source, boolean contents, String contentsTitle) {
         if (parts.isEmpty()) throw new IllegalArgumentException("Empty PDF tree");
         Part root = parts.get(0);
-        var document = new NodePdfDocument().prepare(root.title(), "", root.contentId(),
+        var document = new NodePdfDocument(limits).prepare(root.title(), "", root.contentId(),
                 options, source, PdfFilename.create(root.title(), root.occurrenceId()));
         Element body = (Element) document.getElementsByTagName("body").item(0);
         // The root title is added below with the same hierarchy rules as every other occurrence.
@@ -46,7 +49,7 @@ public final class SubtreePdfDocument {
                     "font-size:0;height:0;margin:0;page-break-inside:avoid");
             title.setAttribute("data-pdf-bookmark", options.outline() ? Integer.toString(part.depth() + 1) : "exclude");
             section.appendChild(title);
-            var nodeDocument = new NodePdfDocument().prepare(part.title(), part.html(), part.contentId(), contentOptions, null);
+            var nodeDocument = new NodePdfDocument(limits).prepare(part.title(), part.html(), part.contentId(), contentOptions, null);
             Element nodeBody = (Element) nodeDocument.getElementsByTagName("body").item(0);
             for (var child = nodeBody.getFirstChild(); child != null; child = child.getNextSibling())
                 section.appendChild(document.importNode(child, true));

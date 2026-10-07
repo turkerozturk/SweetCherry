@@ -15,6 +15,6 @@ Paylaşımlı düğüm master’ın içeriğini kullanır; PDF başlığının k
 
 ## Sınırlar
 
-Raspberry Pi gibi cihazlarda büyük işlerin bellek tüketimini sınırlamak için tek seferde en fazla 512 düğüm, 64 alt seviye ve toplam 64 Mi karakter işlenmiş HTML kabul edilir. Tek düğümün metni için mevcut 8 Mi karakter sınırı korunur. Sınır aşımında aktarım reddedilir; kırpılmış PDF verilmez. Bozuk döngülü hiyerarşi de reddedilir. Tek düğüm ve alt ağaç PDF üretimleri aynı eşzamanlı iş kilidini kullanır.
+Raspberry Pi gibi cihazlarda büyük işlerin bellek tüketimini sınırlamak için varsayılan olarak en fazla 512 düğüm, 64 alt seviye ve toplam 64 Mi karakter işlenmiş HTML kabul edilir. Bu değerler `myapp.pdf` ayarlarıyla değiştirilebilir; ayrıntılar [PDF sınırları ve nesne seçimleri](pdf-limits-and-objects.md) belgesindedir. Tek düğümün metni için mevcut 8 Mi karakter sınırı korunur. Sınır aşımında aktarım reddedilir; kırpılmış PDF verilmez. Bozuk döngülü hiyerarşi de reddedilir. Tek düğüm ve alt ağaç PDF üretimleri aynı eşzamanlı iş kilidini kullanır.
 
 CTB değişmez ve dış kaynaklar ağdan indirilmez. Font, resim, rich-text ve meta bilgi kuralları mevcut düğüm PDF hattından gelir.

@@ -116,4 +116,23 @@ class PdfExportOptionsTest {
         org.assertj.core.api.Assertions.assertThat(model).containsEntry("includeDescendants", true).containsEntry("contents", true);
         org.assertj.core.api.Assertions.assertThat(model.get("options")).isEqualTo(PdfExportOptions.defaults());
     }
+
+    @Test void objectSelectionIsRememberedOnlyAfterSuccessfulExport() {
+        var service = mock(NodePdfExportService.class);
+        var sources = mock(PdfSourceMetadata.class);
+        var controller = new NodePdfOptionsController(service, sources);
+        var session = new org.springframework.mock.web.MockHttpSession();
+        assertThat(NodePdfOptionsController.rememberedObjects(session))
+                .isEqualTo(com.turkerozturk.richtext.experimental.PdfObjectSelection.all());
+        when(service.export(eq(53L), any(), isNull(), any()))
+                .thenReturn(new NodePdfExportService.Export("Root", new byte[]{1}));
+        controller.downloadObjects(53, session, "A4", "portrait", true, true, true,
+                false, false, false, false, false, false, true, false, true);
+        var expected = new com.turkerozturk.richtext.experimental.PdfObjectSelection(false, true, false, true);
+        assertThat(NodePdfOptionsController.rememberedObjects(session)).isEqualTo(expected);
+        when(service.export(eq(53L), any(), isNull(), any())).thenThrow(new IllegalStateException("test"));
+        assertThatThrownBy(() -> controller.downloadObjects(53, session, "A4", "portrait", true, true, true,
+                false, false, false, false, false, true, true, true, true)).isInstanceOf(IllegalStateException.class);
+        assertThat(NodePdfOptionsController.rememberedObjects(session)).isEqualTo(expected);
+    }
 }
