@@ -1,0 +1,6 @@
+Source: https://repo.maven.apache.org/maven2/org/hibernate/common/hibernate-commons-annotations/7.0.3.Final/hibernate-commons-annotations-7.0.3.Final-sources.jar
+
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright: Red Hat Inc. and Hibernate Authors
+ */

@@ -1,0 +1,8 @@
+Source: https://repo.maven.apache.org/maven2/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2-sources.jar
+
+/*
+ * Jakarta Bean Validation API
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */

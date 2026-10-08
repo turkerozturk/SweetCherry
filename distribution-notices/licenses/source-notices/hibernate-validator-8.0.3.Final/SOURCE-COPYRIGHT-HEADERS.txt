@@ -1,0 +1,8 @@
+Source: https://repo.maven.apache.org/maven2/org/hibernate/validator/hibernate-validator/8.0.3.Final/hibernate-validator-8.0.3.Final-sources.jar
+
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */

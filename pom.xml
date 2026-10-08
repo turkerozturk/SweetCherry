@@ -508,6 +508,9 @@
 										<include name="CHANGELOG.md"/>
 									</fileset>
 								</copy>
+                                <copy todir="${project.basedir}/release/SweetCherry" overwrite="true">
+                                    <fileset dir="${project.basedir}/distribution-notices"/>
+                                </copy>
                                 <copy todir="${project.basedir}/release/SweetCherry/documentation/en" overwrite="true">
                                     <fileset dir="${project.basedir}/documentation/en">
                                         <include name="**/*.md"/>

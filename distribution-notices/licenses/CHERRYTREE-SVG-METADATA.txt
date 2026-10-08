@@ -1,0 +1,2889 @@
+BOOT-INF/classes/static/img/icons/cherry_black.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_blue.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_cyan.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_green.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_grey.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_orange.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_orange_dark.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_purple.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_red.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_sherbert.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/cherry_yellow.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_about.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3933">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_add.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_anchor.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_anchor_edit.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_anchor_insert.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_anchor_link.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ar.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata42">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_bg.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3008">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_bulb.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata25"><rdf:RDF><ns2:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></ns2:Work></rdf:RDF></ns0:metadata>
+
+BOOT-INF/classes/static/img/icons/ct_c.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_calendar.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3143">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_cancel.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata21">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_case_lower.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4720">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_case_toggle.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4720">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_case_upper.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4720">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_cherries.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_cherry_edit.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_circle-green.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata23">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_circle-grey.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata23">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_circle-red.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata23">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_circle-yellow.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata23">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_clear.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_close.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata21">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_code.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_codebox_edit.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_codebox_insert.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_color_bg.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_color_fg.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_computer.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata182">
+  <rdf:RDF>
+   <ns2:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+   </ns2:Work>
+  </rdf:RDF>
+ </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_cpp.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_cs.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3065">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_de.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_debian.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata954">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_dictionary.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata46">
+  <rdf:RDF>
+   <ns2:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+   </ns2:Work>
+  </rdf:RDF>
+ </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_directory.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata8865">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_done.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7981">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_edit.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata8662">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_edit_copy.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3380">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_edit_cut.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4301">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_edit_delete.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3167">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_edit_paste.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3380">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_el.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_en.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_en_US.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_es.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3758">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_execute.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7">
+  <rdf:RDF>
+   <ns2:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:creator>
+     <ns2:Agent>
+      <dc:title>Lapo Calamandrei</dc:title>
+     </ns2:Agent>
+    </dc:creator>
+    <dc:title>System Run</dc:title>
+    <ns2:license rdf:resource="http://creativecommons.org/licenses/GPL/2.0/" />
+    <dc:subject>
+     <rdf:Bag>
+      <rdf:li>run</rdf:li>
+      <rdf:li>launch</rdf:li>
+      <rdf:li>exec</rdf:li>
+     </rdf:Bag>
+    </dc:subject>
+   </ns2:Work>
+   <ns2:License rdf:about="http://creativecommons.org/licenses/GPL/2.0/">
+    <ns2:permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+    <ns2:permits rdf:resource="http://web.resource.org/cc/Distribution" />
+    <ns2:requires rdf:resource="http://web.resource.org/cc/Notice" />
+    <ns2:permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+    <ns2:requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+    <ns2:requires rdf:resource="http://web.resource.org/cc/SourceCode" />
+   </ns2:License>
+  </rdf:RDF>
+ </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_export_from_cherrytree.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fa.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4587">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fi.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_file.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3968">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_file_icon.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata16">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title>tango mail attachment</dc:title>
+        <dc:date>2010-04-03T15:29:59</dc:date>
+        <dc:description>An icon from Tango Project. Since version 0.8.90 Tango Project icons are Public Domain.</dc:description>
+        <dc:source>http://openclipart.org/detail/36679/tango-mail-attachment-by-warszawianka</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>warszawianka</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>clip art</rdf:li>
+            <rdf:li>clipart</rdf:li>
+            <rdf:li>externalsource</rdf:li>
+            <rdf:li>icon</rdf:li>
+            <rdf:li>office</rdf:li>
+            <rdf:li>paperclip</rdf:li>
+            <rdf:li>tango</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_find.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_find_again.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_find_all.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_find_back.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_find_replace.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_find_sel.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_find_selnsub.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_flip-horizontal.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata22">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_flip-vertical.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata22">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-indent.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata24">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-bold.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-clear.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-clone.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-h1.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-h2.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-h3.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-h4.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-h5.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-h6.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-italic.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-latest.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-monospace.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-small.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-strikethrough.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-subscript.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-superscript.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt-underline.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-txt.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fmt-unindent.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata24">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fonts.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fr.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3176">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_freebsd.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_from_cherrytree.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_from_html.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_from_txt.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3968">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_fullscreen.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ghost.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata16">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title>Ghost</dc:title>
+        <dc:date>2011-10-20T13:00:28</dc:date>
+        <dc:description>Cute little Ghost for Halloween</dc:description>
+        <dc:source>https://openclipart.org/detail/164221/ghost-by-arcdroid</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>arcdroid</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>white ghost halloween</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ghostlock.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata16">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title>Ghost</dc:title>
+        <dc:date>2011-10-20T13:00:28</dc:date>
+        <dc:description>Cute little Ghost for Halloween</dc:description>
+        <dc:source>https://openclipart.org/detail/164221/ghost-by-arcdroid</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>arcdroid</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>white ghost halloween</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ghostlockpin.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata16">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title>Ghost</dc:title>
+        <dc:date>2011-10-20T13:00:28</dc:date>
+        <dc:description>Cute little Ghost for Halloween</dc:description>
+        <dc:source>https://openclipart.org/detail/164221/ghost-by-arcdroid</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>arcdroid</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>white ghost halloween</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ghostpin.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata16">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title>Ghost</dc:title>
+        <dc:date>2011-10-20T13:00:28</dc:date>
+        <dc:description>Cute little Ghost for Halloween</dc:description>
+        <dc:source>https://openclipart.org/detail/164221/ghost-by-arcdroid</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>arcdroid</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>white ghost halloween</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_gnome.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata1330">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Piedone</dc:title>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>Lapo Calamandrei</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag />
+        </dc:subject>
+        <dc:contributor>
+          <ns2:Agent>
+            <dc:title />
+          </ns2:Agent>
+        </dc:contributor>
+        <ns2:license rdf:resource="http://creativecommons.org/licenses/GPL/2.0/" />
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/licenses/GPL/2.0/">
+        <ns2:permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+        <ns2:permits rdf:resource="http://web.resource.org/cc/Distribution" />
+        <ns2:requires rdf:resource="http://web.resource.org/cc/Notice" />
+        <ns2:permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+        <ns2:requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+        <ns2:requires rdf:resource="http://web.resource.org/cc/SourceCode" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_go-back.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_go-down.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_go-forward.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_go-jump.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3886">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_go-up.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_help.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3940">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_hi_IN.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3926">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_home.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata8288">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_horiz_rule.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata63">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_hr.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3779">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_html.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_hu.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3800">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_hy.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata14">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_image_edit.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_image_insert.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_image_save.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_import_in_cherrytree.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_index.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4217">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_info.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3940">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ini.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata23">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_insert.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_it.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4604">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ja.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4637">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_justify-center.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata20">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_justify-fill.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata20">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_justify-left.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata20">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_justify-right.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata20">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_kk_KZ.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3081">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_kk_LA.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3081">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ko.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3014">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_leaf.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7981">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_link_handle.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata25386">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_link_website.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3128">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_list_bulleted.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata26">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_list_numbered.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata26">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_list_todo.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata26">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_locked.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4104">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_lockpin.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata151">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title />
+        <dc:date>2011-03-30T12:22:25</dc:date>
+        <dc:description />
+        <dc:source>https://openclipart.org/detail/129961/pins-by-doofi</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>DooFi</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>clipart_issue</rdf:li>
+            <rdf:li>map</rdf:li>
+            <rdf:li>marker</rdf:li>
+            <rdf:li>needle</rdf:li>
+            <rdf:li>pin</rdf:li>
+            <rdf:li>point</rdf:li>
+            <rdf:li>tack</rdf:li>
+            <rdf:li>thumb</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_lt.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3357">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_mail.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata82">
+  <rdf:RDF>
+   <ns2:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title />
+   </ns2:Work>
+  </rdf:RDF>
+ </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_mb_in_tb_no.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_mb_in_tb_yes.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_menubar.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_network.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4217">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_new-instance.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_nl.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_node_bullet.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata26">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_node_link.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata25386">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_node_name_header.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_node_no_icon.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata26">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_notes.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata103">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_open.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata8865">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_people.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata38">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_perl.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_pin-add.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata151">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title />
+        <dc:date>2011-03-30T12:22:25</dc:date>
+        <dc:description />
+        <dc:source>https://openclipart.org/detail/129961/pins-by-doofi</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>DooFi</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>clipart_issue</rdf:li>
+            <rdf:li>map</rdf:li>
+            <rdf:li>marker</rdf:li>
+            <rdf:li>needle</rdf:li>
+            <rdf:li>pin</rdf:li>
+            <rdf:li>point</rdf:li>
+            <rdf:li>tack</rdf:li>
+            <rdf:li>thumb</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_pin-remove.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata151">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title />
+        <dc:date>2011-03-30T12:22:25</dc:date>
+        <dc:description />
+        <dc:source>https://openclipart.org/detail/129961/pins-by-doofi</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>DooFi</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>clipart_issue</rdf:li>
+            <rdf:li>map</rdf:li>
+            <rdf:li>marker</rdf:li>
+            <rdf:li>needle</rdf:li>
+            <rdf:li>pin</rdf:li>
+            <rdf:li>point</rdf:li>
+            <rdf:li>tack</rdf:li>
+            <rdf:li>thumb</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_pin.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata151">
+    <rdf:RDF>
+      <ns2:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <ns2:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <ns2:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </ns2:Agent>
+        </dc:publisher>
+        <dc:title />
+        <dc:date>2011-03-30T12:22:25</dc:date>
+        <dc:description />
+        <dc:source>https://openclipart.org/detail/129961/pins-by-doofi</dc:source>
+        <dc:creator>
+          <ns2:Agent>
+            <dc:title>DooFi</dc:title>
+          </ns2:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>clipart_issue</rdf:li>
+            <rdf:li>map</rdf:li>
+            <rdf:li>marker</rdf:li>
+            <rdf:li>needle</rdf:li>
+            <rdf:li>pin</rdf:li>
+            <rdf:li>point</rdf:li>
+            <rdf:li>tack</rdf:li>
+            <rdf:li>thumb</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </ns2:Work>
+      <ns2:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns2:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </ns2:License>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_pl.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3683">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_preferences.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata17">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_print.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3833">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_pt.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4089">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_pt_BR.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3194">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_python.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_quit-app.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3940">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_redo.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3886">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_remove.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_replace_again.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_replace_all.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_replace_sel.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_replace_selnsub.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ro.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_rotate-left.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata22">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_rotate-right.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata26">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ru.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_save-as.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4060">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_save.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4060">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_shopping.svg
+<ns0:metadata xmlns:ns0="http://www.w3.org/2000/svg"> Svg Vector Icons : http://www.onlinewebfonts.com/icon </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_skull.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_sl.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3095">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_sort-asc.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_sort-desc.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_spell-check.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_star.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3933">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_statusbar.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_stop.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata26">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_sv.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3065">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_table_edit.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_table_insert.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_table_save.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata7572">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_term-red.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4065">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_term.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4065">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_timestamp.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata712">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_toolbar.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_to_cherrytree.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4377">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_to_html.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_to_pdf.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3815">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_to_txt.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3968">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_tr.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4108">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_tree-node-add.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_tree-node-dupl.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_tree-node-shared.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_tree-nodesub-dupl.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_tree-subnode-add.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_treelines.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata12">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_tux.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_ubuntu.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata2916">
+  <rdf:RDF>
+   <ns2:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title />
+   </ns2:Work>
+  </rdf:RDF>
+ </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_uk.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4174">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_undo.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3886">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_unlocked.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4104">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_urgent.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata5405">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_warning.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4062">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_win10.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_win2012.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3124">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_xml.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata3096">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_zh_CN.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4346">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_zh_TW.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata4154">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_zoom-in.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata17">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>
+
+
+BOOT-INF/classes/static/img/icons/ct_zoom-out.svg
+<ns0:metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="metadata17">
+    <rdf:RDF>
+      <ns2:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </ns2:Work>
+    </rdf:RDF>
+  </ns0:metadata>

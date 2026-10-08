@@ -1,0 +1,48 @@
+name: Complete 1.0.0 draft license notices
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sweetcherry-release-1.0.0-notices
+  cancel-in-progress: false
+
+jobs:
+  repack-draft:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repack existing draft binaries with license files
+        shell: pwsh
+        run: ./packaging/windows/finalize-release-notices.ps1
+      - name: Keep original draft assets for recovery
+        uses: actions/upload-artifact@v4
+        with:
+          name: SweetCherry-1.0.0-original-draft-assets
+          path: ${{ env.SC_ORIGINAL_ASSETS }}/*
+          retention-days: 30
+          if-no-files-found: error
+      - name: Keep prepared updated assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: SweetCherry-1.0.0-with-notices
+          path: ${{ env.SC_UPDATED_ASSETS }}/*
+          retention-days: 30
+          if-no-files-found: error
+      - name: Update assets of the unpublished draft
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = gh api "repos/$env:GITHUB_REPOSITORY/releases/$env:SC_DRAFT_RELEASE_ID" | ConvertFrom-Json
+          if (!$release.draft -or [string]$release.id -ne $env:SC_DRAFT_RELEASE_ID) { throw 'Draft changed; assets were not uploaded.' }
+          $files = @(Get-ChildItem $env:SC_UPDATED_ASSETS -File | ForEach-Object { $_.FullName })
+          gh release upload v1.0.0 --repo $env:GITHUB_REPOSITORY --clobber @files
+          if ($LASTEXITCODE -ne 0) { throw 'Some asset uploads failed. Draft stays unpublished; originals are retained in the recovery artifact.' }
+          gh release view v1.0.0 --repo $env:GITHUB_REPOSITORY --json isDraft,assets
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect updated draft.' }
