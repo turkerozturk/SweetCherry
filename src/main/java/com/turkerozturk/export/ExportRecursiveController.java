@@ -20,334 +20,41 @@
  */
 package com.turkerozturk.export;
 
-import com.turkerozturk.bookmark.Bookmark;
-import com.turkerozturk.children.Children;
-import com.turkerozturk.children.ChildrenService;
-import com.turkerozturk.codebox.CodeBox;
-import com.turkerozturk.grid.Grid;
-import com.turkerozturk.image.Image;
-import com.turkerozturk.multipledatabases.TenantContext;
-import com.turkerozturk.node.Node;
-import com.turkerozturk.node.NodeService;
+import com.turkerozturk.multipledatabases.RequiresTenant;
+import java.io.IOException;
+import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Set;
-
-/**
- * node_leri korur. Bir dugumu altindaki tum dugumlerle birlikte veritabaniAdi + dugumId seklinde ayri bir dosyaya kaydeder.
- * Oyle bir dosya onceden varsa icini silmesi gerekir.
- */
 @Controller
+@RequiresTenant
 public class ExportRecursiveController {
-
     private static final Logger logger = LoggerFactory.getLogger(ExportRecursiveController.class);
+    private final CtbExportService service;
 
-    @Autowired
-    NodeService nodeService;
+    public ExportRecursiveController(CtbExportService service) { this.service = service; }
 
-    @Autowired
-    ChildrenService childrenService;
-
-    @Value("${user.dir}")
-    private String applicationPath;
-
-    @Value("${myapp.exportingFolderName}")
-    private String exportingFolderName;
-
-
-    private void createTablesIfNotExist(Connection conn) throws IOException, SQLException {
-
-        Statement stmt = conn.createStatement();
-
-        stmt.executeUpdate(SqliteSchemaLoader.load());
-    }
-
-    /**
-     * Children tablosunda olmayan bir node_id belirlemek gerekiyor,
-     * neden Node tablosu degil cunku onda shared node id ler yok.
-     * @param conn
-     * @return
-     * @throws SQLException
-     */
-    private long getNewNodeId(Connection conn) throws SQLException {
-
-
-        // Benzersiz node_id belirleme
-        String getNodeIdQuery = "SELECT MAX(node_id) FROM children";
-        long newNodeId = 1;
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(getNodeIdQuery);
-        // try (Statement stmt = conn.createStatement();
-        //      ResultSet rs = stmt.executeQuery(getNodeIdQuery)) {
-        if (rs.next()) {
-            int maxNodeId = rs.getInt(1);
-            newNodeId = maxNodeId + 1;
-        }
-        //  }
-
-        return newNodeId;
-
-    }
-
-    private boolean isMainNode = true;
-
-    private void insertOneNodeRelatedData(int nodeId, Connection conn, boolean isRegularNode) throws SQLException {
-
-        //long newNodeId = getNewNodeId(conn);
-        //long newSequenceId = newNodeId;
-
-        Children children;
-
-        if(isRegularNode) {
-            Node node = nodeService.getById(nodeId);
-            children = node.getChildren();//childrenService.findById(nodeId);
-            Bookmark bookmark = node.getBookmark();
-            Set<Grid> grids = node.getGrids();
-            Set<CodeBox> codeBoxes = node.getCodeBoxes();
-            Set<Image> images = node.getImages();
-
-            // Insert Node data
-            String nodeInsert = "INSERT INTO node (node_id, name, txt, syntax, tags, " +
-                    "is_ro, is_richtxt, has_codebox, has_table, has_image, " +
-                    "level, ts_creation, ts_lastsave) VALUES " +
-                    "(:node_id, :name, :txt, :syntax, :tags, " +
-                    ":is_ro, :is_richtxt, :has_codebox, :has_table, :has_image, " +
-                    ":level, :ts_creation, :ts_lastsave)";
-            try (PreparedStatement pstmt = conn.prepareStatement(nodeInsert)) {
-                //pstmt.setLong(1, node.getNodeId());
-                pstmt.setLong(1, nodeId);
-                pstmt.setString(2, node.getName());
-                pstmt.setString(3, node.getTxt());
-                pstmt.setString(4, node.getSyntax());
-                pstmt.setString(5, node.getTags());
-                pstmt.setLong(6, node.getIsReadOnly16bit());
-                pstmt.setLong(7, node.getIsRichText());
-                pstmt.setBoolean(8, node.getHasCodeBox());
-                pstmt.setBoolean(9, node.getHasTable());
-                pstmt.setBoolean(10, node.getHasImage());
-                pstmt.setLong(11, node.getLevel());
-                pstmt.setLong(12, node.getCreationTimestamp());
-                pstmt.setLong(13, node.getLastSaveTimestamp());
-                pstmt.executeUpdate();
-            }
-
-
-
-            // Insert Bookmark data
-            if (bookmark != null) {
-                String bookmarkInsert = "INSERT INTO bookmark (node_id, sequence) VALUES (?, ?)";
-                try (PreparedStatement pstmt = conn.prepareStatement(bookmarkInsert)) {
-                    //pstmt.setLong(1, bookmark.getNodeId());
-                    pstmt.setLong(1, nodeId);
-                    pstmt.setLong(2, bookmark.getSequence());
-                    pstmt.executeUpdate();
-                }
-            }
-
-            // Insert Grid data
-            if (grids != null) {
-                String gridInsert = "INSERT INTO grid (node_id, offset, justification, txt, col_min, col_max) VALUES (?, ?, ?, ?, ?, ?)";
-                for (Grid grid : grids) {
-                    try (PreparedStatement pstmt = conn.prepareStatement(gridInsert)) {
-                        //pstmt.setLong(1, grid.getId().getNodeId());
-                        pstmt.setLong(1, nodeId);
-                        pstmt.setInt(2, grid.getId().getOffset());
-                        pstmt.setString(3, grid.getJustification());
-                        pstmt.setString(4, grid.getTxt());
-                        pstmt.setInt(5, grid.getColMin());
-                        pstmt.setInt(6, grid.getColMax());
-                        pstmt.executeUpdate();
-                    }
-                }
-            }
-
-            // Insert CodeBox data
-            if (codeBoxes != null) {
-                String codeBoxInsert = "INSERT INTO codebox (node_id, offset, justification, txt, syntax, width, height, is_width_pix, do_highl_bra, do_show_linenum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                for (CodeBox codeBox : codeBoxes) {
-                    try (PreparedStatement pstmt = conn.prepareStatement(codeBoxInsert)) {
-                        //pstmt.setLong(1, codeBox.getId().getNodeId());
-                        pstmt.setLong(1, nodeId);
-                        pstmt.setInt(2, codeBox.getId().getOffset());
-                        pstmt.setString(3, codeBox.getJustification());
-                        pstmt.setString(4, codeBox.getTxt());
-                        pstmt.setString(5, codeBox.getSyntax());
-                        pstmt.setInt(6, codeBox.getWidth());
-                        pstmt.setInt(7, codeBox.getHeight());
-                        pstmt.setInt(8, codeBox.getIsWidthPix());
-                        pstmt.setInt(9, codeBox.getDoHighlBra());
-                        pstmt.setInt(10, codeBox.getDoShowLinenum());
-                        pstmt.executeUpdate();
-                    }
-                }
-            }
-
-            // Insert Image data
-            if (images != null) {
-                String imageInsert = "INSERT INTO image (node_id, offset, justification, anchor, png, filename, link, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                for (Image image : images) {
-                    try (PreparedStatement pstmt = conn.prepareStatement(imageInsert)) {
-                        //pstmt.setLong(1, image.getNodeId());
-                        pstmt.setLong(1, nodeId);
-                        pstmt.setInt(2, image.getOffset());
-                        pstmt.setString(3, image.getJustification());
-                        pstmt.setString(4, image.getAnchor());
-                        pstmt.setBytes(5, image.getPng());
-                        pstmt.setString(6, image.getFileName());
-                        pstmt.setString(7, image.getLink());
-                        pstmt.setLong(8, image.getTime());
-                        pstmt.executeUpdate();
-                    }
-                }
-            }
-
-
-        } else {
-            // Shared Node oldugundan id ve verisi sadece children tablosunda tek satir kayit olarak var.
-            children = childrenService.findById(nodeId);
-
-        }
-
-
-
-
-
-        // Insert Children data
-        String childrenInsert = "INSERT INTO children (node_id, father_id, sequence, master_id) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(childrenInsert)) {
-            //pstmt.setLong(1, children.getNodeId());
-            pstmt.setLong(1, nodeId);
-            if(!isMainNode) {
-                pstmt.setLong(2, children.getFatherId());
-            } else {
-                // it is main node
-                pstmt.setLong(2, 0);
-                isMainNode = false;
-            }
-            pstmt.setLong(3, children.getSequence());
-            pstmt.setLong(4, children.getMasterId());
-            pstmt.executeUpdate();
-        }
-
-
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-    // security: bu metodu ekleme sebebi, URL elle yazilirsa hata mesaji goruntulenmeden node content sayfasina yonlendirmek.
     @GetMapping("/exportWithSubNodes/{node_id}")
     public String exportPage(@PathVariable("node_id") Integer nodeId) {
         return "redirect:/nodes/" + nodeId;
     }
 
-    //https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
     @PostMapping("/exportWithSubNodes/{node_id}")
     public String export1(@PathVariable("node_id") Integer nodeId,
-                          @RequestParam(defaultValue = "true") boolean includeDescendants,
-                          RedirectAttributes redirectAttributes) {
-
-        logger.info("export contorller " + nodeId);
-
-        String directoryPath = applicationPath + File.separator + exportingFolderName;
-
-
-        // bilgi basla
-        String dbFileName = "export_" + TenantContext.getCurrentTenant() + "_" + nodeId + ".ctb";
-
-        String dbFilePath = directoryPath + File.separator + dbFileName;
-
+            @RequestParam(defaultValue = "true") boolean includeDescendants,
+            RedirectAttributes redirectAttributes) {
         try {
-            Files.createDirectories(Path.of(directoryPath));
-            if (Files.exists(Path.of(dbFilePath))) {
-                logger.info("db file exits: " + dbFilePath);
-                LocalDateTime currentDateTime = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-                String formattedDateTime = currentDateTime.format(formatter);
-                Path newFilePath = Path.of(dbFilePath + "__" + formattedDateTime + ".old");
-                Files.move(Path.of(dbFilePath), newFilePath, StandardCopyOption.REPLACE_EXISTING);
-                logger.info("Old export file moved to: " + newFilePath);
-            } else {
-                logger.info("db file not exits: " + dbFilePath);
-            }
-        } catch (IOException e) {
-            logger.error("Error while preparing separate CTB export", e);
+            var result = service.export(nodeId, includeDescendants, false);
+            redirectAttributes.addFlashAttribute("contentText", "Export successful. Exported node count: "
+                    + result.count() + ". File: " + result.filename());
+        } catch (IOException | SQLException failure) {
+            logger.error("CTB export failed", failure);
             redirectAttributes.addFlashAttribute("contentText", "Export failed.");
-            return "redirect:/export-result";
         }
-
-        int exportedNodeCount = 0;
-        String sqliteUrl = "jdbc:sqlite:" + dbFilePath;
-        try (Connection conn = DriverManager.getConnection(sqliteUrl)) {
-            if (conn != null) {
-
-
-                createTablesIfNotExist(conn);
-
-                isMainNode = true;
-
-                List<Children> childrens = includeDescendants
-                        ? childrenService.findAllSubChildren(nodeId)
-                        : List.of(childrenService.findById(nodeId));
-                exportedNodeCount = childrens.size();
-                for (Children children : childrens) {
-                    boolean isRegulardNode = children.getMasterId() == null || children.getMasterId() == 0;
-                    if(isRegulardNode) {
-                        insertOneNodeRelatedData((int) children.getNodeId(), conn, true);
-                    } else {
-                        insertOneNodeRelatedData((int) children.getNodeId(), conn, false);
-                    }
-
-
-                }
-
-            }
-        } catch (SQLException e) {
-            logger.error("Error during export", e);
-            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
-            return "redirect:/export-result";
-        } catch (IOException e) {
-            logger.error("Error during export", e);
-            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
-            return "redirect:/export-result";
-        }
-
-
-        // bilgi bitti
-
-        logger.info("export şu dosya yoluna yapıldı dbFilePath: " + dbFilePath);
-        redirectAttributes.addFlashAttribute("contentText",
-                "Export successful. Exported node count: " + exportedNodeCount + ". File: " + dbFileName
-                        + (includeDescendants ? " (selected node and descendants)." : " (selected node only)."));
         return "redirect:/export-result";
     }
-
-
-
 
 }

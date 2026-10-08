@@ -82,5 +82,5 @@ Eski sürümlerden kalmış, silinmiş düğümlere ait bookmark kayıtları oku
 
 ## Ayrı doğrulanacak işler
 
-- Ortak/yeni CTB’ye kopyalama: dışarıda kalan master’a referans veren bir alt ağacın hedef CTB’de geçerli içerik bağlantıları kurduğu ayrıca doğrulanmalıdır.
+- Ortak/yeni CTB’ye kopyalamada parent/master eşleme uygulanır; dış master’ın yerini hedefte bir içerik kopyası alır. Dört seçenek ve manuel kabul listesi: [CTB dışa aktarma](ctb-export.md#paylaşımlı-konumların-ctbye-aktarılması).
 - Metin içindeki internal linkler: silinen kimlikler yeni master kimliğine otomatik çevrilmez. Bookmark temizliği ile metin bağlantılarının korunması ayrı konulardır.

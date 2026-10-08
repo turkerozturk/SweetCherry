@@ -319,3 +319,92 @@ Paylaşımlı parent desteği açılırken kaldırılan, artık geçerli olmayan
 ```java
 // Shared nodes cannot own children.
 ```
+
+## `src/main/java/com/turkerozturk/export/ExportRecursiveController.java` (2026-10-08)
+
+Eski export akışı ortak JDBC servisine taşınırken kaldırılan yorumlar:
+
+```text
+/**
+ * node_leri korur. Bir dugumu altindaki tum dugumlerle birlikte veritabaniAdi + dugumId seklinde ayri bir dosyaya kaydeder.
+ * Oyle bir dosya onceden varsa icini silmesi gerekir.
+ */
+/**
+     * Children tablosunda olmayan bir node_id belirlemek gerekiyor,
+     * neden Node tablosu degil cunku onda shared node id ler yok.
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+// Benzersiz node_id belirleme
+// try (Statement stmt = conn.createStatement();
+//      ResultSet rs = stmt.executeQuery(getNodeIdQuery)) {
+//  }
+//long newNodeId = getNewNodeId(conn);
+//long newSequenceId = newNodeId;
+//childrenService.findById(nodeId);
+// Insert Node data
+//pstmt.setLong(1, node.getNodeId());
+// Insert Bookmark data
+//pstmt.setLong(1, bookmark.getNodeId());
+// Insert Grid data
+//pstmt.setLong(1, grid.getId().getNodeId());
+// Insert CodeBox data
+//pstmt.setLong(1, codeBox.getId().getNodeId());
+// Insert Image data
+//pstmt.setLong(1, image.getNodeId());
+// Shared Node oldugundan id ve verisi sadece children tablosunda tek satir kayit olarak var.
+// Insert Children data
+//pstmt.setLong(1, children.getNodeId());
+// it is main node
+// security: bu metodu ekleme sebebi, URL elle yazilirsa hata mesaji goruntulenmeden node content sayfasina yonlendirmek.
+//https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
+// bilgi basla
+// bilgi bitti
+```
+
+## `src/main/java/com/turkerozturk/export/ExportManipulatedRecursiveController.java` (2026-10-08)
+
+Eski export akışı ortak JDBC servisine taşınırken kaldırılan yorumlar:
+
+```text
+// Benzersiz node_id belirleme
+// try (Statement stmt = conn.createStatement();
+//      ResultSet rs = stmt.executeQuery(getNodeIdQuery)) {
+//  }
+// Benzersiz sequence belirlemek, eger father_id 0 ise. father_id yi de biz 0 yapiyoruz zaten,
+// her baska node tree ekledigimizde koke yerlessin diye.
+// try (Statement stmt = conn.createStatement();
+//      ResultSet rs = stmt.executeQuery(getNodeIdQuery)) {
+//  }
+// long newNodeId = getNewNodeId(nodeId);
+//   long newSequenceId = newNodeId;
+//childrenService.findById(nodeId);
+// Insert Node data
+//pstmt.setLong(1, node.getNodeId());
+// Insert Bookmark data
+//pstmt.setLong(1, bookmark.getNodeId());
+//pstmt.setLong(2, newSequenceId);
+// Insert Grid data
+//pstmt.setLong(1, grid.getId().getNodeId());
+// Insert CodeBox data
+//pstmt.setLong(1, codeBox.getId().getNodeId());
+// Insert Image data
+//pstmt.setLong(1, image.getNodeId());
+// Shared Node oldugundan id ve verisi sadece children tablosunda tek satir kayit olarak var.
+// Insert Children data
+//pstmt.setLong(1, children.getNodeId());
+//pstmt.setLong(2, newRootNodeId + children.getFatherId());
+// 0 or null
+// it is main node
+// 0 or null
+//pstmt.setLong(2, 0);
+//pstmt.setLong(3, children.getSequence());
+//pstmt.setLong(3, newSequenceId);
+//pstmt.setLong(4, newRootNodeId + children.getMasterId());
+//https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-sql.html
+// bilgi basla
+// bilgi "it is necessary" to set it.
+// bilgi bitti
+//model.addAttribute("contentText", "export başarılı.");
+```

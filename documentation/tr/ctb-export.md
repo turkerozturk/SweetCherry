@@ -72,17 +72,45 @@ Bu nedenle kimlikler arasındaki boşluklar rastgele değildir; kaynak düğüml
 
 Silmeden veya CherryTree ile düzenlemeden önce gerekli dosyaların yedeğini alın.
 
-## Alias, link ve anchor sınırlaması
+## Paylaşımlı konumların CTB’ye aktarılması
 
-Normal düğümler ve alt düğüm hiyerarşisi mevcut denemelerde hedef CTB'ye yazılmaktadır. Ancak kaynak veritabanındaki **alias/shared node**, başka bir node'a verilen bağlantı veya anchor gibi yapılarda saklanan `node_id` referanslarının tamamı henüz yeni hedef kimliklere güvenilir biçimde çevrilmemektedir.
+Dört seçenek gerçek ve paylaşımlı konumlarda kullanılabilir. Kapsam, seçilen `children.node_id` ve alt ağaç seçilmişse onun `father_id` ile bağlı kendi çocuklarıdır. Master’ın başka konumdaki çocukları aktarılmaz.
 
-Bu durumda:
+| Kaynak durumu | Hedefteki sonuç |
+| --- | --- |
+| Yalnız bir shared konum aktarılır | Master’ın içerik ve nesneleri bu konumun kimliğiyle bağımsız gerçek düğüm olarak kopyalanır |
+| Master da seçilen alt ağaç içindedir | Master ve shared konumlar kopyalanır; shared bağlantılar hedefteki master kimliğine çevrilir |
+| Master dışarıda, aynı gruptan birden fazla shared konum içeridedir | Ağaç sırasındaki ilk konum gerçek master olur; diğer konumlar hedefte ona bağlanır |
 
-- DB Browser for SQLite ile bakıldığında düğüm kayıtları hedef CTB içinde görülebilir.
-- CherryTree Desktop ağacı hatalı referansa kadar gösterebilir ve ardından yedekten geri dönmeyi önerebilir.
-- SweetCherry tarafından oluşturulan dosya için CherryTree'nin kendi otomatik yedeği bulunmayabilir; geri yükleme sorusuna **Hayır** denmesi dosyanın boş veya donmuş görünmesine yol açabilir.
+**Hedef CTB’de dışarıda kalan kaynak master’a bağımlı shared bağlantı bırakılmaz.** İlk konumda master içeriği materialize edilir; aynı grubun her konumu için ayrı içerik kopyası oluşturulmaz. Kaynak veritabanı değişmez. Hedefin içeriği kaynaktan bağımsızdır; kaynaktaki sonraki düzenlemeler export dosyasını değiştirmez.
 
-Bu nedenle alias/link/anchor içeren dalların export'u şimdilik deneysel kabul edilmelidir. Özgün CTB dosyası değiştirilmez, fakat üretilen export dosyasının CherryTree ile sorunsuz açılacağı garanti edilmez. Sorun içerik kayıtlarının tamamen kaybolmasından çok, referans kimliklerinin hedef veritabanına doğru çevrilememesidir.
+Ortak CTB’ye eklerken kimlikler `node` ve `children` tablolarındaki en büyük kimlikten sonra ayrılır. Parent, master, nesne ve bookmark kimlikleri aynı eşlemeye göre yazılır. Her export yeni bir bağımsız grup ekler; önceki export grubuyla birleştirme yapılmaz. Yeni ayrı CTB’de kaynak ağaç kimlikleri korunur; seçilen kökün ebeveyni `0` olur.
+
+İçerik ve nesneler JDBC üzerinden kopyalanır; binary resim/attachment verileri ve SQL NULL değerleri korunur. Hedefe yazma transaction içindedir. Ortak CTB’de hata varsa eklenen satırlar geri alınır. Ayrı CTB geçici dosyada tamamlanır; ancak başarılı olduğunda mevcut çıktı `.old` olarak taşınır ve yeni çıktı yerleştirilir. Bu geçmiş export dosyaları uygulamanın not veritabanını otomatik yedeklediği anlamına gelmez.
+
+### CherryTree kaynak incelemesi (2026-10-08)
+
+- [`ct_storage_sqlite.cc`](https://github.com/giuspen/cherrytree/blob/master/src/ct/ct_storage_sqlite.cc): `_write_node_to_db`, yalnız düğüm export’unda shared master bilgisini sıfırlar; alt ağaç export’unda verilen master eşlemesini uygular. Kendi çocuklarını ağaç üzerinden gezer.
+- [`ct_storage_control.cc`](https://github.com/giuspen/cherrytree/blob/master/src/ct/ct_storage_control.cc): `CURRENT_NODE_AND_SUBNODES` için master dışarıda kalıyorsa ilk aktarılacak shared konumu `expo_master_reassign` ile yeni master seçer.
+
+SweetCherry aynı grup yaklaşımını bağımsız JDBC koduyla uygular; CherryTree kaynak kodu kopyalanmamıştır.
+
+### Metin içindeki linkler ve anchor’lar
+
+Ağaçtaki parent/master bağlantıları ile rich-text içindeki internal node linkleri ayrı konulardır. Metin içindeki node ID’leri otomatik yeniden yazılmaz. Ortak CTB’de kimlikler değiştiği veya bağlantı hedefi kapsam dışında kaldığı için internal linklerin hedefi korunmayabilir. Dış URL’ler, nesne verileri ve mevcut anchor içeriği aynen kopyalanır. Bu sınırlama shared ağaç ilişkilerinin eksik aktarılması anlamına gelmez.
+
+### Manuel kabul listesi
+
+[`src/test/resources/fixtures/shared-node-tree.sql`](../../src/test/resources/fixtures/shared-node-tree.sql) dosyasından [test CTB’si oluşturun](shared-node-operations.md#sqlden-manuel-test-ctbsi-oluşturma).
+
+Önceki sürümle üretilmiş export dosyaları kendiliğinden onarılmaz. Manuel doğrulamaya boş bir ortak CTB ile başlayın; gerekiyorsa eski `exportednodes.ctb` dosyasını ayrı bir yere taşıyın. Kaynak test CTB’sini değiştirmeyin.
+
+1. Shared 11’de dört seçeneği deneyin: yalnız düğümde bir gerçek kök, alt ağaçta 11, 12, 13, 14, 15, 18, 19 bulunmalı. Master 2’nin çocuğu 3 gelmemeli.
+2. Çıktıları CherryTree’de açın. 18’in altında 19 kalmalı; hedefte olmayan master’a referans bulunmamalı.
+3. 10’u 11’in altına taşıyıp alt ağacı aktarın: 18 ve 10 aynı hedef içeriğe bağlanmalı, biri gerçek master olmalı.
+4. Gerçek 1’i 11’in altına taşıyıp aktarın: 18 ve 10 bu gerçek düğümün hedefteki kimliğine bağlanmalı.
+5. Kaynak master’a resim/attachment, tablo, kod kutusu ekleyin; aktarılan gerçek master’da nesneleri kontrol edin. Shared konuma eklenen bookmark kendi hedef konumunda kalmalı.
+6. Ortak CTB’ye aynı dalı iki kez ekleyin; iki bağımsız kök ve geçerli parent/master bağlantıları bulunmalı.
 
 ## SweetCherry içinde veri kaynağı olarak açma
 
@@ -90,22 +118,15 @@ Bu nedenle alias/link/anchor içeren dalların export'u şimdilik deneysel kabul
 
 Bağlantı tanım dosyalarını `allTenants` klasörüne yüklemek için SweetCherry'de bir yükleme arayüzü de bulunmaktadır.
 
-## TODO ve sağlamlaştırma notları
+## Kalan işler
 
-- Aynı kaynak düğümün daha önce export edilip edilmediğini belirleyen isteğe bağlı yinelenen kayıt kontrolü tasarla.
-- Mevcut alt düğüm hiyerarşisi davranışını otomatik testle sabitle.
-- Kimlik üretimini, ilişkileri koruyan açık bir eski-yeni ID eşleme tablosuyla yeniden tasarla.
-- Alias/shared node, node bağlantısı ve anchor referanslarını aynı eski-yeni ID eşleme tablosuyla güvenilir biçimde dönüştür.
-- Bir dalın tamamını tek transaction içinde yaz; yarım kalan export sonucunda eksik CTB oluşmasını engelle.
-- Controller içindeki export durumunu istek başına yerel hale getir; eşzamanlı iki export isteğinin birbirini etkilemesini engelle.
-- Export sırasında hedef CTB'nin SweetCherry veya CherryTree tarafından açık olması durumunu algıla ya da kullanıcıyı daha belirgin uyar.
-- Export sonucu, dosya yolu ve eklenen düğüm sayısını kullanıcıya daha ayrıntılı göster.
-- Download ve delete işlemlerinde izin verilen dosya adlarını sunucu tarafında daha sıkı doğrula.
-- `exportednodes.ctb` dosyasını aktif tenant olarak kullanma senaryosunu ayrıca test et ve belgele.
+- İsteğe bağlı yinelenen export kontrolü.
+- Rich-text içindeki internal node linklerinin hedef kimliklere uyarlanması ve kapsam dışı hedefler için politika.
+- Export hedefinin ayrıca aktif tenant veya CherryTree’de açık olması senaryosunun doğrulanması. Export dosyasını incelemeden/değiştirmeden önce kullanmakta olan programda kapatın.
 
 ## Freeplane / FreeMind dışa aktarma
 
-Yeni masaüstü ve mobil düğüm sayfalarının Export menüsünde **Freeplane / FreeMind (.mm)** bulunur. Ortak sayfa şablonundaki `/mindmap-export?nodeId=<ağaç-kimliği>` formu ID alanını doldurur; doğrudan açıldığında kimlik elle girilebilir. Tenant kapalıysa önce veri kaynağı seçimi gerekir. Görünüm token'ı ve POST CSRF kontrolü korunur. Paylaşımlı düğümde ID, shared occurrence'ın kendi kimliğidir; görünen ad/stiller master'dan okunur. Shared occurrence bir yapraktır; master'ın çocukları onun alt ağacı gibi dışa aktarılmaz. İkonlar seçilirse `.mm` dosyasının yanında eşleşen PNG ikonları içeren `ctbicons` klasörü gerekir.
+Yeni masaüstü ve mobil düğüm sayfalarının Export menüsünde **Freeplane / FreeMind (.mm)** bulunur. Ortak sayfa şablonundaki `/mindmap-export?nodeId=<ağaç-kimliği>` formu ID alanını doldurur; doğrudan açıldığında kimlik elle girilebilir. Tenant kapalıysa önce veri kaynağı seçimi gerekir. Görünüm token'ı ve POST CSRF kontrolü korunur. Paylaşımlı düğümde ID, shared occurrence'ın kendi kimliğidir; görünen ad/stiller master'dan okunur. Shared occurrence kendi çocuklarıyla genişletilir; master'ın başka konumdaki çocukları onun alt ağacı gibi dışa aktarılmaz. İkonlar seçilirse `.mm` dosyasının yanında eşleşen PNG ikonları içeren `ctbicons` klasörü gerekir.
 
 
 ## Düşünce Haritası menüsü ve ikon paketi

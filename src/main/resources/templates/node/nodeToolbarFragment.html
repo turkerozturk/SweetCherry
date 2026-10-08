@@ -21,23 +21,23 @@
             <div class="dropdown">
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{toolbar.ctb}">Export</span></button>
                 <div class="dropdown-menu p-1">
-                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                    <form th:action="@{/expo/{id}(id=${requestedNodeId})}" method="post">
                         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                         <input type="hidden" name="includeDescendants" value="false"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionSingle}"></button>
                     </form>
-                    <form th:action="@{/expo/{id}(id=${node.nodeId})}" method="post">
+                    <form th:action="@{/expo/{id}(id=${requestedNodeId})}" method="post">
                         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                         <input type="hidden" name="includeDescendants" value="true"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionBranch}"></button>
                     </form>
                     <hr class="dropdown-divider">
-                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${requestedNodeId})}" method="post">
                         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                         <input type="hidden" name="includeDescendants" value="false"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateSingle}"></button>
                     </form>
-                    <form th:action="@{/exportWithSubNodes/{id}(id=${node.nodeId})}" method="post">
+                    <form th:action="@{/exportWithSubNodes/{id}(id=${requestedNodeId})}" method="post">
                         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                         <input type="hidden" name="includeDescendants" value="true"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
