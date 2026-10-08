@@ -60,12 +60,14 @@ public class NodeDeletionService {
 
     /** A shared node has a children row but no node row. */
     @Transactional
-    public void deleteNodeWithSubNodes(long nodeId) {
+    public long deleteNodeWithSubNodes(long nodeId) {
         if (!isCurrentTenantWritable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
-        entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> NodeDeletionSql.delete(connection, nodeId));
+        long nextSelected=entityManager.unwrap(org.hibernate.Session.class)
+                .doReturningWork(connection -> NodeDeletionSql.delete(connection, nodeId));
         entityManager.clear();
         logger.info("Deleted tree occurrence {} and its descendants; surviving shared groups preserved.", nodeId);
+        return nextSelected;
     }
 }

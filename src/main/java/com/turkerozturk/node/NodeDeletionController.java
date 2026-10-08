@@ -28,6 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,8 @@ public class NodeDeletionController {
     @PreAuthorize("hasRole('ADMIN')")
     @RequiresTenant
     @GetMapping("/nodes/delete/{nodeId}")
-    public String confirmDeletion(@PathVariable long nodeId, Model model) {
+    public String confirmDeletion(@PathVariable long nodeId, Model model,
+            @RequestParam(defaultValue="tree") String view) {
         Children selected = childrenRepository.findByNodeId(nodeId);
         if (selected == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -72,21 +74,23 @@ public class NodeDeletionController {
         model.addAttribute("node", node);
         model.addAttribute("selectedNodeId", nodeId);
         model.addAttribute("sharedNode", shared);
+        model.addAttribute("deleteView", "reader".equals(view) ? "reader" : "tree");
         return "node/nodeDelete";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequiresTenant
     @PostMapping("/nodes/delete/{nodeId}")
-    public String deleteNode(@PathVariable long nodeId) {
+    public String deleteNode(@PathVariable long nodeId, @RequestParam(defaultValue="tree") String view) {
         if (!nodeDeletionService.isCurrentTenantWritable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
         if (childrenRepository.findByNodeId(nodeId) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        nodeDeletionService.deleteNodeWithSubNodes(nodeId);
-        return "redirect:/";
+        long nextSelected=nodeDeletionService.deleteNodeWithSubNodes(nodeId);
+        if (!"reader".equals(view)) return "redirect:/tree?nodeId="+nextSelected;
+        return nextSelected==0 ? "redirect:/" : "redirect:/nodes/"+nextSelected;
     }
 
 

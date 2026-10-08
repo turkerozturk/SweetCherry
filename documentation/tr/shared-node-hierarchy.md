@@ -27,3 +27,5 @@ Yönlü taşıma ve alt ağaç çoğaltma paylaşımlı ebeveynlerde desteklenir
 | Paylaşımlı 10 → 1 | Çocuksuz referans |
 
 Kontrol için 11 ve 16’yı masaüstü ağacında açın; mobilde alt düğüme ve geri ebeveyne gidin. 19’un breadcrumb bağlantıları 11 ve 18’e gitmeli. Üç haritada ve 11’in alt ağaç PDF’sinde 12, 13, 14, 15, 18, 19 görünmeli; master 2’nin çocuğu 3 görünmemeli.
+
+Gerçek düğümün `master_id` değeri genellikle `0`, eski CTB dosyalarında `NULL` olabilir. Manuel test CTB’sini SQL’den üretme adımları: [Paylaşımlı düğüm işlemleri](shared-node-operations.md#sqlden-manuel-test-ctbsi-oluşturma).

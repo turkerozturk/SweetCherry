@@ -25,15 +25,38 @@ CherryTree kaynağı: https://github.com/giuspen/cherrytree/blob/master/src/ct/c
 
 2026-10-08 incelemesinde `node_subnodes_paste2` alt düğüm verilerini yeni kimliklerle kopyalarken shared master bilgisini koruyor. `node_delete`, yalnız seçilen alt ağacın kimliklerini topluyor; silinen master’ın kalan bir grup üyesine içeriğini taşıyor ve diğer başvuruları ona bağlıyor. SweetCherry bu davranışları bağımsız SQL işlemleriyle uygular; kaynak kod kopyalanmamıştır.
 
-Kaynakta kök düğüm çoğaltma ayrı `_node_add` akışındadır ve paylaşımlı kökü bağımsız gerçek düğüme dönüştürebilir. SweetCherry’de daha önce onaylanan “paylaşımlı kopya aynı master’a bağlanır” davranışı bu adımda korunmuştur; kök düğümün bağımsızlaştırılması ayrı bir karar gerektirir. Yeni master seçiminin kimliği CherryTree’den farklı olabilir; korunması gereken içerik, dış konumlar ve ağaç ilişkileridir.
+**Bilinçli fark: CherryTree’nin `_node_add` akışı paylaşımlı kökü bağımsız gerçek düğüme dönüştürebilir. SweetCherry’de paylaşımlı kökün kopyası aynı özgün master’a bağlanır; bu tercih korunmaktadır. Bu, geçerli bir paylaşımlı kayıt oluşturur ve veritabanı yapısını bozmaz; kopyanın içeriği bağımsız değildir.**
+
+**Silmede seçilen yeni master’ın kimliği CherryTree’den farklı olabilir. Korunan içerik, dış konumlar ve ağaç ilişkileri esas alınır.**
+
+## Silme sonrası seçim
+
+Silinen konumun sıralamadaki önceki kardeşi seçilir. Önceki kardeş yoksa sonraki kardeş, kardeş yoksa ebeveyn seçilir. Son kök silinirse sanal kök (`0`) gösterilir. Gerçek ve paylaşımlı konumlar arasında ayrım yapılmaz; seçim `children.sequence` sırasına göredir.
+
+## SQL’den manuel test CTB’si oluşturma
+
+Kaynak dosya: [`src/test/resources/fixtures/shared-node-tree.sql`](../../src/test/resources/fixtures/shared-node-tree.sql). Test veritabanı bu SQL’den üretilir; oluşturulan CTB depoya eklenmez.
+
+DB Browser for SQLite’da yeni, boş bir `shared-node-tree.ctb` dosyası oluşturun. Tablo oluşturma penceresini iptal edin. **Execute SQL** sekmesinde kaynak SQL dosyasını açıp tamamını çalıştırın; değişiklikleri kaydedip bağlantıyı kapatın. Var olan not veritabanınızda bu script’i çalıştırmayın.
+
+Alternatif olarak SQLite CLI kuruluysa depo kökünde Windows CMD’den:
+
+```bat
+mkdir target\manual-tests
+sqlite3 target/manual-tests/shared-node-tree.ctb ".read src/test/resources/fixtures/shared-node-tree.sql"
+```
+
+Hedef CTB önceden mevcut olmamalıdır. Mevcut demo tenant tanımını ayrı bir config dosyasına kopyalayıp `name` ve SQLite bağlantı yolunu yeni CTB’ye göre değiştirin; test için `custom.isWritable=true` kullanın. Diğer ayarları koruyun. Veri kaynaklarını yeniden yükleyip bu tanımı seçin. CTB’yi yeniden oluşturmak veya üzerine yazmak için önce SweetCherry’de veri kaynağını, CherryTree ve DB Browser’da dosyayı kapatın.
+
+Fixture düz metin ve ağaç ilişkilerini içerir. Nesne ve bookmark korumasını manuel kontrol etmek için başlangıç kopyasına ayrıca resim, tablo, kod kutusu ve yer işareti ekleyin. Otomatik testler binary/NULL verilerini ayrıca oluşturur.
 
 ## Demo kopyasında manuel test
 
-Her senaryoya başlangıçtaki CTB’nin ayrı kopyasıyla başlayın. SQL fixture’ında eklenen 18 ve 19 orijinal demo dosyasında bulunmayabilir.
+Her senaryoya yukarıdaki SQL’den üretilen CTB’nin ayrı başlangıç kopyasıyla başlayın. Bu fixture 18 ve 19 dahil test konumlarını içerir.
 
 | İşlem | Beklenen sonuç |
 | --- | --- |
-| 11’i alt ağacıyla çoğalt | Yeni shared kök → 2; 12, 13, 14, 15 bağımsız gerçek kopyalar; varsa 18 → 1 ve altındaki 19 kopyalanır |
+| 11’i alt ağacıyla çoğalt | Yeni shared kök → 2; 12, 13, 14, 15 bağımsız gerçek kopyalar; 18 → 1 ve altındaki 19 kopyalanır |
 | 1’in alt ağacındaki referansı çoğalt | Yeni shared referans özgün master’a bağlı kalır; yeni gerçek master kopyasına yönlenmez |
 | Shared 16’yı sil | 16, 7, 8 kalkar; gerçek 6 kalır; dışarıdaki 17 yeni master olur, 8’in içeriğini korur |
 | Gerçek 6’yı sil | 16 yeni master olur; 7 ve 8 onun altında kalır; nesneler ve 16 bookmark’ı korunur |
@@ -42,3 +65,15 @@ Her senaryoya başlangıçtaki CTB’nin ayrı kopyasıyla başlayın. SQL fixtu
 | Bir grubun tüm üyelerini aynı alt ağaçta sil | Grubun içerik ve nesne satırları tamamen kaldırılır |
 
 SQLite testleri ayrıca binary/NULL korunması, döngünün yazmadan önce reddi ve promotion hatasında transaction rollback durumlarını kapsar. SweetCherry otomatik yedek almaz.
+
+## Kullanım ve eski kayıtlar
+
+Release öncesi denemeleri demo veya ayrı CTB kopyalarıyla yapın; diğer tenant tanımlarında `custom.isWritable=false` kullanabilirsiniz. Silme onayında seçilen ağaç konumunun kimliği ile içerik master’ının kimliğini ayrı kontrol edin. Paylaşımlı bağlantılar kendi `children.node_id` değerini korur.
+
+Eski sürümlerden kalmış, silinmiş düğümlere ait bookmark kayıtları okuma sayfasında bildirilir; sırf liste görüntülendi diye otomatik temizlenmez.
+
+## Ayrı doğrulanacak işler
+
+- Paylaşımlı konumun altında yeni alt düğüm oluşturma: mevcut oluşturma servisi hâlâ gerçek parent ister; gösterim, taşıma ve çoğaltma desteği bu kısıtı kendiliğinden kaldırmaz.
+- Ortak/yeni CTB’ye kopyalama: dışarıda kalan master’a referans veren bir alt ağacın hedef CTB’de geçerli içerik bağlantıları kurduğu ayrıca doğrulanmalıdır.
+- Metin içindeki internal linkler: silinen kimlikler yeni master kimliğine otomatik çevrilmez. Bookmark temizliği ile metin bağlantılarının korunması ayrı konulardır.

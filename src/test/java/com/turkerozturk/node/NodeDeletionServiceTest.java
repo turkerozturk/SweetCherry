@@ -124,6 +124,26 @@ class NodeDeletionServiceTest {
         assertThat(number("SELECT master_id FROM children WHERE node_id=16")).isEqualTo(6);
         validReferences();
     }
+    @Test void nextSelectionPrefersPreviousSiblingIncludingSharedOccurrence() throws Exception {
+        assertThat(NodeDeletionSql.delete(connection,9)).isEqualTo(16);
+    }
+    @Test void firstSiblingDeletionSelectsNextSibling() throws Exception {
+        assertThat(NodeDeletionSql.delete(connection,1)).isEqualTo(2);
+    }
+    @Test void onlyChildDeletionSelectsSharedParent() throws Exception {
+        assertThat(NodeDeletionSql.delete(connection,19)).isEqualTo(18);
+    }
+    @Test void deletingLastRootReturnsVirtualRootWithoutADeadNodeId() throws Exception {
+        try(var statement=connection.createStatement()) {
+            statement.execute("DELETE FROM bookmark");statement.execute("DELETE FROM image");
+            statement.execute("DELETE FROM grid");statement.execute("DELETE FROM codebox");
+            statement.execute("DELETE FROM children WHERE node_id!=4");
+            statement.execute("DELETE FROM node WHERE node_id!=4");
+            statement.execute("UPDATE children SET father_id=0 WHERE node_id=4");
+        }
+        assertThat(NodeDeletionSql.delete(connection,4)).isZero();
+        assertThat(number("SELECT COUNT(*) FROM children")).isZero();
+    }
     @Test void readOnlyServiceDoesNotOpenTheTransactionConnection() {
         TenantContext.setCurrentTenant("readonly");var properties=new CustomPropertiesHolder();
         properties.addCustomProperties("readonly",Map.of("custom.isWritable","false"));

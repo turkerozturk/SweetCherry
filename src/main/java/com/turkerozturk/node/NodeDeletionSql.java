@@ -28,15 +28,15 @@ import org.springframework.web.server.ResponseStatusException;
 /** Deletes occurrence subtrees, preserving content when a shared group survives outside them. */
 final class NodeDeletionSql {
     private NodeDeletionSql() { }
-    private record Row(long id,long parent,long master) { }
+    private record Row(long id,long parent,long master,long sequence) { }
 
-    static void delete(Connection connection,long selectedId) throws SQLException {
+    static long delete(Connection connection,long selectedId) throws SQLException {
         var rows=new LinkedHashMap<Long,Row>();
         var contentIds=new HashSet<Long>();
         try(var statement=connection.createStatement();var result=statement.executeQuery(
-                "SELECT node_id,father_id,COALESCE(master_id,0) FROM children ORDER BY node_id")) {
+                "SELECT node_id,father_id,COALESCE(master_id,0),sequence FROM children ORDER BY node_id")) {
             while(result.next()) {
-                var row=new Row(result.getLong(1),result.getLong(2),result.getLong(3));
+                var row=new Row(result.getLong(1),result.getLong(2),result.getLong(3),result.getLong(4));
                 if(row.id<=0 || rows.put(row.id,row)!=null) throw conflict();
             }
         }
@@ -67,6 +67,13 @@ final class NodeDeletionSql {
             if(!deleting.add(id)) throw conflict();
             pending.addAll(byParent.getOrDefault(id,List.of()));
         }
+        // Pick a surviving occurrence in the same transaction as deletion.
+        var selected=rows.get(selectedId);
+        var siblings=rows.values().stream().filter(row->row.parent==selected.parent)
+                .sorted(Comparator.comparingLong(Row::sequence).thenComparingLong(Row::id)).toList();
+        int at=siblings.indexOf(selected);
+        long nextSelected=at>0 ? siblings.get(at-1).id
+                : at+1<siblings.size() ? siblings.get(at+1).id : selected.parent;
         // Decide all promotions before changing any row; references are not hierarchy edges.
         var promotions=new LinkedHashMap<Long,Long>();
         for(long id:deleting) if(rows.get(id).master==0) {
@@ -97,6 +104,7 @@ final class NodeDeletionSql {
                 }
             }
         }
+        return nextSelected;
     }
     private static ResponseStatusException conflict() {
         return new ResponseStatusException(HttpStatus.CONFLICT,"Invalid tree or shared content reference; deletion was cancelled.");
