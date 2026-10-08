@@ -30,10 +30,12 @@
     </th:block>
     <template data-workspace-status>
         <th:block th:if="${node != null}">
-            <span><b th:text="#{tree.type}"></b>: <span th:text="${node.syntax}"></span></span>
+            <span><b th:text="#{tree.type}"></b>: <span th:text="${node.syntax == 'custom-colors' ? #messages.msg('node.type.richText') : (node.syntax == 'plain-text' ? #messages.msg('node.type.plainText') : node.syntax)}"></span></span>
             <span><b th:text="#{tree.created}"></b>: <span th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></span></span>
             <span><b th:text="#{tree.modified}"></b>: <span th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></span></span>
             <span><b th:text="#{tree.children}"></b>: <span th:text="${childNodes != null ? #lists.size(childNodes) : 0}"></span></span>
+            <span><b th:text="#{node.nodeId}"></b>: <span th:text="${node.nodeId}"></span></span>
+            <span th:if="${isSharedNode == true}"><b th:text="#{node.sharedId}"></b>: <span th:text="${requestedNodeId}"></span></span>
         </th:block>
         <span th:if="${node == null}" th:text="${currentTenantName}"></span>
     </template>

@@ -408,3 +408,15 @@ Eski export akışı ortak JDBC servisine taşınırken kaldırılan yorumlar:
 // bilgi bitti
 //model.addAttribute("contentText", "export başarılı.");
 ```
+
+## `src/main/java/com/turkerozturk/node/NodeController.java` (2026-10-08)
+
+Arama POST/GET akışları ayrılırken güncellenen yorum:
+
+```java
+// bilgi: artik hem get hem post icin tek metod kullaniyoruz. GET ile gelindiginde FormSearch sinifinda tanimli
+```
+
+## Arama yönlendirmesi geri alındı (2026-10-08)
+
+`src/main/java/com/turkerozturk/node/NodeController.java` dosyasındaki önceki POST/GET ortak binding akışı ve özgün yorumlar geri getirildi. Önceki kayıt, yapılan değişikliğin geçmişini gösterir; mevcut arama POST sonrası GET’e yönlenmez.

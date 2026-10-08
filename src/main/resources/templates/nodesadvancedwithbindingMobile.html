@@ -98,14 +98,17 @@
                             <div class="">
 
                                 <label for="nodeIcons" th:text="#{search.icon}">Ikon:</label>
-                                <select multiple size="4" name="nodeIcons" id="nodeIcons" class="form-select">
-                                    <option th:each="nodeIcon : *{allIcons}"
-                                            th:value="${nodeIcon.name}"
-                                            th:text="${nodeIcon.iconNameForHuman}"
-                                            th:selected="${formSearch.getNodeIcons != null and formSearch.getNodeIcons.contains(nodeIcon)}"
-                                    >
-                                    </option>
-                                </select>
+                                <details id="nodeIcons" class="position-relative">
+                                    <summary class="form-control" th:text="#{search.icon.choose}"></summary>
+                                    <div class="position-absolute bg-body border rounded p-2 shadow" style="z-index:10;min-width:15rem;max-height:16rem;overflow:auto">
+                                        <label th:each="nodeIcon : *{allIcons}" class="d-flex align-items-center gap-2 py-1">
+                                            <input type="checkbox" name="nodeIcons" th:value="${nodeIcon.name}"
+                                                   th:checked="${formSearch.getNodeIcons != null and formSearch.getNodeIcons.contains(nodeIcon)}"/>
+                                            <img th:src="@{/img/ctbicons/{name}.png(name=${nodeIcon.iconName})}" width="20" height="20" alt="" loading="lazy"/>
+                                            <span th:text="${nodeIcon.iconNameForHuman}"></span>
+                                        </label>
+                                    </div>
+                                </details>
                                 <span th:if="${#fields.hasErrors('nodeIcons')}"
                                       th:errors="*{nodeIcons}">nodeIcons Error</span>
 
@@ -456,7 +459,7 @@
                             <span th:text="${node.tags}"></span>
                             )
                             (
-                            <span th:text="${node.syntax}"></span>
+                            <span th:text="${node.syntax == 'custom-colors' ? #messages.msg('node.type.richText') : (node.syntax == 'plain-text' ? #messages.msg('node.type.plainText') : node.syntax)}"></span>
                             )
                         </i>
                         <!--    <td class="text-center" th:text="${node.isRichText}"></td> -->
