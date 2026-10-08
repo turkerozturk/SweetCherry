@@ -1,10 +1,10 @@
 # SweetCherry kurulum ve kullanım kılavuzu
 
-> Bu belge, henüz resmi bir SweetCherry sürümü yayımlanmadan önce `main` dalındaki kaynak kodu denemek isteyenler içindir. `main` dalı geliştirme aşamasındadır; özellikler ve ekranlar değişebilir.
+> Bu belge kaynak koddan derleme içindir. Hazır Windows paketini kullanmak için [kurulum kılavuzuna](installation.md) bakın. Kararlı kaynak için `v1.0.0` etiketini kullanabilirsiniz; `main` geliştirme dalıdır.
 
 ## SweetCherry nedir?
 
-SweetCherry, [CherryTree](https://www.giuspen.net/cherrytree/) ile oluşturulmuş **CTB (SQLite)** not veritabanlarını web tarayıcısında görüntüleyen bir yardımcı uygulamadır. CherryTree'nin yerine geçmez: notları oluşturmak ve düzenlemek için CherryTree, aynı CTB içeriğini SweetCherry'nin farklı web görünümleriyle incelemek için SweetCherry kullanılır.
+SweetCherry, [CherryTree](https://www.giuspen.net/cherrytree/) ile oluşturulmuş **CTB (SQLite)** not veritabanlarını web tarayıcısında görüntüleyen bir yardımcı uygulamadır. CherryTree'ye eşlik eder; farklı web görünümleri yanında desteklenen içerik ve düğüm düzenleme işlemlerini de sunar.
 
 Başlangıç için ikisini aynı bilgisayarda yan yana çalıştırabilirsiniz:
 

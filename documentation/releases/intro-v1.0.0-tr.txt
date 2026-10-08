@@ -1,0 +1,13 @@
+SweetCherry, CherryTree not veritabanlarıyla çalışan açık kaynaklı bir web yardımcısıdır.
+
+Amacım, CherryTree'de tuttuğum notlara bilgisayardan ve telefondan bir tarayıcıyla erişebilmekti. Artık notları görüntülemenin yanında, desteklenen içerikleri düzenlemek de mümkün.
+
+Masaüstü ve mobil görünümlerde düğümler arasında gezinebilir, yer işaretleri ekleyebilir, resim, dosya, bağlantı ve tablolarla çalışabilirsiniz. Düğümleri taşıyabilir ve çoğaltabilirsiniz. Paylaşımlı düğümler de kendi ağaç konumlarıyla kullanılır.
+
+Notlarınızı düşünce haritalarında görüntüleyebilir, Freeplane dosyası olarak indirebilirsiniz. Bir düğümü veya alt ağacını, sayfa ve içerik seçenekleriyle PDF'ye aktarabilirsiniz.
+
+Windows altmış dört bit paketinde Java birlikte gelir. Kurulum sihirbazını kullanabilir veya portable paketi bir klasöre açabilirsiniz. Küçük kontrol penceresi uygulamanın durumunu gösterir; tarayıcıyı açmayı ve uygulamayı durdurmayı kolaylaştırır.
+
+SweetCherry otomatik yedek almaz. Önemli veritabanlarını düzenlemeden önce ayrıca yedekleyin.
+
+İndirme bağlantısı ve Türkçe, İngilizce kurulum kılavuzları açıklamada yer alıyor.

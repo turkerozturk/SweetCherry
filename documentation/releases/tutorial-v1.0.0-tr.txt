@@ -1,0 +1,25 @@
+Bu videoda SweetCherry'nin Windows paketini kurup, içindeki demo veritabanını açacağız.
+
+GitHub'daki bir nokta sıfır nokta sıfır sürümünün indirme bölümünü açın. Windows altmış dört bit kurulum dosyasını indirin. Bu paket Java içerdiğinden ayrıca Java kurmanız gerekmez. Kaynak kod arşivleri hazır uygulama değildir.
+
+Kurulum dosyasını açın. Yazma izniniz olan ve kolay bulabileceğiniz bir klasör seçin. Kurulum sonunda SweetCherry'yi başlatın.
+
+Kontrol penceresi başlangıç durumunu gösterir. Uygulama hazır olduğunda tarayıcıda aç düğmesine tıklayın. Yerel adres localhost, port sekiz bin seksendir.
+
+İlk giriş bilgileri uygulama klasöründeki login credentials properties dosyasındadır. Klasörü kontrol penceresinden açabilirsiniz. Yönetici kullanıcı adı admin'dir. Şifre, admin nokta password anahtarının karşısındaki değerdir. Anahtarın kendisi kullanıcı adı değildir. Bu dosyayı videoda göstermiyoruz.
+
+Giriş yaptıktan sonra demo veri kaynağını seçin. Demo veritabanı paketle birlikte gelir; kendi notlarınızı kullanmadan uygulamayı inceleyebilirsiniz.
+
+Soldaki ağaçtan bir düğüm seçin. Sağ tarafta içeriği göreceksiniz. Yer işareti ekleyebilir, yer işaretleri sayfasından yeniden açabilirsiniz. Paylaşımlı düğümler, aynı içeriği ağacın farklı yerlerinden gösterir ve kendi alt düğümlerine sahip olabilir.
+
+Harita menüsünden Markmap veya Mermaid görünümünü açın. Freeplane seçeneği dosya indirmek içindir. CherryTree ikonlarını ilk kez kullanacaksanız ikonları içeren ZIP seçeneğini tercih edin. Arşivi açtıktan sonra harita ve ikon klasörü yan yana bulunur.
+
+PDF menüsünden yalnız düğüm veya düğüm ve alt düğümler seçeneğini açın. Sayfa boyutu ve yönünü, başlık ve sayfa bilgilerini, içerilecek nesneleri seçebilirsiniz. Alt ağaç çıktısı PDF görüntüleyicinin navigasyon bölümünde düğüm hiyerarşisini de gösterir. Seçimler aynı oturum boyunca hatırlanır.
+
+Kendi veritabanınızı bağlamak için uygulama klasöründeki all Tenants klasörüne bir tenant yapılandırması koyabilirsiniz. Bu dosya veritabanının sunucudaki konumunu ve kullanım ayarlarını belirtir. Ayrıntılı örnek kurulum kılavuzundadır.
+
+SweetCherry otomatik yedek almaz. Önemli CTB dosyalarını düzenlemeden önce yedekleyin ve CherryTree ile SweetCherry'den aynı anda yazma işlemi yapmayın.
+
+Tarayıcıyı kapatmak uygulamayı durdurmaz. İşiniz bittiğinde kontrol penceresindeki durdur düğmesini veya sistem tepsisi menüsünü kullanın. Uygulama kapalıyken portable klasörü taşıyabilirsiniz. Klasör dışında duran veritabanları bu kopyaya dahil değildir.
+
+İndirme ve kurulum belgelerinin bağlantılarını video açıklamasında bulabilirsiniz.

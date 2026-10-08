@@ -4,38 +4,40 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-08
+
 ### Added
 
-- Windows, Linux ve macOS için ilk derleme, ayrı derleme ve çalıştırma scriptleri.
-- Demo CTB veritabanı ve göreli yollu örnek tenant tanımı içeren çalıştırılabilir dağıtım klasörü.
-- Normal düğüm ve alt ağaç için koleksiyona veya ayrı CTB'ye aktaran dört export seçeneği.
-- Normal kullanımdan ayrılmış `operations` ve `experiments` profilleri.
-- Türkçe kurulum, isteğe bağlı özellikler, CTB export ve yayım hazırlık belgeleri.
-- Windows ve Linux üzerinde Java 17 ile test/paketleme yapan CI iş akışı.
-- Seçilen CTB'nin bütün üst düğümlerini tek haritada gösteren Mermaid ve Markmap görünümleri.
+- Java 17 içeren Windows x64 installer ve portable ZIP; masaüstü kontrol penceresi, tepsi menüsü, başlangıç durumu ve kapatma kontrolleri.
+- İngilizce ve Türkçe son kullanıcı kurulum kılavuzları; HTTP/HTTPS, Caddy/proxy ve yerel/uzak erişim belgeleri.
+- Masaüstü ve mobil okuma, yer işaretleri, düğüm taşıma/çoğaltma ve gerçek/paylaşımlı düğüm altında kardeş/alt düğüm oluşturma.
+- Zengin metin düzenleme; resim ve dosya yükleme/panodan resim, dış bağlantı ve tablo düzenleme, web sayfasından biçimli yapıştırma, nesne silme.
+- Markmap/Mermaid haritaları; Freeplane/FreeMind ve isteğe bağlı CherryTree ikon ZIP'i.
+- Düğüm/alt ağaç PDF; gömülü fontlar, bağlantılar, hiyerarşik PDF navigasyonu, içerik tablosu ve oturumda hatırlanan sayfa/nesne seçenekleri. Şablon tablosu PDF çıktısı.
+- Düğüm ve alt ağaç için ortak veya yeni CTB'ye dört aktarma seçeneği; paylaşımlı konumların hiyerarşisi ve desteklenen master eşlemeleri.
+- Tenant yapılandırması indirme/silme onayları; dosya yokken SQLite'ın boş veritabanı oluşturmasını engelleme ve bağlantı havuzlarını kapatma.
+- İsteğe bağlı çevrimdışı astronomi widget'ları ve konum/zaman ayarları.
 
 ### Changed
 
-- Geliştirme sürümü `0.5.0-SNAPSHOT` olarak işaretlendi; sürümleme ve yedek sorumluluğu belgelendi.
-- Ortak arayüz markası SweetCherry olarak güncellendi; veri kaynağı ve düzenleme ekranlarına otomatik yedek alınmadığı uyarısı eklendi.
-
-- Spring Boot 3.2.4 sürümünden 3.5.16 sürümüne yükseltildi.
-- Yavaş lisans, bağımlılık raporu ve Asciidoctor görevleri isteğe bağlı Maven profillerine taşındı.
-- Paketleme çıktısı `release/SweetCherry` altında toplandı; kullanıcı tarafından değiştirilmiş demo verileri korunuyor.
-- Uygulama varsayılan olarak yalnızca yerel bilgisayardaki `127.0.0.1` adresinde dinliyor.
+- Uygulama adı SweetCherry; sürüm 1.0.0. Varsayılan dinleme adresi 127.0.0.1.
+- Java 17 tabanı ve güncellenmiş bağımlılıklar; Windows dağıtımı GitHub Actions ile oluşturulur.
+- Yavaş bağımlılık/lisans raporları ayrı Maven profillerine taşındı.
+- Otomatik yedek alınmadığı açıklandı; ilk hesap parolaları uygulama klasöründeki dosyada üretilir.
 
 ### Fixed
 
-- GitHub kaynak ZIP'inde `.git` klasörü bulunmadığında Maven derlemesinin başarısız olması önlendi.
-- İlk girişte service-worker dosyasına yönlenme ve tenant seçilmeden veri tabanı gerektiren sayfalardaki teknik hatalar giderildi.
-- CTB export işlemleri `POST/Redirect/GET` akışına geçirildi; tarayıcı geri/ileri hareketinin export'u tekrarlaması önlendi.
-- Export klasörünün ilk işlemden önce oluşturulması ve export dosyalarının güvenli silme onayı düzeltildi.
-- Export dosyası indirme ve silme işlemleri dışa aktarma klasörüyle sınırlandı; mevcut tenant dosyasının üzerine yükleme yapılırken anlaşılır hata veriliyor.
-- Image ve Anchor birleşik kimlik eşlemeleri ayrı kimlik sınıflarıyla düzeltildi.
+- Paylaşımlı düğümlerin gösterim, taşıma, çoğaltma, silme, oluşturma ve export hiyerarşileri.
+- Düğüm silindikten sonra komşu düğüme geçiş; eksik düğümün oturum süresi dolmuş gibi gösterilmesi.
+- Veri kaynağı kapanırken dosya kilidinin bırakılması; silinmiş/eski tenant seçiminde anlaşılır dönüş.
+- Mobil/masaüstü toolbar düzeni, bookmark konumları, resimli ikon seçimi ve arama formunda yinelenen filtreler.
+- Güvenilir proxy üzerinden HTTPS/çerez davranışı, hassas ayar değerlerinin gösterilmemesi ve sade hata/404 sayfaları.
 
 ### Known limitations
 
-- Alias/shared node, node bağlantısı ve anchor referansları içeren exportlar deneysel durumdadır.
-- macOS scriptleri hazırlanmıştır fakat henüz gerçek bir Mac üzerinde doğrulanmamıştır.
-- Yerel hesap parolaları ilk açılışta üretilir; uzak erişim için üretim tipi kimlik yönetimi sağlanmamaktadır.
-- Aynı adlı tenant yapılandırmasının arayüzden değiştirilmesi veya silinmesi henüz desteklenmez.
+- SweetCherry otomatik yedek almaz. İki uygulamadan aynı CTB'ye eşzamanlı yazmayın.
+- İçerik araması saklanan raw metinde çalışır; POST aramasından sonra tarayıcı geri hareketi formun yeniden gönderilmesini isteyebilir.
+- CTB export sırasında metindeki düğüm bağlantılarının kimlikleri yeniden yazılmaz.
+- Kod kutusu düzenleme ve ek editör iyileştirmeleri sonraki çalışmalardır.
+- macOS scriptleri fiziksel Mac üzerinde doğrulanmamıştır.
+- Üçüncü taraf lisans/atıf envanterinin tamamlanması ayrı yayın hazırlık maddesidir.

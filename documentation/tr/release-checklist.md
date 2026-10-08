@@ -1,162 +1,55 @@
-# SweetCherry yayım hazırlık kontrol listesi
+# SweetCherry 1.0.0 yayımlama adımları
 
-Bu belge ilk GitHub sürümünü hazırlamak ve aynı kontrolleri sonraki sürümlerde tekrarlamak içindir. PortableApps.com paketi ayrı bir hedef olarak ele alınır; ilk GitHub sürümünü engellemez.
+Bu aşama yeni özellik veya yeni test turu içermez. Kullanıcı son kaynak üzerinde **334 başarılı test** ve başarılı **Windows x64 bundled distribution** çalıştırması bildirdi. Bu kayıt, henüz oluşturulmamış 1.0.0 paketinin derlendiği anlamına gelmez; mevcut başarılı paket 0.5.0-SNAPSHOT adını taşımaktadır.
 
-## Önerilen ilk paket
+## Hazırlık
 
-İlk sürüm için en sade dağıtım, Maven'ın oluşturduğu `release/SweetCherry` klasörünün ZIP arşividir. Kullanıcı arşivi açar ve işletim sistemine uygun `run` scriptini çalıştırır. Bu paket Java içermez; JDK/JRE 17 veya üstü sistemde kurulu olmalıdır.
-
-Paket adı örneği:
-
-```text
-SweetCherry-0.5.0.zip
-```
-
-Sürüm numarası kesinleştiğinde `pom.xml`, Git etiketi, ZIP adı ve sürüm notları aynı değeri kullanmalıdır. Yayımdan önce geliştirme sırasında anlamlı değişiklikler yapıldıysa `0.5.0` yerine yeni bir sürüm seçilebilir; bu karar kontrol listesini değiştirmez.
-
-## Son özellik turundan sonra odak
-
-Yeni özellik turu tamamlandı: düz/rich text düzenleme, gömülü nesneler, dört yönlü taşıma, tek düğüm/alt ağaç çoğaltma ve bookmark yönetimi artık yayım adayının parçasıdır. Bundan sonraki öncelik yeni özellik değil, doğrulama ve paketlemedir.
-
-- [ ] Bookmark shared kimlikleri, dar ekran kaldırma düğmesi ve gerçek/shared yolları son kez kontrol edildi.
-- [ ] Footer yalnızca çalışan bağlantılar içeriyor; Pricing ve boş Features/FAQs bağlantıları yok.
-- [ ] Help metinlerinin kapsamı gözden geçirildi; mevcut yardım bağlantısı korunuyor, içerik kararı ayrı.
-- [ ] `location-time-language.md` içindeki konum/zaman/widget maddeleri tamamlandı veya sürüm kapsamı açıkça daraltıldı.
-- [ ] Read-only CTB, user hesabı, CSRF, stale tenant ve güvenilmeyen CTB/HTML girdileri son güvenlik turundan geçti.
-- [ ] Temiz paket Windows/Linux üzerinde başlatıldı; gerçek not arşivi yerine CTB kopyasında CherryTree ile karşılaştırıldı.
-- [ ] Yeni editör ve yazma işlemleri sürüm notları/bilinen sınırlamalar bölümüne eklendi.
-
-## Otomatik kontroller
-
-GitHub Actions içindeki `CI` iş akışı hem Windows hem Linux üzerinde Java 17 ile test ve paketleme yapar. Yerel son kontrol:
-
-```bat
-mvnw.cmd clean package
-release\SweetCherry\run.bat
-```
-
-Linux/macOS karşılığı:
+1. Verilen `SweetCherry-comment-removal-log-backup-2026-10-08.md` dosyasını yerelinizde saklayın. Yama geçici yorum arşivini depodan kaldırır.
+2. Yayın yamasını uygulayıp `git diff --check` çalıştırın; değişiklikleri commit/push edin. Proje sürümü 1.0.0 olur; İngilizce kılavuz dağıtım klasörüne de kopyalanır.
+3. Lisans/atıf kaydındaki açık konuyu aşağıdan okuyun. Bu hazırlık onu tamamlanmış olarak işaretlemez.
+4. Yayın commit'i üzerinde etiketi oluşturup gönderin:
 
 ```bash
-sh ./mvnw clean package
-sh ./release/SweetCherry/run.sh
+git tag -a v1.0.0 -m "SweetCherry 1.0.0"
+git push origin v1.0.0
 ```
 
-`clean package`, testleri de çalıştırır. Bilinçli olarak testleri atlamak istenmedikçe yayıma hazırlanırken `-DskipTests` kullanılmamalıdır.
+Önceden yayımlanmış bir etiketi veya sürümü yeniden kullanmayın.
 
-## Her sürümden önce
+## Son paket
 
-- [ ] `main` dalındaki CI Windows ve Linux üzerinde başarılı.
-- [ ] `pom.xml` sürümü, Git etiketi ve paket adı aynı.
-- [ ] Temiz bir GitHub kaynak ZIP'inden ilk derleme denenmiş.
-- [ ] `release/SweetCherry` temiz bir klasöre kopyalanarak çalıştırılmış.
-- [ ] Java bulunamadığında script anlaşılır hata veriyor.
-- [ ] Giriş, Demo Database seçimi ve en az bir normal düğüm görüntüleme denenmiş.
-- [ ] İlk açılışta `login-credentials.properties` üretilmiş; yeniden başlatınca aynı parolalar çalışmış ve kişisel parola dosyası ZIP'e eklenmemiş.
-- [ ] Dört CTB export seçeneği ve download/delete akışı denenmiş.
-- [ ] `user` hesabının yönetici uçlarına erişemediği doğrulanmış.
-- [ ] CTB değiştirildikten sonra eski sekmenin düğüm bağlantısı ve silme/export formu yeni CTB üzerinde çalışmamış.
-- [ ] Oturum süresi dolunca giriş ekranında açıklama görülmüş; yeniden girişten sonra CTB seçimi istenmiş.
-- [ ] Normal profilde yalnızca `health` ve `info`; operations profilinde beklenen Actuator/Swagger uçları doğrulanmış.
-- [ ] Uygulamanın varsayılan olarak yalnızca `127.0.0.1` üzerinde dinlediği doğrulanmış.
-- [ ] `myapp.log`, `allTenants`, `CTBDATA` ve `exportedFiles` yollarının paket klasörü altında kaldığı doğrulanmış.
-- [ ] Alias/shared node/link/anchor içeren export sınırlaması sürüm notlarında açıkça belirtilmiş.
-- [ ] Lisans dosyası ve Türkçe kurulum belgesi arşive eklenmiş.
-- [ ] ZIP için SHA-256 özeti oluşturulmuş ve GitHub Release varlıklarına eklenmiş.
-
-Windows SHA-256 örneği:
-
-```powershell
-Get-FileHash .\SweetCherry-0.5.0.zip -Algorithm SHA256
-```
-
-Linux/macOS örneği:
+GitHub Actions → **Windows x64 bundled distribution** → Run workflow ile **v1.0.0** referansından çalıştırın. Arayüzde etiket seçilemiyorsa GitHub CLI alternatifi:
 
 ```bash
-sha256sum SweetCherry-0.5.0.zip
+gh workflow run windows-bundle.yml --ref v1.0.0
 ```
 
-## Sürüm notlarında mutlaka bulunması gerekenler
+Bu işlem mevcut paketleme ve mevcut testleri yürütür; yeni test eklenmemiştir. Tag push'u kendiliğinden GitHub Release yayımlamaz.
 
-- SweetCherry'nin CherryTree yerine geçmediği ve CTB dosyalarıyla çalıştığı.
-- Java 17+ gereksinimi.
-- Varsayılan tarayıcı adresi, yerleşik hesap adları ve ilk açılışta parola dosyasının konumu.
-- Önemli CTB dosyaları için işlem öncesinde yedek önerisi.
-- Alias/link/anchor içeren exportların deneysel olduğu.
-- macOS akışının gerçek cihazda henüz doğrulanmadığı (doğrulanana kadar).
-- Bilinen önemli sorunlar ve ilgili belgelerin bağlantıları.
+Başarılı çalışmanın `SweetCherry-windows-x64-java17` artifact'ini indirip açın. Dış artifact ZIP'inin tamamını Release'e yüklemek yerine şu **dört dosyayı** alın:
 
-## GitHub üzerinde yayımlama sırası
+| Artifact içindeki yol | Release asset'i |
+| --- | --- |
+| `dist/windows/SweetCherry-1.0.0-windows-x64-setup.exe` | Aynı dosya adı |
+| `dist/windows/SweetCherry-1.0.0-windows-x64.zip` | Aynı dosya adı |
+| `dist/windows/SHA256SUMS.txt` | Aynı dosya adı |
+| `release/SweetCherry/windows-bundle.json` | Aynı dosya adı |
 
-1. Sürüm numarasını ve kullanıcıya dönük değişiklik listesini kesinleştir.
-2. Temiz kaynak üzerinde bu listedeki kontrolleri tamamla.
-3. `release/SweetCherry` klasörünü sürüm numaralı ZIP haline getir.
-4. ZIP'in SHA-256 özetini üret.
-5. İmzalı veya açıklamalı Git etiketi oluştur ve gönder.
-6. GitHub Release taslağı oluştur; ZIP ve checksum dosyasını ekle.
-7. Taslağı yayımlamadan önce temiz bir Windows makinede indirilen varlığı son kez dene.
+Manifest konumunu artifact içinde dosya adına göre de bulabilirsiniz. Dosya adlarında 0.5.0-SNAPSHOT varsa eski artifact kullanılmıştır. Checksum dosyası EXE ve portable ZIP içindir; EXE'nin dijital olarak imzalandığını göstermez. Kişisel parola dosyaları, günlükler veya kişisel CTB dosyaları eklemeyin. GitHub kaynak ZIP/tar arşivlerini kendisi sunar. Ayrı bir JAR tek başına yapılandırma ve demo klasörlerini içermediği için önerilen indirme değildir.
 
-İlk sürümden sonra bu süreç etiket tetiklemeli bir GitHub Actions iş akışına dönüştürülebilir. İlk kez yayımlarken elle oluşturulan taslak, paket içeriğini ve sürüm notlarını öğrenmek açısından daha güvenlidir.
+## GitHub Release
 
-## Yayımı engellemeyen fakat izlenecek işler
+1. Repository → Releases → Draft a new release.
+2. Mevcut **v1.0.0** etiketini seçin. Başlık: **SweetCherry 1.0.0**.
+3. `documentation/releases/v1.0.0.md` içeriğini açıklamaya yapıştırın.
+4. Yukarıdaki dört asset'i ekleyin. İlk yayın kararlı 1.0.0 olarak seçildiğinden prerelease işaretlemeyin; Latest olarak yayımlayabilirsiniz.
+5. Açıklama ve dosya adları doğru olduğunda Publish release seçin.
+6. Release yayımlandıktan sonra LinkedIn metnini paylaşın. Etiketli kurulum belgesi bağlantıları yayın commit'ine sabitlenmiştir.
 
-- `exportedFiles` listesindeki her CTB için `CTBDATA` klasörüne uygun göreli yol içeren tenant `.txt` tanımı üretip indirme düğmesi eklemek. Aynı ada sahip mevcut tanımları değiştirmemeli.
-- Dışa aktarılan dosya silindikten sonra başarı mesajından listeye geri dönme bağlantısı veya liste içinde sonuç gösterme akışı.
-- Aynı adlı tenant yapılandırmasını güvenle değiştirme veya silme: aktif bağlantıyı kapatma, açık onay, yedek ve yeniden yükleme akışı. İlk sürümde dosya elle düzenlenir; yükleme mevcut dosyayı değiştirmez.
-- HTML/PDF içeriği, grid ve XML işleyicilerinin güvenilmeyen CTB verisine karşı güvenlik incelemesi ve örnek kötü amaçlı CTB testleri.
-- Export parser'ında alias/shared node/link/anchor kimlik eşleme çalışması.
-- `plain-text` içindeki `{sweet-cherry}` işaretiyle açılan ayrı HTML gösterim ve zengin metin düzenleyici tasarımı. Bu işaret uygulanmadan önce güvenilmeyen HTML'nin arındırılması ve CherryTree ile uyumluluk ayrıca incelenmeli.
-- macOS gerçek cihaz testi.
-- PortableApps.com Format paketi.
-- Otomatik güncelleme.
-- Uzak erişim için ayrı güvenli dağıtım profili.
-- Giriş sınırının çoklu kullanıcı, proxy yeniden başlatma ve uygulama yeniden başlatma davranışını değerlendirmek; sınırın uygulama belleğinde tutulduğunu ve yeniden başlatılınca sıfırlandığını belgelemek.
+## Kalan lisans/atıf kaydı
 
-## İnternetten erişim için ayrı kabul kontrolü
+[Üçüncü taraf lisans planı](third-party-notices-plan.md) henüz tamamlanmış envanter değildir. Maven bağımlılıkları kadar kopyalanmış JavaScript/CSS, fontlar ve CherryTree ikonları da kapsamdadır. Gerekli lisans/NOTICE/atıf metinlerinin dağıtımda bulunması yayın hazırlığının açık maddesidir; başarılı test veya paketleme bunu doğrulamaz. Mevcut lisans dosyalarını ve runtime'ın lisans klasörlerini koruyun. Bu belgede lisans incelemesi tamamlandı iddiası yoktur.
 
-İlk dağıtım yerel kullanım içindir. Dinamik DNS ve proxy üzerinden uzaktan erişim sağlamak, giriş ekranının ve seçilen CTB içeriğinin internete açılması anlamına gelir. Yalnızca TLS sertifikasının çalışması bu kontrolün yerine geçmez.
+## Yayın sonrasına bırakılanlar
 
-- [ ] İnternet yönlendiricisinde yalnızca proxy için gereken portlar açık; SweetCherry'nin 8080 ve ikinci HTTP portu internete doğrudan yönlendirilmemiş.
-- [ ] SweetCherry host güvenlik duvarı yalnızca gereken LAN istemcilerine ve proxy hostuna izin veriyor; `server.address: 0.0.0.0` tek başına bir erişim kuralı değildir.
-- [ ] Tarayıcı–proxy bağlantısı HTTPS; proxy–SweetCherry arasındaki HTTP trafiği güvenilir LAN/VPN içindedir.
-- [ ] Oturum çerezi, proxy başlıkları, yönlendirme ve HTTPS davranışı aynı alan adı üzerinden doğrulandı. HTTP üzerinden localhost/LAN erişimi istendiğinde `Secure` çerezinin etkisi ayrıca kararlaştırıldı.
-- [ ] Giriş denemesi sınırı gerçek istemciyi yanlış engellemiyor; farklı WAN istemcileri, doğrudan LAN ve localhost ayrı ayrı denendi.
-- [ ] CTB içeriğinden HTML üreten yollar, dosya yükleme/dışa aktarma uçları, kullanıcı rolleri ve aktif operasyon profili ayrı ayrı gözden geçirildi.
-
-### Giriş sınırı için güvenilir proxy adresi
-
-Varsayılan davranış TCP bağlantısının IP adresini kullanır. Caddy arkasında bütün WAN istemcileri aynı proxy IP'sinden görünür. Caddy'ye gelen istemci adresini tek başlıkta iletmek için ilgili site bloğuna örneklerdeki IP adreslerini sizinkilerle değiştirerek şunu koyun: 
-
-```caddyfile
-notes.example.org {
-    reverse_proxy 192.168.0.5:8080 {
-        header_up X-SweetCherry-Client-IP {remote_host}
-        header_up X-SweetCherry-Forwarded-Proto {scheme}
-    }
-}
-```
-
-SweetCherry'nin JAR dışındaki `application.yml` dosyasında, **uygulamanın doğrudan bağlantıda gördüğü Caddy IP'sini** belirtin:
-
-```yaml
-myapp:
-  login:
-    trusted-proxy-address: 192.168.0.2
-```
-
-Mevcut `myapp.login` bölümüne yalnızca `trusted-proxy-address` satırını ekleyin; diğer kullanıcı adlarını silmeyin. Caddy yapılandırmasını doğrulayıp yeniden yükledikten ve SweetCherry'yi yeniden başlattıktan sonra logdaki `clientIp` değerini kontrol edin. Proxy dışındaki isteklerde başlık yok sayılır. Güvenilir proxy eşleşse bile başlık eksik, birden fazla veya geçersizse doğrudan proxy IP'si kullanılır. Bu adres varsayılan olarak yalnız giriş sınırı ve giriş logları için kullanılır. HTTPS proxy desteği ayrıca etkinleştirilirse yalnız bu peer'dan gelen protocol başlığı da kabul edilir; ayrıntılar [HTTP, HTTPS ve oturum güvenliği](https-and-session-security.md) belgesindedir.
-
-Docker ağ kipine göre `{remote_host}` gerçek WAN istemcisi yerine bir ağ geçidi adresi olabilir. Farklı dış ağlardan denemelerde aynı `clientIp` görülürse güven sınırını genişletmeyin; önce Caddy'nin gelen bağlantıda gördüğü adresi ve Docker ağ yolunu inceleyin. Uygulama yeniden başlatılırsa 15 dakikalık sayaçlar bellekte oldukları için sıfırlanır.
-
-Kurulumdaki DNS, NAT/firewall, sertifika yenileme ve dış yapılandırma kayıtları için [erişim kurulum rehberi](network-access.md) kullanılabilir.
-
-- [ ] [Sürümleme akışı](versioning.md) tamamlandı; geçici yorum arşivi yerel olarak yedeklenip depodan kaldırıldı.
-- [ ] Otomatik yedek alınmadığı uyarısı veri kaynağı seçimi ve düzenleme ekranlarında görülebiliyor.
-
-- [ ] [Üçüncü taraf lisans ve atıf envanteri](third-party-notices-plan.md) tamamlanıp gerekli dosyalar dağıtıma eklendi.
-
-- [ ] [Windows x64 Java içeren dağıtım](windows-bundled-distribution.md) CI ve gerçek Java kurulmamış Windows üzerinde denendi; EXE/ZIP, checksum ve runtime manifesti Release’e eklendi.
-
-## Bağımlılık bakım kabulü
-
-[Bağımlılık bakım belgesindeki](dependency-maintenance.md) ilk güncelleme grubunun otomatik/manüel kontrollerini tamamlayın. Çözülen transitif bağımlılık ağacının güvenlik incelemesi ve kalan SQLite, parser/PDF, frontend ve zaman dilimi güncelleme adayları ayrıca değerlendirilmelidir.
+Yeni geliştirme/test turları; bağımlılık bakımının sonraki adımları; ek editör konforu; görünür metinde arama; macOS gerçek cihaz doğrulaması; PortableApps paketi ve otomatik güncelleme. Mevcut uzak erişim kurulumu için [ağ rehberi](network-access.md) ve [HTTPS/oturum belgesi](https-and-session-security.md) kullanılır. HTTP, proxy ve firewall ayarları her kurulumun kendi sorumluluğundadır.
