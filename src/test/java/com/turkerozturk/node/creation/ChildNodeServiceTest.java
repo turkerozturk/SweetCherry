@@ -2,7 +2,6 @@ package com.turkerozturk.node.creation;
 
 import com.turkerozturk.multipledatabases.CustomPropertiesHolder;
 import com.turkerozturk.multipledatabases.TenantContext;
-import com.turkerozturk.node.Node;
 import com.turkerozturk.node.properties.NodePropertiesService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -29,13 +28,13 @@ class ChildNodeServiceTest {
         settings.addCustomProperties("demo", Map.of("custom.newNodeName", "", "custom.newNodeTags", "work"));
         NodePropertiesService properties = mock(NodePropertiesService.class);
         when(properties.writable()).thenReturn(true);
-        when(properties.realNode(10L)).thenReturn(new Node());
         EntityManager manager = mock(EntityManager.class);
-        Query ids = mock(Query.class), sequence = mock(Query.class), nodeInsert = mock(Query.class), childInsert = mock(Query.class);
-        when(manager.createNativeQuery(anyString())).thenReturn(ids, sequence, nodeInsert, childInsert);
-        for (Query query : new Query[]{ids, sequence, nodeInsert, childInsert}) {
+        Query parent = mock(Query.class), ids = mock(Query.class), sequence = mock(Query.class), nodeInsert = mock(Query.class), childInsert = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(parent, ids, sequence, nodeInsert, childInsert);
+        for (Query query : new Query[]{parent, ids, sequence, nodeInsert, childInsert}) {
             when(query.setParameter(anyString(), any())).thenReturn(query);
         }
+        when(parent.getSingleResult()).thenReturn(1L);
         when(ids.getSingleResult()).thenReturn(56L);
         when(sequence.getSingleResult()).thenReturn(4L);
         ChildNodeService service = new ChildNodeService(properties, settings);
@@ -60,13 +59,21 @@ class ChildNodeServiceTest {
         verify(childInsert).executeUpdate();
     }
 
-    @Test void refusesReadOnlyTenantAndSharedParent() {
+    @Test void refusesReadOnlyTenantAndMissingParentBeforeAnyWrite() {
         NodePropertiesService properties = mock(NodePropertiesService.class);
+        var manager = mock(EntityManager.class);
         ChildNodeService service = new ChildNodeService(properties, new CustomPropertiesHolder());
+        ReflectionTestUtils.setField(service, "entityManager", manager);
         assertThatThrownBy(() -> service.create(10L)).isInstanceOf(AccessDeniedException.class);
+        verifyNoInteractions(manager);
         when(properties.writable()).thenReturn(true);
-        when(properties.realNode(10L)).thenThrow(new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND));
+        var parent = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(parent);
+        when(parent.setParameter("id", 10L)).thenReturn(parent);
+        when(parent.getSingleResult()).thenReturn(0L);
         assertThatThrownBy(() -> service.create(10L)).isInstanceOf(ResponseStatusException.class);
+        verify(parent, never()).executeUpdate();
+        verify(properties, never()).realNode(anyLong());
     }
 
     @Test void createsTopLevelNodeWithoutLookingForRealParent() {

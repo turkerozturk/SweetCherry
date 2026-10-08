@@ -59,7 +59,14 @@ public class ChildNodeService {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
         if (!topLevel) {
-            properties.realNode(parentId); // Shared nodes cannot own children.
+            // Parent is a tree occurrence; a shared occurrence can own its own children.
+            long count = ((Number) entityManager.createNativeQuery(
+                    "SELECT COUNT(*) FROM children WHERE node_id = :id")
+                    .setParameter("id", parentId).getSingleResult()).longValue();
+            if (parentId <= 0 || count != 1) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND);
+            }
         }
         Map<String, String> defaults = settings.getCustomProperties(TenantContext.getCurrentTenant());
         String name = defaults == null ? "New node" : defaults.getOrDefault("custom.newNodeName", "New node");

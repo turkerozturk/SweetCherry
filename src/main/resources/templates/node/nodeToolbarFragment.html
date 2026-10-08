@@ -52,7 +52,7 @@
 <form th:action="@{/nodes/siblings/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="dropdown-item" type="submit" th:text="#{toolbar.sibling}"></button>
 </form>
-<form th:if="${isSharedNode != true}" th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
+<form th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="dropdown-item" type="submit" th:text="#{toolbar.child}"></button>
 </form>
 <th:block th:replace="~{node/nodeBookmarkFragment :: addBookmark(${view})}"></th:block>

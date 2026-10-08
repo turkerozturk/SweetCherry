@@ -6,6 +6,14 @@ Gerçek ve paylaşımlı konumlarda **Alt düğümlerle çoğalt** kullanılabil
 
 Kök olarak seçilmiş paylaşımlı düğümde SweetCherry’nin mevcut tek-kopya sözleşmesi korunur: yeni kök yine aynı master’a referanstır. Alt ağaç seçeneği onun kendi çocuklarını da çoğaltır. Bookmark’lar ve metin içindeki internal link kimlikleri kopyaya uyarlanmaz.
 
+## Kardeş ve alt düğüm oluşturma
+
+Gerçek ve paylaşımlı konumlarda **Oluştur - Kardeş Düğüm** ve **Oluştur - Alt Düğüm** seçenekleri bulunur. Oluşturulan düğüm bağımsız gerçek düğümdür; paylaşımlı kopya değildir.
+
+Alt düğümün `father_id` değeri seçilen konumun kendi `children.node_id` değeridir. Paylaşımlı parent’ın master’ına yönlendirilmez ve master’ın diğer konumlarına çocuk eklenmez. Yeni çocuk bu parent’ın en son çocuğu olur. Kardeş ise seçilen konumun hemen arkasına, aynı parent altında eklenir; parent paylaşımlı olabilir.
+
+Admin, writable tenant, CSRF ve tenant token kontrolleri korunur. Olmayan parent veya kardeş konumu için yazma yapılmaz. Fixture’da 11’in altında çocuk, 18’in yanında kardeş oluşturup yalnız seçilen dalın değiştiğini ve CherryTree’de aynı konumu gösterdiğini kontrol edin.
+
 ## Silme ve yeni master
 
 Silme işleminin kapsamı seçilen konum ve `father_id` ile altında bulunan tüm konumlardır. Paylaşımlı düğümün çocukları da bu kapsama dahildir. Dışarıdaki paylaşımlı başvurular otomatik olarak silinmez.
@@ -74,6 +82,5 @@ Eski sürümlerden kalmış, silinmiş düğümlere ait bookmark kayıtları oku
 
 ## Ayrı doğrulanacak işler
 
-- Paylaşımlı konumun altında yeni alt düğüm oluşturma: mevcut oluşturma servisi hâlâ gerçek parent ister; gösterim, taşıma ve çoğaltma desteği bu kısıtı kendiliğinden kaldırmaz.
 - Ortak/yeni CTB’ye kopyalama: dışarıda kalan master’a referans veren bir alt ağacın hedef CTB’de geçerli içerik bağlantıları kurduğu ayrıca doğrulanmalıdır.
 - Metin içindeki internal linkler: silinen kimlikler yeni master kimliğine otomatik çevrilmez. Bookmark temizliği ile metin bağlantılarının korunması ayrı konulardır.

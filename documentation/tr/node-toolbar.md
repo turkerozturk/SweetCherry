@@ -3,7 +3,7 @@
 Yeni masaüstü ve mobil görünümler ortak araç çubuğunu kullanır:
 Bilgi → Özellikler → Düzenle → Taşıma okları → PDF → CTB → Harita → Ekle → Sil.
 
-Düzenle menüsünde mevcut metin ve zengin metin düzenleyicileri, ayrıca daha önceki tek düğüm/alt ağaç çoğaltma işlemleri korunur. Ekle menüsü kardeş düğüm, alt düğüm, yer işareti ve paylaşımlı düğüm oluşturmayı içerir. Kardeş düğüm, seçilen ağaç kaydının hemen sonrasına eklenir; paylaşımlı düğüm seçilmişse onun ağaç konumu kullanılır. Paylaşımlı bir düğümün altına düğüm ekleme sınırı korunur.
+Düzenle menüsünde mevcut metin ve zengin metin düzenleyicileri, ayrıca daha önceki tek düğüm/alt ağaç çoğaltma işlemleri korunur. Ekle menüsü kardeş düğüm, alt düğüm, yer işareti ve paylaşımlı düğüm oluşturmayı içerir. Kardeş düğüm, seçilen ağaç kaydının hemen sonrasına eklenir; paylaşımlı düğüm seçilmişse onun ağaç konumu kullanılır. Paylaşımlı konumlarda da kardeş ve alt düğüm oluşturulabilir. Alt düğüm, master’ın değil seçilen ağaç konumunun altında oluşturulur.
 
 Taşıma oklarının açıklamaları Alt + Shift + yön tuşu kısayolunu gösterir. PDF alt düğümler seçeneği, aynı sihirbaz üzerinden alt ağaç PDF aktarımını açar. Yetki, salt okunur veri kaynağı ve düğüm türüne göre önceki görünürlük kuralları sürer.
 

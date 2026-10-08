@@ -311,3 +311,11 @@ Dosya: `src/test/java/com/turkerozturk/node/duplication/NodeDuplicationServiceTe
 ```java
 // Subtree copying through a shared parent remains deferred; ordinary controls still load.
 ```
+
+## `src/main/java/com/turkerozturk/node/creation/ChildNodeService.java` (2026-10-08)
+
+Paylaşımlı parent desteği açılırken kaldırılan, artık geçerli olmayan yorum:
+
+```java
+// Shared nodes cannot own children.
+```
