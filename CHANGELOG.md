@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+### Added
+
+- ADMIN için tenant config oluşturma/düzenleme sihirbazı: sunucunun yerel veya ağ paylaşımı CTB dosyasını Gözat ile seçme, ayarları formdan düzenleme ve kaydedince mevcut seçim akışıyla açma. CTB kopyalanmaz; bilinmeyen config alanları korunur.
+
 ### Fixed
 
 - Eski SQLite CTB şemaları seçimden önce kontrol edilir. Eksik `children.master_id` alanı yalnız `custom.allowLegacySchemaUpgrade=true` (veya `1`) izniyle ve yönetici seçiminde, varsayılan `0` ile transaction içinde eklenebilir. Desteklenmeyen eksikler dosya değiştirilmeden açıklanır.

@@ -241,6 +241,40 @@ public class MultitenantConfiguration implements ApplicationContextAware {
         if (debugEnabled) logger.info("Data sources reloaded.");
     }
 
+    /** Writes one wizard config and replaces only its registration, leaving other sources/pools intact. */
+    public synchronized void installTenantConfig(String oldTenant, Path file, byte[] bytes, Properties properties, String expectedRevision) throws IOException {
+        var routing = (MultitenantDataSource) dataSource();
+        var current = routing.getResolvedDataSources();
+        String name = properties.getProperty("name");
+        if (current.containsKey(name) && !name.equals(oldTenant)) throw new IllegalArgumentException("wizard.duplicateName");
+        if (oldTenant != null) {
+            if (!current.containsKey(oldTenant) || Files.isSymbolicLink(file) || !TenantWizardService.revision(file).equals(expectedRevision))
+                throw new IllegalArgumentException("wizard.stale");
+            if (!(current.get(oldTenant) instanceof ManagedTenantDataSource managed)) throw new IllegalStateException("Unsupported data source lifecycle");
+            managed.close();
+        }
+        var replacement = new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
+                .driverClassName(properties.getProperty("datasource.driver-class-name")).url(properties.getProperty("datasource.url"))
+                .username(properties.getProperty("datasource.username")).password(properties.getProperty("datasource.password")).build(),
+                "true".equals(properties.getProperty(CtbSchemaCompatibility.SETTING)));
+        try {
+            if (oldTenant == null) Files.write(file, bytes, java.nio.file.StandardOpenOption.CREATE_NEW);
+            else {
+                Path temporary = Files.createTempFile(file.getParent(), ".tenant-edit-", ".tmp");
+                try { Files.write(temporary, bytes); Files.move(temporary, file, java.nio.file.StandardCopyOption.ATOMIC_MOVE, java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
+                finally { Files.deleteIfExists(temporary); }
+            }
+        } catch (IOException | RuntimeException error) { replacement.close(); throw error; }
+        Map<Object,Object> next = new HashMap<>(current);
+        if (oldTenant != null) { next.remove(oldTenant); customPropertiesHolder.removeCustomProperties(oldTenant); }
+        next.put(name, replacement);
+        Map<String,String> custom = new HashMap<>();
+        properties.stringPropertyNames().stream().filter(key -> key.startsWith("custom.")).forEach(key -> custom.put(key, properties.getProperty(key)));
+        custom.put("propertyFileName", file.getFileName().toString());
+        customPropertiesHolder.addCustomProperties(name, custom);
+        routing.setTargetDataSources(next); routing.afterPropertiesSet();
+    }
+
     /** Removes one config and its registration after releasing its pool; leaves database contents untouched. */
     public synchronized void deleteTenantConfig(String tenant, Path file) throws IOException {
         var routing = (MultitenantDataSource) dataSource();

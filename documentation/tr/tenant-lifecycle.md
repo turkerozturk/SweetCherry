@@ -19,3 +19,7 @@ Tenant config silme ve aktarım güvenliği: [Ayarlar ve bağlantı portları](s
 Silinmiş veya yeniden yükleme sonrasında kaldırılmış bir tenant eski sayfadan seçilirse `/setTenant` 400 yerine güncel seçim listesine uyarıyla döner. Başka geçerli seçim varsa değiştirilmez. `/setTenant` adresini GET ile açmak yalnız `/` seçim/giriş akışına yönlendirir; seçim değiştirmek halen CSRF korumalı POST işlemiyle yapılır.
 
 Eski SQLite CTB şemaları için opsiyonel geçiş ve izin ayarı: [Eski CTB şemalarını açma](legacy-ctb-schema.md).
+
+## Veri kaynağı oluşturma ve düzenleme
+
+Mevcut dosya yükleme yöntemine ek olarak [CTB açma ve veri kaynağı sihirbazı](tenant-wizard.md) kullanılabilir. Gözat, SweetCherry sunucusunun dosyalarını listeler; CTB dosyası bulunduğu konumda kalır.

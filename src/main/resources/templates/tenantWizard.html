@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{wizard.title}">Tenant wizard</title></head>
+<body>
+<section layout:fragment="content" class="container py-3" style="max-width: 900px">
+    <h1 th:text="#{wizard.title}"></h1><p th:text="#{wizard.location}"></p>
+    <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
+    <p class="alert alert-warning" th:if="${wizardError}" th:text="${#messages.msg(wizardError)}"></p>
+    <form method="post" th:action="@{/tenants/wizard}" th:object="${wizard}" id="tenantWizardForm">
+        <input type="hidden" th:field="*{tenant}"><input type="hidden" th:field="*{revision}">
+        <div class="row g-3">
+            <div class="col-md-6"><label for="type" th:text="#{wizard.type}"></label><select class="form-select" th:field="*{type}"><option value="sqlite">SQLite CTB</option><option value="mysql">MySQL</option><option value="mariadb">MariaDB</option><option value="postgresql">PostgreSQL</option></select></div>
+            <div class="col-md-6"><label for="name" th:text="#{wizard.name}"></label><input class="form-control" th:field="*{name}" maxlength="160"><small th:text="#{wizard.defaultName}"></small></div>
+            <div class="col-12" id="wizardSqlite"><label for="path" th:text="#{wizard.path}"></label><div class="input-group"><input class="form-control" th:field="*{path}"><button type="button" id="wizardBrowse" class="btn btn-outline-secondary" th:text="#{wizard.browse}"></button></div><small th:text="#{wizard.network}"></small></div>
+            <div class="col-12" id="wizardRemote"><label for="url" th:text="#{wizard.url}"></label><input class="form-control" th:field="*{url}" maxlength="4000" placeholder="jdbc:postgresql://server:5432/notes"></div>
+            <div class="col-md-6"><label for="username" th:text="#{wizard.username}"></label><input class="form-control" th:field="*{username}" maxlength="256" autocomplete="off"></div>
+            <div class="col-md-6"><label for="wizardPassword" th:text="#{wizard.password}"></label><input class="form-control" id="wizardPassword" name="password" type="password" maxlength="1024" autocomplete="new-password"><small th:text="#{wizard.passwordHelp}"></small><label class="d-block"><input type="checkbox" th:field="*{clearPassword}"> <span th:text="#{wizard.clearPassword}"></span></label></div>
+            <div class="col-md-6"><label for="role" th:text="#{wizard.role}"></label><select class="form-select" th:field="*{role}"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select><small th:text="#{wizard.roleHelp}"></small></div>
+            <div class="col-md-6"><label for="maxEmbeddedFileSizeMB" th:text="#{wizard.limit}"></label><input class="form-control" type="number" min="1" max="20" step="1" th:field="*{maxEmbeddedFileSizeMB}"></div>
+            <div class="col-md-6"><label for="newNodeName" th:text="#{wizard.newNodeName}"></label><input class="form-control" th:field="*{newNodeName}" maxlength="1000"></div>
+            <div class="col-md-6"><label for="newNodeTags" th:text="#{wizard.newNodeTags}"></label><input class="form-control" th:field="*{newNodeTags}" maxlength="1000"></div>
+            <div class="col-12"><label><input type="checkbox" th:field="*{writable}"> <span th:text="#{wizard.writable}"></span></label></div>
+            <div class="col-12"><label><input type="checkbox" th:field="*{allowLegacySchemaUpgrade}"> <span th:text="#{wizard.upgrade}"></span></label><p class="small" th:text="#{wizard.upgradeHelp}"></p></div>
+        </div>
+        <p class="mt-3" th:text="#{wizard.confirmHelp}"></p>
+        <button class="btn btn-primary" type="submit" th:text="#{wizard.save}"></button>
+        <a class="btn btn-secondary" th:href="@{/tenants}" th:text="#{wizard.cancel}"></a>
+    </form>
+    <dialog id="wizardFiles" style="width: min(900px,95vw); max-height: 85vh">
+        <h2 th:text="#{wizard.browseTitle}"></h2><p th:text="#{wizard.location}"></p>
+        <form id="wizardFolderForm" class="input-group"><input id="wizardFolder" class="form-control" th:aria-label="#{wizard.folder}"><button class="btn btn-primary" th:text="#{wizard.go}"></button></form>
+        <div class="my-2"><button type="button" id="wizardRoots" th:text="#{wizard.roots}"></button> <button type="button" id="wizardUp" th:text="#{wizard.up}"></button> <button type="button" id="wizardClose" th:text="#{wizard.cancel}"></button></div>
+        <p id="wizardBrowseStatus" role="status" th:attr="data-loading=#{wizard.loading},data-error=#{wizard.browseError},data-truncated=#{wizard.truncated}"></p>
+        <div id="wizardEntries" th:attr="data-folder=#{wizard.folder},data-file=#{wizard.file}"></div>
+    </dialog>
+</section>
+<section layout:fragment="pageSpecificJsScripts"><script th:src="@{/js/tenantWizard.js}"></script></section>
+</body></html>

@@ -21,6 +21,7 @@
         <div class="row text-center">
 
             <h1>Dosya Yükleme Formu</h1>
+            <p><a class="btn btn-success" th:href="@{/tenants/wizard}" th:text="#{wizard.create}"></a></p>
 
             <form method="post" th:action="@{/upload-database}" enctype="multipart/form-data">
                 <label for="file">Dosya Seç:</label>
