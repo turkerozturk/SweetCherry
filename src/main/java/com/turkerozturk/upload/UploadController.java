@@ -58,6 +58,7 @@ public class UploadController {
                 "# datasource.password=admin\n" +
                 "datasource.init-mode=always\n" +
                 "custom.isWritable=false\n" +
+                "custom.allowLegacySchemaUpgrade=false\n" +
                 "# https://www.baeldung.com/multitenancy-with-spring-data-jpa";
 
 

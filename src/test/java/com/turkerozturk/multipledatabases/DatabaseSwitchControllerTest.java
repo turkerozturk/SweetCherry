@@ -41,4 +41,22 @@ class DatabaseSwitchControllerTest {
         assertThat(request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN)).isEqualTo(token);
         assertThat(controller.selectionPage()).isEqualTo("redirect:/");
     }
+    @Test void schemaProblemPreservesSelectionAndExposesOnlySafeInstructions() throws Exception {
+        var service = mock(TenantService.class);
+        var source = mock(ManagedTenantDataSource.class);
+        when(service.getAllTenants()).thenReturn(Map.of("Old", source));
+        when(service.getCustomProperties("Old")).thenReturn(Map.of("propertyFileName", "old.txt", "datasource.password", "secret"));
+        when(source.activate(false)).thenThrow(new CtbSchemaCompatibility.Problem(java.util.List.of("children.master_id"), true));
+        var controller = new DatabaseSwitchController(); ReflectionTestUtils.setField(controller, "tenantService", service);
+        var request = new MockHttpServletRequest();
+        request.getSession().setAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT, "Previous");
+        request.getSession().setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN, "previous-token");
+        assertThat(controller.setTenant("Old", request)).isEqualTo("redirect:/");
+        assertThat(request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT)).isEqualTo("Previous");
+        assertThat(request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN)).isEqualTo("previous-token");
+        assertThat(request.getSession().getAttribute("dataSourceOperationError")).isEqualTo("schema");
+        assertThat(request.getSession().getAttribute("ctbSchemaConfig")).isEqualTo("old.txt");
+        assertThat(request.getSession().getAttribute("ctbSchemaSql")).isEqualTo(CtbSchemaCompatibility.UPGRADE_SQL);
+    }
+
 }

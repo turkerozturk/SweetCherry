@@ -47,6 +47,10 @@ public class TenantService {
     @Autowired
     private CustomPropertiesHolder customPropertiesHolder;
 
+    public Map<String, String> getCustomProperties(String tenant) {
+        return customPropertiesHolder.getCustomProperties(tenant);
+    }
+
     public Map<String, DataSource> getAllTenants() {
         AbstractRoutingDataSource routingDataSource = (AbstractRoutingDataSource) this.dataSource;
         Map<Object, DataSource> resolvedDataSources = routingDataSource.getResolvedDataSources();

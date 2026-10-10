@@ -64,7 +64,17 @@ public class DatabaseSwitchController {
         }
         String generation = null;
         try {
-            if (source instanceof ManagedTenantDataSource managed) generation = managed.activate();
+            if (source instanceof ManagedTenantDataSource managed) generation = managed.activate(request.isUserInRole("ADMIN"));
+        } catch (CtbSchemaCompatibility.Problem error) {
+            logger.warn("Data source selection failed for {}: {}", tenant, error.getMessage());
+            var session = request.getSession();
+            session.setAttribute("dataSourceOperationError", "schema");
+            session.setAttribute("ctbSchemaMissing", String.join(", ", error.getMissing()));
+            session.setAttribute("ctbSchemaSupported", error.isSupported());
+            session.setAttribute("ctbSchemaSql", error.getSql());
+            var properties = tenantService.getCustomProperties(tenant);
+            session.setAttribute("ctbSchemaConfig", properties == null ? "" : properties.getOrDefault("propertyFileName", ""));
+            return "redirect:/";
         } catch (java.sql.SQLException | RuntimeException error) {
             logger.warn("Data source selection failed for {}", tenant, error);
             request.getSession().setAttribute("dataSourceOperationError", "select");

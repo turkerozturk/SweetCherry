@@ -17,3 +17,5 @@ Manuel kontrol: CTB seç → sorgu aç → CTB kapat → Windows'ta dosyayı yen
 Tenant config silme ve aktarım güvenliği: [Ayarlar ve bağlantı portları](settings.md). Silme yalnız config dosyasını kaldırır; CTB veya uzak veritabanını silmez.
 
 Silinmiş veya yeniden yükleme sonrasında kaldırılmış bir tenant eski sayfadan seçilirse `/setTenant` 400 yerine güncel seçim listesine uyarıyla döner. Başka geçerli seçim varsa değiştirilmez. `/setTenant` adresini GET ile açmak yalnız `/` seçim/giriş akışına yönlendirir; seçim değiştirmek halen CSRF korumalı POST işlemiyle yapılır.
+
+Eski SQLite CTB şemaları için opsiyonel geçiş ve izin ayarı: [Eski CTB şemalarını açma](legacy-ctb-schema.md).

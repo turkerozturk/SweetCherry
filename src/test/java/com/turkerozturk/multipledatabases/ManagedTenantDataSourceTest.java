@@ -24,8 +24,11 @@ class ManagedTenantDataSourceTest {
         Path file = directory.resolve("demo.ctb");
         try (var connection = DriverManager.getConnection("jdbc:sqlite:" + file);
              var statement = connection.createStatement()) {
-            for (String table : new String[]{"node", "children", "bookmark", "image", "grid", "codebox"})
-                statement.execute("CREATE TABLE " + table + " (id INTEGER)");
+            try (var input = getClass().getResourceAsStream("/fixtures/shared-node-tree.sql")) {
+                String sql = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+                for (String line : sql.split("\\R"))
+                    if (line.startsWith("CREATE TABLE")) statement.execute(line);
+            }
         }
         return file;
     }

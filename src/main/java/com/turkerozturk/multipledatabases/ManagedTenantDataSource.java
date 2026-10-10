@@ -15,12 +15,18 @@ import java.util.function.Supplier;
 /** A reusable tenant registration whose JDBC pool can be explicitly released and reopened. */
 public final class ManagedTenantDataSource extends AbstractDataSource implements AutoCloseable {
     private final Supplier<HikariDataSource> factory;
+    private final boolean schemaUpgradeEnabled;
     private HikariDataSource pool;
     private boolean closed;
     private int borrowed;
     private String generation = UUID.randomUUID().toString();
 
     public ManagedTenantDataSource(Supplier<HikariDataSource> factory) {
+        this(factory, false);
+    }
+
+    public ManagedTenantDataSource(Supplier<HikariDataSource> factory, boolean schemaUpgradeEnabled) {
+        this.schemaUpgradeEnabled = schemaUpgradeEnabled;
         this.factory = factory;
         this.pool = configure(factory.get());
     }
@@ -42,15 +48,13 @@ public final class ManagedTenantDataSource extends AbstractDataSource implements
     public synchronized boolean isClosed() { return closed; }
 
     /** Verifies connectivity and the required CTB tables before a session selects this source. */
-    public synchronized String activate() throws SQLException {
+    public synchronized String activate() throws SQLException { return activate(false); }
+
+    public synchronized String activate(boolean administrator) throws SQLException {
         if (closed) { pool = configure(factory.get()); closed = false; }
         try (Connection connection = getConnection()) {
             if (pool.getJdbcUrl().startsWith("jdbc:sqlite:")) {
-                for (String table : new String[]{"node", "children", "bookmark", "image", "grid", "codebox"}) {
-                    try (var statement = connection.createStatement()) {
-                        statement.executeQuery("SELECT 1 FROM " + table + " LIMIT 0").close();
-                    }
-                }
+                CtbSchemaCompatibility.ensure(connection, schemaUpgradeEnabled, administrator);
             }
         } catch (SQLException | RuntimeException error) {
             close();

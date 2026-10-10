@@ -168,14 +168,16 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                     dataSourceBuilder.password(dsPassword);
                     dataSourceBuilder.url(dsUrl);
                     String registrationName = dsHumanFriendlyName;
+                    String schemaPermission = tenantProperties.getProperty(CtbSchemaCompatibility.SETTING, "false").trim();
+                    boolean schemaUpgradeEnabled = "true".equalsIgnoreCase(schemaPermission) || "1".equals(schemaPermission);
                     if (!resolvedDataSources.containsKey(dsHumanFriendlyName)) {
                         resolvedDataSources.put(dsHumanFriendlyName, new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
-                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build()));
+                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build(), schemaUpgradeEnabled));
                     } else {
                         registrationName = dsHumanFriendlyName + "(random: " + StringHelper.generateRandomString(3) + ")";
                         resolvedDataSources.put(registrationName,
                                 new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
-                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build()));
+                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build(), schemaUpgradeEnabled));
                     }
                     if (debugEnabled) logger.info("Data source: " + dsHumanFriendlyName +
                             ", db: " + tenantProperties.getProperty("datasource.url"));

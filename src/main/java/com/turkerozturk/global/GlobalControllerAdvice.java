@@ -97,6 +97,18 @@ public class GlobalControllerAdvice {
         return code;
     }
 
+    @ModelAttribute("ctbSchemaWarning")
+    public java.util.Map<String, Object> ctbSchemaWarning(jakarta.servlet.http.HttpServletRequest request) {
+        var session = request.getSession(false);
+        if (session == null || session.getAttribute("ctbSchemaMissing") == null) return null;
+        var warning = new java.util.HashMap<String, Object>();
+        for (String key : new String[]{"Missing", "Supported", "Sql", "Config"}) {
+            warning.put(key.toLowerCase(java.util.Locale.ROOT), session.getAttribute("ctbSchema" + key));
+            session.removeAttribute("ctbSchema" + key);
+        }
+        return warning;
+    }
+
     @ModelAttribute("currentTenantName")
     public String getCurrentTenantName() {
         return TenantContext.getCurrentTenant();

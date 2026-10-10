@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+### Fixed
+
+- Eski SQLite CTB şemaları seçimden önce kontrol edilir. Eksik `children.master_id` alanı yalnız `custom.allowLegacySchemaUpgrade=true` (veya `1`) izniyle ve yönetici seçiminde, varsayılan `0` ile transaction içinde eklenebilir. Desteklenmeyen eksikler dosya değiştirilmeden açıklanır.
+
 ## [1.0.0] - 2026-10-08
 
 ### Added

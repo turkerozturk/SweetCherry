@@ -12,6 +12,17 @@
     <p class="alert alert-warning" th:if="${dataSourceOperationError == 'missing'}" th:text="#{tenant.selectionMissing}"></p>
     <p class="alert alert-warning" th:if="${dataSourceOperationError == 'select'}" th:text="#{tenant.selectionFailed}"></p>
     <p class="alert alert-warning" th:if="${dataSourceOperationError == 'busy'}" th:text="#{tenant.closeBusy}"></p>
+    <div class="alert alert-warning" th:if="${ctbSchemaWarning != null}">
+        <p th:text="#{tenant.schemaMissing(${ctbSchemaWarning.missing})}"></p>
+        <th:block th:if="${ctbSchemaWarning.supported}">
+            <p th:text="#{tenant.schemaPlan}"></p>
+            <pre class="text-break" style="white-space: pre-wrap" th:text="${ctbSchemaWarning.sql}"></pre>
+            <p th:text="#{tenant.schemaInstructions(${ctbSchemaWarning.config})}"></p>
+            <code>custom.allowLegacySchemaUpgrade=true</code>
+            <p th:text="#{tenant.schemaBackup}"></p>
+        </th:block>
+        <p th:unless="${ctbSchemaWarning.supported}" th:text="#{tenant.schemaUnsupported}"></p>
+    </div>
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
 
 
