@@ -45,7 +45,8 @@ class TenantWizardServiceTest {
         var source=(ManagedTenantDataSource)routing.getResolvedDataSources().get(form.name);source.activate(true);source.close();
         assertThat(Files.readAllBytes(file)).isEqualTo(before);
         var name=holder.getCustomProperties(form.name).get("propertyFileName");var p=properties(directory.resolve("allTenants").resolve(name));
-        assertThat(p.getProperty("datasource.url")).isEqualTo("jdbc:sqlite:"+file);
+        // Windows TEMP may use an 8.3 alias; the wizard persists the resolved real path.
+        assertThat(p.getProperty("datasource.url")).isEqualTo("jdbc:sqlite:"+file.toRealPath());
         assertThat(p.getProperty("custom.isWritable")).isEqualTo("false");assertThat(p.getProperty(CtbSchemaCompatibility.SETTING)).isEqualTo("false");
     }
     @Test void editRetainsUnknownPropertiesAndPasswordWithoutDisplayingIt()throws Exception {
