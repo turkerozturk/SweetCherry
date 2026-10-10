@@ -332,6 +332,10 @@
                         <ul class="dropdown-menu">
                             <li sec:authorize="isAuthenticated()">
                                 <th:block sec:authorize="hasRole('ADMIN')">
+                                    <a class="dropdown-item" th:href="@{/system/settings}" th:text="#{appsettings.title}">Application settings</a>
+                                    <form method="POST" th:action="@{/restartContext}" th:attr="data-shutdown-confirm=#{appsettings.restartConfirm}">
+                                        <button class="dropdown-item" type="submit" th:text="#{appsettings.restart}">Restart SweetCherry</button>
+                                    </form>
                                     <form method="POST" action="/shutdownContext" th:action="@{/shutdownContext}"
                                           data-shutdown-confirm="Stop SweetCherry? All connected users will lose access."
                                           th:attr="data-shutdown-confirm=#{navbar.shutdownConfirm}">

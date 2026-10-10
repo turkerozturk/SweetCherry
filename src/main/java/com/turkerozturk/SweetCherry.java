@@ -51,10 +51,13 @@ public class SweetCherry implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(SweetCherry.class);
 
     private static boolean desktopMode;
+    private static String[] startupArgs = new String[0];
+    private static final java.util.concurrent.atomic.AtomicBoolean restarting = new java.util.concurrent.atomic.AtomicBoolean();
 
-    private static ConfigurableApplicationContext context; // https://www.baeldung.com/java-restart-spring-boot-app
+    private static volatile ConfigurableApplicationContext context; // https://www.baeldung.com/java-restart-spring-boot-app
 
     public static void main(String[] args) {
+        startupArgs = args.clone();
 
         com.turkerozturk.desktop.DesktopControl controls = null;
         if (com.turkerozturk.desktop.DesktopControl.requested(args)) {
@@ -83,6 +86,23 @@ public class SweetCherry implements CommandLineRunner {
 
     }
 
+
+    /** Restart in the current JVM, retaining launch arguments and rereading external configuration. */
+    public static boolean requestRestart() {
+        if (context == null || !context.isActive() || !restarting.compareAndSet(false, true)) return false;
+        final ConfigurableApplicationContext previous = context;
+        final String[] args = startupArgs.clone();
+        Thread worker = new Thread(() -> {
+            try {
+                Thread.sleep(1000); // Allow the confirmation response to reach the browser.
+                previous.close();
+                main(args);
+            } catch (Exception error) { logger.error("SweetCherry restart failed; start the application manually", error); }
+            finally { restarting.set(false); }
+        }, "sweetcherry-restart");
+        worker.setContextClassLoader(SweetCherry.class.getClassLoader());
+        worker.setDaemon(false); worker.start(); return true;
+    }
 
     @Override
     public void run(String... args) {

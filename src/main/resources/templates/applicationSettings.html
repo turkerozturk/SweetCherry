@@ -1,0 +1,14 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout}"><head><title th:text="#{appsettings.title}"></title></head><body><section layout:fragment="content" class="container py-3">
+<h1 th:text="#{appsettings.title}"></h1><p th:text="#{appsettings.description}"></p>
+<p class="alert alert-info" th:if="${notice}" th:text="${#messages.msg(notice)}"></p>
+<form th:if="${snapshot}" method="post" th:action="@{/system/settings}">
+<p><span th:text="#{appsettings.file}"></span> <code th:text="${snapshot.path}"></code></p>
+<input type="hidden" name="revision" th:value="${snapshot.revision}">
+<div class="table-responsive"><table class="table"><thead><tr><th th:text="#{appsettings.setting}"></th><th th:text="#{appsettings.savedValue}"></th><th th:text="#{appsettings.effective}"></th></tr></thead><tbody>
+<tr th:each="setting:${settings}"><td><label th:for="${setting.key}" th:text="${#messages.msg('appsettings.'+setting.key)}"></label><small class="d-block" th:text="${setting.key}"></small></td><td>
+<select class="form-select" th:if="${setting.type=='boolean'}" th:name="${setting.key}" th:id="${setting.key}"><option value="true" th:selected="${snapshot.values[setting.key]=='true'}" th:text="#{appsettings.on}"></option><option value="false" th:selected="${snapshot.values[setting.key]=='false'}" th:text="#{appsettings.off}"></option></select>
+<input class="form-control" th:unless="${setting.type=='boolean'}" th:type="${setting.type=='number'?'number':'text'}" th:name="${setting.key}" th:id="${setting.key}" th:value="${snapshot.values[setting.key]}" th:attr="min=${setting.type=='number'?1:null},max=${setting.type=='number'?setting.maximum:null}" maxlength="160" required>
+</td><td th:text="${snapshot.effective[setting.key]}"></td></tr></tbody></table></div>
+<button class="btn btn-primary" type="submit" th:text="#{appsettings.save}"></button></form>
+<p th:text="#{appsettings.limits}"></p><a th:href="@{/}" th:text="#{appsettings.home}"></a>
+</section></body></html>

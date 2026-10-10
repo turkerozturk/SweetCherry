@@ -6,6 +6,7 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ### Added
 
+- ADMIN için seçilmiş güvenlik dışı YAML ayarlarını düzenleme formu ve onaylı, aynı JVM içinde yeniden başlatma.
 - ADMIN için tenant config oluşturma/düzenleme sihirbazı: sunucunun yerel veya ağ paylaşımı CTB dosyasını Gözat ile seçme, ayarları formdan düzenleme ve kaydedince mevcut seçim akışıyla açma. CTB kopyalanmaz; bilinmeyen config alanları korunur.
 
 ### Fixed

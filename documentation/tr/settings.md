@@ -72,3 +72,7 @@ Gerçek WARN/ERROR mesajları ve login güvenlik kayıtları gizlenmez. Bütün 
 ## PDF aktarımı
 
 `myapp.pdf.*` sınırları ve nesne seçimleri: [PDF sınırları ve nesne seçimleri](pdf-limits-and-objects.md).
+
+## Ayarları arayüzden düzenleme
+
+Seçilmiş güvenlik dışı alanlar için [Uygulama Ayarları ve yeniden başlatma](application-settings-ui.md) sayfasına bakın.

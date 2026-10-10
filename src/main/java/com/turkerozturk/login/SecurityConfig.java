@@ -141,7 +141,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
-                        .requestMatchers("/tenants/wizard", "/tenants/wizard/**", "/nodes/delete/**", "/upload-form", "/upload-database", "/reload-datasources", "/delete/**")
+                        .requestMatchers("/system/settings", "/restartContext", "/tenants/wizard", "/tenants/wizard/**", "/nodes/delete/**", "/upload-form", "/upload-database", "/reload-datasources", "/delete/**")
                         .hasRole("ADMIN")
                         .requestMatchers("/img/**", "/about", "/main", "/features", "/static/css/**", "/webjars/**",
                                 "/sw.js", "/workbox-*.js",
