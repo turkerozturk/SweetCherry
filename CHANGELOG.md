@@ -6,6 +6,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ### Added
 
+- Masaüstü kontrol penceresinde tüm yerel YAML ayarları için tablo/metin editörü; JAR varsayılanından gerektiğinde harici dosya oluşturma, gizli alan maskeleme ve mevcut yeniden başlatma akışı.
+
 - ADMIN için seçilmiş güvenlik dışı YAML ayarlarını düzenleme formu ve onaylı, aynı JVM içinde yeniden başlatma.
 - ADMIN için tenant config oluşturma/düzenleme sihirbazı: sunucunun yerel veya ağ paylaşımı CTB dosyasını Gözat ile seçme, ayarları formdan düzenleme ve kaydedince mevcut seçim akışıyla açma. CTB kopyalanmaz; bilinmeyen config alanları korunur.
 

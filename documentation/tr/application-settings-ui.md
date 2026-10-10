@@ -11,3 +11,5 @@ Spring tarafından gerçekten yüklenmiş tek bir harici `application.yml` veya 
 Yanıt geldikten sonra birkaç saniye bekleyip bağlantıdan ana sayfayı açın. Başlatma hatası olursa `myapp.log` kontrol edilip elle yeniden açılır. Başarılı yeniden başlatma bir sağlık garantisi değildir. Port ayarları bu formda değişmediğinden adres aynı kalır.
 
 Komut satırı ve ortam değişkenleri YAML değerlerinden önceliklidir. Örneğin run.sh tarayıcı açma ayarını argümanla true yapar. Formda dosya değeri ve şu anda etkin değer ayrı gösterilir. PDF limitini yükseltmek özellikle Raspberry Pi’de bellek tükenmesine yol açabilir; derinlik formda 256 ile sınırlandırılır. SweetCherry CTB yedeği almaz.
+
+Masaüstünde tüm YAML alanları için ayrı [YAML editörü](desktop-yaml-editor.md) vardır; bu web formunun güvenlik dışı kapsamını değiştirmez.

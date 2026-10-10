@@ -18,6 +18,7 @@ public final class DesktopControl {
     private JProgressBar progress;
     private JButton open;
     private JButton stop;
+    private JButton settings;
     private TrayIcon tray;
     private volatile String url;
     private volatile Runnable shutdown;
@@ -70,6 +71,9 @@ public final class DesktopControl {
         JButton folder = new JButton(text("Uygulama Klasörü", "Application Folder"));
         folder.addActionListener(e -> background(() -> Desktop.getDesktop().open(new File(".").getCanonicalFile())));
         JPanel files = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); files.add(folder);
+        settings = new JButton(text("YAML Ayarları", "YAML Settings")); settings.setEnabled(false);
+        settings.addActionListener(e -> new com.turkerozturk.desktop.config.DesktopYamlEditorDialog(frame).setVisible(true));
+        files.add(settings);
         JLabel loginHelp = new JLabel(text(
                 "<html>Varsayılan kullanıcı adları: <b>admin</b> ve <b>user</b>.<br>Şifreler uygulama klasöründeki <b>login-credentials.properties</b> dosyasındadır.<br><b>admin.password</b> bir ayar anahtarıdır; kullanıcı adı değildir.<br>Şifreyi dosyada değiştirip SweetCherry’yi yeniden başlatın.<br>application.yml içinde özel giriş ayarları varsa onlar kullanılır.</html>",
                 "<html>Default usernames: <b>admin</b> and <b>user</b>.<br>Passwords are in <b>login-credentials.properties</b> in the application folder.<br><b>admin.password</b> is a setting key, not a username.<br>Change the password in the file, then restart SweetCherry.<br>Custom login settings in application.yml take precedence.</html>"));
@@ -106,7 +110,7 @@ public final class DesktopControl {
         SwingUtilities.invokeLater(() -> {
             status.setText(text("SweetCherry çalışıyor.", "SweetCherry is running."));
             this.address.setText(address); progress.setIndeterminate(false); progress.setValue(100);
-            open.setEnabled(true); stop.setEnabled(true);
+            open.setEnabled(true); stop.setEnabled(true); settings.setEnabled(true);
             if (browse) openBrowser();
         });
     }
@@ -122,6 +126,7 @@ public final class DesktopControl {
         SwingUtilities.invokeLater(() -> {
             status.setText(portConflict ? text("Port kullanımda. Diğer uygulamayı veya port ayarını kontrol edin.", "Port in use. Check the other application or port settings.")
                     : text("Başlatılamadı. Ayrıntılar için logu açın.", "Startup failed. Open the log for details."));
+            settings.setEnabled(true);
             progress.setIndeterminate(false); stop.setText(text("Çık", "Exit")); stop.setEnabled(true);
             reveal(); frame.pack();
         });
@@ -147,7 +152,7 @@ public final class DesktopControl {
     private void stop() {
         if (!stopping.compareAndSet(false, true)) return;
         status.setText(text("SweetCherry kapatılıyor…", "Stopping SweetCherry…"));
-        open.setEnabled(false); stop.setEnabled(false); progress.setIndeterminate(true);
+        open.setEnabled(false); stop.setEnabled(false); settings.setEnabled(false); progress.setIndeterminate(true);
         new Thread(shutdown, "sweetcherry-desktop-shutdown").start();
     }
 
