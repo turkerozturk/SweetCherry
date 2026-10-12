@@ -114,7 +114,9 @@ Ağaçtaki parent/master bağlantıları ile rich-text içindeki internal node l
 
 ## SweetCherry içinde veri kaynağı olarak açma
 
-`exportednodes.ctb`, başka CTB dosyaları gibi `allTenants` altında bir bağlantı tanımı oluşturularak SweetCherry'ye tanıtılabilir. Ancak hem export hedefi hem de aktif veri kaynağı olarak aynı dosyayı kullanmak kafa karıştırabilir ve eşzamanlı yazma riski doğurabilir. Şimdilik dosyayı önce indirmek/kopyalamak ve ayrı bir adla tanıtmak daha güvenlidir.
+`exportednodes.ctb`, başka CTB dosyaları gibi `allTenants` altında bir bağlantı tanımı veya tenant sihirbazı ile SweetCherry'ye tanıtılabilir. Görüntülemek, düzenlemek ve içindeki bir dalı tekrar ortak CTB'ye kopyalamak mümkündür. Aktif kaynak dosyası ile ortak export hedefi aynı dosyaysa kopyalama ikinci bağlantı açmadan mevcut transaction bağlantısında yapılır; yeni kimliklerle bağımsız bir kopya eklenir. Hata halinde bu kopyaya ait eklemeler geri alınır.
+
+**Aynı dosyaya export yapmak aktif tenant'ın `custom.isWritable=true` ayarını gerektirir.** Salt okunur bir bağlantı üzerinden aynı CTB'ye yazılamaz. Bu değişiklik başka uygulamaların veya oturumların eşzamanlı yazma kilitlerini ortadan kaldırmaz; böyle bir durumda işlemi tekrar deneyin. Otomatik yedekleme yapılmaz.
 
 Bağlantı tanım dosyalarını `allTenants` klasörüne yüklemek için SweetCherry'de bir yükleme arayüzü de bulunmaktadır.
 

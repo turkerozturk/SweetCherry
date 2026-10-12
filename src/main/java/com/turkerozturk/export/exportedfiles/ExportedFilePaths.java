@@ -13,7 +13,7 @@ final class ExportedFilePaths {
         if (applicationPath == null || exportingFolderName == null || filename == null
                 || !exportingFolderName.matches("[\\p{L}\\p{N}._ -]+")
                 || exportingFolderName.startsWith(".")
-                || !filename.matches("[\\p{L}\\p{N}._ -]+")
+                || !filename.matches("[^\\\\/:*?\"<>|\\p{Cntrl}]+")
                 || filename.startsWith(".")) {
             throw new IllegalArgumentException("Invalid export path");
         }

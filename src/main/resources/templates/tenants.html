@@ -27,8 +27,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="tenant : ${tenants}">
-            <td th:text="${tenant.tenantName == currentTenantName ? 'Active' : 'Passive'}"></td>
+        <tr th:each="tenant : ${tenants}" th:classappend="${tenant.tenantName == currentTenantName} ? 'table-success' : ''">
+            <td th:text="${tenant.tenantName == currentTenantName} ? #{tenant.active} : #{tenant.passive}" th:classappend="${tenant.tenantName == currentTenantName} ? 'fw-bold' : ''"></td>
             <td><a th:href="@{/tenants/config(tenant=${tenant.tenantName})}" th:title="${tenant.fileName}" aria-label="Download tenant configuration">
                 <i class="fas fa-download" aria-hidden="true"></i></a>
                 <a class="btn btn-sm btn-outline-secondary" th:href="@{/tenants/wizard(tenant=${tenant.tenantName})}" th:title="#{wizard.edit}" th:aria-label="#{wizard.edit}"><i class="fas fa-pen" aria-hidden="true"></i></a>
@@ -37,10 +37,10 @@
                     <button type="submit" class="btn btn-sm btn-outline-danger" th:title="#{tenant.delete.title}" th:aria-label="#{tenant.delete.title}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                 </form> <i><b th:text="${tenant.tenantName}"></b></i></td>
             <td th:text="${tenant.url}"></td>
-            <td th:text="${tenant.authenticationConfigured} ? #{tenant.yes} : #{tenant.no}"></td>
+            <td th:text="${tenant.authenticationConfigured} ? #{tenant.yes} : #{tenant.no}" th:classappend="${tenant.authenticationConfigured} ? 'fw-bold' : ''"></td>
             <td th:text="${tenant.driverClassName}"></td>
             <td th:text="${tenant.fileName}"></td>
-            <td th:text="${tenant.isWritable}"></td>
+            <td th:text="${tenant.isWritable} ? #{tenant.yes} : #{tenant.no}" th:classappend="${tenant.isWritable} ? 'fw-bold text-danger' : ''"></td>
 
         </tr>
         </tbody>

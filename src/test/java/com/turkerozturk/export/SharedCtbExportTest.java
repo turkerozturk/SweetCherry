@@ -68,6 +68,46 @@ class SharedCtbExportTest {
             }
         }
     }
+    @Test void sameFileCollectionUsesOneConnectionAndPreservesOriginalBranch() throws Exception {
+        Path output = directory.resolve("exports/exportednodes.ctb");
+        Files.createDirectories(output.getParent());
+        try (var source = fixture()) {
+            try (var statement=source.createStatement()) {
+                statement.execute("VACUUM INTO '"+output.toString().replace("'","''")+"'");
+            }
+        }
+        try (var source=DriverManager.getConnection("jdbc:sqlite:"+output)) {
+            var service=service(source);
+            var holder=new com.turkerozturk.multipledatabases.CustomPropertiesHolder();
+            holder.addCustomProperties("Fixture",java.util.Map.of("custom.isWritable","true"));
+            ReflectionTestUtils.setField(service,"customPropertiesHolder",holder);
+            source.setAutoCommit(false); // Simulate Spring's existing source transaction.
+            try (var statement=source.createStatement();var rows=statement.executeQuery("SELECT * FROM children")) {
+                assertThat(rows.next()).isTrue();
+            }
+            assertThat(service.export(11,true,true).count()).isEqualTo(7);
+            assertThat(number(source,"SELECT COUNT(*) FROM children")).isEqualTo(26);
+            valid(source);
+            source.commit();
+            holder.addCustomProperties("Fixture",java.util.Map.of("custom.isWritable","false"));
+            assertThatThrownBy(()->service.export(11,true,true))
+                .isInstanceOfSatisfying(org.springframework.web.server.ResponseStatusException.class,
+                    failure -> assertThat(failure.getStatusCode().value()).isEqualTo(403));
+            assertThat(number(source,"SELECT COUNT(*) FROM children")).isEqualTo(26);
+        }
+    }
+    @Test void inPlaceFailureRollsBackOnlyItsOwnChanges() throws Exception {
+        try (var source=fixture()) {
+            source.setAutoCommit(false);
+            try(var statement=source.createStatement()){statement.execute("DELETE FROM node WHERE node_id=1");}
+            assertThatThrownBy(()->CtbExportService.appendInPlace(source,11,true))
+                .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+            assertThat(number(source,"SELECT COUNT(*) FROM children")).isEqualTo(19);
+            assertThat(number(source,"SELECT COUNT(*) FROM node WHERE node_id=1")).isZero();
+            source.rollback();
+        }
+    }
+
     private CtbExportService service(Connection source) throws Exception {
         TenantContext.setCurrentTenant("Fixture");
         var manager=mock(EntityManager.class);var session=mock(Session.class);

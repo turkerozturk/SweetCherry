@@ -4,6 +4,11 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Highlight the active tenant and writable/authenticated settings, with translated status and yes/no labels.
+- Accept safe export filenames containing tenant display-name punctuation for download and deletion.
+- Export into the selected collection CTB through the same transaction connection; enforce writable tenant settings and roll back failed copies.
+
+
 ### Added
 
 - Masaüstü kontrol penceresinde tüm yerel YAML ayarları için tablo/metin editörü; JAR varsayılanından gerektiğinde harici dosya oluşturma, gizli alan maskeleme ve mevcut yeniden başlatma akışı.
