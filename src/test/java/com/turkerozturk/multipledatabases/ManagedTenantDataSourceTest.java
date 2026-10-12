@@ -78,9 +78,23 @@ class ManagedTenantDataSourceTest {
         var connection = org.mockito.Mockito.mock(Connection.class);
         org.mockito.Mockito.when(pool.getJdbcUrl()).thenReturn("jdbc:postgresql://localhost/notes");
         org.mockito.Mockito.when(pool.getConnection()).thenReturn(connection);
+        var metadata=org.mockito.Mockito.mock(java.sql.DatabaseMetaData.class);
+        org.mockito.Mockito.when(connection.getMetaData()).thenReturn(metadata);
+        org.mockito.Mockito.when(metadata.getDatabaseProductName()).thenReturn("PostgreSQL");
+        org.mockito.Mockito.when(metadata.getDatabaseProductVersion()).thenReturn("15.0");
+        org.mockito.Mockito.when(metadata.getDatabaseMajorVersion()).thenReturn(15);
+        org.mockito.Mockito.when(metadata.getConnection()).thenReturn(connection);
+        org.mockito.Mockito.when(metadata.getSQLKeywords()).thenReturn("");
+        var statement=org.mockito.Mockito.mock(java.sql.Statement.class);
+        var rows=org.mockito.Mockito.mock(java.sql.ResultSet.class);
+        org.mockito.Mockito.when(connection.createStatement()).thenReturn(statement);
+        org.mockito.Mockito.when(statement.executeQuery(org.mockito.ArgumentMatchers.anyString())).thenReturn(rows);
+        org.mockito.Mockito.when(rows.next()).thenReturn(true,false);
+        org.mockito.Mockito.when(rows.getString(1)).thenReturn("PostgreSQL 15.0");
         var source = new ManagedTenantDataSource(() -> pool);
         source.activate();
-        org.mockito.Mockito.verify(connection, org.mockito.Mockito.never()).createStatement();
+        assertThat(source.hibernateDialect().dialect()).isInstanceOf(org.hibernate.dialect.PostgreSQLDialect.class);
+        org.mockito.Mockito.verify(connection, org.mockito.Mockito.never()).prepareStatement(org.mockito.ArgumentMatchers.anyString());
         source.close();
         org.mockito.Mockito.verify(pool).close();
     }

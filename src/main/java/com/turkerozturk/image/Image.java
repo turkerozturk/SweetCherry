@@ -37,7 +37,7 @@ public class Image implements Serializable {
     private Long nodeId;
 
     @Id
-    @Column(name = "offset")
+    @Column(name = "`offset`")
     private Integer offset;
 
     @Column(name = "justification")

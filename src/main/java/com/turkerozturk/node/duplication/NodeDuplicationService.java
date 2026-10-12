@@ -176,24 +176,31 @@ public class NodeDuplicationService {
     private static void copyRows(Connection connection,String table,long from,long to,long timestamp,boolean node) throws SQLException {
         if(!Set.of("node","image","grid","codebox").contains(table)) throw new IllegalArgumentException("Unsupported table");
         var columns=new ArrayList<String>();
-        try(var statement=connection.prepareStatement("PRAGMA table_info("+quote(table)+")");var rows=statement.executeQuery()) {
-            while(rows.next()) columns.add(rows.getString("name"));
+        try(var statement=connection.prepareStatement("SELECT * FROM "+table+" WHERE 1=0");var rows=statement.executeQuery()) {
+            var metadata=rows.getMetaData();
+            for(int i=1;i<=metadata.getColumnCount();i++) columns.add(metadata.getColumnName(i));
         }
+        String delimiter=connection.getMetaData().getIdentifierQuoteString().trim();
+        var quotedColumns=new ArrayList<String>();
+        for(String column:columns) quotedColumns.add(quote(column,delimiter));
         if(!columns.contains("node_id") || node && (!columns.contains("ts_creation") || !columns.contains("ts_lastsave"))) throw conflict();
         var expressions=new ArrayList<String>();var parameters=new ArrayList<Long>();
         for(String column:columns) {
             if(column.equals("node_id")) {expressions.add("?");parameters.add(to);}
             else if(node && (column.equals("ts_creation") || column.equals("ts_lastsave"))) {expressions.add("?");parameters.add(timestamp);}
-            else expressions.add(quote(column));
+            else expressions.add(quote(column,delimiter));
         }
-        String sql="INSERT INTO "+quote(table)+" ("+String.join(",",columns.stream().map(NodeDuplicationService::quote).toList())+") SELECT "
-                +String.join(",",expressions)+" FROM "+quote(table)+" WHERE node_id=?";
+        String sql="INSERT INTO "+quote(table,delimiter)+" ("+String.join(",",quotedColumns)+") SELECT "
+                +String.join(",",expressions)+" FROM "+quote(table,delimiter)+" WHERE node_id=?";
         try(var statement=connection.prepareStatement(sql)) {
             int parameter=1;for(long value:parameters) statement.setLong(parameter++,value);statement.setLong(parameter,from);
             int count=statement.executeUpdate();if(node && count!=1) throw conflict();
         }
     }
-    private static String quote(String identifier) {return "\""+identifier.replace("\"","\"\"")+"\"";}
+    private static String quote(String identifier,String delimiter) {
+        if(!identifier.matches("[A-Za-z_][A-Za-z_0-9]*")) throw conflict();
+        return delimiter+identifier+delimiter;
+    }
     /** Covers occurrence placement and real-node identities; no source rows are overwritten by duplication. */
     private static String revision(Snapshot snapshot) {
         try {

@@ -37,7 +37,7 @@ public class CombinedId implements Serializable {
     @Column(name = "node_id")
     private Integer nodeId;
 
-    @Column(name = "\"offset\"")  // Escape the offset column name for postgresql
+    @Column(name = "`offset`") // Hibernate renders the selected database's identifier quotes.
     private Integer offset;
 
     // equals ve hashCode metodlarını eklemek önemlidir

@@ -18,6 +18,7 @@ public final class ManagedTenantDataSource extends AbstractDataSource implements
     private final boolean schemaUpgradeEnabled;
     private HikariDataSource pool;
     private boolean closed;
+    private TenantHibernateDialect hibernateDialect;
     private int borrowed;
     private String generation = UUID.randomUUID().toString();
 
@@ -56,11 +57,21 @@ public final class ManagedTenantDataSource extends AbstractDataSource implements
             if (pool.getJdbcUrl().startsWith("jdbc:sqlite:")) {
                 CtbSchemaCompatibility.ensure(connection, schemaUpgradeEnabled, administrator);
             }
+            hibernateDialect = TenantHibernateDialect.detect(connection);
         } catch (SQLException | RuntimeException error) {
             close();
             throw error;
         }
         return generation;
+    }
+
+    /** Resolves metadata once per pool generation; never consults a different tenant's connection. */
+    public synchronized TenantHibernateDialect hibernateDialect() throws SQLException {
+        if (closed) throw new SQLException("Tenant data source is closed; select it again.");
+        if (hibernateDialect == null) try (var connection = getConnection()) {
+            hibernateDialect = TenantHibernateDialect.detect(connection);
+        }
+        return hibernateDialect;
     }
 
     /** Counts borrowed connections so explicit close cannot interrupt an active transaction. */
@@ -87,7 +98,7 @@ public final class ManagedTenantDataSource extends AbstractDataSource implements
     @Override public synchronized void close() {
         if (borrowed != 0) throw new IllegalStateException("Data source has active requests; try closing it again shortly.");
         if (!closed) {
-            pool.close(); closed = true; generation = UUID.randomUUID().toString();
+            pool.close(); hibernateDialect = null; closed = true; generation = UUID.randomUUID().toString();
         }
     }
 }

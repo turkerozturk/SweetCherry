@@ -36,7 +36,6 @@ spring:
   mvc:
     locale: en_US, tr_TR # MULTILANGUAGE Supported languages
   jpa: # DATABASE
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
     properties:
       hibernate:
         boot:

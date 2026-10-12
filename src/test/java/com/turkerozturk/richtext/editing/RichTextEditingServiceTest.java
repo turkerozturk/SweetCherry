@@ -88,11 +88,10 @@ class RichTextEditingServiceTest {
         addImage();
         var editor = service.open(12);
         service.save(12, "<node><rich_text>ZZT</rich_text><rich_text __sweet_object='image:1'>\uFFFC</rich_text><rich_text>ext</rich_text></node>", editor.revision());
-        verify(query).setParameter("from", 1);
-        verify(query).setParameter("to", -2);
-        verify(query).setParameter("from", -2);
-        verify(query).setParameter("to", 3);
-        verify(query, times(3)).executeUpdate();
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT offset FROM image WHERE node_id=12")) {
+            assertThat(rows.next()).isTrue();assertThat(rows.getInt(1)).isEqualTo(3);assertThat(rows.next()).isFalse();
+        } catch(java.sql.SQLException failure){throw new AssertionError(failure);}
+        verify(query).executeUpdate();
         verify(entityManager).clear();
     }
 

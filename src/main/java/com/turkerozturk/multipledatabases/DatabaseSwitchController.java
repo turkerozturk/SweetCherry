@@ -64,7 +64,11 @@ public class DatabaseSwitchController {
         }
         String generation = null;
         try {
-            if (source instanceof ManagedTenantDataSource managed) generation = managed.activate(request.isUserInRole("ADMIN"));
+            if (source instanceof ManagedTenantDataSource managed) {
+                generation = managed.activate(request.isUserInRole("ADMIN"));
+                var settings = tenantService.getCustomProperties(tenant);
+                managed.hibernateDialect().setting(settings == null ? null : settings.get("custom.hibernateDialect"));
+            }
         } catch (CtbSchemaCompatibility.Problem error) {
             logger.warn("Data source selection failed for {}: {}", tenant, error.getMessage());
             var session = request.getSession();

@@ -1,5 +1,7 @@
 package com.turkerozturk.richtext.editing;
 
+import com.turkerozturk.jdbc.JdbcIdentifiers;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
@@ -146,7 +148,7 @@ public class RichTextEditingService {
         for (var object : objects) if (deleted.contains(object.reference().key())) {
             entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
                 try (var statement = connection.prepareStatement("DELETE FROM " + object.reference().table()
-                        + " WHERE node_id = ? AND offset = ?")) {
+                        + " WHERE node_id = ? AND "+JdbcIdentifiers.quote(connection,"offset")+" = ?")) {
                     statement.setLong(1, id); statement.setInt(2, object.reference().offset());
                     if (statement.executeUpdate() != 1) throw new java.sql.SQLException("Object changed; reload the editor");
                 }
@@ -161,7 +163,7 @@ public class RichTextEditingService {
         for (var entry : pending.entrySet()) {
             entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
                 try (var insert = connection.prepareStatement("INSERT INTO image "
-                        + "(node_id, offset, justification, anchor, png, filename, link, time) VALUES (?, ?, 'left', '', ?, ?, '', ?)")) {
+                        + "(node_id, "+JdbcIdentifiers.quote(connection,"offset")+", justification, anchor, png, filename, link, time) VALUES (?, ?, 'left', '', ?, ?, '', ?)")) {
                     insert.setLong(1, id); insert.setInt(2, saved.newImages().get(entry.getKey()));
                     insert.setBytes(3, entry.getValue().bytes()); insert.setString(4, entry.getValue().name());
                     insert.setLong(5, entry.getValue().name().isEmpty() ? 0 : Instant.now().getEpochSecond());
@@ -176,8 +178,8 @@ public class RichTextEditingService {
             var reference = fresh ? null : objects.stream().map(Stored::reference).filter(ref -> ref.key().equals(entry.getKey())).findFirst().orElseThrow();
             int offset = fresh ? saved.newImages().get(entry.getKey()) : saved.offsets().get(reference);
             entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
-                String sql = fresh ? "INSERT INTO grid (txt, node_id, offset, justification, col_min, col_max) VALUES (?, ?, ?, 'left', 200, 200)"
-                        : "UPDATE grid SET txt = ? WHERE node_id = ? AND offset = ?";
+                String sql = fresh ? "INSERT INTO grid (txt, node_id, "+JdbcIdentifiers.quote(connection,"offset")+", justification, col_min, col_max) VALUES (?, ?, ?, 'left', 200, 200)"
+                        : "UPDATE grid SET txt = ? WHERE node_id = ? AND "+JdbcIdentifiers.quote(connection,"offset")+" = ?";
                 try (var statement = connection.prepareStatement(sql)) {
                     statement.setString(1, entry.getValue()); statement.setLong(2, id); statement.setInt(3, offset);
                     if (statement.executeUpdate() != 1) throw new java.sql.SQLException("Table changed; reload the editor");
@@ -219,8 +221,8 @@ public class RichTextEditingService {
     static List<Stored> readObjects(java.sql.Connection connection, long id) throws java.sql.SQLException {
         var result = new java.util.ArrayList<Stored>();
         for (String table : List.of("image", "codebox", "grid")) {
-            try (var query = connection.prepareStatement("SELECT offset AS editor_offset, * FROM " + table
-                    + " WHERE node_id = ? ORDER BY offset")) {
+            try (var query = connection.prepareStatement("SELECT "+JdbcIdentifiers.quote(connection,"offset")+" AS editor_offset, * FROM " + table
+                    + " WHERE node_id = ? ORDER BY "+JdbcIdentifiers.quote(connection,"offset"))) {
                 query.setLong(1, id);
                 try (var rows = query.executeQuery()) {
                     var metadata = rows.getMetaData();
@@ -243,9 +245,13 @@ public class RichTextEditingService {
     }
     /** Updates only the offset column; payload/metadata and row count are preserved. */
     private void move(long id, String table, int from, int to) {
-        int changed = entityManager.createNativeQuery("UPDATE " + table + " SET offset = :to WHERE node_id = :id AND offset = :from")
-                .setParameter("to", to).setParameter("id", id).setParameter("from", from).executeUpdate();
-        if (changed != 1) throw new ResponseStatusException(HttpStatus.CONFLICT, "Object changed; reload the editor.");
+        entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
+            String offset=JdbcIdentifiers.quote(connection,"offset");
+            try(var statement=connection.prepareStatement("UPDATE "+table+" SET "+offset+"=? WHERE node_id=? AND "+offset+"=?")) {
+                statement.setInt(1,to);statement.setLong(2,id);statement.setInt(3,from);
+                if(statement.executeUpdate()!=1) throw new ResponseStatusException(HttpStatus.CONFLICT,"Object changed; reload the editor.");
+            }
+        });
     }
 
     /** Covers the source content/type and flags so a stale editor cannot silently overwrite changes. */

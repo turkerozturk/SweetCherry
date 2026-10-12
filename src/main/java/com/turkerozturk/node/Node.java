@@ -52,10 +52,13 @@ public class Node {
     @Column(name = "is_richtxt")
     private long isRichText;
     @Column(name = "has_codebox")
+    @Convert(converter = org.hibernate.type.NumericBooleanConverter.class)
     private boolean hasCodeBox;
     @Column(name = "has_table")
+    @Convert(converter = org.hibernate.type.NumericBooleanConverter.class)
     private boolean hasTable;
     @Column(name = "has_image")
+    @Convert(converter = org.hibernate.type.NumericBooleanConverter.class)
     private boolean hasImage;
     private long level;
     @Column(name = "ts_creation")

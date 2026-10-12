@@ -47,10 +47,10 @@ public interface NodeRepository extends JpaRepository<Node, Long> {
     @Query("SELECT n FROM Node n ORDER BY n.lastSaveTimestamp DESC")
     List<Node> findRecentlyModifiedNodes(Pageable pageable);
 
-    @Query(value = "SELECT * FROM node n WHERE n.name LIKE %:name% AND n.txt LIKE %:txt% AND n.tags LIKE %:tags% ;", nativeQuery = true)
+    @Query(value = "SELECT * FROM node n WHERE n.name LIKE %:name% AND n.txt LIKE %:txt% AND n.tags LIKE %:tags%", nativeQuery = true)
     List<Node> findByCustomQuery(@Param("name") String name, @Param("txt") String txt, @Param("tags") String tags);
 
-    @Query(value = "SELECT * FROM node n WHERE n.name LIKE %:name% AND n.txt LIKE %:txt% AND n.tags LIKE %:tags% ;", nativeQuery = true)
+    @Query(value = "SELECT * FROM node n WHERE n.name LIKE %:name% AND n.txt LIKE %:txt% AND n.tags LIKE %:tags%", nativeQuery = true)
     Page<Node> findByCustomQuery(@Param("name") String name, @Param("txt") String txt, @Param("tags") String tags, Pageable pageable);
 
     @Query(value = "SELECT * FROM node n WHERE n.name LIKE %:name% AND n.txt LIKE %:txt% AND n.tags LIKE %:tags% " +

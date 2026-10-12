@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Route Hibernate entity managers by the selected tenant's JDBC database type/version without a global YAML dialect switch.
+- Use JDBC metadata and driver-specific identifier quoting for duplication and rich-text objects; keep CTB object flags as numeric 0/1 values.
+
+
 - Highlight the active tenant and writable/authenticated settings, with translated status and yes/no labels.
 - Accept safe export filenames containing tenant display-name punctuation for download and deletion.
 - Export into the selected collection CTB through the same transaction connection; enforce writable tenant settings and roll back failed copies.

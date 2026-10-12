@@ -34,7 +34,7 @@ public class Anchor implements Serializable {
     private Long nodeId;
 
     @Id
-    @Column(name = "offset")
+    @Column(name = "`offset`")
     private Integer offset;
 
     @Column(name = "justification")

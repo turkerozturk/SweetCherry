@@ -59,4 +59,15 @@ class DatabaseSwitchControllerTest {
         assertThat(request.getSession().getAttribute("ctbSchemaSql")).isEqualTo(CtbSchemaCompatibility.UPGRADE_SQL);
     }
 
+    @Test void wrongDialectOverridePreservesPreviousTenant() throws Exception {
+        var service=mock(TenantService.class);var source=mock(ManagedTenantDataSource.class);
+        when(service.getAllTenants()).thenReturn(Map.of("Wrong",source));
+        when(service.getCustomProperties("Wrong")).thenReturn(Map.of("custom.hibernateDialect","postgresql"));
+        when(source.hibernateDialect()).thenReturn(new TenantHibernateDialect(new org.hibernate.community.dialect.SQLiteDialect()));
+        var controller=new DatabaseSwitchController();ReflectionTestUtils.setField(controller,"tenantService",service);
+        var request=new MockHttpServletRequest();request.getSession().setAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT,"Previous");
+        controller.setTenant("Wrong",request);
+        assertThat(request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__CURRENT_TENANT)).isEqualTo("Previous");
+        assertThat(request.getSession().getAttribute("dataSourceOperationError")).isEqualTo("select");
+    }
 }
