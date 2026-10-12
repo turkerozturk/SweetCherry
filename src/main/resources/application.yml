@@ -38,6 +38,8 @@ spring:
   jpa: # DATABASE
     properties:
       hibernate:
+        globally_quoted_identifiers: true # Tablo/kolon adlarini secilen dialect'e gore alintilar.
+        globally_quoted_identifiers_skip_column_definitions: true # BLOB gibi columnDefinition tiplerini alintilamaz.
         boot:
           allow_jdbc_metadata_access: false # Hibernate 6 icin JDBC metadata erisimini kapatir; tenant secilmeden acilabilsin.
         temp:

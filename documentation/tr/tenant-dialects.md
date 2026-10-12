@@ -48,3 +48,11 @@ Metadata/fabrika testleri gerçek MariaDB/PostgreSQL sunucusu yerine JDBC mock'l
 6. Sunucu erişilemiyorken uygulama açılmalı; o tenant seçildiğinde mevcut bağlantı hata mesajı gösterilmelidir.
 
 SweetCherry otomatik veritabanı yedeği almaz. Uzak veritabanı yazma kontrollerini test kopyasında yapın.
+
+## MySQL sürücüsüyle MariaDB bağlantısı
+
+MySQL Connector/J ile MariaDB'ye bağlanıldığında JDBC metadata motoru MySQL veya sürümü `5.5.5-10.x-MariaDB` olarak gösterebilir. SweetCherry MariaDB işaretini gerçek sürüm metninden ayırır; işaret metadata içinde yoksa MySQL bağlantısında `SELECT VERSION()` ile kontrol eder. Uyumluluk öneki olan `5.5.5` gerçek MariaDB sürümü olarak kullanılmaz.
+
+Bu kombinasyonda MySQL sürücüsünün `getSQLKeywords()` sorgusu MariaDB'de bulunmayan `information_schema.KEYWORDS.RESERVED` kolonunu isteyebilir. Yalnız MariaDB + MySQL sürücüsü için bu ek keyword listesi okunmaz; Hibernate'in yerleşik keyword bilgisi korunur. Gerçek MySQL, PostgreSQL ve MariaDB sürücülerindeki diğer metadata hataları gizlenmez. Mevcut tenant dosyasını değiştirmek zorunlu değildir.
+
+Varsayılan YAML'de `spring.jpa.properties.hibernate.globally_quoted_identifiers=true` ve `globally_quoted_identifiers_skip_column_definitions=true` kullanılır. SQLite/PostgreSQL için çift tırnak, MySQL/MariaDB için backtick Hibernate tarafından seçilir. İkinci ayar `BLOB` gibi açık tip tanımlarının identifier sanılarak alıntılanmasını önler. Native SQL bu ayarlardan otomatik etkilenmez; nesne sorgularındaki JDBC quoting ayrıca korunur. Quoting ayarları yukarıdaki metadata sürücü hatasının çözümü değildir.

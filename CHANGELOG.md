@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Detect MariaDB behind MySQL Connector/J, retain its real version and avoid the incompatible optional keyword metadata query; enable portable ORM identifier quoting by default.
+
+
 - Route Hibernate entity managers by the selected tenant's JDBC database type/version without a global YAML dialect switch.
 - Use JDBC metadata and driver-specific identifier quoting for duplication and rich-text objects; keep CTB object flags as numeric 0/1 values.
 
