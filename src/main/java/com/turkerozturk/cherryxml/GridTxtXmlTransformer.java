@@ -40,6 +40,9 @@ import java.io.StringWriter;
 
 @Component
 public class GridTxtXmlTransformer {
+    private static volatile boolean debugEnabled;
+    @org.springframework.beans.factory.annotation.Value("${myapp.debug:false}")
+    public void configureDebug(boolean enabled) { debugEnabled = enabled; }
 
     private static final String ROW_TAG = "row";
     private static final String CELL_TAG = "cell";
@@ -89,7 +92,7 @@ public class GridTxtXmlTransformer {
             transformedXml = writer.toString();
 
             // Dönüştürülen XML'i kontrol için eklenen adım
-            System.out.println(transformedXml);
+            if (debugEnabled) System.out.println(transformedXml);
 
         } catch (ParserConfigurationException | IOException | SAXException | TransformerException e) {
             throw new RuntimeException(e);

@@ -104,7 +104,7 @@ public class FormSearch {
 
     public LinkedHashSet<NodeIcon> getAllIcons() {
         NodeIcon[] sortedIcons = NodeIcon.values();
-        Arrays.sort(sortedIcons, Comparator.comparing(NodeIcon::getIconNameForHuman));
+        Arrays.sort(sortedIcons, Comparator.comparing((NodeIcon icon) -> icon != NodeIcon.OTHER).thenComparing(NodeIcon::getIconNameForHuman, String.CASE_INSENSITIVE_ORDER));
         LinkedHashSet<NodeIcon> nodeIcons = new LinkedHashSet<>();
         for(NodeIcon nodeIcon : sortedIcons) {
             nodeIcons.add(nodeIcon);

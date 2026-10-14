@@ -55,6 +55,8 @@ import static com.turkerozturk.yenixmlparser.YeniXMLTransformer.RICH_TEXT_TAG;
 
 @Service
 public class NodeService {
+    @org.springframework.beans.factory.annotation.Value("${myapp.debug:false}")
+    private boolean debugEnabled;
 
     @Autowired
     private ChildrenRepository childrenRepository;
@@ -128,7 +130,7 @@ public class NodeService {
 
     public List<Node> getNodesByTagsAndFatherId(String tags, long fatherId) {
         List<Children> childrenList = childrenRepository.findByFatherId(fatherId);
-        System.out.println("turker: " + childrenList.size());
+        if (debugEnabled) System.out.println("turker: " + childrenList.size());
         List<Node> nodeList = new ArrayList<>();
         nodeList.add(nodeRepository.findById(fatherId));
         for (Children child : childrenList) {
@@ -333,22 +335,28 @@ public class NodeService {
     }
 
 
+    /** is_ro contains the icon and a separate low-bit content read-only flag. */
+    public static List<Integer> iconFilterValues(Set<NodeIcon> icons) {
+        return icons.stream().flatMap(icon -> java.util.stream.Stream.of(
+                icon.getIconIdIn16bit(), icon.getIconIdIn16bit() | 1)).distinct().toList();
+    }
+
     public Page<Node> getFilteredFormNodes(FormSearch formSearch, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            System.out.println("hata var:");
+            if (debugEnabled) System.out.println("hata var:");
             // Binding hatasi varsa, hataları yazdir. bilgi CHATGPT gosterdi:
             for (FieldError error : bindingResult.getFieldErrors()) {
-                System.out.println("Field: " + error.getField());
-                System.out.println("Code: " + error.getCode());
-                System.out.println("Message: " + error.getDefaultMessage());
+                if (debugEnabled) System.out.println("Field: " + error.getField());
+                if (debugEnabled) System.out.println("Code: " + error.getCode());
+                if (debugEnabled) System.out.println("Message: " + error.getDefaultMessage());
             }
         }
 
         LinkedHashSet<NodeIcon> selectedNodeIcons = formSearch.getNodeIcons();
         if(selectedNodeIcons != null) {
             for (NodeIcon nodeIcon : selectedNodeIcons) {
-                System.out.println(nodeIcon.name());
+                if (debugEnabled) System.out.println(nodeIcon.name());
             }
         }
 
@@ -373,7 +381,7 @@ public class NodeService {
 
 
 
-        if (formSearch.getNodeIcons() == null) {
+        if (formSearch.getNodeIcons() == null || formSearch.getNodeIcons().isEmpty()) {
             //nodeIcons = 0L;
             nodes = getNodesWithCustomQuery(formSearch.getNameFilter(),
                     formSearch.getTextFilter(),
@@ -392,9 +400,7 @@ public class NodeService {
                         .map(nodeIcon -> nodeIcon.getIconIdIn16bit())
                         .toArray(Integer[]::new);
 */
-            List<Integer> iconIds = nodeIconSet.stream()
-                    .map(nodeIcon -> nodeIcon.getIconIdIn16bit())
-                    .collect(Collectors.toList());
+            List<Integer> iconIds = iconFilterValues(nodeIconSet);
 
 
             nodes = getNodesWithCustomQuery(iconIds, //nodeIcons

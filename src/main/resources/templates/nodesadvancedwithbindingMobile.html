@@ -97,18 +97,22 @@
                             <!-- ICONS -->
                             <div class="">
 
-                                <label for="nodeIcons" th:text="#{search.icon}">Ikon:</label>
-                                <details id="nodeIcons" class="position-relative">
+                                <div data-icon-picker>
+                                <label for="iconSearch" th:text="#{search.icon}">Icon</label>
+                                <input id="iconSearch" type="search" class="form-control mb-1" data-icon-search th:placeholder="#{icon.search}" th:attr="aria-label=#{icon.search}"/>
+                                <details id="nodeIcons" class="position-relative" data-icon-details>
                                     <summary class="form-control" th:text="#{search.icon.choose}"></summary>
                                     <div class="position-absolute bg-body border rounded p-2 shadow" style="z-index:10;min-width:15rem;max-height:16rem;overflow:auto">
-                                        <label th:each="nodeIcon : *{allIcons}" class="d-flex align-items-center gap-2 py-1">
+                                        <label th:each="nodeIcon : *{allIcons}" class="icon-choice d-flex align-items-center gap-2 py-1">
                                             <input type="checkbox" name="nodeIcons" th:value="${nodeIcon.name}"
                                                    th:checked="${formSearch.getNodeIcons != null and formSearch.getNodeIcons.contains(nodeIcon)}"/>
-                                            <img th:src="@{/img/ctbicons/{name}.png(name=${nodeIcon.iconName})}" width="20" height="20" alt="" loading="lazy"/>
-                                            <span th:text="${nodeIcon.iconNameForHuman}"></span>
+                                            <img th:if="${nodeIcon.name() != 'OTHER'}" th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${nodeIcon.iconName})}" width="20" height="20" alt="" loading="lazy"/>
+                                            <span data-icon-label th:text="${nodeIcon.name() == 'OTHER'} ? #{icon.none} : ${nodeIcon.iconNameForHuman}"></span>
                                         </label>
                                     </div>
                                 </details>
+                                <div data-icon-selected class="d-flex flex-wrap gap-1 mt-1" aria-live="polite" th:attr="aria-label=#{icon.selected}"></div>
+                                </div>
                                 <span th:if="${#fields.hasErrors('nodeIcons')}"
                                       th:errors="*{nodeIcons}">nodeIcons Error</span>
 
@@ -506,6 +510,8 @@
 
 
 <section layout:fragment="pageSpecificJsScripts">
+    <style>.icon-choice[hidden] { display: none !important; }</style>
+    <script defer th:src="@{/js/icon-picker.js}"></script>
 
     <button id="scrollToTopBtn">⬆️</button>
 

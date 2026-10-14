@@ -42,11 +42,17 @@ public class ChildrenController {
 
     @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/father")
-    public String getNodesByFatherId(@RequestParam(required = false) Long fatherId, Model model) {
-        if (fatherId == null) {
-            fatherId = 0L; // Varsayılan olarak 0'a eşitlenir.
+    public String getNodesByFatherId(@RequestParam(required = false) String fatherId, Model model) {
+        long id;
+        try {
+            id = fatherId == null || fatherId.isBlank() ? 0 : Long.parseLong(fatherId.trim());
+            if (id < 0) throw new NumberFormatException();
+        } catch (NumberFormatException invalid) {
+            model.addAttribute("invalidFatherId", true);
+            model.addAttribute("nodes", List.of());
+            return "father";
         }
-        List<NaviNode> nodes = childrenService.getNaviNodesByFatherId(fatherId);
+        List<NaviNode> nodes = childrenService.getNaviNodesByFatherId(id);
         model.addAttribute("nodes", nodes);
         return "father";
     }

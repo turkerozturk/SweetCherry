@@ -18,27 +18,34 @@
             <label class="form-check-label" for="bold">Başlık kalın</label>
         </div>
         <fieldset class="mb-3">
-            <legend class="fs-5">Başlık rengi</legend>
-            <label th:if="${originalColor != null}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
+            <legend class="fs-5" th:text="#{titlecolor.label}">Title color</legend>
+            <label th:if="${originalColor != null}" th:title="${originalColor}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
                 <input type="radio" name="color" value="KEEP" th:checked="${selectedColor == 'KEEP'}"/>
                 <span th:style="|background-color: ${originalColor}; width: 1.5rem; height: 1.5rem; border: 1px solid #666; display: inline-block;|" aria-hidden="true"></span>
-                <span th:text="|Mevcut: ${originalColor}|">Mevcut renk</span>
+                <span th:text="#{titlecolor.keep}">Current color</span>
             </label>
-            <label th:each="item : ${colors}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
+            <label th:each="item : ${colors}" th:title="${item.hex()}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
                 <input type="radio" name="color" th:value="${item.name()}"
                        th:checked="${selectedColor == item.name()}"/>
                 <span th:if="${item.name() != 'NONE'}" th:style="|background-color: ${item.hex()}; width: 1.5rem; height: 1.5rem; border: 1px solid #666; display: inline-block;|" aria-hidden="true"></span>
-                <span th:text="${item.name() == 'NONE' ? 'Renk yok' : item.hex()}">Renk</span>
+                <span th:text="${#messages.msg('titlecolor.' + item.name())}">Color</span>
             </label>
         </fieldset>
-        <div class="mb-3">
-            <label for="nodeIcon" class="form-label">Simge</label>
-            <select id="nodeIcon" name="icon" class="form-select">
-                <option th:each="item : ${icons}" th:value="${item.name()}"
-                        th:selected="${selectedIconId == item.iconIdIn16bit}"
-                        th:text="${item.name() == 'OTHER' ? 'Varsayılan (belirtilmemiş)' : item.iconNameForHuman}">Simge</option>
-            </select>
-            <small class="form-text">Varsayılan simge seçilirse kod düğümlerinde dilin simgesi gösterilebilir.</small>
+        <div class="mb-3" data-icon-picker>
+            <label for="propertyIconSearch" class="form-label" th:text="#{search.icon}">Icon</label>
+            <input id="propertyIconSearch" type="search" class="form-control mb-1" data-icon-search th:placeholder="#{icon.search}" th:attr="aria-label=#{icon.search}"/>
+            <details class="position-relative" data-icon-details>
+                <summary class="form-control" th:text="#{search.icon.choose}">Choose icon</summary>
+                <div class="border rounded p-2" style="max-height:16rem;overflow:auto">
+                    <label th:each="item : ${icons}" class="icon-choice d-flex align-items-center gap-2 py-1">
+                        <input type="radio" name="icon" th:value="${item.name()}" th:checked="${selectedIconId == item.iconIdIn16bit}"/>
+                        <img th:if="${item.name() != 'OTHER'}" th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="20" height="20" alt="" loading="lazy"/>
+                        <span data-icon-label th:text="${item.name() == 'OTHER'} ? #{icon.none} : ${item.iconNameForHuman}"></span>
+                    </label>
+                </div>
+            </details>
+            <div data-icon-selected class="d-flex flex-wrap gap-1 mt-1" aria-live="polite" th:attr="aria-label=#{icon.selected}"></div>
+            <small class="form-text" th:text="#{icon.defaultHelp}"></small>
         </div>
         <div class="form-check mb-3">
             <input id="contentReadOnly" class="form-check-input" type="checkbox" name="contentReadOnly"
@@ -79,6 +86,8 @@
     </form>
 </section>
 <section layout:fragment="pageSpecificJsScripts">
+    <style>.icon-choice[hidden] { display: none !important; }</style>
+    <script defer th:src="@{/js/icon-picker.js}"></script>
     <script>
         (() => {
             const codeRadio = document.getElementById('typeCode');

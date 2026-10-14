@@ -39,7 +39,9 @@ public class NodePropertiesController {
         model.addAttribute("originalColor", selected == null ? String.format("#%06X", (node.getIsRichText() >>> 3) & 0xFFFFFF) : null);
         model.addAttribute("bold", (node.getIsRichText() & 2L) != 0);
 
-        model.addAttribute("icons", NodeIcon.values());
+        model.addAttribute("icons", java.util.Arrays.stream(NodeIcon.values())
+                .sorted(java.util.Comparator.comparing((NodeIcon icon) -> icon != NodeIcon.OTHER)
+                        .thenComparing(NodeIcon::getIconNameForHuman, String.CASE_INSENSITIVE_ORDER)).toList());
         IconIdAndIsReadOnly iconIdAndIsReadOnly = BitOperation.processSixteenBitData((int) node.getIsReadOnly16bit());
         model.addAttribute("selectedIconId", (int) (node.getIsReadOnly16bit() & 0x7FFE));
         boolean g = (node.getIsReadOnly16bit() & 1L) != 0;

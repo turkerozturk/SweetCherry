@@ -6,6 +6,8 @@
 </head>
 <body>
 <section layout:fragment="content">
+<p class="alert alert-warning" th:if="${invalidFatherId}" th:text="#{father.invalidId}"></p>
+
 
 <h1>Nodes by Father ID</h1>
 <table border="1">
