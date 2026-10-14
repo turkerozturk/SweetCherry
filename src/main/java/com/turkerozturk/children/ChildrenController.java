@@ -33,12 +33,14 @@ public class ChildrenController {
     @Autowired
     private ChildrenService childrenService;
 
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/children")
     public String getAllChildrenAsHtml(Model model) {
         model.addAttribute("children", childrenService.getChildren());
         return "children"; // Bu, bir Thymeleaf şablonu olmalıdır: src/main/resources/templates/children.html
     }
 
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/father")
     public String getNodesByFatherId(@RequestParam(required = false) Long fatherId, Model model) {
         if (fatherId == null) {

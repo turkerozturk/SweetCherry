@@ -47,6 +47,7 @@ public class ImageController {
     @Autowired
     private ImageService imageService;
 
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/images")
     public String getAllChildrenAsHtml(Model model) {
         model.addAttribute("images", imageService.getImages());

@@ -42,6 +42,7 @@ public class GridController {
     @Autowired
     private NodeService nodeService;
 
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/grids")
     public String getAllAsHtml(Model model) {
         model.addAttribute("grids", gridService.getGrids());

@@ -42,6 +42,7 @@ public class CodeBoxController {
     @Autowired
     private NodeService nodeService;
 
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/codeboxes")
     public String getAllAsHtml(Model model) {
         model.addAttribute("codeboxes", codeBoxService.getCodeBoxes());

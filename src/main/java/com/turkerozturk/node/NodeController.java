@@ -75,6 +75,7 @@ public class NodeController {
     @Value("${myapp.debug:false}")
     private Boolean myappIsDebugEnabled;
 
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/nodes")
     public String getAllNodesAsHtml(Model model, @RequestParam(required = false) String filter) {
         List<Node> nodes;
