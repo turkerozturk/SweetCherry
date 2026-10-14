@@ -17,6 +17,17 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class SharedParentCreationFixtureTest {
+    @Test void newIdRemainsAboveSharedOnlyIds() throws Exception {
+        try (var connection = fixture()) {
+            try (var statement = connection.createStatement()) {
+                statement.execute("INSERT INTO children (node_id, father_id, sequence, master_id) VALUES (100, 0, 99, 2)");
+            }
+            assertThat(service(connection).create(11)).isEqualTo(101);
+            assertThat(number(connection, "SELECT master_id FROM children WHERE node_id=100")).isEqualTo(2);
+            assertThat(number(connection, "SELECT COUNT(*) FROM node WHERE node_id=101")).isEqualTo(1);
+        }
+    }
+
     @Test void childBelongsToSharedOccurrenceAndNotItsMaster() throws Exception {
         try (var connection = fixture()) {
             assertThat(service(connection).create(11)).isEqualTo(20);

@@ -75,7 +75,7 @@ public class ChildNodeService {
 
         // Alias ids live only in children; reserve a number above both tables.
         long id = ((Number) entityManager.createNativeQuery("SELECT COALESCE(MAX(node_id), 0) + 1 FROM "
-                + "(SELECT node_id FROM node UNION ALL SELECT node_id FROM children)")
+                + "(SELECT node_id FROM node UNION ALL SELECT node_id FROM children) AS occurrence_ids")
                 .getSingleResult()).longValue();
         long sequence = ((Number) entityManager.createNativeQuery(
                 "SELECT COALESCE(MAX(sequence), 0) + 1 FROM children WHERE father_id = :parent")
