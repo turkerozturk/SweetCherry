@@ -80,8 +80,10 @@ public class DatabaseSwitchController {
             session.setAttribute("ctbSchemaConfig", properties == null ? "" : properties.getOrDefault("propertyFileName", ""));
             return "redirect:/";
         } catch (java.sql.SQLException | RuntimeException error) {
-            logger.warn("Data source selection failed for {}", tenant, error);
+            var reason = TenantConnectionFailure.classify(error);
+            logger.warn("Data source selection failed: {}", reason);
             request.getSession().setAttribute("dataSourceOperationError", "select");
+            request.getSession().setAttribute("dataSourceFailureReason", reason);
             return "redirect:/";
         }
         HttpSession session = request.getSession(); // chatgpt onerdi.

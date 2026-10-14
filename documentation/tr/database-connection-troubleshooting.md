@@ -95,3 +95,17 @@ HTML `background="black"` renk değil resim adresidir; tarayıcı black adlı ka
 - https://www.postgresql.org/docs/17/auth-pg-hba-conf.html
 - https://www.postgresql.org/docs/17/sql-grant.html
 - https://mariadb.com/docs/server/reference/error-codes/mariadb-error-codes-1000-to-1099/e1020
+
+## Aktif tenant health kontrolü
+
+Actuator'ın genel routing DataSource kontrolü kapalı tenant kayıtlarına da bağlanmaya çalışabilir. SweetCherry'nin `dbHealthIndicator` kontrolü yalnız başlatılmış ve kapatılmamış tenant havuzlarını kontrol eder. Kapalı/henuz açılmamış kayıtlar bağlantı açılmadan atlanır; tenant seçimi değiştirilmez. Çalışan bir havuzda bağlantı doğrulaması başarısızsa DOWN korunur.
+
+Hiç açık havuz olmaması uygulamanın hatalı çalıştığı anlamına gelmez; bu durumda DB bileşeni UP döner. Bu sonuç tüm tenant config dosyalarının bağlantılarının başarılı olduğu anlamına gelmez. Health detayları mevcut Actuator erişim ayarlarına bağlıdır; bu değişiklik ayrıntıları herkese açmaz.
+
+## Kısa bağlantı hataları ve güvenli ekran açıklaması
+
+Tenant açılışındaki bağlantı hataları loga tek satır kategorisiyle yazılır; JDBC stack trace yerine network/credentials/connect/database/unknown ayrımı kullanılır. Önceki seçili tenant korunur. Seçim ekranında Türkçe/İngilizce açıklama gösterilir. Veritabanından gelen ham mesaj SQL, parola veya bağlantı URL'si içerebileceği için doğrudan HTML/loga taşınmaz. Sınıflandırılamayan hata genel açıklamayla bildirilir. Bu düzenleme tüm uygulama hatalarını susturmaz; veri kaynağı seçimiyle sınırlıdır.
+
+## PostgreSQL nesne silme bayrakları
+
+`has_image`, `has_table` ve `has_codebox` integer sütunlarıdır. Nesne silme sonrasında `CASE WHEN EXISTS(...) THEN 1 ELSE 0 END` yazılır; PostgreSQL boolean sonucu integer sütuna doğrudan yazılmaz. Bu sorgu SQLite ve MariaDB ile de uyumludur. Şema ve nesne silme onay davranışı değiştirilmez.

@@ -97,6 +97,15 @@ public class GlobalControllerAdvice {
         return code;
     }
 
+    @ModelAttribute("dataSourceFailureReason")
+    public String dataSourceFailureReason(jakarta.servlet.http.HttpServletRequest request) {
+        var session = request.getSession(false);
+        if (session == null) return null;
+        String reason = (String) session.getAttribute("dataSourceFailureReason");
+        session.removeAttribute("dataSourceFailureReason");
+        return reason;
+    }
+
     @ModelAttribute("ctbSchemaWarning")
     public java.util.Map<String, Object> ctbSchemaWarning(jakarta.servlet.http.HttpServletRequest request) {
         var session = request.getSession(false);

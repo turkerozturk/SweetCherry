@@ -190,9 +190,9 @@ public class RichTextEditingService {
                 .setParameter("id", id).executeUpdate();
         if (!deleted.isEmpty()) entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
             try (var statement = connection.prepareStatement("UPDATE node SET "
-                    + "has_image = EXISTS(SELECT 1 FROM image WHERE node_id = ?), "
-                    + "has_table = EXISTS(SELECT 1 FROM grid WHERE node_id = ?), "
-                    + "has_codebox = EXISTS(SELECT 1 FROM codebox WHERE node_id = ?) WHERE node_id = ?")) {
+                    + "has_image = CASE WHEN EXISTS(SELECT 1 FROM image WHERE node_id = ?) THEN 1 ELSE 0 END, "
+                    + "has_table = CASE WHEN EXISTS(SELECT 1 FROM grid WHERE node_id = ?) THEN 1 ELSE 0 END, "
+                    + "has_codebox = CASE WHEN EXISTS(SELECT 1 FROM codebox WHERE node_id = ?) THEN 1 ELSE 0 END WHERE node_id = ?")) {
                 for (int parameter = 1; parameter <= 4; parameter++) statement.setLong(parameter, id);
                 if (statement.executeUpdate() != 1) throw new java.sql.SQLException("Node changed; reload the editor");
             }

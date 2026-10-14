@@ -10,7 +10,10 @@
 
 <div th:fragment="tenantFragment">
     <p class="alert alert-warning" th:if="${dataSourceOperationError == 'missing'}" th:text="#{tenant.selectionMissing}"></p>
-    <p class="alert alert-warning" th:if="${dataSourceOperationError == 'select'}" th:text="#{tenant.selectionFailed}"></p>
+    <div class="alert alert-warning" th:if="${dataSourceOperationError == 'select'}">
+        <span th:text="#{tenant.selectionFailed}"></span>
+        <span th:if="${dataSourceFailureReason != null}" th:text="${#messages.msg('tenant.connection.' + dataSourceFailureReason)}"></span>
+    </div>
     <p class="alert alert-warning" th:if="${dataSourceOperationError == 'busy'}" th:text="#{tenant.closeBusy}"></p>
     <div class="alert alert-warning" th:if="${ctbSchemaWarning != null}">
         <p th:text="#{tenant.schemaMissing(${ctbSchemaWarning.missing})}"></p>
