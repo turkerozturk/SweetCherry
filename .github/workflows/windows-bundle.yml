@@ -61,6 +61,7 @@ jobs:
           path: |
             dist/windows/*-setup.exe
             dist/windows/*-windows-x64.zip
+            dist/windows/*-notices.zip
             dist/windows/SHA256SUMS.txt
             release/SweetCherry/windows-bundle.json
           if-no-files-found: error

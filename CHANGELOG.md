@@ -4,28 +4,35 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
-- Detect MariaDB behind MySQL Connector/J, retain its real version and avoid the incompatible optional keyword metadata query; enable portable ORM identifier quoting by default.
-
-
-- Route Hibernate entity managers by the selected tenant's JDBC database type/version without a global YAML dialect switch.
-- Use JDBC metadata and driver-specific identifier quoting for duplication and rich-text objects; keep CTB object flags as numeric 0/1 values.
-
-
-- Highlight the active tenant and writable/authenticated settings, with translated status and yes/no labels.
-- Accept safe export filenames containing tenant display-name punctuation for download and deletion.
-- Export into the selected collection CTB through the same transaction connection; enforce writable tenant settings and roll back failed copies.
-
+## [1.1.0]
 
 ### Added
 
-- Masaüstü kontrol penceresinde tüm yerel YAML ayarları için tablo/metin editörü; JAR varsayılanından gerektiğinde harici dosya oluşturma, gizli alan maskeleme ve mevcut yeniden başlatma akışı.
-
-- ADMIN için seçilmiş güvenlik dışı YAML ayarlarını düzenleme formu ve onaylı, aynı JVM içinde yeniden başlatma.
-- ADMIN için tenant config oluşturma/düzenleme sihirbazı: sunucunun yerel veya ağ paylaşımı CTB dosyasını Gözat ile seçme, ayarları formdan düzenleme ve kaydedince mevcut seçim akışıyla açma. CTB kopyalanmaz; bilinmeyen config alanları korunur.
+- Tenant configuration wizard for creating/editing connections and opening an existing CTB in place. Desktop users can select a local/network-share file on the machine running SweetCherry; no CTB upload or copy is implied.
+- ADMIN web editor for selected non-security application settings, plus confirmed restart.
+- Desktop YAML editor for local configuration files, masked secret fields, and creating an external override when needed.
+- Tenant-specific Hibernate routing and SQL compatibility for SQLite, MariaDB/MySQL and PostgreSQL; database changes no longer require a global YAML dialect change.
+- Searchable, illustrated icon selectors with selected-icon summaries, combined no-icon filters, and translated title-color names.
 
 ### Fixed
 
-- Eski SQLite CTB şemaları seçimden önce kontrol edilir. Eksik `children.master_id` alanı yalnız `custom.allowLegacySchemaUpgrade=true` (veya `1`) izniyle ve yönetici seçiminde, varsayılan `0` ile transaction içinde eklenebilir. Desteklenmeyen eksikler dosya değiştirilmeden açıklanır.
+- Detect MariaDB behind MySQL Connector/J, preserve its version and avoid incompatible optional keyword metadata queries; enable portable identifier quoting.
+- Use qualified object columns when reading rich-text objects and numeric 0/1 flags after deleting objects, including PostgreSQL.
+- Give node creation UNION subqueries an alias required by MariaDB; include shared-only IDs when reserving a new node ID.
+- Handle intentionally closed/unstarted tenant pools in health checks without opening them. Failures in running pools still report DOWN.
+- Show safe, translated connection-failure explanations and concise logs while retaining the previous tenant selection.
+- Redirect database-dependent list pages to source selection before querying when no tenant is selected; validate malformed, negative and oversized parent IDs.
+- Accept safe export filenames containing tenant display-name punctuation. Copy into an active collection CTB through the existing transaction connection to avoid self-export locking.
+- Check old SQLite CTB schemas before selection. Add missing children.master_id only with explicit custom.allowLegacySchemaUpgrade permission and ADMIN selection; unsupported changes are not performed.
+- Highlight active tenants and writable/authentication settings with translated labels; add missing System-menu icons and remove a spurious background-image request.
+- Keep routine search/table HTML diagnostics behind myapp.debug; preserve POST/binding search and raw node.txt filtering.
+
+### Validation and limitations
+
+- Maintainer reported 393 passing tests and manual checks on SQLite, MariaDB and PostgreSQL for browsing, editing, shared-node operations, exports and the changes above.
+- Windows bundled-package validation is performed separately on the final release tag; source test success does not certify a not-yet-built installer.
+- Automatic backups are not provided. A synchronization target can be overwritten by subsequent synchronization; avoid editing it while another application writes to it.
+- An isolated MariaDB 1020 record-change conflict remains a follow-up observation if it recurs; no automatic retry or isolation weakening was added.
 
 ## [1.0.0] - 2026-10-08
 

@@ -1,15 +1,15 @@
-# SweetCherry 1.0.0 — installation and first use
+# SweetCherry 1.1.0 — installation and first use
 
 SweetCherry is an open-source web companion for CherryTree CTB note databases. It provides browser views, mind maps, editing, and exports. It does not replace CherryTree. The supported starting point is an unencrypted SQLite `.ctb` file; `.ctd`, `.ctx`, and `.ctz` files are outside this guide.
 
 ## Windows 10/11, 64-bit
 
-Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.0.0). Choose one product asset:
+Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.1.0). Choose one product asset:
 
 | Asset | Use |
 | --- | --- |
-| `SweetCherry-1.0.0-windows-x64-setup.exe` | Folder selection wizard and optional shortcuts |
-| `SweetCherry-1.0.0-windows-x64.zip` | Extract and run without an installation wizard |
+| `SweetCherry-1.1.0-windows-x64-setup.exe` | Folder selection wizard and optional shortcuts |
+| `SweetCherry-1.1.0-windows-x64.zip` | Extract and run without an installation wizard |
 
 Both include a Windows x64 Java 17 runtime. You do not need to install Java. The automatically generated **Source code** archives contain source, not the ready-to-run application. Do not run the installer from inside a ZIP.
 
@@ -45,7 +45,9 @@ Sign in and select the demo data source. The package includes `CTBDATA/demo.ctb`
 
 SweetCherry does not upload or copy an existing CTB simply because a tenant configuration is loaded. A tenant file identifies a database accessible to the machine running SweetCherry. A server cannot access a path that exists only on your phone or another PC.
 
-Copy the example tenant config to `allTenants/my-notes.txt` and adapt it:
+Administrator users can use the data-source menu's tenant configuration wizard to create/edit a connection and open the database. Choose an existing CTB on the machine running SweetCherry, give the connection a name, and start read-only. In desktop mode a file picker is available. When accessing a remote server, a path on your laptop is not a path on that server.
+
+Existing manual tenant files and uploads remain supported. Copy the example tenant config to `allTenants/my-notes.txt` and adapt it:
 
 ```properties
 name=My Notes
@@ -64,6 +66,22 @@ Start with `custom.isWritable=false`. Setting it to `true` enables supported wri
 
 **SweetCherry does not make automatic backups.** Back up important databases yourself and avoid simultaneous writes from SweetCherry and CherryTree. CTB files may stay outside the application folder. Copying the closed application folder does not back up those external databases.
 
+## SQLite, MariaDB and PostgreSQL connections
+
+SweetCherry can switch between SQLite CTB files and compatible CherryTree-schema databases on MariaDB/MySQL or PostgreSQL through tenant configurations. Hibernate uses the selected tenant's JDBC database type/version. A remote database must already contain the compatible schema and content; selecting a connection is not a CTB-to-server migration. SweetCherrySync is a separate project for synchronization.
+
+A database login must have CONNECT/schema/table permissions appropriate to its database system; `custom.isWritable=true` does not grant SQL privileges. Start read-only. If another tool synchronizes into this database, avoid simultaneous editing because later synchronization can overwrite your changes.
+
+Old SQLite files without `children.master_id` show an explanatory warning. The supported upgrade requires explicit `custom.allowLegacySchemaUpgrade=true` and ADMIN selection. Preserve a separate backup before allowing a schema change. Arbitrary missing columns are not automatically invented.
+
+## Application settings
+
+ADMIN users can edit selected non-security application settings from the System menu and use the confirmed restart action. The desktop control window also offers a local YAML editor, including configuration values unavailable in the web editor. Treat these files as sensitive, review changes, and restart when required. Keep application configuration and data during upgrades.
+
+## Upgrading an existing portable installation
+
+Stop SweetCherry. Preserve your application folder, external CTB files, `allTenants`, external YAML files, `login-credentials.properties`, and any exports you need. Extract the new package into a separate folder, then carry over your own configuration/data deliberately. Do not overwrite your credentials or notes with demo files, and do not merge the new bundled Java runtime with the old one. Recreate shortcuts if the application location changes. Existing external YAML overrides remain effective; new defaults do not override them automatically.
+
 ## Stop, move, or remove SweetCherry
 
 Closing a browser tab does not stop the server. Use **Stop SweetCherry** in the control window, the tray menu, or the administrator shutdown action in the web interface. Closing the control window offers either stopping or keeping the server running.
@@ -72,7 +90,7 @@ After stopping, you may copy or move the application folder. Recreate shortcuts 
 
 ## Other systems and source builds
 
-The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.0.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.0.0.zip), extract it, and run:
+The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.1.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.1.0.zip), extract it, and run:
 
 - Windows: `first-run.bat`
 - Linux/Raspberry Pi: `sh ./first-run.sh`

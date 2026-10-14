@@ -1,4 +1,6 @@
-# 1.0.0 taslağına lisans ve atıf dosyalarını ekleme
+# 1.0.0 taslağına lisans ve atıf dosyalarını ekleme — tarihsel kayıt
+
+**1.0.0 yayımlanmıştır. Aşağıdaki işlem eski taslağın tamamlanmasına aittir; 1.1.0 için çalıştırmayın.** Yeni paketler lisans dosyalarını normal derlemede içerir. Güncel akış: [release-checklist.md](release-checklist.md).
 
 Bu çalışma uygulamayı değiştirmez. JAR ve launcher mevcut `v1.0.0` paketinden alınır; SHA-256 değerlerinin aynı kaldığı kontrol edilir. Logo korunur. Lisans envanteri `distribution-notices/THIRD-PARTY-NOTICES.md` ve `licenses/` içindedir. Sonraki normal Maven paketlemeleri de bu dosyaları release klasörüne kopyalar.
 

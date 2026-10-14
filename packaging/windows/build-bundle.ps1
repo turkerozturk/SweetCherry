@@ -16,7 +16,7 @@ if (!(Test-Path (Join-Path $bundle 'application.yml'))) {
     Copy-Item $filteredConfig (Join-Path $bundle 'application.yml')
 }
 # Never package a developer's existing release folder; the workflow starts from a clean checkout.
-foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','CTBDATA/demo.ctb','allTenants/demo.txt')) {
+foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','THIRD-PARTY-NOTICES.md','licenses','CTBDATA/demo.ctb','allTenants/demo.txt')) {
     if (!(Test-Path (Join-Path $bundle $name))) { throw "Missing distribution file: $name. Run Maven package first." }
 }
 if (Test-Path (Join-Path $bundle 'login-credentials.properties')) { throw 'Do not package an already-used distribution.' }
@@ -72,6 +72,8 @@ $commit = (& git -C $repo rev-parse HEAD).Trim()
 & $IsccPath "/DSourceDir=$bundle" "/DOutputDir=$out" "/DAppVersion=$version" "/DFileVersion=$fileVersion" "$PSScriptRoot/SweetCherry.iss"
 if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed.' }
 Compress-Archive -Path $bundle -DestinationPath "$out/SweetCherry-$version-windows-x64.zip" -Force
+# Standalone attribution archive; identical notice files are already inside both application packages.
+Compress-Archive -Path @((Join-Path $bundle 'THIRD-PARTY-NOTICES.md'), (Join-Path $bundle 'licenses')) -DestinationPath "$out/SweetCherry-$version-notices.zip" -Force
 Get-ChildItem $out -File | Where-Object { $_.Extension -in @('.exe','.zip') } | ForEach-Object {
     "$( (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() )  $($_.Name)"
 } | Set-Content "$out/SHA256SUMS.txt" -Encoding ascii

@@ -1,6 +1,8 @@
-# SweetCherry 1.0.0 — third-party notices
+# SweetCherry 1.1.0 — third-party notices
 
-SweetCherry is distributed under GNU GPL v3. See the root `LICENSE` and [application source at v1.0.0](https://github.com/turkerozturk/SweetCherry/tree/v1.0.0). Application binaries come from commit `8f88bc943d3b1b772184dfd4d3936c5424e5fbce`. The `noticesCommit` in `windows-bundle.json` identifies the later documentation-only packaging revision; it does not change the application build commit.
+SweetCherry is distributed under GNU GPL v3 or later. See the root `LICENSE` and [application source at v1.1.0](https://github.com/turkerozturk/SweetCherry/tree/v1.1.0). The application version and exact build commit are recorded in `windows-bundle.json` for each Windows package. License and attribution files are copied into the normal Maven distribution before bundling.
+
+The dependency and copied-asset license inventory was prepared for 1.0.0. The declared Maven dependencies and copied third-party assets covered by this inventory are unchanged for 1.1.0; application code and documentation have changed. Runtime license files accompany the actual Java runtime bundled by the Windows workflow.
 
 Third-party components retain their own licenses. This inventory records the actual Windows bundle, original license files, source copyright notices and upstream references. It is an attribution record, not a legal certification. License alternatives in a POM are reproduced as declared, not a requirement to combine mutually alternative licenses.
 
@@ -20,7 +22,7 @@ Moon-phase GIFs were obtained from the U.S. Naval Observatory [moon phases page]
 
 ## CherryTree icons
 
-CherryTree icon files were taken from CherryTree sources and converted/resized for SweetCherry. CherryTree is GPL v3; individual SVG metadata can instead specify GPL v2 or public-domain/CC0 artwork. Those individual declarations are preserved in `licenses/CHERRYTREE-SVG-METADATA.txt`; do not assume every icon has a single uniform license. Original SVG files and converted PNG files are available in the [SweetCherry v1.0.0 source tree](https://github.com/turkerozturk/SweetCherry/tree/v1.0.0/src/main/resources/static/img). Upstream: https://github.com/giuspen/cherrytree . Some SVG metadata identifies Openclipart/DooFi artwork. Retain that metadata when redistributing those files.
+CherryTree icon files were taken from CherryTree sources and converted/resized for SweetCherry. CherryTree is GPL v3; individual SVG metadata can instead specify GPL v2 or public-domain/CC0 artwork. Those individual declarations are preserved in `licenses/CHERRYTREE-SVG-METADATA.txt`; do not assume every icon has a single uniform license. Original SVG files and converted PNG files are available in the [SweetCherry v1.1.0 source tree](https://github.com/turkerozturk/SweetCherry/tree/v1.1.0/src/main/resources/static/img). Upstream: https://github.com/giuspen/cherrytree . Some SVG metadata identifies Openclipart/DooFi artwork. Retain that metadata when redistributing those files.
 
 ## Browser assets and fonts
 

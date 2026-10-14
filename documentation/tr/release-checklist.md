@@ -1,55 +1,68 @@
-# SweetCherry 1.0.0 yayımlama adımları
+# SweetCherry 1.1.0 yayımlama adımları
 
-Bu aşama yeni özellik veya yeni test turu içermez. Kullanıcı son kaynak üzerinde **334 başarılı test** ve başarılı **Windows x64 bundled distribution** çalıştırması bildirdi. Bu kayıt, henüz oluşturulmamış 1.0.0 paketinin derlendiği anlamına gelmez; mevcut başarılı paket 0.5.0-SNAPSHOT adını taşımaktadır.
+Kaynak doğrulaması ile ürün paketi doğrulaması ayrı adımlardır. Kullanıcı son kaynakta **393 başarılı test** ve SQLite, MariaDB, PostgreSQL manuel kontrolleri bildirmiştir. Bu kayıt henüz oluşturulmamış 1.1.0 Windows installer'ının test edildiği anlamına gelmez. Bu hazırlık yeni uygulama özelliği eklemez.
 
-## Hazırlık
+## 1. Hazırlık yaması ve görüntüler
 
-1. Verilen `SweetCherry-comment-removal-log-backup-2026-10-08.md` dosyasını yerelinizde saklayın. Yama geçici yorum arşivini depodan kaldırır.
-2. Yayın yamasını uygulayıp `git diff --check` çalıştırın; değişiklikleri commit/push edin. Proje sürümü 1.0.0 olur; İngilizce kılavuz dağıtım klasörüne de kopyalanır.
-3. Lisans/atıf kaydındaki açık konuyu aşağıdan okuyun. Bu hazırlık onu tamamlanmış olarak işaretlemez.
-4. Yayın commit'i üzerinde etiketi oluşturup gönderin:
+Yayın hazırlığı pom.xml sürümünü 1.1.0 yapar, changelog/kurulum/yayın/lisans açıklamalarını günceller. Lisans dosyaları normal paketin içine girer; ayrıca küçük notices ZIP oluşturulur.
 
-```bash
-git tag -a v1.0.0 -m "SweetCherry 1.0.0"
-git push origin v1.0.0
+```bat
+git apply --check sweetcherry-4190204-release-1.1.0.patch
+git apply sweetcherry-4190204-release-1.1.0.patch
+git diff --check
+mvnw.cmd clean package
 ```
 
-Önceden yayımlanmış bir etiketi veya sürümü yeniden kullanmayın.
+Ekran görüntüleri isteğe bağlıdır. Eklemek istiyorsanız etiketi oluşturmadan önce [çekim listesi](../images/1.1/README.md) içindeki dosya adlarıyla ekleyin, gerçek dosyalar mevcut olduğunda README'ye bağlantı koyun. Olmayan görüntüler için bozuk link bırakmayın. Parola, kişisel not, dosya yolu ve sunucu adresi göstermeyin.
 
-## Son paket
+Değişiklikleri main dalına commit/push edin. Geçici yorum arşivi 1.0.0 öncesinde zaten yedeklenmişti; tekrar silinecek dosya yoktur. Eski lisans tamamlama workflow'u 1.0.0 taslağına özeldir; **1.1.0 için çalıştırmayın**.
 
-GitHub Actions → **Windows x64 bundled distribution** → Run workflow ile **v1.0.0** referansından çalıştırın. Arayüzde etiket seçilemiyorsa GitHub CLI alternatifi:
+## 2. Yayın commit'i ve etiket
 
-```bash
-gh workflow run windows-bundle.yml --ref v1.0.0
+Pushed yayın commit'inin kısa kimliğini bulun. Aşağıdaki yer tutucuyu gerçek commit ile değiştirin:
+
+```bat
+git tag -a v1.1.0 RELEASE_COMMIT -m "SweetCherry 1.1.0"
+git push origin v1.1.0
 ```
 
-Bu işlem mevcut paketleme ve mevcut testleri yürütür; yeni test eklenmemiştir. Tag push'u kendiliğinden GitHub Release yayımlamaz.
+Cmd Git authentication çalışmıyorsa önceki gibi IntelliJ Git araç penceresi → Tags → v1.1.0 → Push to origin kullanın. Etiketi kaynak/README/görüntüler tamamlandıktan sonra oluşturun. Yayımlanmış v1.0.0 etiketini taşımayın; 1.1.0 etiketini de yayımlandıktan sonra değiştirmeyin.
 
-Başarılı çalışmanın `SweetCherry-windows-x64-java17` artifact'ini indirip açın. Dış artifact ZIP'inin tamamını Release'e yüklemek yerine şu **dört dosyayı** alın:
+## 3. Windows paketleme
 
-| Artifact içindeki yol | Release asset'i |
+Actions → **Windows x64 bundled distribution** → Run workflow → **v1.1.0** seçin. Main'in son halinden değil, bu etiketten paketleyin. CLI alternatifi:
+
+```bash
+gh workflow run windows-bundle.yml --ref v1.1.0
+```
+
+Etiket gönderimi kendiliğinden Release yayımlamaz. Görev mevcut testleri, paketlemeyi ve Java kurulu olmadan installer/launcher smoke testini çalıştırır.
+
+Artifact `SweetCherry-windows-x64-java17` içinden şu dosyaları alın; dış artifact ZIP'ini release asset'i olarak yüklemeyin:
+
+| Konum | Release asset'i |
 | --- | --- |
-| `dist/windows/SweetCherry-1.0.0-windows-x64-setup.exe` | Aynı dosya adı |
-| `dist/windows/SweetCherry-1.0.0-windows-x64.zip` | Aynı dosya adı |
-| `dist/windows/SHA256SUMS.txt` | Aynı dosya adı |
-| `release/SweetCherry/windows-bundle.json` | Aynı dosya adı |
+| `dist/windows/SweetCherry-1.1.0-windows-x64-setup.exe` | Installer |
+| `dist/windows/SweetCherry-1.1.0-windows-x64.zip` | Portable ZIP |
+| `dist/windows/SweetCherry-1.1.0-notices.zip` | Lisans/atıf ZIP'i |
+| `dist/windows/SHA256SUMS.txt` | Üç ZIP/EXE ürün dosyasının checksum'ları |
+| `release/SweetCherry/windows-bundle.json` veya portable paketin içindeki aynı dosya | Sürüm/runtime/commit manifest'i |
 
-Manifest konumunu artifact içinde dosya adına göre de bulabilirsiniz. Dosya adlarında 0.5.0-SNAPSHOT varsa eski artifact kullanılmıştır. Checksum dosyası EXE ve portable ZIP içindir; EXE'nin dijital olarak imzalandığını göstermez. Kişisel parola dosyaları, günlükler veya kişisel CTB dosyaları eklemeyin. GitHub kaynak ZIP/tar arşivlerini kendisi sunar. Ayrı bir JAR tek başına yapılandırma ve demo klasörlerini içermediği için önerilen indirme değildir.
+Gerekirse artifact içinde windows-bundle.json dosyasını adına göre bulun. Dosya adları 1.1.0 olmalı; SNAPSHOT veya 1.0.0 paketini karıştırmayın. Manifest'teki commit v1.1.0 commit'iyle aynı olmalı.
 
-## GitHub Release
+Son paketi ayrı, temiz bir klasörde açın. Launcher başlangıcı, giriş, demo açma, durdurma/yeniden başlatma ve ayar editörü erişimini kısaca kontrol edin. Kendi CTB'lerinizi/parolanızı yayın paketine koymayın. Pakette `THIRD-PARTY-NOTICES.md`, `licenses/`, runtime lisansları ve kılavuzların bulunduğunu doğrulayın. Checksum publisher imzası değildir; EXE'nin dijital imzası yoktur.
 
-1. Repository → Releases → Draft a new release.
-2. Mevcut **v1.0.0** etiketini seçin. Başlık: **SweetCherry 1.0.0**.
-3. `documentation/releases/v1.0.0.md` içeriğini açıklamaya yapıştırın.
-4. Yukarıdaki dört asset'i ekleyin. İlk yayın kararlı 1.0.0 olarak seçildiğinden prerelease işaretlemeyin; Latest olarak yayımlayabilirsiniz.
-5. Açıklama ve dosya adları doğru olduğunda Publish release seçin.
-6. Release yayımlandıktan sonra LinkedIn metnini paylaşın. Etiketli kurulum belgesi bağlantıları yayın commit'ine sabitlenmiştir.
+## 4. GitHub Release taslağı
 
-## Kalan lisans/atıf kaydı
+1. Releases → Draft a new release.
+2. Mevcut v1.1.0 etiketi; başlık SweetCherry 1.1.0.
+3. [İngilizce release açıklaması](../releases/v1.1.0.md) içeriğini kullanın.
+4. Yukarıdaki beş asset'i yükleyin. GitHub Source code ZIP/tar.gz dosyalarını kendisi ekler; toplamda yedi asset görünür.
+5. Stable olarak yayımlayacağımız için prerelease işaretlemeyin; Latest seçilebilir.
+6. Görev ve son paket kontrolü başarılı olduktan sonra Publish release.
 
-[Üçüncü taraf lisans planı](third-party-notices-plan.md) henüz tamamlanmış envanter değildir. Maven bağımlılıkları kadar kopyalanmış JavaScript/CSS, fontlar ve CherryTree ikonları da kapsamdadır. Gerekli lisans/NOTICE/atıf metinlerinin dağıtımda bulunması yayın hazırlığının açık maddesidir; başarılı test veya paketleme bunu doğrulamaz. Mevcut lisans dosyalarını ve runtime'ın lisans klasörlerini koruyun. Bu belgede lisans incelemesi tamamlandı iddiası yoktur.
+Bu belge veya yama yayın işlemini otomatik yapmaz. Taslağı/paketleri görmeden yayımlanmış saymayın.
 
-## Yayın sonrasına bırakılanlar
+## 5. Yayın sonrası
 
-Yeni geliştirme/test turları; bağımlılık bakımının sonraki adımları; ek editör konforu; görünür metinde arama; macOS gerçek cihaz doğrulaması; PortableApps paketi ve otomatik güncelleme. Mevcut uzak erişim kurulumu için [ağ rehberi](network-access.md) ve [HTTPS/oturum belgesi](https-and-session-security.md) kullanılır. HTTP, proxy ve firewall ayarları her kurulumun kendi sorumluluğundadır.
+README'deki `/releases/latest` bağlantısı son kararlı sürüme gider. İsterseniz geliştirmeye devam ederken main sürümünü 1.1.1-SNAPSHOT yapın; aynı tag/paket değiştirilmez. Henüz ayrı nightly/development download kanalı oluşturulmadı. Yeni özellikler, VPS demo ve geniş güvenlik incelemesi sonraki işlerdir; 1.1.0 için yeni feature hedefi değildir.

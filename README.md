@@ -6,7 +6,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 ## Download and start
 
-[GitHub Releases](https://github.com/turkerozturk/SweetCherry/releases) contains the Windows x64 installer and portable ZIP with Java 17 included. Windows users do not need to install Java separately. Extract the portable ZIP before running `SweetCherry.exe`.
+[Download the latest stable release](https://github.com/turkerozturk/SweetCherry/releases/latest). The release page contains the Windows x64 installer and portable ZIP with Java 17 included. Windows users do not need to install Java separately. Extract the portable ZIP before running `SweetCherry.exe`.
 
 - [Installation and usage — English](documentation/en/setup-and-run.md)
 - [Kurulum ve kullanım — Türkçe](documentation/tr/installation.md)
@@ -18,10 +18,21 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 - Rich-text editing, images and attachments, external links, tables, and formatted web-page paste.
 - Node movement, duplication, shared-node hierarchy, and bookmarks.
+- Tenant configuration wizard, SQLite/MariaDB/MySQL/PostgreSQL connections, and application settings editors.
 - Markmap, Mermaid, Freeplane/FreeMind exports, and PDF export with hierarchical navigation.
 - Local use or configurable network access; offline sun and moon calculations.
 
 [CTB export](documentation/tr/ctb-export.md) · [Shared nodes](documentation/tr/shared-node-operations.md) · [Network access](documentation/tr/network-access.md) · [Optional features](documentation/tr/optional-features.md) · [Versioning](documentation/tr/versioning.md)
+
+## Release information
+
+[Changelog](CHANGELOG.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
+
+Development builds are not currently published as a separate download channel. Use the stable release for ordinary use; source builds from `main` may include unreleased changes.
+
+## Development
+
+SweetCherry is developed and maintained by Türker Öztürk. ChatGPT/Codex assistance was used for implementation, test code and documentation; project decisions, review and manual release validation remain with the maintainer.
 
 ## License
 

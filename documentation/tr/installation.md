@@ -1,9 +1,9 @@
-# SweetCherry 1.0.0 — hazır Windows paketini kullanma
+# SweetCherry 1.1.0 — hazır Windows paketini kullanma
 
-[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.0.0) Windows 10/11 **64 bit** için bir ürün dosyası indirin:
+[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.1.0) Windows 10/11 **64 bit** için bir ürün dosyası indirin:
 
-- `SweetCherry-1.0.0-windows-x64-setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
-- `SweetCherry-1.0.0-windows-x64.zip`: tamamını çıkarıp `SweetCherry.exe` çalıştırabileceğiniz portable paket.
+- `SweetCherry-1.1.0-windows-x64-setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
+- `SweetCherry-1.1.0-windows-x64.zip`: tamamını çıkarıp `SweetCherry.exe` çalıştırabileceğiniz portable paket.
 
 İkisinde de Java 17 vardır; ayrıca Java kurmanız gerekmez. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
 
@@ -17,8 +17,22 @@ EXE imzalanmamıştır; Windows uyarı gösterebilir. Dosyanın proje release sa
 
 ## Kendi notlarınız
 
-`allTenants/demo.txt` tanımını ayrı bir `.txt` dosyasına kopyalayın. `name` alanını ve `datasource.url` yolunu mevcut CTB’nize göre değiştirin. Başlangıçta `custom.isWritable=false` kullanın. Menüden veri kaynaklarını yeniden yükleyip yeni tanımı seçin. CTB uygulama klasörü dışında kalabilir. Yol, SweetCherry’nin çalıştığı makinede erişilebilir olmalıdır.
+Yönetici olarak veri kaynağı menüsündeki tenant sihirbazını kullanabilirsiniz. Masaüstü modunda mevcut yerel/ağ paylaşımı CTB dosyasını Gözat ile seçin; dosya kopyalanmaz. Uzak SweetCherry sunucusu laptopunuzdaki dosya yoluna kendiliğinden erişemez.
+
+Manuel yöntem de korunur: `allTenants/demo.txt` tanımını ayrı bir `.txt` dosyasına kopyalayın. `name` alanını ve `datasource.url` yolunu mevcut CTB’nize göre değiştirin. Başlangıçta `custom.isWritable=false` kullanın. Menüden veri kaynaklarını yeniden yükleyip yeni tanımı seçin. CTB uygulama klasörü dışında kalabilir. Yol, SweetCherry’nin çalıştığı makinede erişilebilir olmalıdır.
 
 **SweetCherry otomatik yedek almaz.** Önemli CTB’leri kendiniz yedekleyin. CherryTree ve SweetCherry’den aynı dosyaya eşzamanlı yazmayın. Uygulamayı kapatıp tüm klasörünü kopyalamak taşımayı kolaylaştırır; klasör dışındaki CTB’ler bu kopyaya dahil değildir.
 
 Ayrıntılar: [tenant ayarları ve kaynak derleme](setup-and-run.md), [Windows paket yapısı](windows-bundled-distribution.md), [uzaktan erişim](network-access.md), [English installation guide](../en/setup-and-run.md).
+
+## Sunucu veritabanları ve ayarlar
+
+SQLite, MariaDB/MySQL ve PostgreSQL tenant'ları arasında geçiş için global application.yml dialect değişimi gerekmez. Sunucu veritabanında uyumlu CherryTree şeması/içerik önceden bulunmalıdır. Tenant seçmek SQLite'tan sunucuya aktarım yapmaz; SweetCherrySync ayrı projedir. `custom.isWritable=true` SQL yetkisi kazandırmaz. Senkronizasyon hedefindeki düzenlemeler sonraki aktarımda üzerine yazılabilir.
+
+System menüsünde seçilmiş güvenlik dışı uygulama ayarları ve onaylı yeniden başlatma vardır. Masaüstü kontrol penceresindeki yerel YAML editörü daha geniş ayarları yönetebilir. Güvenlik ve ağ ayarlarını ne yaptığınızı bilerek değiştirin.
+
+## 1.0.0'dan yükseltme
+
+SweetCherry'yi durdurun. Uygulama klasörünüzü ve klasör dışındaki CTB'leri koruyun; `allTenants`, harici YAML, `login-credentials.properties` ve gerekli export dosyalarını saklayın. Yeni paketi ayrı bir klasöre açın; kendi ayar/verilerinizi seçerek taşıyın. Demo dosyalarıyla kendi verinizi veya parolanızı değiştirmeyin; yeni runtime klasörünü eski Java dosyalarıyla karıştırmayın. Yol değiştiyse kısayolları yeniden oluşturun. Eski harici YAML override'ları yeni varsayılanlardan önce uygulanmaya devam eder.
+
+Eski CTB'nin desteklenen şema güncellemesi dosyayı değiştirir; izin vermeden önce ayrıca yedek alın. Daha fazla bilgi: [veritabanı bağlantı sorunları](database-connection-troubleshooting.md).

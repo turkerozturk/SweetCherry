@@ -12,10 +12,14 @@ Uygulama sürümünün tek kaynağı `pom.xml` içindeki proje `<version>` alan�
 
 Bu numaralandırma bütün CherryTree özelliklerinin uygulandığı veya hatasızlık garantisi verildiği anlamına gelmez. Sınırlamalar sürüm notlarında açıklanır. Kaynak: https://semver.org/
 
-Yayın hazırlığını commit/push edin, etiketi aynı commit'e koyun ve son dağıtımı o etiketten oluşturun. Yayımlanmış etiketi taşımayın; aynı sürümün dosyalarını farklı bir derlemeyle değiştirmeyin. Düzeltme yeni bir sürüm olur. Yayın sonrasında main üzerinde sıradaki çalışma sürümü örneğin `1.0.1-SNAPSHOT` olabilir.
+Yayın hazırlığını commit/push edin, etiketi aynı commit'e koyun ve son dağıtımı o etiketten oluşturun. Yayımlanmış etiketi taşımayın; aynı sürümün dosyalarını farklı bir derlemeyle değiştirmeyin. Düzeltme yeni bir sürüm olur. 1.1.0 yayımlandıktan sonra main üzerinde sıradaki çalışma sürümü `1.1.1-SNAPSHOT` olabilir. Yeni özellikler birikirse sonraki yayın hazırlığında `1.2.0` seçilebilir.
 
-Adım adım işlem ve asset listesi: [yayın hazırlığı](release-checklist.md). Geçici yorum arşivi bu hazırlıkta depodan kaldırılmıştır; verilen yedek dosyasını yamayı uygulamadan önce yerelinizde saklayın. Git geçmişi de korunur.
+Adım adım işlem ve asset listesi: [yayın hazırlığı](release-checklist.md). 1.0.0 hazırlığındaki geçici yorum arşivi daha önce yedeklenip kaldırılmıştır; bu adım her release için tekrarlanmaz. Git geçmişi korunur.
 
-## 1.0.0 sonrası çalışma
+## 1.1.0 ve sonrası çalışma
 
-Normal düzeltmeleri `main` dalına commit/push etmeye devam edin. Çalışma sürümü `1.0.1-SNAPSHOT` olarak ayrılmıştır; her commit için etiket gerekmez. Sonraki yayın kapsamına göre patch sürümünü veya yeni özellikler birikirse minor sürümünü yayın hazırlığında belirleyin. Yalnız o hazırlık bittiğinde yeni sürüm etiketi oluşturun. `v1.0.0` ve yayımlanmış paketleri değiştirmeyin.
+1.1.0 uyumlu yeni özellikleri ve hata düzeltmelerini birlikte içerir. Normal değişiklikleri main dalına commit/push etmeye devam edin; her commit için etiket gerekmez. Yalnız yayın hazırlığı tamamlandığında yeni sürüm etiketi oluşturun. Yayımlanmış 1.0.0/1.1.0 etiketlerini ve paketlerini değiştirmeyin.
+
+Nightly veya development build kanalı zorunlu değildir. Şu anda yalnız kararlı release indirme kanalı var. İleride development paketleri sunulursa tarih/commit ve deneme sürümü olduğu açıkça belirtilir; stable latest bağlantısı bunlarla karıştırılmaz.
+
+GitHub Issues bug/enhancement etiketleriyle yeterlidir. İstenirse somut bir yayın için Milestone oluşturulabilir; takvim ve bütün gelecek özellikleri peşinen taahhüt etmek gerekmez.
