@@ -221,7 +221,7 @@ public class RichTextEditingService {
     static List<Stored> readObjects(java.sql.Connection connection, long id) throws java.sql.SQLException {
         var result = new java.util.ArrayList<Stored>();
         for (String table : List.of("image", "codebox", "grid")) {
-            try (var query = connection.prepareStatement("SELECT "+JdbcIdentifiers.quote(connection,"offset")+" AS editor_offset, * FROM " + table
+            try (var query = connection.prepareStatement("SELECT "+JdbcIdentifiers.quote(connection,"offset")+" AS editor_offset, " + table + ".* FROM " + table
                     + " WHERE node_id = ? ORDER BY "+JdbcIdentifiers.quote(connection,"offset"))) {
                 query.setLong(1, id);
                 try (var rows = query.executeQuery()) {
