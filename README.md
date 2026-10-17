@@ -4,6 +4,8 @@ SweetCherry is an open-source web companion for [CherryTree](https://www.giuspen
 
 Browse your notes in desktop and mobile web views, explore them as mind maps, edit supported content, and export nodes or branches to PDF and CTB. SweetCherry complements CherryTree; it does not replace it.
 
+![SweetCherry 1.1.0](documentation/images/1.1/sweetcherry-1-1-0-release.jpg)
+
 ## Download and start
 
 [Download the latest stable release](https://github.com/turkerozturk/SweetCherry/releases/latest). The release page contains the Windows x64 installer and portable ZIP with Java 17 included. Windows users do not need to install Java separately. Extract the portable ZIP before running `SweetCherry.exe`.
