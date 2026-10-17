@@ -109,3 +109,15 @@ The first build needs internet access to download Maven/dependencies. Scripts pr
 ## Known limits
 
 Raw content search operates on stored `node.txt`, including rich-text XML. Search results use POST; browser Back may require resubmission or show an expired-document message. Internal node links in CTB exports are not rewritten to new node IDs. Shared tree parent/master relationships are remapped separately and are supported. Codebox editing and broader rich-text compatibility remain future work.
+
+## Bundled quick-start guides
+
+`CTBDATA/sweetcherry-hizli-baslangic.ctb` and `CTBDATA/sweetcherry-quickstart-en.ctb` contain the Turkish and English quick-start guides. Select **SweetCherry Quick Start (TR)** or **SweetCherry Quick Start (EN)** in the data source list. Their `allTenants/quickstart-tr.txt` and `quickstart-en.txt` definitions are read-only. The guides have no images; TODO bodies are intentionally empty. They can also be opened in CherryTree.
+
+**What is a tenant?** In SweetCherry, this technical term means a data source connection definition. It comes from the application's multitenancy architecture. Switching sources resembles opening/closing files in a desktop application. A file in `allTenants` stores the database path/connection and opening settings, not the notes themselves. Several definitions may point to one CTB; deleting a definition does not delete the CTB.
+
+## Editor helpers
+
+In visual rich-text editing mode, clicking `☐`, `☑` or `☒` at the start of a line (optionally preceded only by spaces or tabs) cycles through those three states. Boxes preceded by other text or objects remain unchanged. Save writes the change to the database; Undo/Redo are supported. In text/preview mode, boxes remain ordinary text.
+
+The **33~** button in both rich-text and plain-text editors inserts 33 tildes and a line break at the cursor, replacing selected text if any. Ctrl+R retains its browser refresh function.

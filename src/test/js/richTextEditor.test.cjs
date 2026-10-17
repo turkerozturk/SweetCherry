@@ -5,16 +5,18 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 /** Executes the real editor script against a small DOM double to test model/history behavior. */
-function editor(initialRuns, maxFileBytes, objects, clipboard) {
+function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
     const handlers = new Map();
     function element(id = '') {
         return {id, value:'', style:{}, dataset:{}, childNodes:[], selectionStart:0, selectionEnd:0,
             hidden:true, disabled:false, addEventListener(type, fn) {handlers.set(id + ':' + type, fn);},
-            replaceChildren() {this.childNodes = [];}, appendChild(child) {this.childNodes.push(child);},
+            replaceChildren(...nodes) {this.childNodes = nodes;}, appendChild(child) {this.childNodes.push(child);},
             showModal() {this.open=true;}, close() {this.open=false;}, click() {const handler=handlers.get(id+':click');if(handler)handler({});},
+            setAttribute() {}, contains(target) { return this.childNodes.some(n => n === target || n.contains && n.contains(target)); },
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
+    if (visual) { ids.richVisualMode=element('richVisualMode'); ids.richVisualMode.checked=true; }
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     let saved;
@@ -22,6 +24,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard) {
         getElementById: id => ids[id],
         querySelectorAll: selector => selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
         createElement: () => element(),
+        createDocumentFragment: () => element(),
         createTextNode: text => ({text}),
         implementation: {createDocument() {
             const root = element();
@@ -31,7 +34,8 @@ function editor(initialRuns, maxFileBytes, objects, clipboard) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes},
+    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
+        RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
         crypto:{randomUUID:()=> 'test-uuid'},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
@@ -246,4 +250,28 @@ test('removing a pending object sends no database deletion reference', () => {
     e.ids.richAllowDeletion.checked=true;e.fire('richObjects','click');
     e.ids.richObjectList.childNodes[0].childNodes[0].checked=true;e.fire('richObjectDelete','click');
     assert.equal(text(e.runs()),'');assert.equal(e.ids.richDeleted.value,'[]');
+});
+
+ test('separator inserts 33 tildes plus newline and shares rich-text undo history', () => {
+    const e=editor([{text:'A😀B',attributes:{weight:'heavy',future:'keep'}}]);
+    e.select(1,3); e.fire('richSeparator','click');
+    assert.equal(text(e.runs()),'A'+'~'.repeat(33)+'\nB');
+    assert.equal(e.runs()[1].attributes.weight,'heavy');
+    e.fire('richUndo','click'); assert.equal(text(e.runs()),'A😀B');
+    e.fire('richRedo','click'); assert.equal(text(e.runs()),'A'+'~'.repeat(33)+'\nB');
+});
+
+test('only leading visual boxes cycle, preserving attributes and undo/redo across formatted runs', () => {
+    const e=editor([{text:'  ',attributes:{}},{text:'☐ Task',attributes:{weight:'heavy',future:'keep'}},{text:'\nx ☐ text\n😀 ☐ text\n\t☑ done\n☒ failed',attributes:{}}],null,null,null,true);
+    const boxes=()=>{const found=[];function walk(n){if(n.dataset&&n.dataset.checkOffset!==undefined)found.push(n);for(const c of n.childNodes||[])walk(c);}walk(e.ids.richPreview);return found;};
+    assert.deepEqual(boxes().map(b=>b.textContent),['☐','☑','☒']);
+    const original=text(e.runs());
+    for(const expected of ['☑','☒','☐']) {
+        const box=boxes()[0];e.fire('richPreview','click',{target:{closest:()=>box},detail:1,preventDefault(){}});
+        assert.equal(Array.from(text(e.runs()))[2],expected);
+        assert.equal(e.runs().find(r=>r.text===expected).attributes.future,'keep');
+    }
+    assert.equal(text(e.runs()),original);
+    e.fire('richUndo','click');assert.equal(Array.from(text(e.runs()))[2],'☒');
+    e.fire('richRedo','click');assert.equal(text(e.runs()),original);
 });

@@ -2,6 +2,8 @@
 
 Bu klasörde henüz ekran görüntüsü yoktur. Aşağıdaki dosyalar gerçek uygulamadan alındıktan sonra README'ye veya ayrı galeriye eklenebilir. Resim varmış gibi çalışan link/placeholder oluşturulmadı. Görüntüler yayın için zorunlu değildir; eklenecekse etiket öncesinde commit edin.
 
+1.1.0 yayını için ekran görüntüsü eklenmeyecek. Aşağıdaki liste ileride kullanılabilecek isteğe bağlı plandır.
+
 ## Dosyalar ve içerik
 
 | Dosya | Gösterilecek içerik | İngilizce kısa açıklama |

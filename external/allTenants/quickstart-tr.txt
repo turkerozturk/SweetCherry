@@ -1,0 +1,10 @@
+# Bundled quick-start guide; read-only to preserve the original instructions.
+name=SweetCherry Quick Start (TR)
+security-role=ADMIN
+datasource.url=jdbc:sqlite:CTBDATA/sweetcherry-hizli-baslangic.ctb
+datasource.driver-class-name=org.sqlite.JDBC
+custom.isWritable=false
+custom.allowLegacySchemaUpgrade=false
+custom.newNodeName=New Node
+custom.newNodeTags=
+custom.maxEmbeddedFileSizeMB=9

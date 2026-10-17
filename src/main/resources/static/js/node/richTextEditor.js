@@ -182,6 +182,18 @@
     document.querySelectorAll('[data-choice]').forEach(control => control.addEventListener('change', () => format(control.dataset.choice, control.value)));
     document.getElementById('clearFormat').addEventListener('click', () => format('clear', ''));
 
+    const separator = document.getElementById('richSeparator');
+    separator.addEventListener('pointerdown', event => event.preventDefault());
+    separator.addEventListener('click', () => { if (!composing) { rememberSelection(); visualChange('~'.repeat(33) + '\n'); } });
+    preview.addEventListener('click', event => {
+        if (!visual() || composing || event.detail > 1) return;
+        const box = event.target.closest('[data-check-offset]');
+        if (!box || !preview.contains(box)) return;
+        const start = Number(box.dataset.checkOffset), character = sub(previous, start, start + 1);
+        const next = {'☐':'☑', '☑':'☒', '☒':'☐'}[character];
+        if (next) { event.preventDefault(); visualChange(next, start, start + 1); }
+    });
+
     const linkButton=document.getElementById('richLink'),linkDialog=document.getElementById('richLinkDialog');
     if (linkButton && linkDialog) {
         const urlInput=document.getElementById('richLinkUrl'),error=document.getElementById('richLinkError');
@@ -297,6 +309,15 @@
     /** Builds a safe preview from text nodes and controlled styles, never from stored HTML. */
     function render() {
         preview.replaceChildren();
+        // One pass through the text per render, with one delegated click listener.
+        const boxes = new Set();
+        let utf16Offset = 0, codePointOffset = 0;
+        for (const match of previous.matchAll(/^[ \t]*([☐☑☒])/gm)) {
+            const position = match.index + match[0].length - 1;
+            codePointOffset += count(previous.slice(utf16Offset, position));
+            boxes.add(codePointOffset); utf16Offset = position;
+        }
+        let modelOffset = 0;
         let paragraph = document.createElement('div');
         paragraph.style.margin = '0';
         function flush(allowEmpty = false) {
@@ -308,6 +329,7 @@
         }
         for (const run of runs) {
           if (run.attributes.__sweet_object) {
+            modelOffset += count(run.text);
             const key = run.attributes.__sweet_object;
             const object = (window.richEditorObjects || {})[key] || {label:key};
             const slot = document.createElement('span');
@@ -336,6 +358,24 @@
           for (let index = 0; index < lines.length; index++) {
             const span = document.createElement('span'), a = run.attributes;
             span.textContent = lines[index];
+            if (visual()) {
+                const fragment = document.createDocumentFragment();
+                let plain = '';
+                for (const character of lines[index]) {
+                    if (boxes.has(modelOffset)) {
+                        if (plain) { fragment.appendChild(document.createTextNode(plain)); plain = ''; }
+                        const box = document.createElement('span');
+                        box.dataset.checkOffset = modelOffset; box.textContent = character;
+                        box.style.cursor = 'pointer';
+                        box.title = '☐ → ☑ → ☒ → ☐';
+                        fragment.appendChild(box);
+                    } else plain += character;
+                    modelOffset++;
+                }
+                if (plain) fragment.appendChild(document.createTextNode(plain));
+                span.replaceChildren(fragment);
+            } else modelOffset += count(lines[index]);
+            if (index < lines.length - 1) modelOffset++;
             span.dataset.richAttributes = JSON.stringify(a);
             if (a.weight === 'heavy') span.style.fontWeight = 'bold';
             if (a.style === 'italic') span.style.fontStyle = 'italic';

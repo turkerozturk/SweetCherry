@@ -494,6 +494,23 @@
 									  tofile="${project.basedir}/release/SweetCherry/allTenants/demo.txt"
 									  unless:set="release.demo.tenant.exists"/>
 
+                                <available file="${project.basedir}/release/SweetCherry/CTBDATA/sweetcherry-hizli-baslangic.ctb" property="release.sweetcherry-hizli-baslangic_ctb.exists"/>
+                                <copy file="${project.basedir}/external/CTBDATA/sweetcherry-hizli-baslangic.ctb"
+                                      tofile="${project.basedir}/release/SweetCherry/CTBDATA/sweetcherry-hizli-baslangic.ctb"
+                                      unless:set="release.sweetcherry-hizli-baslangic_ctb.exists"/>
+                                <available file="${project.basedir}/release/SweetCherry/CTBDATA/sweetcherry-quickstart-en.ctb" property="release.sweetcherry-quickstart-en_ctb.exists"/>
+                                <copy file="${project.basedir}/external/CTBDATA/sweetcherry-quickstart-en.ctb"
+                                      tofile="${project.basedir}/release/SweetCherry/CTBDATA/sweetcherry-quickstart-en.ctb"
+                                      unless:set="release.sweetcherry-quickstart-en_ctb.exists"/>
+                                <available file="${project.basedir}/release/SweetCherry/allTenants/quickstart-tr.txt" property="release.quickstart-tr_txt.exists"/>
+                                <copy file="${project.basedir}/external/allTenants/quickstart-tr.txt"
+                                      tofile="${project.basedir}/release/SweetCherry/allTenants/quickstart-tr.txt"
+                                      unless:set="release.quickstart-tr_txt.exists"/>
+                                <available file="${project.basedir}/release/SweetCherry/allTenants/quickstart-en.txt" property="release.quickstart-en_txt.exists"/>
+                                <copy file="${project.basedir}/external/allTenants/quickstart-en.txt"
+                                      tofile="${project.basedir}/release/SweetCherry/allTenants/quickstart-en.txt"
+                                      unless:set="release.quickstart-en_txt.exists"/>
+
 								<copy todir="${project.basedir}/release/SweetCherry" overwrite="true">
 									<fileset dir="${project.basedir}/external">
 										<include name="run.bat"/>

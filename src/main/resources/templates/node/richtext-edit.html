@@ -21,6 +21,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="hidden" name="tables" id="richTables" value="{}">
 <label><input type="checkbox" id="richVisualMode" checked> <span th:text="#{richtext.edit.visual}"></span></label>
 <div class="toolbar">
+<button type="button" id="richSeparator" th:title="#{editor.separator.help}">33~</button>
 <button type="button" id="richUndo" th:text="#{richtext.edit.undo}" title="Ctrl+Z"></button>
 <button type="button" id="richRedo" th:text="#{richtext.edit.redo}" title="Ctrl+Y / Ctrl+Shift+Z"></button>
 <button type="button" data-format="weight" data-value="heavy" th:title="#{richtext.edit.bold}"><b>B</b></button>

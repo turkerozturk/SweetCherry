@@ -8,6 +8,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ### Added
 
+- Bundled unchanged Turkish/English CTB quick-start guides with read-only connection definitions.
+- Clickable line-leading checkbox cycle in visual rich-text editing and a 33-tilde separator button in both text editors.
+
 - Tenant configuration wizard for creating/editing connections and opening an existing CTB in place. Desktop users can select a local/network-share file on the machine running SweetCherry; no CTB upload or copy is implied.
 - ADMIN web editor for selected non-security application settings, plus confirmed restart.
 - Desktop YAML editor for local configuration files, masked secret fields, and creating an external override when needed.
@@ -15,6 +18,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 - Searchable, illustrated icon selectors with selected-icon summaries, combined no-icon filters, and translated title-color names.
 
 ### Fixed
+
+- Open the application folder directly with Explorer on Windows, bypassing shell file associations.
 
 - Detect MariaDB behind MySQL Connector/J, preserve its version and avoid incompatible optional keyword metadata queries; enable portable identifier quoting.
 - Use qualified object columns when reading rich-text objects and numeric 0/1 flags after deleting objects, including PostgreSQL.

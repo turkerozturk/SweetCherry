@@ -36,3 +36,15 @@ System menüsünde seçilmiş güvenlik dışı uygulama ayarları ve onaylı ye
 SweetCherry'yi durdurun. Uygulama klasörünüzü ve klasör dışındaki CTB'leri koruyun; `allTenants`, harici YAML, `login-credentials.properties` ve gerekli export dosyalarını saklayın. Yeni paketi ayrı bir klasöre açın; kendi ayar/verilerinizi seçerek taşıyın. Demo dosyalarıyla kendi verinizi veya parolanızı değiştirmeyin; yeni runtime klasörünü eski Java dosyalarıyla karıştırmayın. Yol değiştiyse kısayolları yeniden oluşturun. Eski harici YAML override'ları yeni varsayılanlardan önce uygulanmaya devam eder.
 
 Eski CTB'nin desteklenen şema güncellemesi dosyayı değiştirir; izin vermeden önce ayrıca yedek alın. Daha fazla bilgi: [veritabanı bağlantı sorunları](database-connection-troubleshooting.md).
+
+## Dağıtımdaki hızlı başlangıç kılavuzları
+
+`CTBDATA/sweetcherry-hizli-baslangic.ctb` ve `CTBDATA/sweetcherry-quickstart-en.ctb`, Türkçe ve İngilizce hızlı başlangıç kılavuzlarıdır. Veri kaynağı listesinden **SweetCherry Quick Start (TR)** veya **SweetCherry Quick Start (EN)** seçilebilir. `allTenants/quickstart-tr.txt` ve `quickstart-en.txt` bağlantıları salt okunurdur. Kılavuzlar resimsizdir; TODO içerikleri sonraki kullanım için boş bırakılmıştır. CherryTree ile de açılabilirler.
+
+**Tenant ne demek?** SweetCherry'de kullanıcıya sunulan bir veri kaynağı bağlantı tanımıdır. Teknik ad, uygulamanın çoklu veritabanı (multitenancy) yapısından gelir. Masaüstü uygulamasında dosya açma/kapatmaya benzer biçimde veritabanları arasında geçiş yaparsınız. `allTenants` içindeki dosya notların kendisini değil, veritabanının yolunu/bağlantısını ve açılma ayarlarını tutar. Bir CTB'ye birden fazla tanımla bağlanılabilir; tanımı silmek CTB'yi silmez.
+
+## Editörde küçük yardımcılar
+
+Zengin metnin görsel düzenleme modunda, satır başında yalnız boşluk veya tab sonrasında bulunan `☐`, `☑`, `☒` işaretlerine tıklamak bu üç durumu sırayla değiştirir. Önünde başka metin veya nesne olan kutular değişmez. Değişiklik Kaydet ile veritabanına yazılır; Geri Al/Yinele desteklenir. Metin/önizleme modunda kutular normal metindir.
+
+Zengin metin ve düz metin editörlerindeki **33~** düğmesi imlece 33 tilde ve satır sonu ekler; seçili metin varsa onun yerine ekler. Ctrl+R tarayıcının sayfayı yenileme kısayolu olarak korunur.

@@ -12,6 +12,7 @@
     <form th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
         <label for="nodeText" class="form-label">İçerik</label>
+        <button type="button" id="plainSeparator" class="btn btn-outline-secondary mb-2" th:title="#{editor.separator.help}">33~</button>
         <textarea id="nodeText" name="text" class="form-control font-monospace" rows="20"
                   spellcheck="false" th:text="${node.txt}"></textarea>
         <div class="mt-3">
@@ -19,6 +20,7 @@
             <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId})}">İptal</a>
         </div>
     </form>
+<script th:src="@{/js/node/plainTextEditor.js}"></script>
 </section>
 </body>
 </html>

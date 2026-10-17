@@ -69,7 +69,7 @@ public final class DesktopControl {
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         buttons.add(open); buttons.add(stop); buttons.add(log);
         JButton folder = new JButton(text("Uygulama Klasörü", "Application Folder"));
-        folder.addActionListener(e -> background(() -> Desktop.getDesktop().open(new File(".").getCanonicalFile())));
+        folder.addActionListener(e -> background(() -> openApplicationFolder(new File(".").getCanonicalFile())));
         JPanel files = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); files.add(folder);
         settings = new JButton(text("YAML Ayarları", "YAML Settings")); settings.setEnabled(false);
         settings.addActionListener(e -> new com.turkerozturk.desktop.config.DesktopYamlEditorDialog(frame).setVisible(true));
@@ -175,11 +175,24 @@ public final class DesktopControl {
         }
     }
 
+    /** Bypasses Windows shell file associations, which can silently ignore Desktop.open. */
+    private static void openApplicationFolder(File folder) throws Exception {
+        if (!folder.isDirectory()) throw new java.io.IOException("Application folder does not exist: " + folder);
+        if (System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT).contains("win")) {
+            String windows = System.getenv("SystemRoot");
+            File explorer = new File(windows == null ? "C:\\Windows" : windows, "explorer.exe");
+            // Explorer can delegate to an existing process and return a nonzero exit code on success.
+            new ProcessBuilder(explorer.getAbsolutePath(), folder.getCanonicalPath()).start();
+        } else {
+            Desktop.getDesktop().open(folder);
+        }
+    }
+
     private void openBrowser() { if (url != null) background(() -> Desktop.getDesktop().browse(URI.create(url))); }
     private void background(Task task) {
         Thread thread = new Thread(() -> {
             try { task.run(); } catch (Exception error) {
-                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(frame, error.getMessage(), "SweetCherry", JOptionPane.WARNING_MESSAGE));
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(frame, text("İşlem tamamlanamadı: ", "Could not complete action: ") + error, "SweetCherry", JOptionPane.WARNING_MESSAGE));
             }
         }, "sweetcherry-desktop-action");
         thread.setDaemon(true); thread.start();

@@ -16,7 +16,7 @@ if (!(Test-Path (Join-Path $bundle 'application.yml'))) {
     Copy-Item $filteredConfig (Join-Path $bundle 'application.yml')
 }
 # Never package a developer's existing release folder; the workflow starts from a clean checkout.
-foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','THIRD-PARTY-NOTICES.md','licenses','CTBDATA/demo.ctb','allTenants/demo.txt')) {
+foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','THIRD-PARTY-NOTICES.md','licenses','CTBDATA/demo.ctb','allTenants/demo.txt','CTBDATA/sweetcherry-hizli-baslangic.ctb','CTBDATA/sweetcherry-quickstart-en.ctb','allTenants/quickstart-tr.txt','allTenants/quickstart-en.txt')) {
     if (!(Test-Path (Join-Path $bundle $name))) { throw "Missing distribution file: $name. Run Maven package first." }
 }
 if (Test-Path (Join-Path $bundle 'login-credentials.properties')) { throw 'Do not package an already-used distribution.' }

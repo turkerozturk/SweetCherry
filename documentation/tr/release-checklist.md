@@ -13,7 +13,7 @@ git diff --check
 mvnw.cmd clean package
 ```
 
-Ekran görüntüleri isteğe bağlıdır. Eklemek istiyorsanız etiketi oluşturmadan önce [çekim listesi](../images/1.1/README.md) içindeki dosya adlarıyla ekleyin, gerçek dosyalar mevcut olduğunda README'ye bağlantı koyun. Olmayan görüntüler için bozuk link bırakmayın. Parola, kişisel not, dosya yolu ve sunucu adresi göstermeyin.
+1.1.0 yayınına ekran görüntüsü eklenmeyecek; bu yayın için gerekli değildir. Ekran görüntüleri isteğe bağlıdır. Eklemek istiyorsanız etiketi oluşturmadan önce [çekim listesi](../images/1.1/README.md) içindeki dosya adlarıyla ekleyin, gerçek dosyalar mevcut olduğunda README'ye bağlantı koyun. Olmayan görüntüler için bozuk link bırakmayın. Parola, kişisel not, dosya yolu ve sunucu adresi göstermeyin.
 
 Değişiklikleri main dalına commit/push edin. Geçici yorum arşivi 1.0.0 öncesinde zaten yedeklenmişti; tekrar silinecek dosya yoktur. Eski lisans tamamlama workflow'u 1.0.0 taslağına özeldir; **1.1.0 için çalıştırmayın**.
 

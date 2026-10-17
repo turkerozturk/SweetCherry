@@ -53,6 +53,10 @@ Source: "{#SourceDir}\*"; DestDir: "{app}"; Excludes: "CTBDATA\*,allTenants\*,ex
 Source: "{#SourceDir}\application.yml"; DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "{#SourceDir}\CTBDATA\demo.ctb"; DestDir: "{app}\CTBDATA"; Flags: onlyifdoesntexist
 Source: "{#SourceDir}\allTenants\demo.txt"; DestDir: "{app}\allTenants"; Flags: onlyifdoesntexist
+Source: "{#SourceDir}\CTBDATA\sweetcherry-hizli-baslangic.ctb"; DestDir: "{app}\CTBDATA"; Flags: onlyifdoesntexist
+Source: "{#SourceDir}\CTBDATA\sweetcherry-quickstart-en.ctb"; DestDir: "{app}\CTBDATA"; Flags: onlyifdoesntexist
+Source: "{#SourceDir}\allTenants\quickstart-tr.txt"; DestDir: "{app}\allTenants"; Flags: onlyifdoesntexist
+Source: "{#SourceDir}\allTenants\quickstart-en.txt"; DestDir: "{app}\allTenants"; Flags: onlyifdoesntexist
 [Icons]
 Name: "{userdesktop}\SweetCherry"; Filename: "{app}\SweetCherry.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 Name: "{userprograms}\SweetCherry"; Filename: "{app}\SweetCherry.exe"; WorkingDir: "{app}"; Tasks: startmenuicon
