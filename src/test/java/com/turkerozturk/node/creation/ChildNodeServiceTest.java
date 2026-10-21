@@ -29,9 +29,9 @@ class ChildNodeServiceTest {
         NodePropertiesService properties = mock(NodePropertiesService.class);
         when(properties.writable()).thenReturn(true);
         EntityManager manager = mock(EntityManager.class);
-        Query parent = mock(Query.class), ids = mock(Query.class), sequence = mock(Query.class), nodeInsert = mock(Query.class), childInsert = mock(Query.class);
-        when(manager.createNativeQuery(anyString())).thenReturn(parent, ids, sequence, nodeInsert, childInsert);
-        for (Query query : new Query[]{parent, ids, sequence, nodeInsert, childInsert}) {
+        Query parent = mock(Query.class), ids = mock(Query.class), sequence = mock(Query.class), nodeInsert = mock(Query.class), childInsert = mock(Query.class), touch = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(parent, ids, sequence, nodeInsert, childInsert, touch);
+        for (Query query : new Query[]{parent, ids, sequence, nodeInsert, childInsert, touch}) {
             when(query.setParameter(anyString(), any())).thenReturn(query);
         }
         when(parent.getSingleResult()).thenReturn(1L);
@@ -107,9 +107,9 @@ class ChildNodeServiceTest {
         when(properties.writable()).thenReturn(true);
         EntityManager manager = mock(EntityManager.class);
         Query occurrence = mock(Query.class), ids = mock(Query.class), sequence = mock(Query.class),
-                insert = mock(Query.class), child = mock(Query.class), shift = mock(Query.class), place = mock(Query.class);
-        when(manager.createNativeQuery(anyString())).thenReturn(occurrence, ids, sequence, insert, child, shift, place);
-        for (Query query : new Query[]{occurrence, ids, sequence, insert, child, shift, place})
+                insert = mock(Query.class), child = mock(Query.class), shift = mock(Query.class), place = mock(Query.class), touch = mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(occurrence, ids, sequence, insert, child, shift, place, touch);
+        for (Query query : new Query[]{occurrence, ids, sequence, insert, child, shift, place, touch})
             when(query.setParameter(anyString(), any())).thenReturn(query);
         when(occurrence.getResultList()).thenReturn(java.util.Collections.singletonList(new Object[]{0L, 2L}));
         when(ids.getSingleResult()).thenReturn(99L);

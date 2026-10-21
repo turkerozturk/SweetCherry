@@ -143,7 +143,8 @@ class NodeDuplicationServiceTest {
         assertThat(number("SELECT COUNT(*) FROM grid")).isEqualTo(1);
         assertThat(number("SELECT COUNT(*) FROM codebox")).isEqualTo(1);
         assertThat(number("SELECT COUNT(*) FROM bookmark")).isEqualTo(2);
-        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isEqualTo(20);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isGreaterThan(20);
+        assertThat(number("SELECT ts_creation FROM node WHERE node_id=1")).isEqualTo(10);
     }
     @Test void sharedCreationFromAliasPointsDirectlyToRealMaster() throws Exception {
         String revision=NodeDuplicationService.state(NodeDuplicationService.read(connection),10).revision();

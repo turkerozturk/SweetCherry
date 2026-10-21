@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Make node modification dates consistent across content editing, property saves, moves, creation, bookmarks and shared-node operations; preserve timestamps on no-op content saves and CTB exports. See `documentation/tr/node-timestamps.md` for the rules and manual checks.
+
 ## [1.1.0]
 
 ### Added

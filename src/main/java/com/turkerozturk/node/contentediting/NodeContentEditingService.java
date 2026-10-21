@@ -41,7 +41,8 @@ public class NodeContentEditingService {
         if (text == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Text is required.");
         }
-        editableNode(nodeId);
+        Node node = editableNode(nodeId);
+        if (java.util.Objects.equals(node.getTxt(), text)) return;
         // Recheck flags in the UPDATE in case CherryTree or another tab changed them after the SELECT.
         int updated = entityManager.createNativeQuery("UPDATE node SET txt = :text, ts_lastsave = :timestamp "
                         + "WHERE node_id = :id AND (is_ro & 1) = 0 AND syntax <> 'custom-colors'")

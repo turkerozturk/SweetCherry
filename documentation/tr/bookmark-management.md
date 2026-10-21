@@ -24,3 +24,7 @@ Bookmark yolları artık master'ın yolundan değil, her bookmark'ın kendi `chi
 ## Silme sonrası gezinme
 
 Gerçek veya paylaşımlı konum silindiğinde önceki kardeş, yoksa sonraki kardeş, yoksa ebeveyn seçilir. Son kök silinirse sanal kök gösterilir. Yalnız bookmark kaldırmak seçili düğümü veya ağaç yapısını değiştirmez.
+
+## Değişiklik tarihi
+
+Bookmark ekleme, kaldırma veya sıra anahtarının değiştirilmesi ilgili gerçek içerik düğümünün `ts_lastsave` değerini günceller; shared konumlarda master kullanılır. Tekrar ekleme/kaldırma ve aynı sıra değeriyle tekrar kayıt yazma sayılmaz. [Tarih kuralları ve manuel testler](node-timestamps.md).

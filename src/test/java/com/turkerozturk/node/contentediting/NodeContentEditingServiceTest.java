@@ -97,4 +97,15 @@ class NodeContentEditingServiceTest {
                 .satisfies(error -> assertThat(((ResponseStatusException) error).getStatusCode())
                         .isEqualTo(HttpStatus.CONFLICT));
     }
+
+    @Test void unchangedOrUndonePlainTextNeverIssuesAnUpdate() {
+        var properties=mock(NodePropertiesService.class);when(properties.writable()).thenReturn(true);
+        var node=new Node();node.setSyntax("plain-text");node.setTxt("Same\n😀");
+        when(properties.realNode(15L)).thenReturn(node);
+        var manager=mock(EntityManager.class);var service=new NodeContentEditingService(properties);
+        ReflectionTestUtils.setField(service,"entityManager",manager);
+        service.update(15L,"Same\n😀");
+        verifyNoInteractions(manager);
+    }
+
 }

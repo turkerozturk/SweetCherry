@@ -153,4 +153,15 @@ class NodeDeletionServiceTest {
         assertThatThrownBy(()->service.deleteNodeWithSubNodes(6)).isInstanceOf(AccessDeniedException.class);
         verifyNoInteractions(manager);
     }
+
+    @Test void deletingSharedOccurrenceTouchesSurvivingMasterAndPreservesCreationTime() throws Exception {
+        try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_creation=50,ts_lastsave=100");}
+        NodeDeletionSql.delete(connection,16);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=6")).isGreaterThan(100);
+        assertThat(number("SELECT ts_creation FROM node WHERE node_id=6")).isEqualTo(50);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=17")).isGreaterThan(100);
+        assertThat(number("SELECT ts_creation FROM node WHERE node_id=17")).isEqualTo(50);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isEqualTo(100);
+    }
+
 }

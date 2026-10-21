@@ -80,6 +80,11 @@ final class NodeDeletionSql {
             aliases.getOrDefault(id,List.of()).stream().filter(alias->!deleting.contains(alias))
                     .findFirst().ifPresent(alias->promotions.put(id,alias));
         }
+        // Alias removal changes the surviving group's structure. Touch before rekeying promoted masters.
+        var changedGroups = new HashSet<Long>(promotions.keySet());
+        for (long id : deleting) if (rows.get(id).master != 0) changedGroups.add(rows.get(id).master);
+        long timestamp = NodeTimestamps.now();
+        for (long master : changedGroups) NodeTimestamps.touchContent(connection,master,timestamp);
         for(var promotion:promotions.entrySet()) {
             long original=promotion.getKey(), replacement=promotion.getValue();
             // Rekey payloads in place: preserve every column, SQL NULL and binary object exactly.

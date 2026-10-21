@@ -35,10 +35,10 @@ class BookmarkWriteServiceTest {
         assertThat(number("SELECT COUNT(*) FROM bookmark WHERE node_id=10")).isZero();
         assertThat(number("SELECT master_id FROM children WHERE node_id=10")).isEqualTo(1);
     }
-    @Test void removingBookmarkKeepsNodeContentTimestampAndTreePlacement() throws Exception {
+    @Test void removingBookmarkTouchesTimestampButKeepsContentAndTreePlacement() throws Exception {
         BookmarkWriteService.add(connection,1);BookmarkWriteService.remove(connection,1);BookmarkWriteService.remove(connection,1);
         assertThat(number("SELECT COUNT(*) FROM bookmark")).isZero();
-        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=1 AND txt='content' AND is_ro=1 AND ts_lastsave=100")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=1 AND txt='content' AND is_ro=1 AND ts_lastsave>100")).isEqualTo(1);
         assertThat(number("SELECT COUNT(*) FROM children WHERE node_id=1 AND father_id=0 AND sequence=1")).isEqualTo(1);
     }
     @Test void orphanCanBeRemovedButMissingOccurrenceCannotBeAdded() throws Exception {
@@ -65,5 +65,31 @@ class BookmarkWriteServiceTest {
         assertThatThrownBy(()->service.state(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.add(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.remove(1)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(()->service.reorder(1,2)).isInstanceOf(AccessDeniedException.class);
     }
+
+    @Test void sharedBookmarkChangesTouchMasterAndRepeatedNoOpsDoNotTouchAgain() throws Exception {
+        BookmarkWriteService.add(connection,10);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isGreaterThan(100);
+        try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_lastsave=100 WHERE node_id=1");}
+        BookmarkWriteService.add(connection,10);
+        BookmarkWriteService.reorder(connection,10,1);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isEqualTo(100);
+        BookmarkWriteService.reorder(connection,10,8);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=10")).isEqualTo(8);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isGreaterThan(100);
+        try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_lastsave=100 WHERE node_id=1");}
+        BookmarkWriteService.remove(connection,10);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isGreaterThan(100);
+        try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_lastsave=100 WHERE node_id=1");}
+        BookmarkWriteService.remove(connection,10);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isEqualTo(100);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=2")).isEqualTo(200);
+    }
+    @Test void invalidBookmarkOrderDoesNotWrite() throws Exception {
+        BookmarkWriteService.add(connection,1);
+        assertThatThrownBy(()->BookmarkWriteService.reorder(connection,1,0)).isInstanceOf(ResponseStatusException.class);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=1")).isEqualTo(1);
+    }
+
 }

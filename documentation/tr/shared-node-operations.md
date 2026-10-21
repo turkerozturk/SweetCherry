@@ -20,7 +20,7 @@ Silme işleminin kapsamı seçilen konum ve `father_id` ile altında bulunan tü
 
 Silinen gerçek düğümün dışarıda referansı kalıyorsa, en küçük kimlikli kalan referans yeni master seçilir:
 
-1. `node`, `image`, `grid`, `codebox` satırlarının `node_id` alanı yeni master kimliğine taşınır. Diğer sütunlar, SQL NULL, binary veriler ve zaman damgaları aynen kalır.
+1. `node`, `image`, `grid`, `codebox` satırlarının `node_id` alanı yeni master kimliğine taşınır. İçerik, SQL NULL ve binary veriler aynen kalır. Oluşturulma tarihi korunur; hayatta kalan grubun `ts_lastsave` değeri güncellenir ([tarih kuralları](node-timestamps.md)).
 2. Yeni master’ın `master_id` değeri `0` olur. Diğer referanslar ona bağlanır.
 3. Yeni master’ın ebeveyni, kendi çocukları ve bookmark’ı korunur.
 4. Silinen alt ağacın konumları ve bookmark’ları kaldırılır. Hiçbir referansı kalmayan içerik grubu tamamen silinir.

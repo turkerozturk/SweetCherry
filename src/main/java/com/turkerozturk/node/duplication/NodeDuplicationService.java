@@ -71,6 +71,8 @@ public class NodeDuplicationService {
             statement.setLong(4,root.master==0?root.id:root.master);
             if(statement.executeUpdate()!=1) throw conflict();
         }
+        com.turkerozturk.node.NodeTimestamps.touchOccurrence(connection,id,
+                com.turkerozturk.node.NodeTimestamps.now());
         return result;
     }
     private void requireWritable() {

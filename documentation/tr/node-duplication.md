@@ -31,3 +31,7 @@ Mobil okuyucuda tam ağaç paneli her açıldığında güncel kayıtlarla yükl
 ## Paylaşımlı düğüm oluşturma
 
 Yeni masaüstü ve mobil okuyucularda Çoğalt menüsündeki **Paylaşımlı Düğüm Oluştur**, seçili occurrence'ın hemen ardından aynı parent altında kardeş oluşturur. Yeni node_id hem node hem children kimliklerinden büyük seçilir. Yalnız children kaydı eklenir; master_id gerçek düğümü gösterir. Kaynak zaten paylaşımlıysa onun gerçek master'ı kullanılır; alias zinciri oluşturulmaz. İçerik/obje satırları, zaman damgaları ve bookmarklar kopyalanmaz. Kardeş sıraları normalleştirilir. Yönetici ve yazılabilir tenant gerekir; CSRF, tenant görünüm token'ı ve ağaç revision kontrolü korunur. Paylaşımlı düğüm içeriği master ile ortaktır; bağımsız içerik isteniyorsa gerçek düğüm çoğaltılır. Bozuk parent zincirleri ve eski ağaç revision’ı reddedilir.
+
+## Tarih kuralları
+
+Gerçek düğüm çoğaltmada orijinallerin tarihleri korunur; yeni gerçek satırlarda oluşturulma ve değişiklik zamanı şimdidir. **Paylaşımlı Düğüm Oluştur** işleminde ayrı bir içerik satırı oluşmaz, mevcut master’ın son değişiklik tarihi güncellenir. Ayrıntılar ve manuel testler: [Düğüm tarihleri](node-timestamps.md).

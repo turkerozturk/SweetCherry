@@ -116,4 +116,21 @@ class SharedParentCreationFixtureTest {
             return result.getLong(1);
         }
     }
+
+    @Test void sharedChildAndSiblingCreationTouchTheContentMasterAndUseFreshNewDates() throws Exception {
+        try(var connection=fixture()) {
+            try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_creation=50,ts_lastsave=100");}
+            long child=service(connection).create(11); // shared occurrence of master 2
+            assertThat(number(connection,"SELECT ts_lastsave FROM node WHERE node_id=2")).isGreaterThan(100);
+            assertThat(number(connection,"SELECT ts_creation FROM node WHERE node_id=2")).isEqualTo(50);
+            assertThat(number(connection,"SELECT ts_lastsave FROM node WHERE node_id=1")).isEqualTo(100);
+            assertThat(number(connection,"SELECT COUNT(*) FROM node WHERE node_id="+child+" AND ts_creation=ts_lastsave AND ts_creation>100")).isEqualTo(1);
+            try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_lastsave=100");}
+            long sibling=service(connection).createSibling(18); // selected shared master 1, parent shared master 2
+            assertThat(number(connection,"SELECT ts_lastsave FROM node WHERE node_id=1")).isGreaterThan(100);
+            assertThat(number(connection,"SELECT ts_lastsave FROM node WHERE node_id=2")).isGreaterThan(100);
+            assertThat(number(connection,"SELECT COUNT(*) FROM node WHERE node_id="+sibling+" AND ts_creation=ts_lastsave AND ts_creation>100")).isEqualTo(1);
+        }
+    }
+
 }

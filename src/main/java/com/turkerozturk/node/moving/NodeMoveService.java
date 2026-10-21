@@ -118,6 +118,8 @@ public class NodeMoveService {
             source.remove(at); target.add(insertAt,node);
             write(connection,source,node.parent); write(connection,target,targetParent);
         }
+        com.turkerozturk.node.NodeTimestamps.touchOccurrence(connection,id,
+                com.turkerozturk.node.NodeTimestamps.now());
     }
     private static void write(Connection connection, List<Row> rows, long parent) throws SQLException {
         try (var statement = connection.prepareStatement("UPDATE children SET father_id = ?, sequence = ? WHERE node_id = ?")) {

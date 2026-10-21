@@ -20,6 +20,10 @@ public class BookmarkWriteController {
     public String add(@PathVariable long id,@RequestParam(defaultValue="reader") String view){
         service.add(id);return "tree".equals(view)?"redirect:/tree?nodeId="+id:"redirect:/nodes/"+id;
     }
+    @PostMapping("/bookmarks/{id}/sequence")
+    public String reorder(@PathVariable long id, @RequestParam long sequence) {
+        service.reorder(id,sequence); return "redirect:/bookmarks";
+    }
     @PostMapping("/bookmarks/{id}/remove")
     public String remove(@PathVariable long id){service.remove(id);return "redirect:/bookmarks";}
 }

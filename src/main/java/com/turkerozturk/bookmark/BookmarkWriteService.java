@@ -10,7 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import java.sql.*;
 
-/** Changes bookmark occurrences without updating node content, timestamps or tree placement. */
+/** Changes bookmark occurrences and touches their content master without altering text or tree placement. */
 @Service
 public class BookmarkWriteService {
     private final NodePropertiesService properties;
@@ -38,6 +38,23 @@ public class BookmarkWriteService {
         requireWritable();
         entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> remove(connection,id));
         entityManager.clear();
+    }
+    /** Updates one stored sort key; equal keys retain the existing node-ID tie breaker. */
+    @Transactional
+    public void reorder(long id, long sequence) {
+        requireWritable();
+        entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> reorder(connection,id,sequence));
+        entityManager.clear();
+    }
+    static void reorder(Connection connection, long id, long sequence) throws SQLException {
+        if (sequence <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid bookmark sequence");
+        requireOccurrence(connection,id);
+        if (!exists(connection,id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bookmark not found");
+        try (var update = connection.prepareStatement("UPDATE bookmark SET sequence=? WHERE node_id=? AND sequence<>?")) {
+            update.setLong(1,sequence); update.setLong(2,id); update.setLong(3,sequence);
+            if (update.executeUpdate() != 0) com.turkerozturk.node.NodeTimestamps.touchOccurrence(
+                    connection,id,com.turkerozturk.node.NodeTimestamps.now());
+        }
     }
     private void requireWritable() {
         if(!writable()) throw new AccessDeniedException("The selected CTB is read-only.");
@@ -70,12 +87,16 @@ public class BookmarkWriteService {
             statement.setLong(1,id);statement.setLong(2,sequence+1);
             if(statement.executeUpdate()!=1)throw new SQLException("Bookmark insert failed");
         }
+        com.turkerozturk.node.NodeTimestamps.touchOccurrence(connection,id,
+                com.turkerozturk.node.NodeTimestamps.now());
     }
     /** Also permits explicit removal of an orphan bookmark; no content row is required or deleted. */
     static void remove(Connection connection,long id) throws SQLException {
         if(id<=0)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid bookmark ID");
         try(var statement=connection.prepareStatement("DELETE FROM bookmark WHERE node_id=?")) {
-            statement.setLong(1,id);statement.executeUpdate();
+            statement.setLong(1,id);
+            if (statement.executeUpdate() != 0) com.turkerozturk.node.NodeTimestamps.touchOccurrence(
+                    connection,id,com.turkerozturk.node.NodeTimestamps.now());
         }
     }
 }

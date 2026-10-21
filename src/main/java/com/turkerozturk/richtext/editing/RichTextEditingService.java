@@ -138,6 +138,18 @@ public class RichTextEditingService {
             canonical = new RichTextXmlWriter().write(saved.text());
         }
         catch (IllegalArgumentException error) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid rich-text XML", error); }
+        // Validate revision, object protections and payloads before deciding this is a no-op.
+        // Preserve the original XML bytes and object rows too when nothing effectively changed.
+        boolean unchangedTables = tables.entrySet().stream().allMatch(entry -> objects.stream()
+                .filter(object -> object.reference().key().equals(entry.getKey()))
+                .anyMatch(object -> RichTextTableCodec.open(tableXml(object)).equals(
+                        RichTextTableCodec.open(entry.getValue()))));
+        boolean unchangedOffsets = survivors.stream().allMatch(object ->
+                saved.offsets().get(object.reference()) == object.reference().offset());
+        if ("custom-colors".equals(node.getSyntax()) && (node.getIsRichText() & 1L) != 0
+                && deleted.isEmpty() && images.isEmpty() && files.isEmpty()
+                && unchangedTables && unchangedOffsets
+                && RichTextChanges.sameText(new RichTextXmlReader().read(node.getTxt()), saved.text())) return;
         int updated = entityManager.createNativeQuery("UPDATE node SET txt = :xml, syntax = 'custom-colors', "
                 + "is_richtxt = (is_richtxt | 1), ts_lastsave = :timestamp WHERE node_id = :id AND (is_ro & 1) = 0 "
                 + "AND txt = :oldText AND syntax = :oldSyntax AND is_richtxt = :oldRich")

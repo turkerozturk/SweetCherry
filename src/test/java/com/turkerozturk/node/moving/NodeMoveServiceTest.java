@@ -21,6 +21,7 @@ class NodeMoveServiceTest {
             statement.execute("INSERT INTO node VALUES(1,'content'),(2,'second'),(3,'third'),(4,'child')");
             statement.execute("INSERT INTO children VALUES(1,0,10,0),(2,0,20,0),(3,0,30,0),(4,1,5,0),(9,0,40,1)");
             statement.execute("INSERT INTO bookmark VALUES(2),(9)");
+            statement.execute("ALTER TABLE node ADD COLUMN ts_lastsave INTEGER DEFAULT 100");
         }
         connection.setAutoCommit(false);
     }
@@ -93,4 +94,26 @@ class NodeMoveServiceTest {
         assertThatThrownBy(()->service.state(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.move(1,NodeMoveService.Direction.UP,"revision")).isInstanceOf(AccessDeniedException.class);
     }
+
+    @Test void movingSharedOccurrenceTouchesItsMasterButNotOtherContent() throws Exception {
+        long before=java.time.Instant.now().getEpochSecond();
+        move(9,NodeMoveService.Direction.UP);
+        try(var statement=connection.createStatement();var row=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=1")) {
+            assertThat(row.next()).isTrue();assertThat(row.getLong(1)).isBetween(before,java.time.Instant.now().getEpochSecond());
+        }
+        try(var statement=connection.createStatement();var row=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=3")) {
+            assertThat(row.next()).isTrue();assertThat(row.getLong(1)).isEqualTo(100);
+        }
+    }
+    @Test void realMoveTouchesSelectedContentAndRejectedMoveDoesNot() throws Exception {
+        assertThatThrownBy(()->move(1,NodeMoveService.Direction.UP)).isInstanceOf(ResponseStatusException.class);
+        try(var statement=connection.createStatement();var row=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=1")) {
+            row.next();assertThat(row.getLong(1)).isEqualTo(100);
+        }
+        move(1,NodeMoveService.Direction.DOWN);
+        try(var statement=connection.createStatement();var row=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=1")) {
+            row.next();assertThat(row.getLong(1)).isGreaterThan(100);
+        }
+    }
+
 }

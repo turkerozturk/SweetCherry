@@ -217,4 +217,25 @@ class SharedCtbExportTest {
     }
     private long number(Connection connection,String sql)throws Exception{try(var st=connection.createStatement();var rs=st.executeQuery(sql)){assertThat(rs.next()).isTrue();return rs.getLong(1);}}
     private String text(Connection connection,String sql)throws Exception{try(var st=connection.createStatement();var rs=st.executeQuery(sql)){assertThat(rs.next()).isTrue();return rs.getString(1);}}
+
+    @Test void allFourExportModesPreserveSourceAndTargetCreationAndModificationDates() throws Exception {
+        for(boolean descendants:new boolean[]{false,true}) for(boolean collection:new boolean[]{false,true}) {
+            try(var source=fixture();var target=DriverManager.getConnection("jdbc:sqlite::memory:")) {
+                try(var statement=source.createStatement()){statement.execute("UPDATE node SET ts_creation=100+node_id,ts_lastsave=200+node_id");}
+                try(var statement=target.createStatement()) {
+                    for(String sql:SqliteSchemaLoader.load().split(";")) if(!sql.isBlank())statement.execute(sql);
+                }
+                CtbExportSql.copy(source,target,11,descendants,collection);
+                try(var statement=target.createStatement();var rows=statement.executeQuery("SELECT name,ts_creation,ts_lastsave FROM node")) {
+                    while(rows.next()) try(var find=source.prepareStatement("SELECT ts_creation,ts_lastsave FROM node WHERE name=?")) {
+                        find.setString(1,rows.getString(1));try(var original=find.executeQuery()) {
+                            assertThat(original.next()).isTrue();assertThat(rows.getLong(2)).isEqualTo(original.getLong(1));assertThat(rows.getLong(3)).isEqualTo(original.getLong(2));
+                        }
+                    }
+                }
+                assertThat(number(source,"SELECT COUNT(*) FROM node WHERE ts_creation<>100+node_id OR ts_lastsave<>200+node_id")).isZero();
+            }
+        }
+    }
+
 }

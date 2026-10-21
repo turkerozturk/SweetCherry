@@ -222,4 +222,19 @@ class NodePropertiesServiceTest {
         ReflectionTestUtils.setField(service, "entityManager", manager);
         return service;
     }
+
+    @Test void savingIdenticalPropertiesStillWritesModificationDateAndNeverCreationDate() {
+        TenantContext.setCurrentTenant("timestamp");
+        var settings=new CustomPropertiesHolder();settings.addCustomProperties("timestamp",Map.of("custom.isWritable","true"));
+        var nodes=mock(NodeRepository.class);var children=mock(ChildrenRepository.class);
+        var occurrence=mock(Children.class);when(occurrence.getMasterId()).thenReturn(0L);when(children.findByNodeId(12L)).thenReturn(occurrence);
+        var node=new Node();node.setName("Same");node.setSyntax("plain-text");when(nodes.findById(12L)).thenReturn(node);
+        var manager=mock(EntityManager.class);var query=mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(query);when(query.setParameter(anyString(),any())).thenReturn(query);
+        var service=new NodePropertiesService(nodes,children,settings);ReflectionTestUtils.setField(service,"entityManager",manager);
+        service.update(12L,"Same",false,TitleColor.NONE,NodeIcon.OTHER,false);
+        verify(manager).createNativeQuery(argThat(sql->sql.contains("ts_lastsave = :timestamp")&&!sql.contains("ts_creation")));
+        verify(query).setParameter(eq("timestamp"),any(Long.class));verify(query).executeUpdate();
+    }
+
 }

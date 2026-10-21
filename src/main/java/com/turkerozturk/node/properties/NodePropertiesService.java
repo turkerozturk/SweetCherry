@@ -93,7 +93,7 @@ public class NodePropertiesService {
         IconIdAndIsReadOnly iconIdAndIsReadOnly = new IconIdAndIsReadOnly(icon.getIconId(), contentReadOnly);
         long concatIconIdAndIsReadOnly = BitOperation.concatIconIdAndIsReadOnly(iconIdAndIsReadOnly);
         // Explicit columns avoid merging the entity's bookmark/children relationships.
-        String sql = "UPDATE node SET name = :name, is_richtxt = :rich, is_ro = :icon"
+        String sql = "UPDATE node SET name = :name, is_richtxt = :rich, is_ro = :icon, ts_lastsave = :timestamp"
                 + (syntaxChanged ? ", syntax = :syntax" : "")
                 + " WHERE node_id = :id"
                 + (syntaxChanged ? (oldSyntax == null ? " AND syntax IS NULL" : " AND syntax = :oldSyntax")
@@ -102,6 +102,7 @@ public class NodePropertiesService {
                 .setParameter("name", name)
                 .setParameter("rich", richText)
                 .setParameter("icon", concatIconIdAndIsReadOnly)
+                .setParameter("timestamp", com.turkerozturk.node.NodeTimestamps.now())
                 .setParameter("id", nodeId);
         if (syntaxChanged) {
             query.setParameter("syntax", newSyntax);

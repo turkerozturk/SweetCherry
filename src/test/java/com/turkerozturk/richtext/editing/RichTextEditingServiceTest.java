@@ -211,4 +211,37 @@ class RichTextEditingServiceTest {
                 .isInstanceOf(ResponseStatusException.class);
         verify(query,never()).executeUpdate();
     }
+
+    @Test void unchangedOrUndoneRichContentPreservesOriginalXmlTimestampAndObjectRows() throws Exception {
+        when(node.getSyntax()).thenReturn("custom-colors");when(node.getIsRichText()).thenReturn(1L);
+        when(node.getTxt()).thenReturn("<node><rich_text weight='heavy'>AB</rich_text></node>");
+        String revision=service.open(12).revision();
+        service.save(12,"<node><rich_text weight='heavy'>A</rich_text><rich_text weight='heavy'>B</rich_text></node>",revision);
+        verify(entityManager,never()).createNativeQuery(anyString());
+        verify(query,never()).executeUpdate();
+    }
+    @Test void unchangedTablePayloadAndProtectedOffsetDoNotTouchTheNode() throws Exception {
+        when(node.getSyntax()).thenReturn("custom-colors");when(node.getIsRichText()).thenReturn(1L);
+        when(node.getTxt()).thenReturn("<node><rich_text>Text</rich_text></node>");
+        try(var statement=connection.createStatement()) {
+            statement.execute("INSERT INTO grid VALUES(12,1,'left','<table><row><cell>Body</cell></row><row><cell>Head</cell></row></table>',80,90)");
+        }
+        var editor=service.open(12);
+        String xml=new com.turkerozturk.richtext.experimental.RichTextXmlWriter().write(editor.document());
+        service.save(12,xml,editor.revision(),"{}","{}","{\"grid:1\":[[\"Head\"],[\"Body\"]]}");
+        verify(query,never()).executeUpdate();
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT offset,txt FROM grid")) {
+            assertThat(rows.next()).isTrue();assertThat(rows.getInt(1)).isEqualTo(1);
+            assertThat(rows.getString(2)).isEqualTo("<table><row><cell>Body</cell></row><row><cell>Head</cell></row></table>");
+        }
+    }
+    @Test void formattingOnlyChangesStillUpdateModificationDate() {
+        when(node.getSyntax()).thenReturn("custom-colors");when(node.getIsRichText()).thenReturn(1L);
+        when(node.getTxt()).thenReturn("<node><rich_text>Text</rich_text></node>");
+        String revision=service.open(12).revision();
+        service.save(12,"<node><rich_text weight='heavy'>Text</rich_text></node>",revision);
+        verify(query).setParameter(eq("timestamp"),any(Long.class));
+        verify(query).executeUpdate();
+    }
+
 }

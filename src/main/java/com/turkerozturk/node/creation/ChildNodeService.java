@@ -51,6 +51,8 @@ public class ChildNodeService {
                 .setParameter("id", id).executeUpdate();
         entityManager.createNativeQuery("UPDATE children SET sequence = :sequence WHERE node_id = :id")
                 .setParameter("sequence", sequence + 1).setParameter("id", id).executeUpdate();
+        com.turkerozturk.node.NodeTimestamps.touchOccurrence(entityManager, occurrenceId,
+                com.turkerozturk.node.NodeTimestamps.now());
         return id;
     }
 
@@ -90,6 +92,7 @@ public class ChildNodeService {
                 + "VALUES (:id, :parent, :sequence, 0)")
                 .setParameter("id", id).setParameter("parent", parentId)
                 .setParameter("sequence", sequence).executeUpdate();
+        if (!topLevel) com.turkerozturk.node.NodeTimestamps.touchOccurrence(entityManager, parentId, timestamp);
         return id;
     }
 }
