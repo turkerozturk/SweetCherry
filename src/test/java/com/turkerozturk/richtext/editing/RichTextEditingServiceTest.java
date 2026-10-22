@@ -109,6 +109,21 @@ class RichTextEditingServiceTest {
         verify(entityManager).createNativeQuery(contains("has_image = 1"));
     }
 
+    @Test void importedImageAndTableSaveTogetherWithoutChangingAnExistingImage() throws Exception {
+        addImage();
+        var picture=new java.awt.image.BufferedImage(2,2,java.awt.image.BufferedImage.TYPE_INT_RGB);
+        var bytes=new java.io.ByteArrayOutputStream();javax.imageio.ImageIO.write(picture,"png",bytes);
+        var images=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-image:import","data:image/png;base64,"+java.util.Base64.getEncoder().encodeToString(bytes.toByteArray())));
+        service.save(12,"<node><rich_text>😀</rich_text><rich_text __sweet_object='image:1'>\uFFFC</rich_text><rich_text __sweet_object='new-image:import'>\uFFFC</rich_text><rich_text __sweet_object='new-table:import'>\uFFFC</rich_text><rich_text>Türkçe</rich_text></node>",service.open(12).revision(),images,"{}","{\"new-table:import\":[[\"Header\"],[\"Value\"]]}");
+        var stored=RichTextEditingService.readObjects(connection,12);assertThat(stored).hasSize(3);
+        var old=stored.stream().filter(o->o.reference().table().equals("image")&&o.reference().offset()==1).findFirst().orElseThrow();
+        assertThat((byte[])old.values()[5]).isEqualTo(new byte[]{1,2});
+        var imported=stored.stream().filter(o->o.reference().table().equals("image")&&o.reference().offset()==2).findFirst().orElseThrow();
+        assertThat(javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream((byte[])imported.values()[5])).getWidth()).isEqualTo(2);
+        var table=stored.stream().filter(o->o.reference().table().equals("grid")).findFirst().orElseThrow();
+        assertThat(table.reference().offset()).isEqualTo(3);assertThat(RichTextTableCodec.open(table.values()[4].toString())).containsExactly(java.util.List.of("Header"),java.util.List.of("Value"));
+    }
+
     @Test void savesAttachmentFilenameAndUnchangedBinaryInImageTable() throws Exception {
         byte[] original = {0, 1, (byte) 255, (byte) 137};
         String files = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-file:test",

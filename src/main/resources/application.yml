@@ -163,6 +163,8 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  # ADMIN-only public webpage import; no LAN/local URLs or browser login cookies.
+  web-import-enabled: true
   pdf:
     # PDF workload limits; increase deliberately for larger exports on stronger machines.
     max-nodes: 512

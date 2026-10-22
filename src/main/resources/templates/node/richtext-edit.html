@@ -39,6 +39,8 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <select data-choice="justification" th:aria-label="#{richtext.edit.align}"><option value="left" th:text="#{richtext.edit.left}"></option><option value="center" th:text="#{richtext.edit.center}"></option><option value="right" th:text="#{richtext.edit.right}"></option><option value="fill" th:text="#{richtext.edit.justify}"></option></select>
 <div class="tool-group" role="group" th:aria-label="#{editor.objectTools}">
 <button type="button" id="richAddImage" th:text="#{richtext.edit.addImage}"></button>
+<button type="button" id="richPasteImage" th:title="#{richtext.clipboardImage}" th:aria-label="#{richtext.clipboardImage}">📋</button>
+<button type="button" id="richWebImport" th:title="#{richtext.webImport}" th:aria-label="#{richtext.webImport}">🌐</button>
 <button type="button" id="richAddFile" th:text="#{richtext.edit.addFile}"></button>
 <button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
 <button type="button" id="richSeparator" th:title="#{editor.separator.help}">33~</button>
@@ -59,6 +61,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
 <span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError}"></span>
 </div>
+<p id="richClipboardHint" class="note" role="alert" hidden th:attr="data-empty=#{richtext.clipboardUnavailable}"></p>
 <p id="richAutoLinkError" role="alert" hidden th:text="#{editor.linkSelectionError}"></p>
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
 <textarea id="richText" spellcheck="false"></textarea>
@@ -96,9 +99,20 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <button type="button" id="richLinkCancel" th:text="#{richtext.edit.cancel}"></button>
 </div>
 </dialog>
+<dialog id="richWebDialog" style="width:45rem;max-width:95vw;max-height:90vh;overflow:auto" aria-labelledby="richWebTitle"
+ th:attr="data-endpoint=@{/nodes/richtext/import/{id}(id=${editor.node.nodeId})},data-loading=#{richtext.web.loading},data-summary=#{richtext.web.summary},data-error=#{richtext.web.error},data-error-url=#{richtext.web.urlError},data-error-blocked=#{richtext.web.blocked},data-error-large=#{richtext.web.large},data-error-busy=#{richtext.web.busy},data-error-type=#{richtext.web.type},data-error-timeout=#{richtext.web.timeout},data-error-disabled=#{richtext.web.disabled},data-error-empty=#{richtext.web.empty},data-error-changed=#{richtext.web.changed},data-error-network=#{richtext.web.network}">
+<h2 id="richWebTitle" th:text="#{richtext.webImport}"></h2>
+<p class="note" th:text="#{richtext.web.help}"></p>
+<label for="richWebUrl" th:text="#{richtext.edit.linkUrl}"></label>
+<input id="richWebUrl" type="url" maxlength="4091" placeholder="https://example.org/article" style="width:100%;box-sizing:border-box">
+<div class="actions"><button type="button" id="richWebLoad" th:text="#{richtext.web.load}"></button><button type="button" id="richWebApply" disabled th:text="#{richtext.web.insert}"></button><button type="button" id="richWebCancel" th:text="#{richtext.edit.cancel}"></button></div>
+<p id="richWebStatus" role="status"></p><pre id="richWebPreview" style="white-space:pre-wrap;max-height:35vh;overflow:auto"></pre>
+</dialog>
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/node/richTextClipboard.js"></script>
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>
+<script th:src="@{/js/node/richTextImageClipboard.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
+<script th:src="@{/js/node/richTextWebImport.js}"></script>
 </body></html>

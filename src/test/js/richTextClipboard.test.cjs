@@ -48,3 +48,15 @@ test('clipboard size and traversal limits reject instead of silently truncating'
  assert.throws(()=>clipboard.fromDom(fragment([text('a'.repeat(200001))])));
  assert.throws(()=>clipboard.fromDom(fragment(Array.from({length:10001},()=>text('A')))));
 });
+
+
+test('only explicit import image map turns image tokens into embedded images',()=>{
+ const source=fragment([element('IMG',[],{'data-import-image':'image0',src:'https://example.org/image.png',alt:'Photo'})]);
+ assert.equal(clipboard.fromDom(source)[0].image,undefined);
+ assert.deepEqual(clipboard.fromDom(source,{image0:'data:image/png;base64,AQID'})[0],{image:'data:image/png;base64,AQID',label:'Photo'});
+});
+test('imported images inside tables are placed after the plain table and retain cell alternative text',()=>{
+ const source=fragment([element('TABLE',[element('TR',[element('TD',[text('Cell '),element('IMG',[],{'data-import-image':'image0',alt:'Photo'})])])])]);
+ const result=clipboard.fromDom(source,{image0:'data:image/png;base64,AQID'});
+ assert.deepEqual(result[0].table,[['Cell Photo']]);assert.equal(result.filter(item=>item.image).length,1);
+});

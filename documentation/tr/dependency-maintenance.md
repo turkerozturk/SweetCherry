@@ -321,3 +321,14 @@ Kaynaklar:
 - https://github.com/flyingsaucerproject/flyingsaucer (Java gereksinimleri)
 - https://pdfbox.apache.org/security.html
 - [PDF dışa aktarma geliştirme planı](pdf-export-plan.md)
+
+
+### URL içerik aktarımı HTTP istemcisi
+
+`org.apache.httpcomponents.client5:httpclient5` doğrudan bağımlılıktır; sürümü Spring Boot
+parent tarafından yönetilir (bu eklemede 5.5.2). Ayrı bir sürüm override'ı yoktur. URL
+aktarımı DNS/IP sabitleme, yönlendirme kontrolü ve boyutu aşan yanıtı tüketmeden kapatma
+özellikleri için kullanır. jsoup sayfa temizleme/dönüştürmede mevcut sürümüyle korunur.
+Güncellemede `WebContentImportTest`, `WebContentImportSecurityTest` ve URL aktarımı
+manuel kontrolleri çalıştırılır. HttpClient Apache License 2.0 lisanslıdır; dağıtım lisans
+raporunda normal bağımlılık olarak yer almalıdır.

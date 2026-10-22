@@ -44,12 +44,12 @@
         return a;
     }
     /** Walks inert parsed DOM into text runs and plain tables; scripts/CSS/remote resources never enter the editor DOM. */
-    function fromDom(fragment){
+    function fromDom(fragment, importedImages={}){
         const items=[];let visits=0,length=0,tables=0;
         const add=(text,a,separator=false)=>{text=text.replace(/\uFFFC/g,'');length+=text.length;if(length>200000)throw new Error('Clipboard too large');if(text)items.push({text,attributes:{...a},separator});};
         const tail=()=>items.length?items[items.length-1].text||'\uFFFC':'';
         const newline=(a,force=false)=>{if(force||items.length&&!tail().endsWith('\n'))add('\n',a,true);};
-        function cellText(node){if(node.nodeType===3)return node.nodeValue;if(node.nodeType!==1)return '';if(['SCRIPT','STYLE','IFRAME','OBJECT','NOSCRIPT'].includes(node.tagName))return '';if(node.tagName==='BR')return '\n';return Array.from(node.childNodes).map(cellText).join('');}
+        function cellText(node){if(node.nodeType===3)return node.nodeValue;if(node.nodeType!==1)return '';if(['SCRIPT','STYLE','IFRAME','OBJECT','NOSCRIPT'].includes(node.tagName))return '';if(node.tagName==='BR')return '\n';if(node.tagName==='IMG')return node.getAttribute('alt')||'[image]';return Array.from(node.childNodes).map(cellText).join('');}
         function tableRows(node){
             const rows=[];
             for(const child of node.children||[]){if(child.tagName==='TR')rows.push(child);else if(['THEAD','TBODY','TFOOT'].includes(child.tagName))rows.push(...Array.from(child.children).filter(row=>row.tagName==='TR'));}
@@ -66,6 +66,8 @@
             const next=styles(node,a);
             if(tag==='BR'){add('\n',next);return;}
             if(tag==='IMG'){
+                const data=importedImages[node.getAttribute('data-import-image')];
+                if(typeof data==='string' && data.startsWith('data:image/png;base64,')){items.push({image:data,label:node.getAttribute('alt')||'Image'});return;}
                 const link=external(node.getAttribute('src')||'');const alt=node.getAttribute('alt')||'';
                 if(link)add(alt||link.slice(5),{...next,link});else if(alt)add(alt,next);
                 return;
@@ -75,6 +77,7 @@
                 length+=matrix.reduce((n,row)=>n+row.reduce((n,cell)=>n+cell.length,0),0);if(length>200000)throw new Error('Clipboard too large');
                 if(valid){if(++tables>10)throw new Error('Too many tables');items.push({table:matrix});}
                 else for(const row of matrix){add(row.join('\t'),next);add('\n',next,true);}
+                for(const img of node.querySelectorAll('img'))if(importedImages[img.getAttribute('data-import-image')])visit(img,next,pre,depth+1);
                 newline(next);return;
             }
             const block=['P','DIV','SECTION','ARTICLE','BLOCKQUOTE','PRE','LI','UL','OL','H1','H2','H3','H4','H5','H6'].includes(tag);
@@ -86,10 +89,10 @@
         }
         visit(fragment);
         if(items.length&&items[items.length-1].separator){const run=items[items.length-1];run.text=run.text.slice(0,-1);if(!run.text)items.pop();}
-        return items.map(item=>item.table?item:{text:item.text,attributes:item.attributes});
+        return items.map(item=>item.table||item.image?item:{text:item.text,attributes:item.attributes});
     }
     /** Parses clipboard HTML in a template; the inert source tree is never attached to the document. */
-    function fromHtml(html,doc){if(html.length>2000000)throw new Error('Clipboard HTML too large');const template=doc.createElement('template');template.innerHTML=html;return fromDom(template.content);}
+    function fromHtml(html,doc,importedImages={}){if(html.length>2000000)throw new Error('Clipboard HTML too large');const template=doc.createElement('template');template.innerHTML=html;return fromDom(template.content,importedImages);}
     function fromInternal(json){
         if(json.length>2000000)throw new Error('Clipboard too large');const rows=JSON.parse(json);
         if(!Array.isArray(rows)||rows.length>10000)throw new Error('Invalid clipboard');let length=0;

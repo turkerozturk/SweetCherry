@@ -557,6 +557,16 @@
         fileButton.addEventListener('click',()=>{captureSelection();filePicker.click();});
         filePicker.addEventListener('change',()=>{if(filePicker.files[0])addObject(filePicker.files[0],true);filePicker.value='';});
     }
+    const clipboardButton=document.getElementById('richPasteImage');
+    if(clipboardButton)clipboardButton.addEventListener('click',async()=>{
+        captureSelection();const at=[...selection],source=JSON.stringify(runs),hint=document.getElementById('richClipboardHint');
+        try {
+            if(readingImage)throw new Error('busy');
+            const file=await window.RichTextImageClipboard.read(navigator.clipboard);
+            if(source!==JSON.stringify(runs))throw new Error('changed');
+            selection=at;focusEditor();restoreSelection();await addImage(file);if(hint)hint.hidden=true;
+        }catch(_){if(hint){hint.textContent=hint.dataset.empty;hint.hidden=false;}}
+    });
     /** Copies formatted text runs only; protected objects are excluded instead of producing phantom OBJ characters. */
     function copySelection(event) {
         rememberSelection();event.preventDefault();
@@ -576,24 +586,33 @@
     }
     /** Inserts imported runs and tables as one model/history change, keeping the original objects protected. */
     function pasteStructured(items) {
-        const incoming=[],newTables={},info={};
+        const incoming=[],newTables={},newImages={},info={};
         for(const item of items){
-            if(item.table){
+            if(item.image){
+                if(typeof item.image!=='string' || item.image.length>Math.ceil(uploadLimit/3)*4+32 || !/^data:image\/png;base64,[A-Za-z0-9+/]*={0,2}$/.test(item.image))throw new Error('Invalid imported image');
+                const key='new-image:'+crypto.randomUUID();newImages[key]=item.image;
+                info[key]={label:item.label||'Image',imageUrl:item.image};incoming.push({text:'\uFFFC',attributes:{__sweet_object:key}});
+            }else if(item.table){
                 const key='new-table:'+crypto.randomUUID();newTables[key]=item.table;
                 info[key]={label:tableButton?tableButton.textContent:'Table',tableRows:item.table};
                 incoming.push({text:'\uFFFC',attributes:{__sweet_object:key}});
             }else if(item.text)incoming.push({text:item.text,attributes:{...item.attributes}});
         }
         if(!incoming.length)return false;
-        if(runs.filter(run=>(run.attributes.__sweet_object||'').startsWith('new-')).length+Object.keys(newTables).length>10
+        if(runs.filter(run=>(run.attributes.__sweet_object||'').startsWith('new-')).length+Object.keys(newTables).length+Object.keys(newImages).length>10
             || Object.keys({...tableChanges,...newTables}).length>20 || JSON.stringify({...tableChanges,...newTables}).length>2000000)throw new Error('Clipboard tables too large');
+        const active=runs.map(run=>run.attributes.__sweet_object);
+        if(Object.entries(pendingImages).filter(([key])=>active.includes(key)).reduce((n,[,value])=>n+value.length,0)
+            +Object.entries(pendingFiles).filter(([key])=>active.includes(key)).reduce((n,[,value])=>n+value.data.length,0)
+            +Object.values(newImages).reduce((n,value)=>n+value.length,0)>29000000)throw new Error('Upload too large');
         captureSelection();const [start,end]=selection,text=incoming.map(run=>run.text).join('');
-        if(!replace(start,end,text))return true;
+        if(!replace(start,end,text))return false;
         let offset=0;
         for(let index=0;index<runs.length;index++){
             if(offset===start&&runs[index].text===text&&!runs[index].attributes.__sweet_object){runs.splice(index,1,...incoming);break;}
             offset+=count(runs[index].text);
         }
+        Object.assign(pendingImages,newImages);
         tableChanges={...tableChanges,...newTables};window.richEditorObjects={...(window.richEditorObjects||{}),...info};
         previous=runs.map(run=>run.text).join('');input.value=previous;
         selection=[start+count(text),start+count(text)];render();focusEditor();restoreSelection();commitHistory();return true;
@@ -601,16 +620,21 @@
     function paste(event) {
         event.preventDefault();rememberSelection();
         const pasteStatus=document.getElementById('richPasteStatus');if(pasteStatus)pasteStatus.hidden=true;
+        const clipboardHint=document.getElementById('richClipboardHint');if(clipboardHint)clipboardHint.hidden=true;
         const transfer=event.clipboardData,clipboard=window.RichTextClipboard;
+        if(!transfer)return;
+        const file=window.RichTextImageClipboard?.fromTransfer(transfer);
+        const plain=transfer.getData('text/plain');
         if(clipboard){
             const own=transfer.getData('application/x-sweetcherry-richtext+json'),html=transfer.getData('text/html');
             try{
                 if(own&&pasteStructured(clipboard.fromInternal(own)))return;
+                if(file && !plain.trim()){addImage(file);return;}
                 if(html&&pasteStructured(clipboard.fromHtml(html,document)))return;
             }catch(_){const status=document.getElementById('richPasteStatus');if(status)status.hidden=false;return;}
         }
-        const file=Array.from(transfer.files||[]).find(file=>file.type.startsWith('image/'));
-        if(file)addImage(file);else visualChange(plainClipboard(transfer.getData('text/plain')).replace(/\r\n?/g,'\n'));
+        if(file)addImage(file);else if(plain)visualChange(plainClipboard(plain).replace(/\r\n?/g,'\n'));
+        else {const hint=document.getElementById('richClipboardHint');if(hint){hint.hidden=false;const types=window.RichTextImageClipboard?.formats(transfer);hint.textContent=hint.dataset.empty+(types?' ('+types+')':'');}}
     }
     for(const target of [input,preview])target.addEventListener('copy',copySelection);
     input.addEventListener('cut',event=>{copySelection(event);visualChange('');});
@@ -685,6 +709,13 @@
         const tables=Object.fromEntries(Object.entries(tableChanges).filter(([key,rows])=>active.has(key) && JSON.stringify(rows)!==JSON.stringify(window.richEditorObjects?.[key]?.tableRows)).sort(([a],[b])=>a.localeCompare(b)));
         return JSON.stringify({runs:normalized,deleted:[...deletedKeys].sort(),tables});
     }
+    window.RichTextImportBridge={
+        capture(){if(readingImage||composing)throw new Error('busy');captureSelection();return {selection:[...selection],content:contentSignature()};},
+        insert(ticket,items){
+            if(readingImage||composing||contentSignature()!==ticket.content)throw new Error('changed');
+            selection=[...ticket.selection];focusEditor();restoreSelection();return pasteStructured(items);
+        }
+    };
     const initialContent=contentSignature();
     window.EditorLeaveGuard.install(form,()=>readingImage || contentSignature()!==initialContent);
 })();

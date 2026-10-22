@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Read clipboard PNG/JPEG file items as well as files; add an explicit permission-based clipboard image button.
+- Add a separate, reviewed public-URL rich-text import with bounded PNG/JPEG downloads, plain tables, atomic undo/redo, and no CTB write before Save. Restrict network targets and preserve the existing HTML paste flow.
+
 - Add persistent node-content zoom controls to View Mode.
 - Group rich-text tools, add list characters and selected-URL linking, and allow resizing the editor.
 - Add plain-text undo/redo and unsaved-change protection to both editors; move Save/Cancel above editing controls.

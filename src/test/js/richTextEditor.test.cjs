@@ -20,7 +20,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     const symbol=element('symbol');symbol.dataset={insertSymbol:'☐'};
-    let saved, dirty;
+    let saved, dirty, windowObject, uuid=0;
     const document = {
         getElementById: id => ids[id],
         querySelectorAll: selector => selector === '[data-insert-symbol]' ? [symbol] : selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
@@ -35,12 +35,12 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, window:{EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
+    vm.runInNewContext(source, {document, URL, window:windowObject={RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
         RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
-        crypto:{randomUUID:()=> 'test-uuid'},
+        crypto:{randomUUID:()=> uuid++===0?'test-uuid':'test-uuid-'+uuid},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
-    function fire(id, type, event = {}) {handlers.get(id + ':' + type)(event);}
+    function fire(id, type, event = {}) {return handlers.get(id + ':' + type)(event);}
     function select(start, end) {ids.richText.selectionStart = start; ids.richText.selectionEnd = end; fire('richText','select');}
     function runs() {fire('richEditForm','submit'); return saved;}
     function key(key, shiftKey = false) {
@@ -54,7 +54,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
         ids.richText.selectionStart = ids.richText.selectionEnd = value.length;
         fire('richText','input');
     }
-    return {ids, align, fire, select, runs, key, type, symbol, dirty:()=>dirty()};
+    return {ids, align, fire, select, runs, key, type, symbol, dirty:()=>dirty(), bridge:()=>windowObject.RichTextImportBridge};
 }
 
 function text(runs) {return runs.map(run => run.text).join('');}
@@ -303,4 +303,30 @@ test('selected URL shortcut leaves external-link dialog intact and rejects unsaf
         } else {assert.equal(e.ids.richAutoLinkError.hidden,false);assert.equal(e.dirty(),false);}
         e.select(0,value.length);e.fire('richLink','click');assert.equal(e.ids.richLinkDialog.open,true);
     }
+});
+
+
+test('clipboard image items with an empty files list insert an image instead of image-only HTML',async()=>{
+ const e=editor();e.select(1,1);
+ const file={type:'image/png',size:3,data:'data:image/png;base64,AQID'};
+ e.fire('richText','paste',{preventDefault(){},clipboardData:{items:[{kind:'file',type:'image/png',getAsFile:()=>file}],files:[],getData:type=>type==='text/html'?'<img>':''}});
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(text(e.runs()),'A\uFFFC😀B\nC');assert.ok(JSON.parse(e.ids.richImages.value)['new-image:test-uuid']);
+ e.key('z');assert.equal(e.dirty(),false);
+});
+test('web import inserts text, image and table as one undoable save payload at its captured cursor',()=>{
+ const e=editor();e.select(1,3);const ticket=e.bridge().capture();
+ assert.equal(e.bridge().insert(ticket,[{text:'Imported',attributes:{weight:'heavy'}},{image:'data:image/png;base64,AQID',label:'Picture'},{table:[['H'],['V']]}]),true);
+ assert.equal(text(e.runs()),'AImported\uFFFC\uFFFCB\nC');
+ assert.equal(Object.keys(JSON.parse(e.ids.richImages.value)).length,1);assert.equal(Object.keys(JSON.parse(e.ids.richTables.value)).length,1);
+ e.key('z');assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(e.dirty(),false);
+ e.key('y');assert.equal(Object.keys(JSON.parse((e.runs(),e.ids.richImages.value))).length,1);
+});
+test('web import rejects stale state, oversized images and protected selections without altering content',()=>{
+ const e=editor();const ticket=e.bridge().capture();e.type('Changed');
+ assert.throws(()=>e.bridge().insert(ticket,[{text:'Lost',attributes:{}}]));assert.equal(text(e.runs()),'Changed');
+ const unchanged=e.bridge().capture();assert.throws(()=>e.bridge().insert(unchanged,[{image:'data:image/svg+xml;base64,AQID'}]));assert.equal(text(e.runs()),'Changed');
+ const protectedEditor=editor(objectRuns());protectedEditor.select(1,2);
+ assert.equal(protectedEditor.bridge().insert(protectedEditor.bridge().capture(),[{text:'Replace',attributes:{}}]),false);
+ assert.equal(text(protectedEditor.runs()),'A\uFFFCB');
 });

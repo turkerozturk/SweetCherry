@@ -475,11 +475,12 @@ metin olarak aktarılır; satır/sütun metni korunur, colspan/rowspan yapısı 
 Tablo hücresi içindeki biçimlendirme düz metne dönüşür. Yeni tablo nesneleri protected
 slot'larla gösterilir ve önceki tablo diyaloğundan düzenlenebilir.
 
-Uzak web img adresi indirilmez: varsa alt metni, yoksa URL'si HTTP(S) bağlantı olarak
-aktarılır. Bu ilk aşama uzak görselin binary verisini CTB'ye eklemez. HTML'de veri üretmeyen
-bir resim yapıştırmasında, panoda gerçek PNG/JPEG file varsa mevcut image ekleme yolu
-kullanılır. Sadece data-URI HTML olup binary file olmayan resimler bu sürümde import edilmez.
-İstenilen web görselleri ayrıca panodan/dosyadan eklenebilir; otomatik resim importu ayrıdır.
+Normal Ctrl+V ile web HTML'sindeki uzak görsel adresleri otomatik indirilmez; mevcut
+metin/tablo yapıştırma yolu korunur. Panodaki PNG/JPEG file/item varsa resim ekleme yolu
+kullanılır. **📋 Panodan resim yapıştır** tarayıcının izinli API'sini ayrıca deneyebilir.
+**🌐 URL’den içerik ekle**, statik bir sayfayı desteklenen resimleriyle ayrı ve onaylı bir
+akışta alır. Kullanım, sınırlar ve manuel kontroller:
+[web-content-and-image-paste.md](web-content-and-image-paste.md).
 
 SweetCherry içindeki copy/cut, düz metne ek olarak güvenli HTML ve özel metin/biçim clipboard
 metadata'sı sağlar. Aynı editöre paste biçimleri taşır. Desteklenen text attribute'ları ve

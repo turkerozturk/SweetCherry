@@ -235,6 +235,12 @@
 			<version>${sweetcherry.flying-saucer.version}</version>
 		</dependency>
 
+        <!-- Public web import: DNS-pinned requests; version managed by Spring Boot. -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+        </dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
 		<dependency>
 			<groupId>org.jsoup</groupId>
