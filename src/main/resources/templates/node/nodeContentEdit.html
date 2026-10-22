@@ -9,17 +9,23 @@
     <p><strong th:text="${node.name}">Düğüm adı</strong>
         <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>
     <p class="text-muted">Bu alan düz metindir. Satır sonları ve kod metni olduğu gibi kaydedilir.</p>
-    <form th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
+    <form id="plainEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
+        <div class="mb-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary" th:text="#{richtext.edit.save}">Kaydet</button>
+            <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}">İptal</a>
+        </div>
         <label for="nodeText" class="form-label">İçerik</label>
+        <div class="d-flex gap-2 mb-2" role="group" th:aria-label="#{editor.tools}">
+        <button type="button" id="plainUndo" class="btn btn-outline-secondary" th:title="#{richtext.edit.undo}" th:aria-label="#{richtext.edit.undo}"><i class="fas fa-undo" aria-hidden="true"></i></button>
+        <button type="button" id="plainRedo" class="btn btn-outline-secondary" th:title="#{richtext.edit.redo}" th:aria-label="#{richtext.edit.redo}"><i class="fas fa-redo" aria-hidden="true"></i></button>
         <button type="button" id="plainSeparator" class="btn btn-outline-secondary mb-2" th:title="#{editor.separator.help}">33~</button>
+        </div>
         <textarea id="nodeText" name="text" class="form-control font-monospace" rows="20"
                   spellcheck="false" th:text="${node.txt}"></textarea>
-        <div class="mt-3">
-            <button type="submit" class="btn btn-primary">Kaydet</button>
-            <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId})}">İptal</a>
-        </div>
+
     </form>
+<script th:src="@{/js/common/editorLeaveGuard.js}"></script>
 <script th:src="@{/js/node/plainTextEditor.js}"></script>
 </section>
 </body>

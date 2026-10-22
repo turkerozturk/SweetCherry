@@ -15,14 +15,15 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
             setAttribute() {}, contains(target) { return this.childNodes.some(n => n === target || n.contains && n.contains(target)); },
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richAutoLink','richAutoLinkError','richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
     if (visual) { ids.richVisualMode=element('richVisualMode'); ids.richVisualMode.checked=true; }
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
-    let saved;
+    const symbol=element('symbol');symbol.dataset={insertSymbol:'☐'};
+    let saved, dirty;
     const document = {
         getElementById: id => ids[id],
-        querySelectorAll: selector => selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
+        querySelectorAll: selector => selector === '[data-insert-symbol]' ? [symbol] : selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
         createElement: () => element(),
         createDocumentFragment: () => element(),
         createTextNode: text => ({text}),
@@ -34,7 +35,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, window:{richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
+    vm.runInNewContext(source, {document, URL, window:{EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
         RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
         crypto:{randomUUID:()=> 'test-uuid'},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
@@ -53,7 +54,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
         ids.richText.selectionStart = ids.richText.selectionEnd = value.length;
         fire('richText','input');
     }
-    return {ids, align, fire, select, runs, key, type};
+    return {ids, align, fire, select, runs, key, type, symbol, dirty:()=>dirty()};
 }
 
 function text(runs) {return runs.map(run => run.text).join('');}
@@ -274,4 +275,32 @@ test('only leading visual boxes cycle, preserving attributes and undo/redo acros
     assert.equal(text(e.runs()),original);
     e.fire('richUndo','click');assert.equal(Array.from(text(e.runs()))[2],'☒');
     e.fire('richRedo','click');assert.equal(text(e.runs()),original);
+});
+
+
+test('dirty state follows content and undo, ignoring selections and mode controls', () => {
+    const e=editor([{text:'Original',attributes:{}}]);
+    assert.equal(e.dirty(),false);e.select(0,4);assert.equal(e.dirty(),false);
+    e.type('Changed');assert.equal(e.dirty(),true);
+    e.key('z');assert.equal(e.dirty(),false);e.key('y');assert.equal(e.dirty(),true);
+    e.key('z');e.select(0,4);e.fire('bold','click');assert.equal(e.dirty(),true);
+    e.fire('bold','click');assert.equal(e.dirty(),false); // split runs alone are not edits
+});
+test('inserted list symbols retain selection, formatting and undo',()=>{
+    const e=editor([{text:'A😀B',attributes:{weight:'heavy'}}]);
+    for(const symbol of ['☐','☑','☒','•']) {
+        e.select(1,3);e.symbol.dataset.insertSymbol=symbol;e.fire('symbol','click');
+        assert.equal(text(e.runs()),'A'+symbol+' B');assert.equal(e.dirty(),true);
+        e.key('z');assert.equal(text(e.runs()),'A😀B');assert.equal(e.dirty(),false);
+    }
+});
+test('selected URL shortcut leaves external-link dialog intact and rejects unsafe addresses',()=>{
+    for(const value of ['https://example.org/a?b=1','www.example.org','javascript:alert(1)','file:///tmp/a','not a url']) {
+        const e=editor([{text:value,attributes:{weight:'heavy'}}]);e.select(0,value.length);e.fire('richAutoLink','click');
+        if(value.startsWith('https:')||value.startsWith('www.')) {
+            assert.equal(e.runs()[0].attributes.link,'webs '+new URL(value.startsWith('www.')?'https://'+value:value).href);
+            assert.equal(e.runs()[0].attributes.weight,'heavy');e.key('z');assert.equal(e.dirty(),false);
+        } else {assert.equal(e.ids.richAutoLinkError.hidden,false);assert.equal(e.dirty(),false);}
+        e.select(0,value.length);e.fire('richLink','click');assert.equal(e.ids.richLinkDialog.open,true);
+    }
 });

@@ -3,7 +3,7 @@
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
 <style>
-body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;color:#20242a}h1{font-size:1.3rem}.toolbar{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:1rem 0}button,select,input{font:inherit;padding:.35rem}textarea{box-sizing:border-box;width:100%;min-height:35vh;font:1rem monospace}#richPreview{white-space:pre-wrap;overflow-wrap:anywhere;min-height:8rem;border:1px solid #ccc;padding:1rem;margin:1rem 0}label{display:inline-flex;gap:.25rem;align-items:center}.note{color:#555}.actions{display:flex;gap:1rem;align-items:center}
+body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;color:#20242a}h1{font-size:1.3rem}.toolbar{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:1rem 0}button,select,input{font:inherit;padding:.35rem}textarea{box-sizing:border-box;width:100%;min-height:35vh;font:1rem monospace}#richPreview{white-space:pre-wrap;overflow-wrap:anywhere;min-height:8rem;border:1px solid #ccc;padding:1rem;margin:1rem 0}label{display:inline-flex;gap:.25rem;align-items:center}.note{color:#555}.actions{display:flex;gap:1rem;align-items:center;margin:.8rem 0}.tool-group{display:inline-flex;flex-wrap:wrap;gap:.2rem;align-items:center;border:1px solid #c3c8ce;border-radius:.35rem;padding:.25rem}.toolbar button{min-width:2.2rem}.toolbar input[type=color]{width:2.5rem;height:2rem;padding:.1rem}#richPreview,#richText{resize:vertical;overflow:auto;min-height:12rem;max-width:100%;box-sizing:border-box}#richPreview{height:45vh}.toolbar .note{flex-basis:100%}
 </style></head>
 <body>
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
@@ -11,7 +11,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <p class="note" th:text="#{richtext.edit.help}"></p>
 <p id="protectedHint" class="note" th:hidden="${#maps.isEmpty(editor.objects)}" th:text="#{richtext.edit.protected}"></p>
 <p class="note" th:if="${editor.node.syntax == 'plain-text'}" th:text="#{richtext.edit.convert}"></p>
-<form id="richEditForm" th:action="@{/nodes/richtext/edit/{id}(id=${editor.node.nodeId})}" method="post">
+<form id="richEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/richtext/edit/{id}(id=${editor.node.nodeId})}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" th:value="${editor.revision}">
 <input type="hidden" name="xml" id="richXml">
@@ -19,39 +19,54 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="hidden" name="files" id="richFiles" value="{}">
 <input type="hidden" name="deleted" id="richDeleted" value="[]">
 <input type="hidden" name="tables" id="richTables" value="{}">
+<div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 <label><input type="checkbox" id="richVisualMode" checked> <span th:text="#{richtext.edit.visual}"></span></label>
 <div class="toolbar">
-<button type="button" id="richSeparator" th:title="#{editor.separator.help}">33~</button>
-<button type="button" id="richUndo" th:text="#{richtext.edit.undo}" title="Ctrl+Z"></button>
-<button type="button" id="richRedo" th:text="#{richtext.edit.redo}" title="Ctrl+Y / Ctrl+Shift+Z"></button>
-<button type="button" data-format="weight" data-value="heavy" th:title="#{richtext.edit.bold}"><b>B</b></button>
-<button type="button" data-format="style" data-value="italic" th:title="#{richtext.edit.italic}"><i>I</i></button>
-<button type="button" data-format="underline" data-value="single" th:title="#{richtext.edit.underline}"><u>U</u></button>
-<button type="button" data-format="strikethrough" data-value="true" th:title="#{richtext.edit.strike}"><s>S</s></button>
-<button type="button" data-format="family" data-value="monospace" th:text="#{richtext.edit.monospace}"></button>
-<label><span th:text="#{richtext.edit.color}"></span><input type="color" data-color="foreground" value="#3584e4"></label>
-<label><span th:text="#{richtext.edit.background}"></span><input type="color" data-color="background" value="#ffffff"></label>
+<div class="tool-group" role="group" th:aria-label="#{editor.formatTools}">
+<button type="button" data-format="weight" data-value="heavy" th:title="#{richtext.edit.bold}" th:aria-label="#{richtext.edit.bold}"><b>B</b></button>
+<button type="button" data-format="style" data-value="italic" th:title="#{richtext.edit.italic}" th:aria-label="#{richtext.edit.italic}"><i>I</i></button>
+<button type="button" data-format="underline" data-value="single" th:title="#{richtext.edit.underline}" th:aria-label="#{richtext.edit.underline}"><u>U</u></button>
+<button type="button" data-format="strikethrough" data-value="true" th:title="#{richtext.edit.strike}" th:aria-label="#{richtext.edit.strike}"><s>S</s></button>
+<button type="button" data-format="family" data-value="monospace" th:title="#{richtext.edit.monospace}" th:aria-label="#{richtext.edit.monospace}"><span style="font-family:monospace">ms</span></button>
+<label th:title="#{richtext.edit.color}"><span th:text="#{richtext.edit.color}"></span><input type="color" data-color="foreground" value="#3584e4" th:aria-label="#{richtext.edit.color}"></label>
+<label th:title="#{richtext.edit.background}"><span th:text="#{richtext.edit.background}"></span><input type="color" data-color="background" value="#ffffff" th:aria-label="#{richtext.edit.background}"></label>
+</div>
+<div class="tool-group" role="group" th:aria-label="#{editor.historyTools}">
+<button type="button" id="richUndo" th:title="#{editor.undoShortcut}" th:aria-label="#{richtext.edit.undo}">↶</button>
+<button type="button" id="richRedo" th:title="#{editor.redoShortcut}" th:aria-label="#{richtext.edit.redo}">↷</button>
+</div>
 <select data-choice="scale" th:aria-label="#{richtext.edit.size}"><option value="" th:text="#{richtext.edit.normal}"></option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="h4">H4</option><option value="h5">H5</option><option value="h6">H6</option><option value="small">Small</option><option value="sub">Sub</option><option value="sup">Sup</option></select>
 <select data-choice="justification" th:aria-label="#{richtext.edit.align}"><option value="left" th:text="#{richtext.edit.left}"></option><option value="center" th:text="#{richtext.edit.center}"></option><option value="right" th:text="#{richtext.edit.right}"></option><option value="fill" th:text="#{richtext.edit.justify}"></option></select>
+<div class="tool-group" role="group" th:aria-label="#{editor.objectTools}">
 <button type="button" id="richAddImage" th:text="#{richtext.edit.addImage}"></button>
-<input type="file" id="richImageFile" accept="image/png,image/jpeg" hidden>
 <button type="button" id="richAddFile" th:text="#{richtext.edit.addFile}"></button>
+<button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
+<button type="button" id="richSeparator" th:title="#{editor.separator.help}">33~</button>
+<button type="button" id="richObjects" th:text="#{richtext.edit.objects}"></button>
+</div>
+<div class="tool-group" role="group" th:aria-label="#{editor.listTools}">
+<button type="button" data-insert-symbol="☐" th:title="#{editor.insertUnchecked}" th:aria-label="#{editor.insertUnchecked}">☐</button>
+<button type="button" data-insert-symbol="☑" th:title="#{editor.insertChecked}" th:aria-label="#{editor.insertChecked}">☑</button>
+<button type="button" data-insert-symbol="☒" th:title="#{editor.insertCrossed}" th:aria-label="#{editor.insertCrossed}">☒</button>
+<button type="button" data-insert-symbol="•" th:title="#{editor.insertBullet}" th:aria-label="#{editor.insertBullet}">•</button>
+</div>
+<button type="button" id="richLink" th:text="#{richtext.edit.link}"></button>
+<button type="button" id="richAutoLink" th:text="#{editor.linkSelection}" th:title="#{editor.linkSelectionHelp}"></button>
+<button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
+<label><input type="checkbox" id="richAllowDeletion" name="allowObjectDeletion" value="true"><span id="richDeletionIcon">🔒</span><span th:text="#{richtext.edit.allowDeletion}"></span></label>
+<input type="file" id="richImageFile" accept="image/png,image/jpeg" hidden>
 <input type="file" id="richFilePicker" hidden>
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
 <span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError}"></span>
-<button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
-<button type="button" id="richLink" th:text="#{richtext.edit.link}"></button>
-<button type="button" id="richObjects" th:text="#{richtext.edit.objects}"></button>
-<label><input type="checkbox" id="richAllowDeletion" name="allowObjectDeletion" value="true"><span id="richDeletionIcon">🔒</span><span th:text="#{richtext.edit.allowDeletion}"></span></label>
-<button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
 </div>
+<p id="richAutoLinkError" role="alert" hidden th:text="#{editor.linkSelectionError}"></p>
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
 <textarea id="richText" spellcheck="false"></textarea>
 <h2 id="richPreviewTitle" th:attr="data-visual=#{richtext.edit.text},data-preview=#{richtext.edit.preview}" th:text="#{richtext.edit.preview}"></h2><div id="richPreview" aria-labelledby="richPreviewTitle"></div>
 <p id="richPasteStatus" class="note" role="alert" hidden th:text="#{richtext.edit.pasteError}"></p>
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <p id="richDeletionHint" role="alert" hidden th:text="#{richtext.edit.deletionLocked}"></p>
-<div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
+
 </form>
 <dialog id="richObjectDialog" style="max-width:95vw;max-height:85vh;overflow:auto" aria-labelledby="richObjectTitle">
 <h2 id="richObjectTitle" th:text="#{richtext.edit.objects}"></h2>
@@ -84,5 +99,6 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/node/richTextClipboard.js"></script>
+<script th:src="@{/js/common/editorLeaveGuard.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
 </body></html>

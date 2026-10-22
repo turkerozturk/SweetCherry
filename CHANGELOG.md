@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add persistent node-content zoom controls to View Mode.
+- Group rich-text tools, add list characters and selected-URL linking, and allow resizing the editor.
+- Add plain-text undo/redo and unsaved-change protection to both editors; move Save/Cancel above editing controls.
+
 - Add recent-node navigation, configurable timeline row counts, node icons and metadata drawers; share desktop/mobile database welcome links.
 - Add touch/mouse/keyboard bookmark ordering with stale-page protection and modification-date updates.
 - Resolve Actuator app.version from artifact build metadata even when external YAML contains an unresolved Maven token.

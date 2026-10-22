@@ -194,6 +194,31 @@
         if (next) { event.preventDefault(); visualChange(next, start, start + 1); }
     });
 
+    // Prevent toolbar focus from discarding a visual selection (including keyboard activation).
+    document.querySelectorAll('.toolbar button').forEach(button=>button.addEventListener('pointerdown',event=>event.preventDefault()));
+    document.querySelectorAll('[data-insert-symbol]').forEach(button=>button.addEventListener('click',()=>{
+        if(composing)return;
+        rememberSelection();visualChange(button.dataset.insertSymbol+' ');
+    }));
+    function webUrl(value) {
+        if (/[\u0000-\u001f\u007f]/.test(value)) throw new Error('Invalid URL');
+        const url=new URL(value);
+        if (!['http:','https:'].includes(url.protocol) || !url.hostname || url.username || url.password || url.href.length>4091) throw new Error('Invalid URL');
+        return url.href;
+    }
+    const autoLink=document.getElementById('richAutoLink');
+    if(autoLink)autoLink.addEventListener('click',()=>{
+        if(composing)return;
+        rememberSelection();
+        const error=document.getElementById('richAutoLinkError');
+        try {
+            if(selection[0]===selection[1])throw new Error('Select a URL');
+            const text=sub(previous,selection[0],selection[1]).trim();
+            if(text.includes('\uFFFC'))throw new Error('Select text only');
+            const url=webUrl(text.startsWith('www.')?'https://'+text:text);
+            error.hidden=true;format('link','webs '+url);
+        } catch (_) {error.hidden=false;focusEditor();restoreSelection();}
+    });
     const linkButton=document.getElementById('richLink'),linkDialog=document.getElementById('richLinkDialog');
     if (linkButton && linkDialog) {
         const urlInput=document.getElementById('richLinkUrl'),error=document.getElementById('richLinkError');
@@ -230,10 +255,8 @@
         document.getElementById('richLinkApply').addEventListener('click',()=>{
             try {
                 const value=urlInput.value.trim();
-                if (/[\u0000-\u001f\u007f]/.test(value)) throw new Error('Invalid URL');
-                const url=new URL(value);
-                if (!['http:','https:'].includes(url.protocol) || !url.hostname || url.username || url.password || url.href.length>4091) throw new Error('Invalid URL');
-                closeLink();format('link','webs '+url.href);
+                const url=webUrl(value);
+                closeLink();format('link','webs '+url);
             } catch (_) {error.hidden=false;urlInput.focus();}
         });
         document.getElementById('richLinkRemove').addEventListener('click',()=>{closeLink();format('externalLinkRemove','');});
@@ -648,4 +671,20 @@
         syncMode();
     }
     render(); commitHistory();
+    // Ignore caret/mode changes and run boundaries; only persisted content contributes to dirty state.
+    function contentSignature() {
+        const normalized=[];
+        for(const run of runs) {
+            if(!run.text)continue;
+            const attributes=Object.fromEntries(Object.entries(run.attributes).sort(([a],[b])=>a.localeCompare(b)));
+            const last=normalized[normalized.length-1];
+            if(last && JSON.stringify(last.attributes)===JSON.stringify(attributes))last.text+=run.text;
+            else normalized.push({text:run.text,attributes});
+        }
+        const active=new Set(runs.map(run=>run.attributes.__sweet_object));
+        const tables=Object.fromEntries(Object.entries(tableChanges).filter(([key,rows])=>active.has(key) && JSON.stringify(rows)!==JSON.stringify(window.richEditorObjects?.[key]?.tableRows)).sort(([a],[b])=>a.localeCompare(b)));
+        return JSON.stringify({runs:normalized,deleted:[...deletedKeys].sort(),tables});
+    }
+    const initialContent=contentSignature();
+    window.EditorLeaveGuard.install(form,()=>readingImage || contentSignature()!==initialContent);
 })();
