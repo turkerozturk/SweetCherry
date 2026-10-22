@@ -21,7 +21,7 @@
 <main id="readerContent">
 <p th:if="${isSharedNode == true}" class="alert alert-info py-1"><span th:text="#{node.sharedReference}"></span> <span th:text="${requestedNodeId}"></span> → <a th:href="@{/nodes/{id}(id=${masterNodeId})}" th:text="${masterNodeId}"></a></p>
 <th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block>
-<p th:if="${node == null}" th:text="#{tree.selectNode}"></p>
+<th:block th:if="${node == null}"><th:block th:replace="~{node/rootWelcomeFragment :: welcome}"></th:block></th:block>
 </main>
 <aside class="offcanvas offcanvas-start" tabindex="-1" id="readerTree" aria-labelledby="readerTreeTitle">
 <div class="offcanvas-header"><h2 id="readerTreeTitle" th:text="#{reader.tree}"></h2><button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:attr="aria-label=#{reader.close}"></button></div>

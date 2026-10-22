@@ -34,7 +34,7 @@ Aynı bookmark'ı tekrar eklemek, zaten kaldırılmış bookmark'ı tekrar kald�
 
 ## Bookmark sıra güncelleme
 
-Bu taban sürümde arayüzden sıra değiştirme işlemi bulunmuyordu. Yazma servisine ve ADMIN kontrollü `POST /bookmarks/{id}/sequence` endpoint'ine `sequence` parametresiyle sıra anahtarı güncellemesi eklendi. Yeni arayüz düğmesi eklenmedi. İstek normal oturum, writable tenant, tenant-view ve CSRF kontrollerine tabidir. Pozitif sıra değeri gerekir; eşit sıra anahtarları mevcut node ID ikincil sıralamasıyla gösterilir. Diğer bookmark'lar otomatik kaydırılmaz.
+Bu taban sürümde arayüzden sıra değiştirme işlemi bulunmuyordu. Yazma servisine ve ADMIN kontrollü `POST /bookmarks/{id}/sequence` endpoint'ine `sequence` parametresiyle sıra anahtarı güncellemesi eklendi. Yer işareti sayfasında artık sıra hücresindeki tutamaçla mouse/dokunma veya klavye kullanılarak toplu sıralama yapılabilir; `POST /bookmarks/order` endpoint’i kullanılır. [Sıralama rehberi](timeline-and-bookmark-order.md). İstek normal oturum, writable tenant, tenant-view ve CSRF kontrollerine tabidir. Pozitif sıra değeri gerekir; eşit sıra anahtarları mevcut node ID ikincil sıralamasıyla gösterilir. Diğer bookmark'lar otomatik kaydırılmaz.
 
 ## Manuel doğrulama
 

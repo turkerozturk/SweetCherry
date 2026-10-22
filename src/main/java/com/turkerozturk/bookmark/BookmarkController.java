@@ -78,8 +78,10 @@ public class BookmarkController {
         model.addAttribute("missingBookmarkIds", missing);
 
         model.addAttribute("canWriteBookmarks", bookmarkWriteService.writable());
+        if (bookmarkWriteService.writable()) model.addAttribute("bookmarkOrderRevision",bookmarkWriteService.orderRevision(bookmarks,available));
+        viewMode = com.turkerozturk.global.ViewController.normalizeMode(viewMode);
         model.addAttribute("viewMode", viewMode);
-        if ("mobile".equals(viewMode)) {
+        if ("reader".equals(viewMode)) {
             return "bookmarksMobile";
         } else {
             return "bookmarks";

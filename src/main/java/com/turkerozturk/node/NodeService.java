@@ -226,13 +226,21 @@ public class NodeService {
 
 
     public List<Node> findRecentlyCreatedNodes() {
-        Pageable pageable = PageRequest.of(0, 50);
-        return nodeRepository.findRecentlyCreatedNodes(pageable);
+        return findRecentlyCreatedNodes(50);
+    }
+
+    public List<Node> findRecentlyCreatedNodes(int limit) {
+        if (limit < 1 || limit > 5000) throw new IllegalArgumentException("Invalid timeline limit");
+        return nodeRepository.findRecentlyCreatedNodes(PageRequest.of(0, limit));
     }
 
     public List<Node> findRecentlyModifiedNodes() {
-        Pageable pageable = PageRequest.of(0, 50);
-        return nodeRepository.findRecentlyModifiedNodes(pageable);
+        return findRecentlyModifiedNodes(50);
+    }
+
+    public List<Node> findRecentlyModifiedNodes(int limit) {
+        if (limit < 1 || limit > 5000) throw new IllegalArgumentException("Invalid timeline limit");
+        return nodeRepository.findRecentlyModifiedNodes(PageRequest.of(0, limit));
     }
 
     /*

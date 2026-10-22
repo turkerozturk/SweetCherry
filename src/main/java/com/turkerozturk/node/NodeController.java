@@ -664,22 +664,56 @@ public class NodeController {
         return ResponseEntity.ok(nodeIds);
     }
 
-    /** Lists the latest 50 created nodes without relying on the retired paged search template. */
+    /** Lists recently created nodes with a bounded, user-selected row limit. */
     @GetMapping("/nodes/timeline/created")
     @RequiresTenant
-    public String getTimelineCreated(Model model) {
-        model.addAttribute("nodes", nodeService.findRecentlyCreatedNodes());
-        model.addAttribute("timelineTitleKey", "timeline.created");
+    public String getTimelineCreated(Model model, @RequestParam(defaultValue="50") String limit) {
+        int rows = timelineLimit(limit,model);
+        model.addAttribute("nodes", nodeService.findRecentlyCreatedNodes(rows));
+        model.addAttribute("timelinePath", "/nodes/timeline/created");
+        model.addAttribute("timelineTitleKey", "timeline.recentCreated");
         return "node/timeline";
     }
 
-    /** Lists the latest 50 modified nodes using the same list-based timeline view. */
+    /** Lists recently modified nodes using the same configurable timeline view. */
     @GetMapping("/nodes/timeline/modified")
     @RequiresTenant
-    public String getTimelineModified(Model model) {
-        model.addAttribute("nodes", nodeService.findRecentlyModifiedNodes());
-        model.addAttribute("timelineTitleKey", "timeline.modified");
+    public String getTimelineModified(Model model, @RequestParam(defaultValue="50") String limit) {
+        int rows = timelineLimit(limit,model);
+        model.addAttribute("nodes", nodeService.findRecentlyModifiedNodes(rows));
+        model.addAttribute("timelinePath", "/nodes/timeline/modified");
+        model.addAttribute("timelineTitleKey", "timeline.recentModified");
         return "node/timeline";
+    }
+
+    /** Bounds the query even for malformed/oversized URL parameters; keeps the page usable. */
+    private int timelineLimit(String value, Model model) {
+        int limit = 50;
+        try {
+            if (value == null || !value.matches("[0-9]{1,4}")) throw new IllegalArgumentException();
+            int parsed = Integer.parseInt(value);
+            if (parsed < 1 || parsed > 5000) throw new IllegalArgumentException();
+            limit = parsed;
+        } catch (IllegalArgumentException error) { model.addAttribute("timelineLimitError",true); }
+        model.addAttribute("timelineLimit",limit);
+        return limit;
+    }
+
+    /** Metadata only: no rich-text rendering or content parsing for the timeline drawer. */
+    @GetMapping("/nodes/{nodeId}/info")
+    @RequiresTenant
+    public String timelineNodeInfo(@PathVariable long nodeId, Model model) {
+        if (nodeId <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        var occurrence = childrenService.findById(nodeId);
+        if (occurrence == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        long master = occurrence.getMasterId() == null || occurrence.getMasterId() == 0
+                ? nodeId : occurrence.getMasterId();
+        var node = nodeService.findById(master);
+        if (node == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        node.setMasterNode(master == nodeId);
+        model.addAttribute("node",node);
+        model.addAttribute("sharedNodeIds",childrenService.getSharedNodeIdsByMasterId(master));
+        return "node/nodeInfoFragment :: info";
     }
 
     // bilgi yeni 20 nisan

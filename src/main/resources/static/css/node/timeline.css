@@ -1,0 +1,7 @@
+.timeline-page a {text-decoration:none;}
+.timeline-table {border-collapse:collapse;border:1px solid black;}
+.timeline-table th,.timeline-table td {border:1px solid black;vertical-align:middle;}
+.timeline-table img {object-fit:contain;margin-right:.25rem;}
+#timelineInfo {width:min(95vw,36rem);overflow-wrap:anywhere;}
+#timelineInfo a {text-decoration:none;}
+#timelineInfo .iconcss {width:25px;height:25px;object-fit:contain;}

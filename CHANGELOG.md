@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add recent-node navigation, configurable timeline row counts, node icons and metadata drawers; share desktop/mobile database welcome links.
+- Add touch/mouse/keyboard bookmark ordering with stale-page protection and modification-date updates.
+- Resolve Actuator app.version from artifact build metadata even when external YAML contains an unresolved Maven token.
+
 - Make node modification dates consistent across content editing, property saves, moves, creation, bookmarks and shared-node operations; preserve timestamps on no-op content saves and CTB exports. See `documentation/tr/node-timestamps.md` for the rules and manual checks.
 
 ## [1.1.0]

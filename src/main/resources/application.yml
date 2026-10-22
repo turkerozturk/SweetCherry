@@ -218,4 +218,4 @@ management:
 info:
   app:
     name: SweetCherry
-    version: "@project.version@"
+    version: "development" # /actuator/info uses the actual artifact build version.

@@ -66,6 +66,7 @@ class BookmarkWriteServiceTest {
         assertThatThrownBy(()->service.add(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.remove(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.reorder(1,2)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(()->service.reorderAll(java.util.List.of(1L),"revision")).isInstanceOf(AccessDeniedException.class);
     }
 
     @Test void sharedBookmarkChangesTouchMasterAndRepeatedNoOpsDoNotTouchAgain() throws Exception {
@@ -92,4 +93,49 @@ class BookmarkWriteServiceTest {
         assertThat(number("SELECT sequence FROM bookmark WHERE node_id=1")).isEqualTo(1);
     }
 
+
+    @Test void dragOrderRewritesAllAffectedSequencesAndTouchesTheirMasters() throws Exception {
+        BookmarkWriteService.add(connection,1);BookmarkWriteService.add(connection,10);BookmarkWriteService.add(connection,2);
+        try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_lastsave=100");}
+        String revision=BookmarkWriteService.orderRevision(connection);
+        BookmarkWriteService.reorderAll(connection,java.util.List.of(2L,10L,1L),revision);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=2")).isEqualTo(1);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=10")).isEqualTo(2);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=1")).isEqualTo(3);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isGreaterThan(100);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=2")).isGreaterThan(100);
+        assertThatThrownBy(()->BookmarkWriteService.reorderAll(connection,java.util.List.of(1L,10L,2L),revision))
+                .isInstanceOf(ResponseStatusException.class);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=2")).isEqualTo(1);
+    }
+    @Test void dragNoOpPreservesDatesAndRejectsDuplicateOrMissingIdsBeforeWriting() throws Exception {
+        BookmarkWriteService.add(connection,1);BookmarkWriteService.add(connection,2);
+        try(var statement=connection.createStatement()){statement.execute("UPDATE node SET ts_lastsave=100");}
+        String revision=BookmarkWriteService.orderRevision(connection);
+        BookmarkWriteService.reorderAll(connection,java.util.List.of(1L,2L),revision);
+        assertThat(number("SELECT ts_lastsave FROM node WHERE node_id=1")).isEqualTo(100);
+        assertThatThrownBy(()->BookmarkWriteService.reorderAll(connection,java.util.List.of(1L,1L),revision)).isInstanceOf(ResponseStatusException.class);
+        assertThatThrownBy(()->BookmarkWriteService.reorderAll(connection,java.util.List.of(2L),revision)).isInstanceOf(ResponseStatusException.class);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=1")).isEqualTo(1);
+    }
+    @Test void dragVisibleBookmarksKeepsOrphanInItsSlot() throws Exception {
+        BookmarkWriteService.add(connection,1);
+        try(var statement=connection.createStatement()){statement.execute("INSERT INTO bookmark VALUES(99,2)");}
+        BookmarkWriteService.add(connection,2);
+        BookmarkWriteService.reorderAll(connection,java.util.List.of(2L,1L),BookmarkWriteService.orderRevision(connection));
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=99")).isEqualTo(2);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=2")).isEqualTo(1);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=1")).isEqualTo(3);
+    }
+
+    @Test void renderedSnapshotRevisionMatchesDatabaseAndBecomesStaleAfterAnotherOrderChange() throws Exception {
+        BookmarkWriteService.add(connection,1);BookmarkWriteService.add(connection,2);
+        var displayed=java.util.List.of(new Bookmark().setNodeId(1).setSequence(1),new Bookmark().setNodeId(2).setSequence(2));
+        var service=new BookmarkWriteService(mock(NodePropertiesService.class));
+        String revision=service.orderRevision(displayed,displayed);
+        assertThat(revision).isEqualTo(BookmarkWriteService.orderRevision(connection));
+        BookmarkWriteService.reorder(connection,2,3);
+        assertThatThrownBy(()->BookmarkWriteService.reorderAll(connection,java.util.List.of(2L,1L),revision)).isInstanceOf(ResponseStatusException.class);
+        assertThat(number("SELECT sequence FROM bookmark WHERE node_id=2")).isEqualTo(3);
+    }
 }

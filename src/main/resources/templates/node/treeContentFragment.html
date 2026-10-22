@@ -3,12 +3,7 @@
 <body>
 <section th:fragment="treeContent" class="workspace-node" th:attr="data-node-id=${requestedNodeId},data-node-title=${node != null ? node.name : currentTenantName}">
     <th:block th:if="${isRootNode == true}">
-        <h1 th:text="${currentTenantName}">Database</h1>
-        <p th:text="#{tree.selectNode}">Select a node in the tree.</p>
-        <form th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
-            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-            <button class="btn btn-sm btn-outline-primary" type="submit"><i class="fas fa-plus"></i> <span th:text="#{tree.addRoot}">Add node</span></button>
-        </form>
+        <th:block th:replace="~{node/rootWelcomeFragment :: welcome}"></th:block>
     </th:block>
     <th:block th:if="${node != null}">
         <header class="workspace-node-header">

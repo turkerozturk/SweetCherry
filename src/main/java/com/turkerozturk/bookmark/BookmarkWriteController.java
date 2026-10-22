@@ -20,6 +20,15 @@ public class BookmarkWriteController {
     public String add(@PathVariable long id,@RequestParam(defaultValue="reader") String view){
         service.add(id);return "tree".equals(view)?"redirect:/tree?nodeId="+id:"redirect:/nodes/"+id;
     }
+    @PostMapping("/bookmarks/order")
+    public String reorderAll(@RequestParam java.util.List<Long> order,@RequestParam String revision, org.springframework.web.servlet.mvc.support.RedirectAttributes flash) {
+        try { service.reorderAll(order,revision); }
+        catch (org.springframework.web.server.ResponseStatusException ex) {
+            if (ex.getStatusCode().value() != 409) throw ex;
+            flash.addFlashAttribute("bookmarkOrderConflict", true);
+        }
+        return "redirect:/bookmarks";
+    }
     @PostMapping("/bookmarks/{id}/sequence")
     public String reorder(@PathVariable long id, @RequestParam long sequence) {
         service.reorder(id,sequence); return "redirect:/bookmarks";

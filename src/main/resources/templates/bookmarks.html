@@ -33,10 +33,19 @@
     </th:block>
 
 
+    <div class="alert alert-warning" th:if="${bookmarkOrderConflict == true}" th:text="#{bookmarks.orderConflict}"></div>
     <th:block th:if="${!#lists.isEmpty(bookmarks)}">
 
 
         <h1 th:text="#{bookmarks.heading}"></h1>
+        <div th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')">
+            <p class="small text-muted" th:text="#{bookmarks.orderHelp}"></p>
+            <form id="bookmarkOrderForm" th:action="@{/bookmarks/order}" method="post" hidden>
+                <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+                <input type="hidden" name="revision" th:value="${bookmarkOrderRevision}">
+                <input type="hidden" name="order" value="">
+            </form>
+        </div>
 
         <table class="bookmarks-table table table-bordered border-success table-sm">
             <thead>
@@ -55,8 +64,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="bookmark:${bookmarks}">
-                <td th:text="${bookmark.sequence}"></td>
+            <tr th:each="bookmark:${bookmarks}" th:attr="data-bookmark-id=${bookmark.nodeId}">
+                <td class="bookmark-order-cell"><span th:text="${bookmark.sequence}"></span>
+                    <button type="button" class="bookmark-drag" th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')" th:title="#{bookmarks.reorder}" th:aria-label="#{bookmarks.reorder}">↕</button>
+                </td>
 
                 <td th:text="${#dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd')}"
                     th:title="${bookmark.node.lastSaveTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
@@ -118,6 +129,6 @@
     </th:block>
 
 </section>
-<section layout:fragment="pageSpecificJsScripts"><script th:src="@{/js/node/confirmNodeCreation.js}"></script></section>
+<section layout:fragment="pageSpecificJsScripts"><script th:src="@{/js/node/confirmNodeCreation.js}"></script><script th:src="@{/js/bookmarks/bookmarkOrder.js}"></script></section>
 </body>
 </html>

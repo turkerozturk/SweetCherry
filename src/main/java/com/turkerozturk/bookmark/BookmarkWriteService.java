@@ -56,6 +56,63 @@ public class BookmarkWriteService {
                     connection,id,com.turkerozturk.node.NodeTimestamps.now());
         }
     }
+    private record OrderRow(long id,long sequence,boolean available) { }
+    private static java.util.List<OrderRow> orderRows(Connection connection) throws SQLException {
+        var rows=new java.util.ArrayList<OrderRow>();
+        try(var query=connection.prepareStatement("SELECT b.node_id,b.sequence,CASE WHEN n.node_id IS NULL THEN 0 ELSE 1 END "
+                + "FROM bookmark b LEFT JOIN children c ON c.node_id=b.node_id LEFT JOIN node n ON n.node_id="
+                + "CASE WHEN COALESCE(c.master_id,0)=0 THEN c.node_id ELSE c.master_id END ORDER BY b.sequence,b.node_id");
+                var result=query.executeQuery()) {
+            while(result.next())rows.add(new OrderRow(result.getLong(1),result.getLong(2),result.getInt(3)!=0));
+        }
+        return rows;
+    }
+    private static String orderRevision(java.util.List<OrderRow> rows) {
+        try {
+            var digest=java.security.MessageDigest.getInstance("SHA-256");
+            for(var row:rows)digest.update((row.id+":"+row.sequence+":"+row.available+";").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(digest.digest());
+        }catch(java.security.NoSuchAlgorithmException error){throw new IllegalStateException(error);}
+    }
+    /** Fingerprints exactly the rows rendered by the GET, avoiding a second query racing with that snapshot. */
+    public String orderRevision(java.util.List<Bookmark> bookmarks,java.util.List<Bookmark> available) {
+        var visible=new java.util.HashSet<Long>();available.forEach(bookmark->visible.add(bookmark.getNodeId()));
+        var rows=bookmarks.stream().map(bookmark->new OrderRow(bookmark.getNodeId(),bookmark.getSequence(),visible.contains(bookmark.getNodeId())))
+                .sorted(java.util.Comparator.comparingLong(OrderRow::sequence).thenComparingLong(OrderRow::id)).toList();
+        return orderRevision(rows);
+    }
+    @Transactional
+    public void reorderAll(java.util.List<Long> order,String revision) {
+        requireWritable();
+        entityManager.unwrap(org.hibernate.Session.class).doWork(connection->reorderAll(connection,order,revision));
+        entityManager.clear();
+    }
+    static String orderRevision(Connection connection) throws SQLException { return orderRevision(orderRows(connection)); }
+
+    /** Merges the visible permutation into existing slots; orphan bookmarks remain present in their slots. */
+    static void reorderAll(Connection connection,java.util.List<Long> order,String revision) throws SQLException {
+        var rows=orderRows(connection);
+        if(!orderRevision(rows).equals(revision))throw new ResponseStatusException(HttpStatus.CONFLICT,"Bookmarks changed; reload the page.");
+        var visible=rows.stream().filter(OrderRow::available).map(OrderRow::id).toList();
+        if(order==null || order.size()>10000 || order.size()!=visible.size()
+                || order.stream().anyMatch(id->id==null || id<=0)
+                || new java.util.HashSet<>(order).size()!=order.size()
+                || !new java.util.HashSet<>(order).equals(new java.util.HashSet<>(visible)))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid bookmark order");
+        if(visible.equals(order))return;
+        var byId=new java.util.HashMap<Long,OrderRow>();rows.forEach(row->byId.put(row.id,row));
+        int at=0;long sequence=0,timestamp=com.turkerozturk.node.NodeTimestamps.now();
+        try(var update=connection.prepareStatement("UPDATE bookmark SET sequence=? WHERE node_id=? AND sequence=?")) {
+            for(var slot:rows) {
+                long id=slot.available?order.get(at++):slot.id;sequence++;
+                var old=byId.get(id);
+                if(old.sequence==sequence)continue;
+                update.setLong(1,sequence);update.setLong(2,id);update.setLong(3,old.sequence);
+                if(update.executeUpdate()!=1)throw new ResponseStatusException(HttpStatus.CONFLICT,"Bookmarks changed; reload the page.");
+                com.turkerozturk.node.NodeTimestamps.touchOccurrence(connection,id,timestamp);
+            }
+        }
+    }
     private void requireWritable() {
         if(!writable()) throw new AccessDeniedException("The selected CTB is read-only.");
     }

@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
-<head><title th:text="${#messages.msg(timelineTitleKey)}">Timeline</title></head>
-<body><section layout:fragment="content">
+<head><title th:text="${#messages.msg(timelineTitleKey)}">Timeline</title>
+<section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/timeline.css}"></section></head>
+<body><section layout:fragment="content" class="timeline-page">
 <h1 th:text="${#messages.msg(timelineTitleKey)}"></h1>
+<form method="get" th:action="@{${timelinePath}}" class="d-flex flex-wrap gap-2 align-items-center mb-2">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<label for="timelineLimit" th:text="#{timeline.limit}">Rows</label>
+<input id="timelineLimit" class="form-control form-control-sm" style="width:7rem" type="number" name="limit" min="1" max="5000" required th:value="${timelineLimit}">
+<button class="btn btn-sm btn-primary" type="submit" th:text="#{timeline.apply}">Show</button>
+</form>
+<p th:if="${timelineLimitError == true}" class="alert alert-warning" th:text="#{timeline.invalidLimit}"></p>
 <p th:text="#{timeline.count(${#lists.size(nodes)})}"></p>
-<div class="table-responsive"><table class="table table-sm">
+<div class="table-responsive"><table class="table table-sm timeline-table">
 <thead><tr><th>ID</th><th th:text="#{timeline.name}"></th><th th:text="#{timeline.created}"></th><th th:text="#{timeline.modified}"></th></tr></thead>
 <tbody><tr th:each="node : ${nodes}">
-<td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="${node.nodeId}"></a></td>
-<td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="${node.name}"></a></td>
+<td><a data-node-info-link th:title="#{node.meta.header}" th:href="@{/nodes/{id}/info(id=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="${node.nodeId}"></a></td>
+<td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}"><img th:if="${node.nodeIcon != null}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="20" height="20" alt="" loading="lazy"> <span th:text="${node.name}"></span></a></td>
 <td th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>
 <td th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>
 </tr></tbody></table></div>
-</section></body></html>
+<aside class="offcanvas offcanvas-start" tabindex="-1" id="timelineInfo" aria-labelledby="timelineInfoTitle" th:attr="data-loading=#{tree.loading},data-error=#{tree.loadError}">
+<div class="offcanvas-header"><h2 id="timelineInfoTitle" class="offcanvas-title" th:text="#{node.meta.header}">Node info</h2><button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:aria-label="#{reader.close}"></button></div>
+<div class="offcanvas-body" aria-live="polite"></div>
+</aside>
+</section>
+<section layout:fragment="pageSpecificJsScripts"><script th:src="@{/js/node/timeline.js}"></script></section>
+</body></html>

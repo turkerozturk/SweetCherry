@@ -82,4 +82,13 @@ class BookmarkControllerTest {
         var model=new ExtendedModelMap();controller.getAllChildrenAsHtml(model,"tree");
         assertThat(((java.util.Map<?,?>)model.get("bookmarkPaths")).get(1L)).isEqualTo(java.util.Map.of(1L,"Node"));
     }
+
+    @Test void currentAndLegacyMobileModesBothUseTheNarrowBookmarkTemplate() {
+        var controller=new BookmarkController();var bookmarks=mock(BookmarkService.class);
+        when(bookmarks.getBookmarks()).thenReturn(List.of());
+        ReflectionTestUtils.setField(controller,"bookmarkService",bookmarks);
+        ReflectionTestUtils.setField(controller,"bookmarkWriteService",mock(BookmarkWriteService.class));
+        for(String mode:List.of("reader","mobile"))assertThat(controller.getAllChildrenAsHtml(new ExtendedModelMap(),mode)).isEqualTo("bookmarksMobile");
+        for(String mode:List.of("tree","desktop"))assertThat(controller.getAllChildrenAsHtml(new ExtendedModelMap(),mode)).isEqualTo("bookmarks");
+    }
 }

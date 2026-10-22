@@ -28,3 +28,7 @@ Gerçek veya paylaşımlı konum silindiğinde önceki kardeş, yoksa sonraki ka
 ## Değişiklik tarihi
 
 Bookmark ekleme, kaldırma veya sıra anahtarının değiştirilmesi ilgili gerçek içerik düğümünün `ts_lastsave` değerini günceller; shared konumlarda master kullanılır. Tekrar ekleme/kaldırma ve aynı sıra değeriyle tekrar kayıt yazma sayılmaz. [Tarih kuralları ve manuel testler](node-timestamps.md).
+
+## Sıralama
+
+Yönetici ve writable kaynakta sıra hücresindeki ↕ tutamacıyla sürükleyerek veya tutamaç odaktayken yukarı/aşağı oklarıyla sıralayın. Bırakınca kaydedilir. Değişen sıra anahtarlarının master modified tarihleri de güncellenir. [Ayrıntılar ve manuel kontroller](timeline-and-bookmark-order.md).

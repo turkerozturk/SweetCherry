@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
+<div th:fragment="welcome">
+<h1 th:text="${currentTenantName}">Database</h1>
+<p th:text="#{tree.selectNode}">Select a node in the tree.</p>
+<form th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<button class="btn btn-sm btn-outline-primary" type="submit"><i class="fas fa-plus"></i> <span th:text="#{tree.addRoot}">Add node</span></button>
+</form>
+<ul class="list-unstyled mt-3">
+<li><a class="text-decoration-none" th:href="@{/nodes/timeline/modified(_tenantView=${tenantViewToken})}" th:text="#{timeline.recentModified}">Recently Modified</a></li>
+<li><a class="text-decoration-none" th:href="@{/nodes/timeline/created(_tenantView=${tenantViewToken})}" th:text="#{timeline.recentCreated}">Recently Added</a></li>
+<li><a class="text-decoration-none" th:href="@{/bookmarks(_tenantView=${tenantViewToken})}" th:text="#{bookmarks.heading}">Bookmarks</a></li>
+</ul>
+</div></body></html>
