@@ -43,9 +43,9 @@ Hesap sonuçları değiştirilemez bir snapshot olarak en fazla bir dakika önbe
 
 ## Dil
 
-`LocaleConfiguration`, `locale` çereziyle dili saklar; varsayılan Türkçe, mevcut çerez süresi bir saattir. `lang` parametresi dili değiştirir. Mesaj dosyaları `messages.properties`, `messages_en.properties`, `messages_tr.properties` olup UTF-8 olarak düzenlenmelidir.
+`LocaleConfiguration`, `locale` çereziyle dili saklar; çerez yokken YAML başlangıç dili veya tarayıcı dili kullanılır; mevcut çerez süresi bir saattir. `lang` parametresi dili değiştirir. Mesaj dosyaları `messages.properties`, `messages_en.properties`, `messages_tr.properties` olup UTF-8 olarak düzenlenmelidir.
 
-Dil değiştirme seçili düğümü, `_tenantView`, diğer URL seçeneklerini ve çapa bağlantısını korur. Astronomi başlıkları, faz adları, durum mesajları ve tablo etiketleri TR/EN mesaj dosyalarından gelir. Bazı eski ekranlarda sabit ifadeler bulunabilir. CTB tarih biçimi ve locale çerezi süresi ayrıca değerlendirilecektir. `spring.mvc.locale` altındaki mevcut dil listesi, özel locale resolver’ın varsayılanını değiştiren kullanıcı ayarı değildir.
+Dil değiştirme seçili düğümü, `_tenantView`, diğer URL seçeneklerini ve çapa bağlantısını korur. Astronomi başlıkları, faz adları, durum mesajları ve tablo etiketleri TR/EN mesaj dosyalarından gelir. Bazı eski ekranlarda sabit ifadeler bulunabilir. CTB tarih biçimi ve locale çerezi süresi ayrıca değerlendirilecektir. `myapp.default-language` boşsa tarayıcı, `en`/`tr` ise o başlangıç dili kullanılır. Eski `spring.mvc.locale` dil listesi varsayılan sayılmaz. [Mobil dil ve yapıştırma rehberi](mobile-language-and-paste.md).
 
 ## Kontroller ve sonraki işler
 

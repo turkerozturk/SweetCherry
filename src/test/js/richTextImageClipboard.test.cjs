@@ -16,3 +16,10 @@ test('explicit clipboard read searches all items for a supported image and repor
  await assert.rejects(()=>clipboard.read(null));await assert.rejects(()=>clipboard.read({read:async()=>[{types:['text/plain']}]}));
  await assert.rejects(()=>clipboard.read({read:async()=>{throw Error('denied');}}));
 });
+
+test('general clipboard read prefers HTML across items and retains plain/image alternatives',async()=>{
+ const data={'text/plain':new Blob(['Plain']),'text/html':new Blob(['<b>Rich</b>']),'image/png':new Blob(['image'],{type:'image/png'})};
+ const content=await clipboard.readContent({read:async()=>Object.keys(data).map(type=>({types:[type],getType:async()=>data[type]}))});
+ assert.equal(content.html,'<b>Rich</b>');assert.equal(content.text,'Plain');assert.equal(content.image.type,'image/png');
+ await assert.rejects(()=>clipboard.readContent(null));
+});

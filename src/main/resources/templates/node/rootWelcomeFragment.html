@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <div th:fragment="welcome">
-<h1 th:text="${currentTenantName}">Database</h1>
+<h1 th:text="${#strings.isEmpty(currentTenantName)} ? #{home.database} : ${currentTenantName}">Database</h1>
 <p th:text="#{tree.selectNode}">Select a node in the tree.</p>
 <form th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
@@ -12,4 +12,13 @@
 <li><a class="text-decoration-none" th:href="@{/nodes/timeline/created(_tenantView=${tenantViewToken})}" th:text="#{timeline.recentCreated}">Recently Added</a></li>
 <li><a class="text-decoration-none" th:href="@{/bookmarks(_tenantView=${tenantViewToken})}" th:text="#{bookmarks.heading}">Bookmarks</a></li>
 </ul>
+<aside class="border rounded bg-body-tertiary p-3 mt-3 small" aria-labelledby="mobileNavigationHelp">
+<h2 id="mobileNavigationHelp" class="h6" th:text="#{home.mobileHelp}">In mobile view</h2>
+<ul class="mb-0">
+<li th:text="#{home.mobileOptions}"></li>
+<li th:text="#{home.mobileTree}"></li>
+<li th:text="#{home.mobileFlat}"></li>
+<li th:text="#{home.mobileArrows}"></li>
+</ul>
+</aside>
 </div></body></html>

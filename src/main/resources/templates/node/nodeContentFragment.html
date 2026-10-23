@@ -9,11 +9,12 @@
 
 
 
-    <div th:if="${node}">
+    <div th:if="${node}" th:with="emptyContent=${node.contentEmpty}">
 
         <div id="content">
 
-            <div id="nodeContent">
+            <p th:if="${emptyContent}" class="node-empty-content border rounded bg-body-tertiary text-body-secondary small fst-italic p-3" role="status" th:text="#{node.emptyNotice}"></p>
+            <div id="nodeContent" th:unless="${emptyContent}">
 
 
 

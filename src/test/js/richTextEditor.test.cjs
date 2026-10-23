@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 /** Executes the real editor script against a small DOM double to test model/history behavior. */
-function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
+function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, options = {}) {
     const handlers = new Map();
     function element(id = '') {
         return {id, value:'', style:{}, dataset:{}, childNodes:[], selectionStart:0, selectionEnd:0,
@@ -15,7 +15,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
             setAttribute() {}, contains(target) { return this.childNodes.some(n => n === target || n.contains && n.contains(target)); },
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richAutoLink','richAutoLinkError','richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richPasteImage','richClipboardHint','richAutoLink','richAutoLinkError','richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
     if (visual) { ids.richVisualMode=element('richVisualMode'); ids.richVisualMode.checked=true; }
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
@@ -35,9 +35,10 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false) {
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, window:windowObject={RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
+    vm.runInNewContext(source, {document, URL, window:windowObject={isSecureContext:options.secure!==false,RichTextEditorSupport:require('../../main/resources/static/js/node/richTextEditorSupport.js'),RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
         RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
-        crypto:{randomUUID:()=> uuid++===0?'test-uuid':'test-uuid-'+uuid},
+        crypto:options.crypto||{randomUUID:()=> uuid++===0?'test-uuid':'test-uuid-'+uuid},
+        navigator:{clipboard:options.clipboardReader},
         FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
     function fire(id, type, event = {}) {return handlers.get(id + ':' + type)(event);}
@@ -329,4 +330,25 @@ test('web import rejects stale state, oversized images and protected selections 
  const protectedEditor=editor(objectRuns());protectedEditor.select(1,2);
  assert.equal(protectedEditor.bridge().insert(protectedEditor.bridge().capture(),[{text:'Replace',attributes:{}}]),false);
  assert.equal(text(protectedEditor.runs()),'A\uFFFCB');
+});
+
+
+test('mobile HTTP can add generic-MIME PNG cloud files without randomUUID',async()=>{
+ const e=editor(undefined,undefined,undefined,undefined,false,{secure:false,crypto:{getRandomValues(bytes){bytes.fill(42);return bytes;}}});
+ const file=Object.assign(new Blob([new Uint8Array([137,80,78,71,13,10,26,10])],{type:'application/octet-stream'}),{name:'cloud.png',data:'data:application/octet-stream;base64,AQID'});
+ e.ids.richImageFile.files=[file];e.fire('richImageFile','change');await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(text(e.runs()),'\uFFFCA😀B\nC');const images=JSON.parse(e.ids.richImages.value);
+ assert.equal(Object.keys(images).length,1);assert.match(Object.keys(images)[0],/^new-image:[a-f0-9-]+$/);assert.equal(Object.values(images)[0],'data:image/png;base64,AQID');
+ e.key('z');assert.equal(e.dirty(),false);
+});
+test('mobile beforeinput DataTransfer uses the rich paste converter and undo',()=>{
+ const clipboard={fromHtml:()=>[{text:'Rich',attributes:{weight:'heavy'}}]};const e=editor(undefined,undefined,undefined,clipboard,true);
+ let prevented=false;e.fire('richPreview','beforeinput',{inputType:'insertFromPaste',cancelable:true,preventDefault(){prevented=true;},dataTransfer:{files:[],getData:type=>type==='text/html'?'<b>Rich</b>':type==='text/plain'?'Plain':''}});
+ assert.equal(prevented,true);assert.equal(e.runs()[0].attributes.weight,'heavy');e.key('z');assert.equal(e.dirty(),false);
+});
+test('clipboard button preserves HTML on secure contexts and explains HTTP without reading',async()=>{
+ const clipboard={fromHtml:()=>[{text:'Rich',attributes:{weight:'heavy'}}]};let reads=0;
+ const reader={read:async()=>{reads++;return [{types:['text/html','text/plain'],getType:async type=>new Blob([type==='text/html'?'<b>Rich</b>':'Plain'])}];}};
+ const secure=editor(undefined,undefined,undefined,clipboard,false,{clipboardReader:reader});await secure.fire('richPasteImage','click');assert.equal(secure.runs()[0].attributes.weight,'heavy');
+ const http=editor(undefined,undefined,undefined,clipboard,false,{secure:false,clipboardReader:reader});http.ids.richClipboardHint.dataset.http='Use HTTPS or native paste';await http.fire('richPasteImage','click');assert.equal(reads,1);assert.equal(http.ids.richClipboardHint.textContent,'Use HTTPS or native paste');assert.equal(http.dirty(),false);
 });

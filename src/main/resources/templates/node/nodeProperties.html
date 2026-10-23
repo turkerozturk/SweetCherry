@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
-<head><title>Düğüm özellikleri</title></head>
+<head><title th:text="#{node.properties.title}">Node properties</title></head>
 <body>
 <section layout:fragment="content" class="container py-3">
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
-    <h1>Düğüm özellikleri</h1>
+    <h1 th:text="#{node.properties.title}">Node properties</h1>
     <form th:action="@{/nodes/properties/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
         <div class="mb-3">
-            <label for="nodeName" class="form-label">Düğüm adı</label>
+            <label for="nodeName" class="form-label" th:text="#{node.properties.name}">Node name</label>
             <input id="nodeName" class="form-control" name="name" type="text" required maxlength="255"
                    th:value="${node.name}"/>
         </div>
         <div class="form-check mb-3">
             <input id="bold" class="form-check-input" type="checkbox" name="bold" value="true" th:checked="${bold}"/>
-            <label class="form-check-label" for="bold">Başlık kalın</label>
+            <label class="form-check-label" for="bold" th:text="#{node.properties.bold}">Bold title</label>
         </div>
         <fieldset class="mb-3">
             <legend class="fs-5" th:text="#{titlecolor.label}">Title color</legend>
@@ -50,39 +50,39 @@
         <div class="form-check mb-3">
             <input id="contentReadOnly" class="form-check-input" type="checkbox" name="contentReadOnly"
                    value="true" th:checked="${contentReadOnly}"/>
-            <label class="form-check-label" for="contentReadOnly">CherryTree içerik salt okunur bayrağı</label>
+            <label class="form-check-label" for="contentReadOnly" th:text="#{node.properties.readOnly}">CherryTree content read-only flag</label>
         </div>
         <fieldset class="mb-3">
-            <legend class="fs-5">Düğüm tipi</legend>
+            <legend class="fs-5" th:text="#{node.properties.type}">Node type</legend>
             <div class="form-check">
                 <input id="typeRichText" class="form-check-input" type="radio" name="nodeType" value="RICH_TEXT"
                        th:checked="${nodeType.name() == 'RICH_TEXT'}" disabled/>
-                <label class="form-check-label" for="typeRichText">Rich Text (şimdilik değiştirilemez)</label>
+                <label class="form-check-label" for="typeRichText" th:text="#{node.properties.richLocked}">Rich Text (currently not editable)</label>
             </div>
             <div class="form-check">
                 <input id="typePlainText" class="form-check-input" type="radio" name="nodeType" value="PLAIN_TEXT"
                        th:checked="${nodeType.name() == 'PLAIN_TEXT'}" th:disabled="${syntaxLocked}"/>
-                <label class="form-check-label" for="typePlainText">Plain Text</label>
+                <label class="form-check-label" for="typePlainText" th:text="#{node.type.plainText}">Plain Text</label>
             </div>
             <div class="form-check">
                 <input id="typeCode" class="form-check-input" type="radio" name="nodeType" value="CODE"
                        th:checked="${nodeType.name() == 'CODE'}" th:disabled="${syntaxLocked}"/>
-                <label class="form-check-label" for="typeCode">Automatic Syntax Highlighting</label>
+                <label class="form-check-label" for="typeCode" th:text="#{node.properties.code}">Automatic syntax highlighting</label>
             </div>
-            <label for="codeSyntax" class="form-label mt-2">Kod dili</label>
+            <label for="codeSyntax" class="form-label mt-2" th:text="#{node.properties.codeLanguage}">Code language</label>
             <select id="codeSyntax" name="codeSyntax" class="form-select" required
                     th:attr="data-locked=${syntaxLocked}"
                     th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}">
-                <option value="" th:selected="${nodeType.name() != 'CODE'}">Dil seçin</option>
+                <option value="" th:selected="${nodeType.name() != 'CODE'}" th:text="#{node.properties.chooseLanguage}">Choose a language</option>
                 <option th:each="item : ${syntaxOptions}" th:value="${item}"
                         th:selected="${node.syntax == item}" th:text="${item}">java</option>
             </select>
-            <small th:if="${syntaxLocked}" class="form-text">
+            <small th:if="${syntaxLocked}" class="form-text" th:text="#{node.properties.syntaxLocked}">
                 Rich Text veya içerik salt okunur durumundayken düğüm tipi değiştirilemez.
             </small>
         </fieldset>
-        <button type="submit" class="btn btn-primary">Kaydet</button>
-        <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId})}">İptal</a>
+        <button type="submit" class="btn btn-primary" th:text="#{richtext.edit.save}">Save</button>
+        <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}">Cancel</a>
     </form>
 </section>
 <section layout:fragment="pageSpecificJsScripts">

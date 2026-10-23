@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Use browser language unless an initial language is configured; complete node-properties translations, add mobile navigation help and a distinct empty-content notice.
+- Fix object IDs on HTTP clients without randomUUID; recognize PNG/JPEG cloud files with missing MIME types and explain upload failures separately.
+- Prefer HTML in the explicit clipboard action where supported, handle mobile beforeinput paste data, and explain HTTP/plain-text clipboard limitations.
+
 - Read clipboard PNG/JPEG file items as well as files; add an explicit permission-based clipboard image button.
 - Add a separate, reviewed public-URL rich-text import with bounded PNG/JPEG downloads, plain tables, atomic undo/redo, and no CTB write before Save. Restrict network targets and preserve the existing HTML paste flow.
 

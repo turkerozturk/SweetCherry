@@ -38,6 +38,26 @@ public class LocaleConfiguration implements WebMvcConfigurer {
 
     private static final String LANGUAGE = "lang";
 
+    @org.springframework.beans.factory.annotation.Value("${myapp.default-language:${spring.web.locale:${spring.mvc.locale:}}}")
+    private String configuredLanguage = "";
+
+    static Locale initialLocale(jakarta.servlet.http.HttpServletRequest request, String configured) {
+        // The historical "en_US, tr_TR" list was not a default-language selection.
+        String value=configured == null ? "" : configured.trim();
+        if(!value.contains(",")) {
+            Locale locale=Locale.forLanguageTag(value.replace('_','-'));
+            if(locale.getLanguage().equals("tr"))return Locale.forLanguageTag("tr-TR");
+            if(locale.getLanguage().equals("en"))return Locale.ENGLISH;
+        }
+        var locales=request.getLocales();
+        while(locales.hasMoreElements()) {
+            var locale=locales.nextElement();
+            if(locale.getLanguage().equals("tr"))return Locale.forLanguageTag("tr-TR");
+            if(locale.getLanguage().equals("en"))return Locale.ENGLISH;
+        }
+        return Locale.ENGLISH;
+    }
+
     /*
     @Bean(name = "localeResolver")
     public LocaleResolver localeResolver() {
@@ -51,7 +71,7 @@ public class LocaleConfiguration implements WebMvcConfigurer {
     @Bean(name = "localeResolver")
     public LocaleResolver localeResolver() {
         CookieLocaleResolver clr = new CookieLocaleResolver();
-        clr.setDefaultLocale(new Locale("tr", "TR"));
+        clr.setDefaultLocaleFunction(request -> initialLocale(request, configuredLanguage));
         clr.setCookieName("locale");
         clr.setCookieMaxAge(3600); // Set the cookie max age as per your requirement
         return clr;

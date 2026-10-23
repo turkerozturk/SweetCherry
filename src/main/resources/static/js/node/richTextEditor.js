@@ -312,7 +312,7 @@
                 if(runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length>=10){error.hidden=false;return;}
                 closeTable();captureSelection();
                 if(!replace(selection[0],selection[1],'\uFFFC'))return;
-                tableKey='new-table:'+crypto.randomUUID();
+                tableKey='new-table:'+window.RichTextEditorSupport.objectId(crypto);
                 let offset=0;
                 for(const run of runs){
                     if(offset===selection[0] && run.text==='\uFFFC' && !run.attributes.__sweet_object){run.attributes={__sweet_object:tableKey};break;}
@@ -507,26 +507,31 @@
     /** Keeps file data local until Save and adds its protected slot to the shared undo/redo model. */
     const addImage = file => addObject(file, false);
     /** Adds images or attachments as protected slots; file content remains local until Save. */
+    function fileError(status,code) {
+        if(status)status.textContent=status.dataset['error'+code.charAt(0).toUpperCase()+code.slice(1)]||status.dataset.error;
+    }
     async function addObject(file, attachment) {
         const status = document.getElementById('richImageStatus');
         if (readingImage) return;
-        if ((!attachment && !['image/png','image/jpeg'].includes(file.type)) || file.size > uploadLimit || (attachment && (!file.name || file.name.length > 255))) {
-            if (status) status.textContent = status.dataset.error; return;
-        }
+        if (!file) return;
+        if (file.size > uploadLimit) { fileError(status,'size');return; }
+        if (attachment && (!file.name || file.name.length > 255)) { fileError(status,'name');return; }
         const at = [...selection], source = JSON.stringify(runs);
         readingImage = true;
         try {
-            const data = await new Promise((resolve,reject)=>{
-                const reader = new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file);
+            const mime=attachment?null:await window.RichTextEditorSupport.imageMime(file);
+            let data = await new Promise((resolve,reject)=>{
+                const reader = new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reader.onabort=()=>reject(new Error('read')); reader.readAsDataURL(file);
             });
+            if(!attachment)data='data:'+mime+';base64,'+data.slice(data.indexOf(',')+1);
             // An asynchronous read must not replace text entered while the file was loading.
-            if (source !== JSON.stringify(runs)) throw new Error('Editor changed');
+            if (source !== JSON.stringify(runs)) throw new Error('changed');
             const activeKeys = runs.map(run=>run.attributes.__sweet_object);
             const activeImages = Object.entries(pendingImages).filter(([key])=>activeKeys.includes(key));
             const activeFiles = Object.entries(pendingFiles).filter(([key])=>activeKeys.includes(key));
             if (runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length >= 10 || activeImages.reduce((n,[,value])=>n+value.length,0)
-                + activeFiles.reduce((n,[,value])=>n+value.data.length,0)+data.length > 29000000) throw new Error('Upload too large');
-            const key = (attachment ? 'new-file:' : 'new-image:') + crypto.randomUUID();
+                + activeFiles.reduce((n,[,value])=>n+value.data.length,0)+data.length > 29000000) throw new Error('objects');
+            const key = (attachment ? 'new-file:' : 'new-image:') + window.RichTextEditorSupport.objectId(crypto);
             if (!replace(at[0],at[1],'\uFFFC')) return;
             let offset = 0;
             for (const run of runs) {
@@ -542,7 +547,7 @@
             previous = runs.map(run=>run.text).join(''); input.value=previous;
             selection=[at[0]+1,at[0]+1]; render(); focusEditor(); restoreSelection(); commitHistory();
             if (status) status.textContent='';
-        } catch (_) { if (status) status.textContent=status.dataset.error; }
+        } catch (error) { fileError(status,['type','size','read','name','changed','objects','unsupported'].includes(error.message)?error.message:'read'); }
         finally { readingImage=false; }
     }
     const imageButton=document.getElementById('richAddImage'),imageFile=document.getElementById('richImageFile');
@@ -560,12 +565,16 @@
     const clipboardButton=document.getElementById('richPasteImage');
     if(clipboardButton)clipboardButton.addEventListener('click',async()=>{
         captureSelection();const at=[...selection],source=JSON.stringify(runs),hint=document.getElementById('richClipboardHint');
+        function show(code){if(hint){hint.textContent=hint.dataset[code]||hint.dataset.empty;hint.hidden=false;}}
+        if(!window.isSecureContext){show('http');return;}
         try {
             if(readingImage)throw new Error('busy');
-            const file=await window.RichTextImageClipboard.read(navigator.clipboard);
+            const content=await window.RichTextImageClipboard.readContent(navigator.clipboard);
             if(source!==JSON.stringify(runs))throw new Error('changed');
-            selection=at;focusEditor();restoreSelection();await addImage(file);if(hint)hint.hidden=true;
-        }catch(_){if(hint){hint.textContent=hint.dataset.empty;hint.hidden=false;}}
+            selection=at;focusEditor();restoreSelection();
+            const map={'text/html':content.html||'','text/plain':content.text||'','application/x-sweetcherry-richtext+json':content.own||''};
+            paste({preventDefault(){},clipboardData:{files:content.image?[content.image]:[],getData:type=>map[type]||''}});
+        }catch(error){show(error.message==='changed'?'changed':'empty');}
     });
     /** Copies formatted text runs only; protected objects are excluded instead of producing phantom OBJ characters. */
     function copySelection(event) {
@@ -590,10 +599,10 @@
         for(const item of items){
             if(item.image){
                 if(typeof item.image!=='string' || item.image.length>Math.ceil(uploadLimit/3)*4+32 || !/^data:image\/png;base64,[A-Za-z0-9+/]*={0,2}$/.test(item.image))throw new Error('Invalid imported image');
-                const key='new-image:'+crypto.randomUUID();newImages[key]=item.image;
+                const key='new-image:'+window.RichTextEditorSupport.objectId(crypto);newImages[key]=item.image;
                 info[key]={label:item.label||'Image',imageUrl:item.image};incoming.push({text:'\uFFFC',attributes:{__sweet_object:key}});
             }else if(item.table){
-                const key='new-table:'+crypto.randomUUID();newTables[key]=item.table;
+                const key='new-table:'+window.RichTextEditorSupport.objectId(crypto);newTables[key]=item.table;
                 info[key]={label:tableButton?tableButton.textContent:'Table',tableRows:item.table};
                 incoming.push({text:'\uFFFC',attributes:{__sweet_object:key}});
             }else if(item.text)incoming.push({text:item.text,attributes:{...item.attributes}});
@@ -633,7 +642,7 @@
                 if(html&&pasteStructured(clipboard.fromHtml(html,document)))return;
             }catch(_){const status=document.getElementById('richPasteStatus');if(status)status.hidden=false;return;}
         }
-        if(file)addImage(file);else if(plain)visualChange(plainClipboard(plain).replace(/\r\n?/g,'\n'));
+        if(file)addImage(file);else if(plain){visualChange(plainClipboard(plain).replace(/\r\n?/g,'\n'));const hint=document.getElementById('richClipboardHint');if(hint && visual()){hint.textContent=hint.dataset.plain;hint.hidden=false;}}
         else {const hint=document.getElementById('richClipboardHint');if(hint){hint.hidden=false;const types=window.RichTextImageClipboard?.formats(transfer);hint.textContent=hint.dataset.empty+(types?' ('+types+')':'');}}
     }
     for(const target of [input,preview])target.addEventListener('copy',copySelection);
@@ -659,6 +668,7 @@
             if (event.inputType === 'historyUndo' || event.inputType === 'historyRedo') {
                 event.preventDefault(); restoreHistory(event.inputType === 'historyUndo' ? -1 : 1); return;
             }
+            if(event.inputType==='insertFromPaste' && event.dataTransfer && event.cancelable){paste({preventDefault:()=>event.preventDefault(),clipboardData:event.dataTransfer});return;}
             captureSelection();
             if (!event.cancelable || event.isComposing || composing) return;
             const formats = {formatBold:['weight','heavy'],formatItalic:['style','italic'],formatUnderline:['underline','single'],formatStrikeThrough:['strikethrough','true']};

@@ -4,7 +4,7 @@
 
 Zengin metin editöründe imleci yerleştirip Ctrl+V kullanın. SweetCherry hem panonun `items` hem de `files` listesindeki PNG/JPEG resmi kontrol eder. Panoda aynı resmin HTML, metin ve dosya biçimleri birlikte bulunabilir. SweetCherry’nin kendi metin/biçim kopyası önceliklidir; yalnız resim içeren panoda resim yolu seçilir. Web sayfasından biçimli metin/tablo yapıştırma yolu korunur.
 
-Araç çubuğundaki **📋 Panodan resim yapıştır** düğmesi tarayıcının izin isteyen Clipboard API’sini ayrıca deneyebilir. Kullanıcı tıklaması, HTTPS veya localhost ve tarayıcı desteği gerekir. Normal Ctrl+V, aynı API’ye bağlı değildir; yerel ağda HTTP üzerinden de denenebilir. İzin verilmezse veya desteklenen resim yoksa açıklama gösterilir. Birden çok resim temsili varsa ilk desteklenen resim kullanılır; aynı ekran görüntüsü iki kez eklenmez.
+Araç çubuğundaki **📋 Panodan içerik yapıştır** düğmesi tarayıcının izin isteyen Clipboard API’sini ayrıca deneyebilir; varsa HTML biçimini de alır. Kullanıcı tıklaması, HTTPS veya localhost ve tarayıcı desteği gerekir. Normal Ctrl+V, aynı API’ye bağlı değildir; yerel ağda HTTP üzerinden de denenebilir. İzin verilmezse veya desteklenen resim yoksa açıklama gösterilir. Birden çok resim temsili varsa ilk desteklenen resim kullanılır; aynı ekran görüntüsü iki kez eklenmez.
 
 **Flameshot için kesin uyumluluk garantisi yoktur:** işletim sisteminin yerel pano biçimlerini tarayıcı PNG/JPEG olarak sunmuyorsa web uygulaması bunları okuyamaz. CherryTree gibi yerel bir uygulamanın okuyabilmesi, web tarayıcısının da aynı biçime erişeceği anlamına gelmez. Pano boş/uyumsuzsa tarayıcının bildirdiği biçim adları açıklamaya eklenir; pano metninin içeriği loglanmaz. Böyle bir durumda görüntüyü PNG kaydedip **Resim Ekle** ile seçin veya çalışan başka bir ekran görüntüsü aracını kullanın. SweetCherry kullanıcının bilgisayarındaki yerel panoyu sunucudan okumaya çalışmaz.
 
@@ -47,3 +47,5 @@ Kaynaklar:
 - https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
 - https://www.w3.org/TR/clipboard-apis/
 - https://hc.apache.org/httpcomponents-client-5.5.x/current/httpclient5/apidocs/
+
+HTTP ile nesne ekleme, Android dosya MIME tipleri ve yerel yapıştırma farkları için [mobil dil ve yapıştırma düzeltmeleri](mobile-language-and-paste.md).

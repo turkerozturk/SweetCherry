@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
 <style>
@@ -39,7 +39,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <select data-choice="justification" th:aria-label="#{richtext.edit.align}"><option value="left" th:text="#{richtext.edit.left}"></option><option value="center" th:text="#{richtext.edit.center}"></option><option value="right" th:text="#{richtext.edit.right}"></option><option value="fill" th:text="#{richtext.edit.justify}"></option></select>
 <div class="tool-group" role="group" th:aria-label="#{editor.objectTools}">
 <button type="button" id="richAddImage" th:text="#{richtext.edit.addImage}"></button>
-<button type="button" id="richPasteImage" th:title="#{richtext.clipboardImage}" th:aria-label="#{richtext.clipboardImage}">📋</button>
+<button type="button" id="richPasteImage" th:title="#{richtext.clipboardPaste}" th:aria-label="#{richtext.clipboardPaste}">📋</button>
 <button type="button" id="richWebImport" th:title="#{richtext.webImport}" th:aria-label="#{richtext.webImport}">🌐</button>
 <button type="button" id="richAddFile" th:text="#{richtext.edit.addFile}"></button>
 <button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
@@ -59,9 +59,9 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="file" id="richImageFile" accept="image/png,image/jpeg" hidden>
 <input type="file" id="richFilePicker" hidden>
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
-<span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError}"></span>
+<span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError},data-error-size=#{richtext.file.size},data-error-type=#{richtext.file.type},data-error-read=#{richtext.file.read},data-error-name=#{richtext.file.name},data-error-changed=#{richtext.file.changed},data-error-objects=#{richtext.file.objects},data-error-unsupported=#{richtext.file.unsupported}"></span>
 </div>
-<p id="richClipboardHint" class="note" role="alert" hidden th:attr="data-empty=#{richtext.clipboardUnavailable}"></p>
+<p id="richClipboardHint" class="note" role="alert" hidden th:attr="data-empty=#{richtext.clipboardUnavailable},data-http=#{richtext.clipboardHttp},data-plain=#{richtext.clipboardPlain},data-changed=#{richtext.file.changed}"></p>
 <p id="richAutoLinkError" role="alert" hidden th:text="#{editor.linkSelectionError}"></p>
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
 <textarea id="richText" spellcheck="false"></textarea>
@@ -113,6 +113,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <script src="/js/node/richTextClipboard.js"></script>
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>
 <script th:src="@{/js/node/richTextImageClipboard.js}"></script>
+<script th:src="@{/js/node/richTextEditorSupport.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
 <script th:src="@{/js/node/richTextWebImport.js}"></script>
 </body></html>

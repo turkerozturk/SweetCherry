@@ -249,6 +249,18 @@ public class Node {
         */
     }
 
+    /** View-only empty state; rich-text markup alone is not content, embedded objects are. */
+    @Transient
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public boolean isContentEmpty() {
+        if (!"custom-colors".equals(syntax)) return txt == null || txt.isBlank();
+        String html = txtAsHtml != null ? txtAsHtml : txt;
+        if (html == null || html.isBlank()) return true;
+        var body = org.jsoup.Jsoup.parseBodyFragment(html).body();
+        return body.text().replace('\u00a0', ' ').isBlank()
+                && body.select("img,table,pre,hr,video,audio,svg,math,object,input").isEmpty();
+    }
+
     public String getTxtAsHtml() {
         return txtAsHtml;
     }

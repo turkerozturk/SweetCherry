@@ -33,8 +33,6 @@ spring:
   http:
     encoding:
       charset: UTF-8
-  mvc:
-    locale: en_US, tr_TR # MULTILANGUAGE Supported languages
   jpa: # DATABASE
     properties:
       hibernate:
@@ -163,6 +161,8 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  # Empty: use browser language. Optional fixed initial language: en or tr. User choice overrides it.
+  default-language: ""
   # ADMIN-only public webpage import; no LAN/local URLs or browser login cookies.
   web-import-enabled: true
   pdf:
