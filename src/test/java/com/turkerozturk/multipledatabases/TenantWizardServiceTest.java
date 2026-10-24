@@ -51,11 +51,12 @@ class TenantWizardServiceTest {
     }
     @Test void editRetainsUnknownPropertiesAndPasswordWithoutDisplayingIt()throws Exception {
         var old=mock(ManagedTenantDataSource.class);Path config=register(existing(ctb()),old);
-        var form=wizard.edit("Original");assertThat(form.password).isEmpty();form.name="Renamed";form.writable=true;
+        var form=wizard.edit("Original");assertThat(form.password).isEmpty();form.name="Renamed";form.writable=true;form.databaseIcon="cherry_blue";
         wizard.save(form);var p=properties(config);
         assertThat(p.getProperty("custom.future.setting")).isEqualTo("keep this");assertThat(p.getProperty("datasource.password")).isEqualTo("private-secret");
         assertThat(p.getProperty("custom.isWritable")).isEqualTo("true");assertThat(routing.getResolvedDataSources()).containsKey("Renamed").doesNotContainKey("Original");verify(old).close();
-        form=wizard.edit("Renamed");form.clearPassword=true;wizard.save(form);assertThat(properties(config).getProperty("datasource.password")).isNull();
+        assertThat(p.getProperty(TenantIcons.PROPERTY)).isEqualTo("cherry_blue");
+        form=wizard.edit("Renamed");assertThat(form.databaseIcon).isEqualTo("cherry_blue");form.clearPassword=true;wizard.save(form);assertThat(properties(config).getProperty("datasource.password")).isNull();
     }
     @Test void staleFormAndBusyPoolNeverOverwriteConfig()throws Exception {
         var old=mock(ManagedTenantDataSource.class);Path config=register(existing(ctb()),old);var form=wizard.edit("Original");

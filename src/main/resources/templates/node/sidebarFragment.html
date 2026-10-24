@@ -36,11 +36,8 @@
                                     </span>
 
                         <span th:unless="${node}"
-                              th:text="${'Database: ' + currentTenantName}"
                               style="color: white; font-weight: bold;"
-                        >
-                                        Data source Name
-                                    </span>
+                        ><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${'Database: ' + currentTenantName}">Database</span></span>
 
                     </a>
 
@@ -75,11 +72,8 @@
 
                     <a th:unless="${node}" th:href="@{/markmap-quick-mind-map/all}"
                        target="_blank" rel="noopener noreferrer" title="Tüm düğümleri Markmap ile aç"
-                          th:text="${'Database: ' + currentTenantName}"
                           style="color: white; font-weight: bold;"
-                    >
-                        Data source Name
-                    </a>
+                    ><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${'Database: ' + currentTenantName}">Database</span></span></a>
                     <form th:if="${isRootNode == true and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')"
                           th:action="@{/nodes/top-level}" method="post" class="d-inline">
                         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>

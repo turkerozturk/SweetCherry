@@ -27,9 +27,12 @@ public class NodeContentEditingController {
         return "node/nodeContentEdit";
     }
 
+    public String save(long nodeId,String text) { return save(nodeId,text,false); }
+
     @PostMapping("/nodes/content/{nodeId}")
-    public String save(@PathVariable long nodeId, @RequestParam("text") String text) {
+    public String save(@PathVariable long nodeId, @RequestParam("text") String text,
+                       @RequestParam(defaultValue="false") boolean continueEditing) {
         service.update(nodeId, text);
-        return "redirect:/nodes/" + nodeId;
+        return continueEditing ? "redirect:/nodes/content/"+nodeId : "redirect:/nodes/" + nodeId;
     }
 }

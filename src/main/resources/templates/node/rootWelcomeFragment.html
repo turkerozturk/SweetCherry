@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <div th:fragment="welcome">
-<h1 th:text="${#strings.isEmpty(currentTenantName)} ? #{home.database} : ${currentTenantName}">Database</h1>
+<h1><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${#strings.isEmpty(currentTenantName)} ? #{home.database} : ${currentTenantName}">Database</span></h1>
 <p th:text="#{tree.selectNode}">Select a node in the tree.</p>
 <form th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">

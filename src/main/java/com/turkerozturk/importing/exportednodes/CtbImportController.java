@@ -20,6 +20,8 @@ public class CtbImportController {
     public CtbImportController(CtbImportService service){this.service=service;}
     @PostMapping("/preview")
     public String preview(@RequestParam String filename,HttpSession session,Model model) {
+        model.addAttribute("importMaxBytes",service.maxBytes());
+        model.addAttribute("importMaxRecords",service.maxRecords());
         session.removeAttribute(SESSION);
         try {
             var preview=service.preview(filename);

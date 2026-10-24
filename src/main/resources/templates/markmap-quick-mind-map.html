@@ -369,6 +369,9 @@
                     + '"></a>';
             }
 
+            if(currentNodeId === 0 && hasVisibleNodeIcon) {
+                iconHtml='<img class="markmap-node-icon" src="'+escapeHtmlAttribute(iconBaseUrl+encodeURIComponent(String(iconName))+'.png')+'" alt="">';
+            }
             node.content =
                 '<span class="markmap-node-label">'
                 + iconHtml

@@ -19,7 +19,7 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="hidden" name="files" id="richFiles" value="{}">
 <input type="hidden" name="deleted" id="richDeleted" value="[]">
 <input type="hidden" name="tables" id="richTables" value="{}">
-<div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
+<div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 <label><input type="checkbox" id="richVisualMode" checked> <span th:text="#{richtext.edit.visual}"></span></label>
 <div class="toolbar">
 <div class="tool-group" role="group" th:aria-label="#{editor.formatTools}">

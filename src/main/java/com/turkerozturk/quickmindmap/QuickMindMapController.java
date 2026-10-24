@@ -30,6 +30,10 @@ public class QuickMindMapController {
     private static final int DEFAULT_LEVEL = 3;
     private static final int INDENT_SIZE = 2;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.turkerozturk.multipledatabases.TenantIcons tenantIcons;
+    private String databaseIcon(){return tenantIcons==null ? com.turkerozturk.multipledatabases.TenantIcons.DEFAULT : tenantIcons.icon(TenantContext.getCurrentTenant());}
+
     private final ChildrenRepository childrenRepository;
     private final NodeRepository nodeRepository;
 
@@ -61,6 +65,7 @@ public class QuickMindMapController {
                 .append(escapeMermaidLabel(tenantName))
                 .append("\"))\n  :::ct-node-0\n");
         addNavigationNode(navigationNodes, "ct-node-0", 0, 0);
+        if(icons) iconNodes.add(Map.of("nodeClass","ct-node-0","iconName",databaseIcon()));
 
         if (level > 0) {
             for (Children root : childrenRepository.findByFatherIdOrderBySequenceAsc(0)) {

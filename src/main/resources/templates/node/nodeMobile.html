@@ -433,10 +433,7 @@
                  class="text-center"
             >
                 <span
-                        th:text="${'Database: ' + currentTenantName}"
-                >
-                        Data source Name
-                </span>
+                ><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${'Database: ' + currentTenantName}">Database</span></span>
                 <form th:if="${canDeleteNode}" sec:authorize="hasRole('ADMIN')"
                       th:action="@{/nodes/top-level}" method="post" class="d-inline ms-2">
                     <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>

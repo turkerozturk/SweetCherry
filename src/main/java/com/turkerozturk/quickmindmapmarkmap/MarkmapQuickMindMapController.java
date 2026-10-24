@@ -28,6 +28,10 @@ import java.util.Set;
 @RequiresTenant
 public class MarkmapQuickMindMapController {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.turkerozturk.multipledatabases.TenantIcons tenantIcons;
+    private String databaseIcon(){return tenantIcons==null ? com.turkerozturk.multipledatabases.TenantIcons.DEFAULT : tenantIcons.icon(TenantContext.getCurrentTenant());}
+
     private final ChildrenRepository childrenRepository;
     private final NodeRepository nodeRepository;
     private final ObjectMapper objectMapper;
@@ -57,6 +61,7 @@ public class MarkmapQuickMindMapController {
         ObjectNode root = objectMapper.createObjectNode();
         root.put("content", tenantName);
         root.putObject("payload").put("nodeId", 0);
+        if(icons) ((ObjectNode)root.get("payload")).put("iconName",databaseIcon());
         ArrayNode branches = root.putArray("children");
         if (level > 0) {
             for (Children child : childrenRepository.findByFatherIdOrderBySequenceAsc(0)) {

@@ -12,7 +12,7 @@
     <form id="plainEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
         <div class="mb-3 d-flex gap-2">
-            <button type="submit" class="btn btn-primary" th:text="#{richtext.edit.save}">Kaydet</button>
+            <button type="submit" class="btn btn-primary" th:text="#{richtext.edit.save}">Kaydet</button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button>
             <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}">İptal</a>
         </div>
         <label for="nodeText" class="form-label">İçerik</label>

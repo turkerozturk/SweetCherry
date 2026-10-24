@@ -16,7 +16,11 @@ public class CtbImportService {
     private final NodePropertiesService properties;
     @Value("${user.dir}") private String applicationPath;
     @Value("${myapp.exportingFolderName}") private String folder;
+    @Value("${myapp.ctb-import.max-bytes:67108864}") private long maxBytes=67108864;
+    @Value("${myapp.ctb-import.max-records:200000}") private int maxRecords=200000;
     public CtbImportService(NodePropertiesService properties) { this.properties=properties; }
+    public long maxBytes(){return maxBytes;}
+    public int maxRecords(){return maxRecords;}
     public record Preview(String filename,String digest,Map<String,Integer> counts) { }
     void writable() { if(!properties.writable()) throw new AccessDeniedException("Selected database is read-only"); }
     private CtbImportData read(String filename) throws Exception {
@@ -27,8 +31,8 @@ public class CtbImportService {
         Path file=directory.resolve(filename);
         if(Files.isSymbolicLink(directory) || !Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)
                 || !file.toRealPath().getParent().equals(directory.toRealPath())) throw new IllegalArgumentException("file");
-        if(Files.size(file)>64L*1024*1024) throw new IllegalArgumentException("limit");
-        return CtbImportData.read(file);
+        if(maxBytes<=0 || maxRecords<=0 || Files.size(file)>maxBytes) throw new IllegalArgumentException("limit");
+        return CtbImportData.read(file,maxBytes,maxRecords);
     }
     public synchronized Preview preview(String filename) throws Exception {
         var data=read(filename); return new Preview(filename,data.digest,data.counts());

@@ -14,7 +14,7 @@
 <a th:if="${parentNodeId != null and parentNodeId != 0}" class="btn" th:href="@{/nodes/{id}(id=${parentNodeId})}" th:title="#{tree.goToParentNode}" th:attr="aria-label=#{tree.goToParentNode}"><i class="fas fa-arrow-up"></i></a>
 <a th:if="${childNodes != null and !#lists.isEmpty(childNodes)}" class="btn" th:href="@{/nodes/{id}(id=${childNodes[0].nodeId})}" th:title="#{reader.child}" th:attr="aria-label=#{reader.child}"><i class="fas fa-arrow-down"></i></a>
 <a th:if="${nextSiblingNaviNode != null}" class="btn" th:href="@{/nodes/{id}(id=${nextSiblingNaviNode.nodeId})}" th:title="#{reader.next}" th:attr="aria-label=#{reader.next}"><i class="fas fa-arrow-right"></i></a>
-<button type="button" id="readerDrawerToggle" class="reader-title" aria-expanded="false" aria-controls="readerDrawer" th:title="#{reader.contextNavigation}"><span th:text="${node != null ? node.name : currentTenantName}"></span> <i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+<button type="button" id="readerDrawerToggle" class="reader-title" aria-expanded="false" aria-controls="readerDrawer" th:title="#{reader.contextNavigation}"><span th:if="${node == null}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"></span><span th:text="${node != null ? node.name : currentTenantName}"></span> <i class="fas fa-chevron-down" aria-hidden="true"></i></button>
 <button type="button" class="btn" data-bs-toggle="offcanvas" data-bs-target="#readerActions" th:title="#{reader.actions}" th:attr="aria-label=#{reader.actions}"><i class="fas fa-ellipsis-v"></i></button>
 </nav>
 <nav id="readerDrawer" hidden th:attr="aria-label=#{reader.contextNavigation}"><th:block th:replace="~{node/readerContextNavigation :: contextNavigation}"></th:block></nav>
@@ -26,7 +26,7 @@
 <aside class="offcanvas offcanvas-start" tabindex="-1" id="readerTree" aria-labelledby="readerTreeTitle">
 <div class="offcanvas-header"><h2 id="readerTreeTitle" th:text="#{reader.tree}"></h2><button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:attr="aria-label=#{reader.close}"></button></div>
 <div class="offcanvas-body">
-<a th:href="@{/}" th:text="${currentTenantName}"></a>
+<a th:href="@{/}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}"></span></a>
 <ul id="readerTreeNodes" class="reader-tree"></ul>
 <button id="readerRetry" type="button" class="btn btn-outline-secondary" hidden th:text="#{reader.retry}"></button>
 </div></aside>

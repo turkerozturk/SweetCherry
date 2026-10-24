@@ -20,11 +20,16 @@ public class RichTextEditingController {
         return "node/richtext-edit";
     }
 
+    public String save(long id,String xml,String revision,String images,String files,String tables,String deleted,boolean allowObjectDeletion) {
+        return save(id,xml,revision,images,files,tables,deleted,allowObjectDeletion,false);
+    }
+
     @PostMapping("/nodes/richtext/edit/{id}")
     public String save(@PathVariable long id, @RequestParam String xml, @RequestParam String revision,
             @RequestParam(defaultValue = "{}") String images, @RequestParam(defaultValue = "{}") String files, @RequestParam(defaultValue = "{}") String tables,
-            @RequestParam(defaultValue = "[]") String deleted, @RequestParam(defaultValue = "false") boolean allowObjectDeletion) {
+            @RequestParam(defaultValue = "[]") String deleted, @RequestParam(defaultValue = "false") boolean allowObjectDeletion,
+            @RequestParam(defaultValue="false") boolean continueEditing) {
         service.save(id, xml, revision, images, files, tables, deleted, allowObjectDeletion);
-        return "redirect:/nodes/" + id;
+        return continueEditing ? "redirect:/nodes/richtext/edit/"+id : "redirect:/nodes/" + id;
     }
 }

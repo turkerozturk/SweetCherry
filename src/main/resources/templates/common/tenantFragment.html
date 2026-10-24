@@ -70,39 +70,14 @@
 
                     <form action="#" th:action="@{/setTenant}" method="post">
                         <!-- <label for="tenant">Tenant Sec:</label> -->
-                        <select id="tenant"
-                                name="tenant"
-                                onchange="this.form.submit()"
-                                class="form-select"
-                        >
+                        <details class="tenant-icon-picker w-100">
+    <summary class="form-select" th:title="#{tenantfragment.option_select_database}"><img th:if="${currentTenantName}" th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1"><span th:text="${currentTenantName != null ? currentTenantName : #messages.msg('tenantfragment.option_select_database')}"></span></summary>
+    <div style="max-height:18rem;overflow-y:auto" role="group" th:aria-label="#{tenantfragment.option_select_database}">
+        <button th:each="tenantName : ${tenantNames}" type="submit" name="tenant" th:value="${tenantName}" class="btn btn-light text-start w-100" th:classappend="${tenantName == currentTenantName} ? 'fw-bold' : ''"><img th:src="@{/img/ctbicons/{icon}.png(icon=${databaseIcons.get(tenantName)})}" width="20" height="20" alt="" class="me-1"><span th:text="${tenantName}"></span></button>
+    </div>
+</details>
 
 
-                            <option th:unless="${currentTenantName}"
-                                    value=""
-                                    th:text="#{tenantfragment.option_select_database}"
-                            >
-                                Select Database
-                            </option>
-                            <option th:each="tenantName : *{tenantNames}"
-                                    th:value="${tenantName}"
-                                    th:text="${tenantName}"
-                                    th:selected="${tenantName == currentTenantName}"
-                            >
-                            </option>
-                            <!-- Diger tenant seceneklerini ekleyin -->
-
-                        </select>
-                        <button class="btn"
-                                type="submit"
-
-
-                        >
-                            <i class="fas fa-plug-circle-plus"></i>
-                            <span th:text="#{tenant.load}">
-
-                            </span>
-
-                        </button>
                     </form>
 
                 </td>

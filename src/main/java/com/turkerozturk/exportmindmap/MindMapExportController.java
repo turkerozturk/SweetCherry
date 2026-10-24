@@ -36,6 +36,10 @@ public class MindMapExportController {
 
     private static final String DEFAULT_FOLD_MODE = "chat";
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.turkerozturk.multipledatabases.TenantIcons tenantIcons;
+    private String databaseIcon(){return tenantIcons==null ? com.turkerozturk.multipledatabases.TenantIcons.DEFAULT : tenantIcons.icon(TenantContext.getCurrentTenant());}
+
     private final ChildrenRepository childrenRepository;
     private final NodeRepository nodeRepository;
 
@@ -196,6 +200,10 @@ public class MindMapExportController {
                 writer.writeAttribute("ID", "ID_0");
                 writer.writeAttribute("FOLDED", "false");
                 writer.writeAttribute("STYLE", "oval");
+                if(includeIcons) {
+                    writer.writeStartElement("hook");writer.writeAttribute("NAME","ExternalObject");
+                    writer.writeAttribute("URI","ctbicons/"+databaseIcon()+".png");writer.writeAttribute("SIZE","1.0");writer.writeEndElement();
+                }
                 writeFontElement(writer, true, false);
                 writeMapStyleHook(writer);
                 visitedNodeIds.add(0L);
@@ -281,6 +289,10 @@ public class MindMapExportController {
 
         if (isRootNode) {
             writer.writeAttribute("STYLE", "oval");
+                if(includeIcons) {
+                    writer.writeStartElement("hook");writer.writeAttribute("NAME","ExternalObject");
+                    writer.writeAttribute("URI","ctbicons/"+databaseIcon()+".png");writer.writeAttribute("SIZE","1.0");writer.writeEndElement();
+                }
         }
 
         String color = displayNode.getTitleColorAsHtmlHex();

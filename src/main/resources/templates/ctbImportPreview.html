@@ -4,6 +4,7 @@
 <body><section layout:fragment="content">
 <h1 th:text="#{ctbImport.title}"></h1>
 <div th:if="${importError != null}" class="alert alert-warning" th:text="${#messages.msg(importError)}"></div>
+<p class="text-muted" th:text="#{ctbImport.limits(${importMaxBytes},${importMaxRecords})}"></p>
 <div th:if="${preview != null}">
 <p><strong th:text="#{ctbImport.source}"></strong> <span th:text="${preview.filename}"></span></p>
 <p><strong th:text="#{ctbImport.target}"></strong> <span th:text="${tenant}"></span></p>

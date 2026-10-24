@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"><body>
 <nav th:fragment="breadcrumbs" class="reader-breadcrumbs" th:attr="aria-label=#{tree.path}">
-<a th:href="@{/}" th:text="${currentTenantName}"></a>
+<a th:href="@{/}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}"></span></a>
 <th:block th:if="${node != null}"><th:block th:each="entry : ${node.breadcrumbs}">
 <span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}"></a>
 </th:block></th:block>

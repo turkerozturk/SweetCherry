@@ -69,6 +69,18 @@ public class GlobalControllerAdvice {
         return snapshot == null ? null : snapshot.moon();
     }
 
+    @Autowired private com.turkerozturk.multipledatabases.TenantIcons tenantIcons;
+
+    @ModelAttribute("currentDatabaseIcon")
+    public String currentDatabaseIcon(){return tenantIcons.icon(TenantContext.getCurrentTenant());}
+
+    @ModelAttribute("databaseIcons")
+    public Map<String,String> databaseIcons(){
+        var icons=new java.util.HashMap<String,String>();
+        tenantService.getAllTenants().keySet().forEach(name->icons.put(name,tenantIcons.icon(name)));
+        return icons;
+    }
+
     @ModelAttribute("tenantNames")
     public List<String> getTenantNames() {
         // Her bir tenant name, bir veritabanindan digerine gecmek icin belirttigimiz isimler.

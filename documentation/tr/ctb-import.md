@@ -39,7 +39,7 @@ dosyayı tekrar onaylamak yeni bir kopya oluşturur; birleştirme/senkronizasyon
   geri alabilmek için transaction desteklemeyen tablolar reddedilir.
 - Tek hedef transaction’ı kullanılır; bir kayıt yazılamazsa tüm eklemeler geri
   alınır. Eşzamanlı ID çakışması da üzerine yazma yerine işlemi iptal eder.
-- Başlangıç sınırı: kaynak dosya ve açılmış alan verileri için 64 MiB, altı tablonun
+- Varsayılan (ayarlanabilir) sınır: kaynak dosya ve açılmış alan verileri için 64 MiB, altı tablonun
   toplamı için 200.000 kayıt. Büyük arşivleri küçük CTB’lere bölerek aktarın.
 - Aktif dosya aynı zamanda kaynak seçilmişse önce okuma tamamlanıp kapatılır,
   sonra hedefe yeni ID’lerle kopyalanır.
@@ -62,3 +62,28 @@ Java paket adı `com.turkerozturk.importing.exportednodes` seçilmiştir;
 
 Otomatik kontroller: `CtbImportTest`, `CtbImportControllerTest`,
 `CtbImportSecurityTest`, `CtbImportTemplateTest`.
+
+## Ayarlanabilir sınırlar ve HTTP
+
+`application.yml` varsayılanları:
+
+```yaml
+myapp:
+  ctb-import:
+    max-bytes: 67108864 # 64 MiB; hem kaynak dosya hem toplam açılmış alan verisi
+    max-records: 200000 # altı tablonun toplamı
+```
+
+Pozitif değerler kullanın. Sistem → Uygulama Ayarları veya masaüstü YAML
+editöründen de değiştirilebilir; yeni değerler için yeniden başlatın. Önizleme
+sayfası o anda geçerli sınırları gösterir. Bellekte tutulan Java nesneleri, diziler,
+metinler ve JDBC sürücüsü nedeniyle gereken heap bu bayt sınırından büyük olabilir.
+
+CTB bu işlem sırasında istemciden yüklenmez: `/exportedFiles` altındaki sunucu
+dosyası okunur. HTTP isteği yalnız dosya adı ve onay bilgilerini taşır; dolayısıyla
+`server.tomcat.max-http-form-post-size` veya multipart upload sınırını CTB boyutu
+kadar artırmaya gerek yoktur. CTB’yi başka bir upload özelliğiyle sunucuya
+getiriyorsanız **o ayrı işlemin** ve varsa reverse proxy’nin sınırları uygulanır.
+
+Rich text resim/dosya ekleme için limitler farklıdır; bkz.
+[Bellek, HTTP ve dosya sınırları](memory-and-transfer-limits.md).

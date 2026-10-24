@@ -37,6 +37,7 @@ public class TenantWizardService {
     }
     public TenantWizardForm edit(String tenant) throws IOException {
         Path file=resolve(tenant); var p=read(file); var f=new TenantWizardForm();
+        f.databaseIcon=p.getProperty(TenantIcons.PROPERTY, "");
         f.tenant=tenant; f.revision=revision(file); f.name=p.getProperty("name",tenant); f.url=p.getProperty("datasource.url","");
         f.type=DRIVERS.entrySet().stream().filter(e->e.getValue().equals(p.getProperty("datasource.driver-class-name"))).map(Map.Entry::getKey).findFirst().orElseThrow(()->new IllegalArgumentException("wizard.unsupportedDriver"));
         if(f.type.equals("sqlite")) f.path=f.url.substring("jdbc:sqlite:".length());
@@ -77,6 +78,7 @@ public class TenantWizardService {
         if(tenants.getAllTenants().containsKey(f.name)&&!f.name.equals(f.tenant))throw new IllegalArgumentException("wizard.duplicateName");
         try { int limit=Integer.parseInt(f.maxEmbeddedFileSizeMB); if(limit<1||limit>20)throw new NumberFormatException(); }
         catch(RuntimeException e){throw new IllegalArgumentException("wizard.invalidLimit");}
+        p.setProperty(TenantIcons.PROPERTY,TenantIcons.resolve(f.databaseIcon));
         p.setProperty("name",f.name);p.setProperty("datasource.driver-class-name",DRIVERS.get(f.type));p.setProperty("datasource.url",url);
         p.setProperty("security-role",f.role);p.setProperty("custom.isWritable",String.valueOf(f.writable));
         p.setProperty(CtbSchemaCompatibility.SETTING,String.valueOf(f.allowLegacySchemaUpgrade));

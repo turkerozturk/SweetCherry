@@ -35,7 +35,7 @@
                 <form th:action="@{/tenants/config/delete}" method="post" class="d-inline" th:attr="data-confirm-message=#{tenant.delete.confirm(${tenant.fileName})}">
                     <input type="hidden" name="tenant" th:value="${tenant.tenantName}">
                     <button type="submit" class="btn btn-sm btn-outline-danger" th:title="#{tenant.delete.title}" th:aria-label="#{tenant.delete.title}"><i class="fas fa-trash" aria-hidden="true"></i></button>
-                </form> <i><b th:text="${tenant.tenantName}"></b></i></td>
+                </form> <img th:src="@{/img/ctbicons/{icon}.png(icon=${databaseIcons.get(tenant.tenantName)})}" width="20" height="20" alt="" class="me-1"><i><b th:text="${tenant.tenantName}"></b></i></td>
             <td th:text="${tenant.url}"></td>
             <td th:text="${tenant.authenticationConfigured} ? #{tenant.yes} : #{tenant.no}" th:classappend="${tenant.authenticationConfigured} ? 'fw-bold' : ''"></td>
             <td th:text="${tenant.driverClassName}"></td>

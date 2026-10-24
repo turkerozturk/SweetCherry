@@ -334,3 +334,7 @@ Windows x64 için Java içeren EXE/ZIP paketleme: [Windows dağıtım rehberi](w
 ## Farklı veritabanı motorları
 
 SQLite, MariaDB/MySQL ve PostgreSQL tenant geçişleri için [tenant dialect yönlendirmesi](tenant-dialects.md) belgesine bakın. Genel YAML dialect ayarını her seçimde değiştirmek gerekmez.
+
+Bellek veya yükleme sınırlarıyla karşılaşırsanız:
+[Bellek, HTTP ve dosya sınırları](memory-and-transfer-limits.md).
+Veritabanları için [özel ikon](database-icons.md) tanımlanabilir.

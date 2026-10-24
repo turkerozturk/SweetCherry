@@ -25,6 +25,10 @@ final class CtbImportData {
     private int rowCount;
 
     static CtbImportData read(Path path) throws Exception {
+        return read(path, 64L*1024*1024, 200000);
+    }
+    static CtbImportData read(Path path,long maxBytes,int maxRecords) throws Exception {
+        if(maxBytes<=0 || maxRecords<=0) throw new IllegalArgumentException("limit");
         var data = new CtbImportData();
         try (var source = DriverManager.getConnection("jdbc:sqlite:" + path.toUri() + "?mode=ro")) {
             source.setAutoCommit(false);
@@ -45,7 +49,7 @@ final class CtbImportData {
                 for(String column:select) lengths.add("COALESCE(length(CAST("+column+" AS BLOB)),0)");
                 try(var s=source.createStatement();var r=s.executeQuery("SELECT COALESCE(SUM("+String.join("+",lengths)+"),0),COUNT(*) FROM "+table)) {
                     r.next();
-                    if(r.getLong(1)>64L*1024*1024-data.bytes || r.getLong(2)>200000-data.rowCount)
+                    if(r.getLong(1)>maxBytes-data.bytes || r.getLong(2)>maxRecords-data.rowCount)
                         throw new IllegalArgumentException("limit");
                 }
                 var rows = new ArrayList<Object[]>(); data.tables.put(table,rows);
@@ -54,14 +58,14 @@ final class CtbImportData {
                 String sql = "SELECT " + String.join(",",select) + " FROM " + table + " ORDER BY " + order;
                 try (var s = source.createStatement(); var r = s.executeQuery(sql)) {
                     while (r.next()) {
-                        if (++data.rowCount > 200000) throw new IllegalArgumentException("limit");
+                        if (++data.rowCount > maxRecords) throw new IllegalArgumentException("limit");
                         Object[] row = new Object[select.size()];
                         for (int i=0;i<row.length;i++) {
                             Object value = entry.getValue().get(i).equals("png") ? r.getBytes(i+1) : r.getObject(i+1);
                             row[i] = value;
                             byte[] encoded = value == null ? new byte[0] : value instanceof byte[] b ? b : value.toString().getBytes(StandardCharsets.UTF_8);
                             data.bytes += encoded.length;
-                            if (data.bytes > 64L*1024*1024) throw new IllegalArgumentException("limit");
+                            if (data.bytes > maxBytes) throw new IllegalArgumentException("limit");
                             hash.update((byte)(value == null ? 0 : value instanceof byte[] ? 1 : 2));
                             hash.update(java.nio.ByteBuffer.allocate(4).putInt(encoded.length).array()); hash.update(encoded);
                         }

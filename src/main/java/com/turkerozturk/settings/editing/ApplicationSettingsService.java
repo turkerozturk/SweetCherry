@@ -25,6 +25,8 @@ public class ApplicationSettingsService {
         new Setting("myapp.openWebBrowserOnStartup","boolean","false",0),
         new Setting("myapp.syntax-highlighting.enabled","boolean","true",0),
         new Setting("myapp.debug","boolean","false",0),
+        new Setting("myapp.ctb-import.max-bytes","number","67108864",2147483647),
+        new Setting("myapp.ctb-import.max-records","number","200000",2147483647),
         new Setting("myapp.pdf.max-nodes","number","512",100000),
         new Setting("myapp.pdf.max-depth","number","64",256),
         new Setting("myapp.pdf.max-node-text-characters","number","8388608",2147483647),

@@ -161,6 +161,10 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  ctb-import:
+    # Server-side CTB file AND decoded field bytes; not an HTTP upload limit. Restart after editing.
+    max-bytes: 67108864 # 64 MiB; raise only with enough Java heap and physical RAM.
+    max-records: 200000 # Combined rows in all six CTB tables.
   # Empty: use browser language. Optional fixed initial language: en or tr. User choice overrides it.
   default-language: ""
   # ADMIN-only public webpage import; no LAN/local URLs or browser login cookies.

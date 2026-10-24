@@ -9,7 +9,7 @@
         <header class="workspace-node-header">
         <h1 th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}" th:text="${node.name}">Node</h1>
         <nav class="workspace-breadcrumbs" th:attr="aria-label=#{tree.path}">
-            <a th:href="@{/tree(nodeId=0)}" th:text="${currentTenantName}"></a>
+            <a th:href="@{/tree(nodeId=0)}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}"></span></a>
             <th:block th:each="entry : ${node.breadcrumbs}">
                 <span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}"></a>
             </th:block>
@@ -32,7 +32,7 @@
             <span><b th:text="#{node.nodeId}"></b>: <span th:text="${node.nodeId}"></span></span>
             <span th:if="${isSharedNode == true}"><b th:text="#{node.sharedId}"></b>: <span th:text="${requestedNodeId}"></span></span>
         </th:block>
-        <span th:if="${node == null}" th:text="${currentTenantName}"></span>
+        <span th:if="${node == null}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}"></span></span>
     </template>
 </section>
 </body>
