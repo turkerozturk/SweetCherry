@@ -10,6 +10,16 @@ import static org.mockito.Mockito.*;
 
 class TenantWizardControllerTest {
     @TempDir Path directory;
+    @Test void databaseIconIsBoundFromTheRealHttpForm()throws Exception {
+        var service=mock(TenantWizardService.class);var selection=mock(DatabaseSwitchController.class);
+        when(service.save(any())).thenReturn("Demo");when(selection.setTenant(eq("Demo"),any())).thenReturn("redirect:/");
+        var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup(new TenantWizardController(service,selection)).build();
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/tenants/wizard")
+            .param("databaseIcon","CHERRY_BLUE").param("name","Demo"))
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl("/"));
+        var saved=org.mockito.ArgumentCaptor.forClass(TenantWizardForm.class);verify(service).save(saved.capture());
+        assertThat(saved.getValue().databaseIcon).isEqualTo("CHERRY_BLUE");
+    }
     @Test void browseListsOnlyFoldersAndCtbWithoutContentAndDisablesCaching()throws Exception {
         Files.createDirectory(directory.resolve("notes"));Files.writeString(directory.resolve("one.ctb"),"payload");Files.writeString(directory.resolve("secret.txt"),"private");
         var controller=new TenantWizardController(mock(TenantWizardService.class),mock(DatabaseSwitchController.class));

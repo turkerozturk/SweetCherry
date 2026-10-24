@@ -29,14 +29,15 @@ class TenantWizardTemplateTest {
                     properties.load(new java.io.InputStreamReader(in,StandardCharsets.UTF_8));
                 }
                 properties.stringPropertyNames().forEach(key->context.getStaticMessageSource().addMessage(key,locale,properties.getProperty(key)));
-                var form=new TenantWizardForm();form.tenant="Existing";form.name="<Türkçe>";form.path="C:/notlar/çığ.ctb";form.password="never-show-secret";
-                Map<String,Object> model=new HashMap<>();model.put("wizard",form);model.put("wizardError","wizard.stale");
+                var form=new TenantWizardForm();form.tenant="Existing";form.name="<Türkçe>";form.path="C:/notlar/çığ.ctb";form.password="never-show-secret";form.databaseIcon="cherrytree";
+                Map<String,Object> model=new HashMap<>();model.put("databaseIconOptions",List.of(com.turkerozturk.helpers.NodeIcon.CT_DB));model.put("wizard",form);model.put("wizardError","wizard.stale");
                 model.put("thymeleafRequestContext",new SpringWebMvcThymeleafRequestContext(new RequestContext(request,response,servlet,model),request));
                 var engine=new SpringTemplateEngine();engine.setTemplateResolver(new StringTemplateResolver());engine.setMessageSource(context);
                 String html=engine.process(template,new WebContext(JakartaServletWebApplication.buildApplication(servlet).buildExchange(request,response),locale,model));
                 var document=org.jsoup.Jsoup.parse(html);
                 assertThat(document.selectFirst("input[name=name]").val()).isEqualTo("<Türkçe>");
                 assertThat(document.selectFirst("input[name=path]").val()).isEqualTo("C:/notlar/çığ.ctb");
+                assertThat(document.selectFirst("input[name=databaseIcon][checked]").val()).isEqualTo("cherrytree");
                 assertThat(html).contains("/tenants/wizard").doesNotContain("never-show-secret","??wizard.");
             }
         }

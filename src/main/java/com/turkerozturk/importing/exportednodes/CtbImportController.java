@@ -29,7 +29,8 @@ public class CtbImportController {
             session.setAttribute(SESSION,pending);
             model.addAttribute("preview",preview); model.addAttribute("token",pending.token());
             model.addAttribute("tenant",pending.tenant());
-        } catch(Exception failure){ model.addAttribute("importError",errorKey(failure)); }
+        } catch(Exception failure){ model.addAttribute("importError",errorKey(failure));
+            if(failure instanceof CtbImportProblem problem)model.addAttribute("importProblem",problem); }
         return "ctbImportPreview";
     }
     @PostMapping("/confirm")
@@ -45,7 +46,8 @@ public class CtbImportController {
                     || !Objects.equals(pending.tenant(),TenantContext.getCurrentTenant())) throw new IllegalArgumentException("changed");
             int count=service.confirm(pending.preview());
             redirect.addFlashAttribute("importCount",count);
-        } catch(Exception failure){redirect.addFlashAttribute("importError",errorKey(failure));}
+        } catch(Exception failure){redirect.addFlashAttribute("importError",errorKey(failure));
+            if(failure instanceof CtbImportProblem problem)redirect.addFlashAttribute("importProblem",problem);}
         return "redirect:/exportedFiles";
     }
     private static String errorKey(Exception failure) {

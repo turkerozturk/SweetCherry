@@ -66,6 +66,14 @@ public class TenantService {
     }
 
 
+    public List<String> getSelectionNames() {
+        var forms=getTenantForms();
+        forms.sort(java.util.Comparator.comparing(TenantForm::isCtb).reversed()
+            .thenComparing(form->form.isCtb()?form.getModifiedMillis():null, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()))
+            .thenComparing(TenantForm::getTenantName,TenantFileMetadata.NAMES));
+        return forms.stream().map(TenantForm::getTenantName).toList();
+    }
+
     public void printDataSourceDetails() {
         AbstractRoutingDataSource routingDataSource = (AbstractRoutingDataSource) this.dataSource;
         Map<Object, DataSource> resolvedDataSources = routingDataSource.getResolvedDataSources();
@@ -111,12 +119,15 @@ public class TenantService {
                 tenantForm.setDriverClassName(hikariDataSource.getDriverClassName());
                 tenantForm.setTenantName(tenantName);
                 tenantForm.setUrl(hikariDataSource.getJdbcUrl());
+                tenantForm.setCtb(TenantFileMetadata.ctbPath(hikariDataSource.getJdbcUrl())!=null);
+                tenantForm.setModifiedMillis(TenantFileMetadata.modified(hikariDataSource.getJdbcUrl()));
                 tenantForm.setUsername(hikariDataSource.getUsername());
                 tenantForm.setPassword(hikariDataSource.getPassword());
                 //tenantForm.setFileName(hikariDataSource.);
 
 
                 Map<String, String> customProperties = customPropertiesHolder.getCustomProperties(tenantName);
+                if(customProperties==null)customProperties=Map.of();
 
                 tenantForm.setFileName(customProperties.get("propertyFileName"));
 
@@ -149,6 +160,7 @@ public class TenantService {
         }
 
 
+        tenantForms.sort(java.util.Comparator.comparing(TenantForm::getTenantName,TenantFileMetadata.NAMES));
         return tenantForms;
     }
 

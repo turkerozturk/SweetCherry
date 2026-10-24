@@ -1,0 +1,16 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="details" th:if="${importProblem != null}" class="alert alert-warning">
+<div th:if="${importProblem.limits != null}" th:with="limit=${importProblem.limits}">
+<p th:text="#{ctbImport.measured}"></p>
+<dl><dt th:text="#{ctbImport.fileBytes}"></dt><dd th:text="${limit.fileBytes}"></dd>
+<dt th:text="#{ctbImport.dataBytes}"></dt><dd th:text="${limit.dataBytes}"></dd>
+<dt th:text="#{ctbImport.recordCount}"></dt><dd th:text="${limit.records}"></dd>
+<dt>myapp.ctb-import.max-bytes</dt><dd th:text="${limit.maxBytes}"></dd>
+<dt>myapp.ctb-import.max-records</dt><dd th:text="${limit.maxRecords}"></dd></dl>
+<p th:text="#{ctbImport.changeLimits}"></p>
+</div>
+<div th:unless="${#lists.isEmpty(importProblem.links)}">
+<p th:text="#{ctbImport.linkDetails}"></p>
+<div class="table-responsive"><table class="table table-bordered"><thead><tr><th th:text="#{ctbImport.sourceId}"></th><th th:text="#{ctbImport.sourceTitle}"></th><th th:text="#{ctbImport.linkField}"></th><th th:text="#{ctbImport.targetId}"></th></tr></thead>
+<tbody><tr th:each="issue:${importProblem.links}"><td th:text="${issue.sourceId}"></td><td th:text="${issue.sourceTitle}"></td><td th:text="${issue.location}"></td><td th:text="${issue.targetId}"></td></tr></tbody></table></div>
+</div></section></body></html>

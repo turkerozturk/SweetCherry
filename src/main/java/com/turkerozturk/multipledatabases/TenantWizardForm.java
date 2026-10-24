@@ -3,7 +3,7 @@ package com.turkerozturk.multipledatabases;
 /** Explicit form fields prevent arbitrary property binding. Password is never populated on edit. */
 public class TenantWizardForm {
     public String tenant = "", revision = "", name = "", type = "sqlite", path = "", url = "", username = "", password = "";
-    public String databaseIcon = "";
+    public String databaseIcon = "ct_db";
     public String getDatabaseIcon(){return databaseIcon;} public void setDatabaseIcon(String v){databaseIcon=v;}
     public String role = "USER", newNodeName = "", newNodeTags = "", maxEmbeddedFileSizeMB = "9";
     public boolean writable, allowLegacySchemaUpgrade, clearPassword;

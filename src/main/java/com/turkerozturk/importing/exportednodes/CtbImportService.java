@@ -31,7 +31,7 @@ public class CtbImportService {
         Path file=directory.resolve(filename);
         if(Files.isSymbolicLink(directory) || !Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)
                 || !file.toRealPath().getParent().equals(directory.toRealPath())) throw new IllegalArgumentException("file");
-        if(maxBytes<=0 || maxRecords<=0 || Files.size(file)>maxBytes) throw new IllegalArgumentException("limit");
+        if(maxBytes<=0 || maxRecords<=0) throw new IllegalArgumentException("limit");
         return CtbImportData.read(file,maxBytes,maxRecords);
     }
     public synchronized Preview preview(String filename) throws Exception {

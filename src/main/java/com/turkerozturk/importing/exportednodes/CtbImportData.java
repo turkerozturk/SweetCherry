@@ -33,6 +33,8 @@ final class CtbImportData {
         try (var source = DriverManager.getConnection("jdbc:sqlite:" + path.toUri() + "?mode=ro")) {
             source.setAutoCommit(false);
             var hash = MessageDigest.getInstance("SHA-256");
+            var selections=new LinkedHashMap<String,List<String>>();
+            long measuredBytes=0,measuredRecords=0;
             for (var entry : COLUMNS.entrySet()) {
                 String table = entry.getKey();
                 var present = new HashSet<String>();
@@ -49,9 +51,16 @@ final class CtbImportData {
                 for(String column:select) lengths.add("COALESCE(length(CAST("+column+" AS BLOB)),0)");
                 try(var s=source.createStatement();var r=s.executeQuery("SELECT COALESCE(SUM("+String.join("+",lengths)+"),0),COUNT(*) FROM "+table)) {
                     r.next();
-                    if(r.getLong(1)>maxBytes-data.bytes || r.getLong(2)>maxRecords-data.rowCount)
-                        throw new IllegalArgumentException("limit");
+                    measuredBytes=Math.addExact(measuredBytes,r.getLong(1));
+                    measuredRecords=Math.addExact(measuredRecords,r.getLong(2));
                 }
+                selections.put(table,select);
+            }
+            long fileBytes=java.nio.file.Files.size(path);
+            if(fileBytes>maxBytes || measuredBytes>maxBytes || measuredRecords>maxRecords)
+                throw new CtbImportProblem(new CtbImportProblem.Limits(fileBytes,measuredBytes,measuredRecords,maxBytes,maxRecords));
+            for(var entry:COLUMNS.entrySet()) {
+                String table=entry.getKey();var select=selections.get(table);
                 var rows = new ArrayList<Object[]>(); data.tables.put(table,rows);
                 // Include every field in ordering: preview fingerprint is independent of physical row order.
                 String order=java.util.stream.IntStream.rangeClosed(1,select.size()).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","));
@@ -112,9 +121,14 @@ final class CtbImportData {
         }
         for (String table:List.of("image","grid","codebox"))
             for(var row:tables.get(table)) if(!real.contains(number(row[0]))) invalid();
-        var identity=new HashMap<Long,Long>(); occurrences.keySet().forEach(id->identity.put(id,id));
-        for(var row:tables.get("node")) if("custom-colors".equals(row[3])) links((String)row[2],identity,true);
-        for(var row:tables.get("image")) links((String)row[6],identity,false);
+        var titles=new HashMap<Long,String>();
+        for(var row:tables.get("node"))titles.put(number(row[0]),String.valueOf(row[1]));
+        var linkIssues=new ArrayList<CtbImportProblem.LinkIssue>();
+        for(var row:tables.get("node")) if("custom-colors".equals(row[3]))
+            inspectLinks((String)row[2],number(row[0]),titles.get(number(row[0])),"node.txt",true,linkIssues);
+        for(var row:tables.get("image"))
+            inspectLinks((String)row[6],number(row[0]),titles.get(number(row[0])),"image.link (offset "+row[1]+")",false,linkIssues);
+        if(!linkIssues.isEmpty())throw new CtbImportProblem(linkIssues);
         var bookmarks=new HashSet<Long>();
         for(var row:tables.get("bookmark")) if(!occurrences.containsKey(number(row[0])) || !bookmarks.add(number(row[0]))) invalid();
     }
@@ -159,9 +173,22 @@ final class CtbImportData {
         }
         return occurrences.size();
     }
+    private void inspectLinks(String text,long sourceId,String title,String location,boolean xml,List<CtbImportProblem.LinkIssue> issues) {
+        if(text==null)return;
+        var matcher=linkPattern(xml).matcher(text);
+        var seen=new HashSet<String>();
+        while(matcher.find()) {
+            String target=matcher.group(2);boolean exists;
+            try{exists=occurrences.containsKey(Long.parseLong(target));}catch(NumberFormatException e){exists=false;}
+            if(!exists && seen.add(target))issues.add(new CtbImportProblem.LinkIssue(sourceId,title,location,target));
+        }
+    }
+    private static java.util.regex.Pattern linkPattern(boolean xml){
+        return java.util.regex.Pattern.compile(xml ? "(\\blink\\s*=\\s*['\"]node\\s+)([0-9]+)" : "^(node\\s+)([0-9]+)");
+    }
     static String links(String text,Map<Long,Long> ids,boolean xml) {
         if(text==null) return null;
-        var pattern=java.util.regex.Pattern.compile(xml ? "(\\blink\\s*=\\s*['\"]node\\s+)([0-9]+)" : "^(node\\s+)([0-9]+)");
+        var pattern=linkPattern(xml);
         var matcher=pattern.matcher(text); var result=new StringBuffer();
         while(matcher.find()) {
             Long replacement; try { replacement=ids.get(Long.parseLong(matcher.group(2))); } catch(NumberFormatException e){replacement=null;}

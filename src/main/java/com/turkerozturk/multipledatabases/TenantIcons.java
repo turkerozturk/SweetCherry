@@ -19,6 +19,9 @@ public class TenantIcons {
     public static String resolve(String value) {
         if(value==null) return DEFAULT;
         String name=value.trim();
+        var known=com.turkerozturk.helpers.NodeIcon.fromNameOrLabel(name);
+        if(known!=com.turkerozturk.helpers.NodeIcon.OTHER) name=known.getIconName();
+        else name=name.toLowerCase(java.util.Locale.ROOT);
         if(name.length()>128 || !name.matches("[A-Za-z0-9_-]+")) return DEFAULT;
         return EXISTS.computeIfAbsent(name,key->new ClassPathResource("static/img/ctbicons/"+key+".png").exists()) ? name : DEFAULT;
     }

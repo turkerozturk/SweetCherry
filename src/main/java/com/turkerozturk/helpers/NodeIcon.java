@@ -311,6 +311,16 @@ public enum NodeIcon {
     }
 
 
+    /** Accepts canonical PNG basenames or human labels, independent of case and word separators. */
+    public static NodeIcon fromNameOrLabel(String value) {
+        if(value==null || value.length()>128) return OTHER;
+        String key=value.trim().toLowerCase(java.util.Locale.ROOT);
+        for(NodeIcon icon:values()) if(icon.iconName.equalsIgnoreCase(key)) return icon;
+        String normalized=key.replaceAll("[\\s_-]+", "");
+        for(NodeIcon icon:values()) if(icon.iconNameForHuman.toLowerCase(java.util.Locale.ROOT).replaceAll("[\\s_-]+", "").equals(normalized)) return icon;
+        return OTHER;
+    }
+
     @Override
     public String toString() {
         return "NodeIcon{" +

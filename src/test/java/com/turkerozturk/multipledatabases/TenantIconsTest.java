@@ -8,6 +8,9 @@ class TenantIconsTest {
     @Test void onlyBundledPngBasenamesAreAcceptedAndChangesAreVisible() {
         for(String input:new String[]{"", "ct_db.png", "../ct_home", "https://example.org/icon", "unknown-icon", "<img>","a".repeat(129)})
             assertThat(TenantIcons.resolve(input)).isEqualTo("ct_db");
+        assertThat(TenantIcons.resolve("CHERRY_BLUE")).isEqualTo("cherry_blue");
+        assertThat(TenantIcons.resolve("W Night Clear")).isEqualTo("ct_W-night-clear");
+        assertThat(TenantIcons.resolve("circle green")).isEqualTo("ct_circle-green");
         assertThat(TenantIcons.resolve(null)).isEqualTo("ct_db");
         assertThat(TenantIcons.resolve(" cherry_blue ")).isEqualTo("cherry_blue");
         var holder=new CustomPropertiesHolder();var icons=new TenantIcons(holder);

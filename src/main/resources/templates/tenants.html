@@ -19,6 +19,7 @@
             <th th:text="#{tenants.data_sources_table.status}">Status</th>
             <th th:text="#{tenants.data_sources_table.human_friendly_name}">Name</th>
             <th th:text="#{tenants.data_sources_table.url}">URL</th>
+            <th th:text="#{tenant.ctbModified}">CTB modified</th>
             <th th:text="#{tenant.authentication}">Authentication configured</th>
             <th th:text="#{tenants.data_sources_table.driver_class_name}">Driver Class Name</th>
             <th th:text="#{tenants.data_sources_table.file_name}">File Name</th>
@@ -37,6 +38,7 @@
                     <button type="submit" class="btn btn-sm btn-outline-danger" th:title="#{tenant.delete.title}" th:aria-label="#{tenant.delete.title}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                 </form> <img th:src="@{/img/ctbicons/{icon}.png(icon=${databaseIcons.get(tenant.tenantName)})}" width="20" height="20" alt="" class="me-1"><i><b th:text="${tenant.tenantName}"></b></i></td>
             <td th:text="${tenant.url}"></td>
+            <td th:text="${tenant.modifiedDate}"></td>
             <td th:text="${tenant.authenticationConfigured} ? #{tenant.yes} : #{tenant.no}" th:classappend="${tenant.authenticationConfigured} ? 'fw-bold' : ''"></td>
             <td th:text="${tenant.driverClassName}"></td>
             <td th:text="${tenant.fileName}"></td>

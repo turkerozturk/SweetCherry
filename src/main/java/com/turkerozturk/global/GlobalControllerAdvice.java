@@ -85,18 +85,8 @@ public class GlobalControllerAdvice {
     public List<String> getTenantNames() {
         // Her bir tenant name, bir veritabanindan digerine gecmek icin belirttigimiz isimler.
 
-        List<String> tenantNames = new ArrayList<>();
-        Map<String, DataSource> tenants = tenantService.getAllTenants();
-        if(tenants != null && !tenants.isEmpty()) {
-            for (Map.Entry<String, DataSource> entry : tenants.entrySet()) {
-
-                tenantNames.add(entry.getKey());
-            }
-            return tenantNames;
-
-        } else {
-            return null;
-        }
+        var names=tenantService.getSelectionNames();
+        return names==null||names.isEmpty()?null:names;
     }
 
     /** Displays a one-request source operation warning without exposing JDBC credentials or stack traces. */

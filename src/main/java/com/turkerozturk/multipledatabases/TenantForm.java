@@ -30,6 +30,13 @@ public class TenantForm {
     private boolean isWritable;
 
 
+    private boolean ctb;
+    private Long modifiedMillis;
+    public boolean isCtb(){return ctb;}
+    public void setCtb(boolean value){ctb=value;}
+    public Long getModifiedMillis(){return modifiedMillis;}
+    public void setModifiedMillis(Long value){modifiedMillis=value;}
+    public String getModifiedDate(){return modifiedMillis==null ? "" : java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss").withZone(java.time.ZoneId.systemDefault()).format(java.time.Instant.ofEpochMilli(modifiedMillis));}
     // Getters and setters
 
 

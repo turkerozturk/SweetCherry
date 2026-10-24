@@ -41,3 +41,6 @@
 #scrollToTopBtn[hidden] {display:none}
 #scrollToTopBtn:hover {background:#084298}
 #scrollToTopBtn:focus-visible {outline:3px solid #222;outline-offset:2px}
+
+.workspace-node-title{display:flex;gap:.4rem;align-items:center;padding:.35rem 0 .5rem}
+.workspace-node-title img{flex:none;object-fit:contain}

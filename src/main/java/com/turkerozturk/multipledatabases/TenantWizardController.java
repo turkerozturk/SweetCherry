@@ -17,7 +17,13 @@ public class TenantWizardController {
     private final DatabaseSwitchController selection;
     public TenantWizardController(TenantWizardService service, DatabaseSwitchController selection){this.service=service;this.selection=selection;}
     @InitBinder("wizard")
-    public void bind(org.springframework.web.bind.WebDataBinder binder){binder.setAllowedFields("tenant","revision","name","type","path","url","username","password","clearPassword","role","writable","allowLegacySchemaUpgrade","newNodeName","newNodeTags","maxEmbeddedFileSizeMB");}
+    public void bind(org.springframework.web.bind.WebDataBinder binder){binder.setAllowedFields("tenant","revision","name","type","path","url","username","password","clearPassword","role","writable","allowLegacySchemaUpgrade","newNodeName","newNodeTags","maxEmbeddedFileSizeMB","databaseIcon");}
+    @ModelAttribute("databaseIconOptions")
+    public java.util.List<com.turkerozturk.helpers.NodeIcon> databaseIconOptions(){
+        return java.util.Arrays.stream(com.turkerozturk.helpers.NodeIcon.values())
+            .filter(icon->!icon.getIconName().equals("zero"))
+            .sorted(java.util.Comparator.comparing(com.turkerozturk.helpers.NodeIcon::getIconNameForHuman,String.CASE_INSENSITIVE_ORDER)).toList();
+    }
     @GetMapping("/tenants/wizard")
     public String form(@RequestParam(required=false) String tenant, Model model,HttpServletResponse response)throws IOException {
         response.setHeader("Cache-Control","no-store");
@@ -36,7 +42,7 @@ public class TenantWizardController {
             String key=error.getMessage(); model.addAttribute("wizardError",key!=null&&key.startsWith("wizard.")?key:"wizard.invalidConfig");
         } catch(IllegalStateException error) {model.addAttribute("wizardError","wizard.busy");}
         catch(IOException error){model.addAttribute("wizardError","wizard.ioError");}
-        form.password=""; return "tenantWizard";
+        form.password="";form.databaseIcon=TenantIcons.resolve(form.databaseIcon); return "tenantWizard";
     }
     public record Entry(String name,String path,boolean directory){}
     public record Listing(String path,String parent,List<Entry> entries,boolean truncated){}

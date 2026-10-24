@@ -17,3 +17,5 @@ Manuel kontrol: düz metni değiştirip devam ederek kaydedin; aynı editörde y
 metin açılmalı. Rich text’te resim veya dosya ekleyip aynı işlemi yapın; yeni nesne
 artık kayıtlı nesne olarak açılmalı ve sonraki kayıt çalışmalı. Sonra içerikte
 hiçbir değişiklik yapmadan kaydedip güncellenme tarihinin aynı kaldığını doğrulayın.
+
+Araç panellerinin yeni düzeni: [Arayüz rehberi](interface-and-import-diagnostics.md).

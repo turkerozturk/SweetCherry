@@ -7,9 +7,8 @@
     </th:block>
     <th:block th:if="${node != null}">
         <header class="workspace-node-header">
-        <h1 th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}" th:text="${node.name}">Node</h1>
         <nav class="workspace-breadcrumbs" th:attr="aria-label=#{tree.path}">
-            <a th:href="@{/tree(nodeId=0)}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}"></span></a>
+            <a th:href="@{/tree(nodeId=0)}"><span th:text="${currentTenantName}"></span></a>
             <th:block th:each="entry : ${node.breadcrumbs}">
                 <span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}"></a>
             </th:block>
@@ -19,6 +18,7 @@
             → <a th:href="@{/nodes/{id}(id=${masterNodeId})}" th:text="${masterNodeId}"></a>
         </p>
         <th:block th:replace="~{node/nodeToolbarFragment :: controls('tree')}"></th:block>
+        <h1 class="workspace-node-title" th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}"><img th:if="${node.nodeIcon != null and node.nodeIcon.iconName != 'zero'}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="26" height="26" alt=""><span th:text="${node.name}"></span></h1>
         </header>
         <div class="workspace-rendered" tabindex="0" th:attr="aria-label=#{tree.content}"><th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block></div>
         <th:block th:replace="~{node/offcanvasFragment :: offcanvasFragment}"></th:block>

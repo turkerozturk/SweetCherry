@@ -2,15 +2,9 @@
 <html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
-<style>
-body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;color:#20242a}h1{font-size:1.3rem}.toolbar{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:1rem 0}button,select,input{font:inherit;padding:.35rem}textarea{box-sizing:border-box;width:100%;min-height:35vh;font:1rem monospace}#richPreview{white-space:pre-wrap;overflow-wrap:anywhere;min-height:8rem;border:1px solid #ccc;padding:1rem;margin:1rem 0}label{display:inline-flex;gap:.25rem;align-items:center}.note{color:#555}.actions{display:flex;gap:1rem;align-items:center;margin:.8rem 0}.tool-group{display:inline-flex;flex-wrap:wrap;gap:.2rem;align-items:center;border:1px solid #c3c8ce;border-radius:.35rem;padding:.25rem}.toolbar button{min-width:2.2rem}.toolbar input[type=color]{width:2.5rem;height:2rem;padding:.1rem}#richPreview,#richText{resize:vertical;overflow:auto;min-height:12rem;max-width:100%;box-sizing:border-box}#richPreview{height:45vh}.toolbar .note{flex-basis:100%}
-</style></head>
+<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"></head>
 <body>
-    <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
-<h1 th:text="#{richtext.edit.title}"></h1><strong th:text="${editor.node.name}"></strong>
-<p class="note" th:text="#{richtext.edit.help}"></p>
-<p id="protectedHint" class="note" th:hidden="${#maps.isEmpty(editor.objects)}" th:text="#{richtext.edit.protected}"></p>
-<p class="note" th:if="${editor.node.syntax == 'plain-text'}" th:text="#{richtext.edit.convert}"></p>
+<header class="rich-page-header"><h1 th:text="#{richtext.edit.title}"></h1><strong th:text="${editor.node.name}"></strong></header>
 <form id="richEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/richtext/edit/{id}(id=${editor.node.nodeId})}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" th:value="${editor.revision}">
@@ -19,7 +13,14 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <input type="hidden" name="files" id="richFiles" value="{}">
 <input type="hidden" name="deleted" id="richDeleted" value="[]">
 <input type="hidden" name="tables" id="richTables" value="{}">
-<div class="actions"><button type="submit" th:text="#{richtext.edit.save}"></button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
+<div class="actions rich-savebar"><button type="button" id="richToolsToggle" aria-controls="richControls" aria-expanded="false" th:text="#{editor.controls}"></button><button type="submit" th:text="#{richtext.edit.save}"></button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
+<div id="richEditorShell" class="rich-editor-shell">
+<aside id="richControls" th:aria-label="#{editor.controls}"><button type="button" id="richToolsClose" th:text="#{editor.closeControls}"></button>
+    <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
+
+<p class="note" th:text="#{richtext.edit.help}"></p>
+<p id="protectedHint" class="note" th:hidden="${#maps.isEmpty(editor.objects)}" th:text="#{richtext.edit.protected}"></p>
+<p class="note" th:if="${editor.node.syntax == 'plain-text'}" th:text="#{richtext.edit.convert}"></p>
 <label><input type="checkbox" id="richVisualMode" checked> <span th:text="#{richtext.edit.visual}"></span></label>
 <div class="toolbar">
 <div class="tool-group" role="group" th:aria-label="#{editor.formatTools}">
@@ -63,6 +64,9 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 </div>
 <p id="richClipboardHint" class="note" role="alert" hidden th:attr="data-empty=#{richtext.clipboardUnavailable},data-http=#{richtext.clipboardHttp},data-plain=#{richtext.clipboardPlain},data-changed=#{richtext.file.changed}"></p>
 <p id="richAutoLinkError" role="alert" hidden th:text="#{editor.linkSelectionError}"></p>
+</aside>
+<div id="richToolsSplitter" role="separator" tabindex="0" aria-orientation="vertical" aria-valuemin="220" aria-valuemax="480" aria-valuenow="280" th:aria-label="#{editor.resizeControls}"></div>
+<main id="richWritingPane">
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
 <textarea id="richText" spellcheck="false"></textarea>
 <h2 id="richPreviewTitle" th:attr="data-visual=#{richtext.edit.text},data-preview=#{richtext.edit.preview}" th:text="#{richtext.edit.preview}"></h2><div id="richPreview" aria-labelledby="richPreviewTitle"></div>
@@ -70,6 +74,8 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <p id="richDeletionHint" role="alert" hidden th:text="#{richtext.edit.deletionLocked}"></p>
 
+</main></div>
+<div id="richToolsBackdrop" hidden></div>
 </form>
 <dialog id="richObjectDialog" style="max-width:95vw;max-height:85vh;overflow:auto" aria-labelledby="richObjectTitle">
 <h2 id="richObjectTitle" th:text="#{richtext.edit.objects}"></h2>
@@ -116,4 +122,5 @@ body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:1rem;
 <script th:src="@{/js/node/richTextEditorSupport.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
 <script th:src="@{/js/node/richTextWebImport.js}"></script>
+<script th:src="@{/js/node/richTextEditorLayout.js}"></script>
 </body></html>

@@ -37,7 +37,7 @@ public class TenantWizardService {
     }
     public TenantWizardForm edit(String tenant) throws IOException {
         Path file=resolve(tenant); var p=read(file); var f=new TenantWizardForm();
-        f.databaseIcon=p.getProperty(TenantIcons.PROPERTY, "");
+        f.databaseIcon=TenantIcons.resolve(p.getProperty(TenantIcons.PROPERTY, ""));
         f.tenant=tenant; f.revision=revision(file); f.name=p.getProperty("name",tenant); f.url=p.getProperty("datasource.url","");
         f.type=DRIVERS.entrySet().stream().filter(e->e.getValue().equals(p.getProperty("datasource.driver-class-name"))).map(Map.Entry::getKey).findFirst().orElseThrow(()->new IllegalArgumentException("wizard.unsupportedDriver"));
         if(f.type.equals("sqlite")) f.path=f.url.substring("jdbc:sqlite:".length());

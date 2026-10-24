@@ -10,6 +10,7 @@
 
     <h1>Download Files</h1>
     <div th:if="${importError != null}" class="alert alert-warning" th:text="${#messages.msg(importError)}"></div>
+<div th:replace="~{common/ctbImportDiagnostics :: details}"></div>
     <div th:if="${importCount != null}" class="alert alert-success" th:text="#{ctbImport.success(${importCount})}"></div>
     <table class="table table-striped">
         <thead>

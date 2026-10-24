@@ -25,12 +25,15 @@ class CtbImportTemplateTest {
                 var properties=new Properties();try(var in=getClass().getResourceAsStream(language.equals("tr")?"/messages_tr.properties":"/messages.properties")){properties.load(new java.io.InputStreamReader(in,StandardCharsets.UTF_8));}
                 properties.stringPropertyNames().forEach(key->context.getStaticMessageSource().addMessage(key,locale,properties.getProperty(key)));
                 Map<String,Object> model=new HashMap<>();model.put("preview",new CtbImportService.Preview("<demo>.ctb","hash",Map.of("node",2,"children",3)));
+                model.put("importProblem",new CtbImportProblem(java.util.List.of(new CtbImportProblem.LinkIssue(2,"<source>","node.txt","999"))));
                 model.put("tenant","<target>");model.put("token","token");model.put("tenantViewToken","view");
                 model.put("thymeleafRequestContext",new SpringWebMvcThymeleafRequestContext(new RequestContext(request,response,servlet,model),request));
-                var engine=new SpringTemplateEngine();engine.setTemplateResolver(new StringTemplateResolver());engine.setMessageSource(context);
-                String html=engine.process(template,new WebContext(JakartaServletWebApplication.buildApplication(servlet).buildExchange(request,response),locale,model));
+                var engine=new SpringTemplateEngine();var resolver=new org.thymeleaf.templateresolver.ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");engine.setTemplateResolver(resolver);engine.setMessageSource(context);
+                String html=engine.process("ctbImportPreview",new WebContext(JakartaServletWebApplication.buildApplication(servlet).buildExchange(request,response),locale,model));
                 var doc=org.jsoup.Jsoup.parse(html);
-                assertThat(doc.select("tbody tr")).hasSize(2);
+                assertThat(doc.select("tbody tr")).hasSize(3);
+                assertThat(doc.text()).contains("<source>","999");
+                assertThat(doc.select("source")).isEmpty();
                 assertThat(doc.selectFirst("input[name=token]").val()).isEqualTo("token");
                 assertThat(doc.selectFirst("input[name=_tenantView]").val()).isEqualTo("view");
                 assertThat(html).contains("&lt;demo&gt;.ctb","&lt;target&gt;").doesNotContain("??ctbImport.");

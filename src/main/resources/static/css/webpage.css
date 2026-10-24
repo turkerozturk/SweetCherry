@@ -14,3 +14,6 @@ body {
 /* View-only magnification; inherited by content fetched into the tree workspace too. */
 #nodeContent { zoom: var(--node-content-zoom, 1); }
 .node-zoom-controls { display:flex; gap:.4rem; align-items:center; padding:.25rem 1rem; }
+
+/* Visible grid boundaries in rendered rich-text content, independent of theme. */
+#nodeContent table,#nodeContent td,#nodeContent th{border:1px solid #000!important;border-collapse:collapse}

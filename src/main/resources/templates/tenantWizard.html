@@ -17,7 +17,26 @@
             <div class="col-md-6"><label for="wizardPassword" th:text="#{wizard.password}"></label><input class="form-control" id="wizardPassword" name="password" type="password" maxlength="1024" autocomplete="new-password"><small th:text="#{wizard.passwordHelp}"></small><label class="d-block"><input type="checkbox" th:field="*{clearPassword}"> <span th:text="#{wizard.clearPassword}"></span></label></div>
             <div class="col-md-6"><label for="role" th:text="#{wizard.role}"></label><select class="form-select" th:field="*{role}"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select><small th:text="#{wizard.roleHelp}"></small></div>
             <div class="col-md-6"><label for="maxEmbeddedFileSizeMB" th:text="#{wizard.limit}"></label><input class="form-control" type="number" min="1" max="20" step="1" th:field="*{maxEmbeddedFileSizeMB}"></div>
-            <div class="col-md-6"><label for="databaseIcon" th:text="#{wizard.databaseIcon}"></label><input class="form-control" th:field="*{databaseIcon}" maxlength="128" placeholder="ct_db"><small th:text="#{wizard.databaseIconHelp}"></small></div>
+            <div class="col-md-6" data-icon-picker>
+                <label for="databaseIconSearch" th:text="#{wizard.databaseIcon}"></label>
+                <input id="databaseIconSearch" type="search" class="form-control mb-1" data-icon-search th:placeholder="#{icon.search}">
+                <details data-icon-details><summary class="form-control" th:text="#{search.icon.choose}"></summary>
+                    <div class="border rounded p-2" style="max-height:16rem;overflow:auto">
+                        <label th:if="${databaseIconOptions != null and !#lists.contains(databaseIconOptions.![iconName], wizard.databaseIcon)}" class="icon-choice d-flex align-items-center gap-2 py-1">
+                            <input type="radio" name="databaseIcon" th:value="${wizard.databaseIcon}" checked>
+                            <img th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${wizard.databaseIcon})}" width="20" height="20" alt="" loading="lazy">
+                            <span data-icon-label th:text="${wizard.databaseIcon}"></span>
+                        </label>
+                        <label th:each="item:${databaseIconOptions}" class="icon-choice d-flex align-items-center gap-2 py-1">
+                            <input type="radio" name="databaseIcon" th:value="${item.iconName}" th:checked="${item.iconName == wizard.databaseIcon}">
+                            <img th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="20" height="20" alt="" loading="lazy">
+                            <span data-icon-label th:text="${item.iconNameForHuman}"></span>
+                        </label>
+                    </div>
+                </details>
+                <div data-icon-selected class="d-flex flex-wrap gap-1 mt-1" aria-live="polite"></div>
+                <small th:text="#{wizard.databaseIconHelp}"></small>
+            </div>
             <div class="col-md-6"><label for="newNodeName" th:text="#{wizard.newNodeName}"></label><input class="form-control" th:field="*{newNodeName}" maxlength="1000"></div>
             <div class="col-md-6"><label for="newNodeTags" th:text="#{wizard.newNodeTags}"></label><input class="form-control" th:field="*{newNodeTags}" maxlength="1000"></div>
             <div class="col-12"><label><input type="checkbox" th:field="*{writable}"> <span th:text="#{wizard.writable}"></span></label></div>
@@ -35,5 +54,5 @@
         <div id="wizardEntries" th:attr="data-folder=#{wizard.folder},data-file=#{wizard.file}"></div>
     </dialog>
 </section>
-<section layout:fragment="pageSpecificJsScripts"><script th:src="@{/js/tenantWizard.js}"></script></section>
+<section layout:fragment="pageSpecificJsScripts"><style>.icon-choice[hidden]{display:none!important}</style><script defer th:src="@{/js/icon-picker.js}"></script><script th:src="@{/js/tenantWizard.js}"></script></section>
 </body></html>

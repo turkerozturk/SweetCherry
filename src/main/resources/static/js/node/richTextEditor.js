@@ -195,7 +195,7 @@
     });
 
     // Prevent toolbar focus from discarding a visual selection (including keyboard activation).
-    document.querySelectorAll('.toolbar button').forEach(button=>button.addEventListener('pointerdown',event=>event.preventDefault()));
+    document.querySelectorAll('.toolbar button').forEach(button=>button.addEventListener('pointerdown',event=>{captureSelection();event.preventDefault();}));
     document.querySelectorAll('[data-insert-symbol]').forEach(button=>button.addEventListener('click',()=>{
         if(composing)return;
         rememberSelection();visualChange(button.dataset.insertSymbol+' ');
@@ -719,6 +719,11 @@
         const tables=Object.fromEntries(Object.entries(tableChanges).filter(([key,rows])=>active.has(key) && JSON.stringify(rows)!==JSON.stringify(window.richEditorObjects?.[key]?.tableRows)).sort(([a],[b])=>a.localeCompare(b)));
         return JSON.stringify({runs:normalized,deleted:[...deletedKeys].sort(),tables});
     }
+    // Layout controls can move focus without changing the content model or undo history.
+    window.RichTextSelectionBridge={
+        capture(){captureSelection();return [...selection];},
+        restore(ticket){if(!ticket)return;selection=[...ticket];focusEditor();restoreSelection();}
+    };
     window.RichTextImportBridge={
         capture(){if(readingImage||composing)throw new Error('busy');captureSelection();return {selection:[...selection],content:contentSignature()};},
         insert(ticket,items){

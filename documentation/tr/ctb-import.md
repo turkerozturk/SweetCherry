@@ -87,3 +87,6 @@ getiriyorsanız **o ayrı işlemin** ve varsa reverse proxy’nin sınırları u
 
 Rich text resim/dosya ekleme için limitler farklıdır; bkz.
 [Bellek, HTTP ve dosya sınırları](memory-and-transfer-limits.md).
+
+Sınır ölçümleri ve kaynak başlık/ID içeren bağlantı hata listesi:
+[Import hata ayrıntıları](interface-and-import-diagnostics.md#import-önizlemesi).
