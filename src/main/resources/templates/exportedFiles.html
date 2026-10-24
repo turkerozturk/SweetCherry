@@ -1,4 +1,4 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
 <head>
@@ -9,6 +9,8 @@
 <section layout:fragment="content">
 
     <h1>Download Files</h1>
+    <div th:if="${importError != null}" class="alert alert-warning" th:text="${#messages.msg(importError)}"></div>
+    <div th:if="${importCount != null}" class="alert alert-success" th:text="#{ctbImport.success(${importCount})}"></div>
     <table class="table table-striped">
         <thead>
         <tr>
@@ -29,6 +31,14 @@
                 <a th:href="@{'/download/' + ${file.name}}" class="btn btn-success">
                     <i class="fas fa-download"></i> Download
                 </a>
+                <form th:if="${importWritable and #authorization.expression('hasRole(''ADMIN'')') and #strings.endsWith(#strings.toLowerCase(file.name), '.ctb')}"
+                      th:action="@{/exportedFiles/import/preview}" method="post" class="d-inline">
+                    <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+                    <input type="hidden" name="filename" th:value="${file.name}">
+                    <button type="submit" class="btn btn-primary" th:title="#{ctbImport.title}">
+                        <i class="fas fa-file-import"></i> <span th:text="#{ctbImport.action}">Import</span>
+                    </button>
+                </form>
                 <form th:action="@{'/delete/' + ${file.name}}" method="post"
                       class="d-inline delete-form" th:attr="data-filename=${file.name}">
                     <button type="submit" class="btn btn-danger">

@@ -49,6 +49,9 @@ public class ExportedFilesController {
     @Value("${myapp.exportingFolderName}")
     private String exportingFolderName;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.turkerozturk.node.properties.NodePropertiesService properties;
+
     @GetMapping("/exportedFiles")
     public String listFiles(Model model) {
         String directoryPath = applicationPath + File.separator + exportingFolderName;
@@ -74,6 +77,7 @@ public class ExportedFilesController {
         }
 
         model.addAttribute("files", fileInfos);
+        model.addAttribute("importWritable", properties.writable());
         return "exportedFiles";
     }
 

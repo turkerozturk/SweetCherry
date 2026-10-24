@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{ctbImport.title}">Import CTB</title></head>
+<body><section layout:fragment="content">
+<h1 th:text="#{ctbImport.title}"></h1>
+<div th:if="${importError != null}" class="alert alert-warning" th:text="${#messages.msg(importError)}"></div>
+<div th:if="${preview != null}">
+<p><strong th:text="#{ctbImport.source}"></strong> <span th:text="${preview.filename}"></span></p>
+<p><strong th:text="#{ctbImport.target}"></strong> <span th:text="${tenant}"></span></p>
+<p th:text="#{ctbImport.explanation}"></p>
+<table class="table table-bordered"><thead><tr><th th:text="#{ctbImport.table}"></th><th th:text="#{ctbImport.rows}"></th></tr></thead>
+<tbody><tr th:each="entry : ${preview.counts}"><td th:text="${entry.key}"></td><td th:text="${entry.value}"></td></tr></tbody></table>
+<form th:action="@{/exportedFiles/import/confirm}" method="post">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<input type="hidden" name="token" th:value="${token}">
+<button type="submit" class="btn btn-primary" th:text="#{ctbImport.confirm}" onclick="this.form.querySelector('button').disabled=true; this.form.submit();"></button>
+</form></div>
+<a th:href="@{/exportedFiles}" class="btn btn-secondary mt-2" th:text="#{ctbImport.cancel}"></a>
+</section></body></html>

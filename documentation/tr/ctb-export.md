@@ -190,3 +190,9 @@ uyarısını kontrol edin; eski dosyalar yeniden dışa aktarılmalıdır. Üç 
 tek düğüm, shared düğüm ve tüm veritabanı aktarımında kullanılabilir. Eski
 `includeIcons=true` isteği uyumluluk için ZIP davranışını korur; yeni form
 `iconMode=none/references/bundle` kullanır.
+
+## Dışa aktarılan CTB’yi geri içe aktarma
+
+`/exportedFiles` sayfasındaki **İçe aktar** işlemi, bir CTB’nin tüm kayıtlarını
+yazılabilir aktif veritabanına önizleme ve onayla ekler. ID ve paylaşımlı düğüm
+eşleme kuralları ile manuel kontroller: [CTB içe aktarma](ctb-import.md).

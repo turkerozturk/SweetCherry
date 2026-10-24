@@ -30,6 +30,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                 || request.getRequestURI().equals(request.getContextPath() + "/nodes/top-level")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/expo/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/exportWithSubNodes/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/exportedFiles/import/")
                 || request.getRequestURI().equals(request.getContextPath() + "/mindmap-export"));
         String pageToken = request.getParameter("_tenantView");
         boolean markedNavigation = pageToken != null;
