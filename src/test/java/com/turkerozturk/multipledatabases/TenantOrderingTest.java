@@ -33,6 +33,9 @@ class TenantOrderingTest {
     @Test void sqliteUriAndNonFileSourcesAreDistinguished()throws Exception {
         Path file=Files.writeString(directory.resolve("Türkçe notes.ctb"),"test");
         assertThat(TenantFileMetadata.ctbPath("jdbc:sqlite:"+file.toUri()+"?mode=ro")).isEqualTo(file.toAbsolutePath());
+        assertThat(TenantFileMetadata.modified("jdbc:sqlite:"+file.toUri()+"?mode=ro")).isEqualTo(Files.getLastModifiedTime(file).toMillis());
+        assertThat(TenantFileMetadata.ctbPath("jdbc:sqlite:file:relative%20notes.ctb?mode=ro"))
+                .isEqualTo(Path.of("relative notes.ctb").toAbsolutePath().normalize());
         assertThat(TenantFileMetadata.ctbPath("jdbc:sqlite::memory:")).isNull();
         assertThat(TenantFileMetadata.ctbPath("jdbc:postgresql://example/test")).isNull();
     }

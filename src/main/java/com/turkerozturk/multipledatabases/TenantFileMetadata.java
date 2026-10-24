@@ -12,9 +12,13 @@ final class TenantFileMetadata {
         if(path.contains("mode=memory") || path.equals(":memory:"))return null;
         try {
             if(path.startsWith("file:")) {
-                var uri=java.net.URI.create(path);
-                path=uri.getPath();
-                if(path==null)path=uri.getSchemeSpecificPart().split("\\?",2)[0];
+                var uri=java.net.URI.create(path.split("\\?",2)[0]);
+                if (uri.isOpaque()) {
+                    path=uri.getSchemeSpecificPart();
+                } else {
+                    // Let the platform provider translate /C:/... on Windows and decode UTF-8.
+                    path=Path.of(uri).toString();
+                }
             }
             path=path.split("\\?",2)[0];
             if(!path.toLowerCase(Locale.ROOT).endsWith(".ctb"))return null;

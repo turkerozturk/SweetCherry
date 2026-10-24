@@ -28,7 +28,7 @@
 /* Keep the node controls outside the independently scrolling reading area. */
 #workspace-content > .workspace-node {display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow:hidden}
 .workspace-node-header {flex:none;padding:.65rem 1rem 0;background:white;border-bottom:1px solid #e4e8ec}
-.workspace-rendered {flex:1;min-height:0;min-width:0;overflow:auto;padding:.65rem 1rem;overscroll-behavior:contain}
+.workspace-rendered {flex:1;min-height:0;min-width:0;overflow:auto;padding:0 1rem .65rem;overscroll-behavior:contain}
 .workspace-rendered #content,.workspace-rendered #nodeContent {width:100%;max-width:100%;min-width:0;overflow-wrap:anywhere}
 .workspace-rendered img {max-width:100% !important;height:auto !important;cursor:zoom-in}
 .workspace-rendered table {display:block;width:max-content;max-width:100%;overflow-x:auto;border-collapse:collapse}
