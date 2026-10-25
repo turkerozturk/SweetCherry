@@ -1,68 +1,98 @@
-# SweetCherry 1.1.0 yayımlama adımları
+# SweetCherry 1.2.0 yayımlama adımları
 
-Kaynak doğrulaması ile ürün paketi doğrulaması ayrı adımlardır. Kullanıcı son kaynakta **393 başarılı test** ve SQLite, MariaDB, PostgreSQL manuel kontrolleri bildirmiştir. Bu kayıt henüz oluşturulmamış 1.1.0 Windows installer'ının test edildiği anlamına gelmez. Bu hazırlık yeni uygulama özelliği eklemez.
+1.1.0 sonrası biriken uyumlu yeni özellikler ve düzeltmeler için yeni sürüm **1.2.0**, etiket
+**v1.2.0** olacaktır. Son özellik commit’i `ad05f1269356a7de163b32805f0d1f0a57874cef` üzerinde
+kullanıcı **471 başarılı Java testi**, manuel taşıma kontrolleri ve başarılı Windows workflow’u
+bildirdi. Etiket, aşağıdaki sürüm hazırlığı commit’ine konur; eski özellik commit’ine konmaz.
 
-## 1. Hazırlık yaması ve görüntüler
+## 1. Sürüm hazırlığını uygula
 
-Yayın hazırlığı pom.xml sürümünü 1.1.0 yapar, changelog/kurulum/yayın/lisans açıklamalarını günceller. Lisans dosyaları normal paketin içine girer; ayrıca küçük notices ZIP oluşturulur.
+Temiz main dalında:
 
 ```bat
-git apply --check sweetcherry-4190204-release-1.1.0.patch
-git apply sweetcherry-4190204-release-1.1.0.patch
+git switch main
+git pull --ff-only
+git apply --check sweetcherry-ad05f12-release-1.2.0.patch
+git apply sweetcherry-ad05f12-release-1.2.0.patch
 git diff --check
 mvnw.cmd clean package
 ```
 
-1.1.0 yayınına ekran görüntüsü eklenmeyecek; bu yayın için gerekli değildir. Ekran görüntüleri isteğe bağlıdır. Eklemek istiyorsanız etiketi oluşturmadan önce [çekim listesi](../images/1.1/README.md) içindeki dosya adlarıyla ekleyin, gerçek dosyalar mevcut olduğunda README'ye bağlantı koyun. Olmayan görüntüler için bozuk link bırakmayın. Parola, kişisel not, dosya yolu ve sunucu adresi göstermeyin.
+Konsolda proje sürümü 1.2.0 olmalı, mevcut testler geçmeli. Bu yama yalnız proje sürümü ve
+README/changelog/yayın belgelerini değiştirir; yeni uygulama özelliği veya bağımlılık güncellemesi içermez.
+README’deki mevcut 1.1.0 ekran görüntüsü korunur; yeni ekran görüntüsü yayın şartı değildir.
 
-Değişiklikleri main dalına commit/push edin. Geçici yorum arşivi 1.0.0 öncesinde zaten yedeklenmişti; tekrar silinecek dosya yoktur. Eski lisans tamamlama workflow'u 1.0.0 taslağına özeldir; **1.1.0 için çalıştırmayın**.
+IntelliJ’den bu değişiklikleri `Prepare SweetCherry 1.2.0 release` mesajıyla commit/push edin.
+Cmd’de GitHub kimlik doğrulaması daha önce çalışmadığından aynı başarılı IntelliJ yöntemini kullanabilirsiniz.
 
-## 2. Yayın commit'i ve etiket
+## 2. Yeni commit’i etiketle ve etiketi gönder
 
-Pushed yayın commit'inin kısa kimliğini bulun. Aşağıdaki yer tutucuyu gerçek commit ile değiştirin:
+Commit/push sonrasında:
 
 ```bat
-git tag -a v1.1.0 RELEASE_COMMIT -m "SweetCherry 1.1.0"
-git push origin v1.1.0
+git status --short
+git log -1 --oneline
+git tag -a v1.2.0 -m "SweetCherry 1.2.0"
 ```
 
-Cmd Git authentication çalışmıyorsa önceki gibi IntelliJ Git araç penceresi → Tags → v1.1.0 → Push to origin kullanın. Etiketi kaynak/README/görüntüler tamamlandıktan sonra oluşturun. Yayımlanmış v1.0.0 etiketini taşımayın; 1.1.0 etiketini de yayımlandıktan sonra değiştirmeyin.
+`git status --short` boş olmalı. Son commit, sürüm hazırlığı commit’i olmalı. IntelliJ:
+**Git araç penceresi → Tags → v1.2.0 → sağ tık → Push to origin**.
 
-## 3. Windows paketleme
+Cmd kimlik doğrulaması çalışıyorsa alternatif `git push origin v1.2.0` olur. Her ikisini yapmak gerekmez.
+Var olan v1.0.0 ve v1.1.0 etiketlerine/paketlerine dokunmayın. Etiket göndermek kendi başına release yayımlamaz.
 
-Actions → **Windows x64 bundled distribution** → Run workflow → **v1.1.0** seçin. Main'in son halinden değil, bu etiketten paketleyin. CLI alternatifi:
+## 3. Etiketten Windows paketini üret
 
-```bash
-gh workflow run windows-bundle.yml --ref v1.1.0
-```
+GitHub → **Actions → Windows x64 bundled distribution → Run workflow → v1.2.0 → Run workflow**.
+Dal/etiket seçimi main değil **v1.2.0** olmalı. Önceden ad05f126/main üzerinde alınan paketi tekrar
+kullanmayın: onun uygulama sürümü hâlâ 1.1.0 idi.
 
-Etiket gönderimi kendiliğinden Release yayımlamaz. Görev mevcut testleri, paketlemeyi ve Java kurulu olmadan installer/launcher smoke testini çalıştırır.
+Görev testleri, Java 17 paketlemeyi ve system Java olmadan installer/launcher kontrollerini çalıştırır.
+Başarılı olunca `SweetCherry-windows-x64-java17` artifact’ini indirin ve dış ZIP’i açın.
+**Complete 1.0.0 draft license notices** workflow’unu çalıştırmayın; eski 1.0.0 taslağına özeldir.
+Yeni normal paketleme lisans/atıfları zaten içerir.
 
-Artifact `SweetCherry-windows-x64-java17` içinden şu dosyaları alın; dış artifact ZIP'ini release asset'i olarak yüklemeyin:
+## 4. Paketleri ayır ve son kontrolü yap
 
-| Konum | Release asset'i |
+Dış artifact ZIP’i değil, içindeki şu beş dosya release’e eklenecek:
+
+| Dosya | Amaç |
 | --- | --- |
-| `dist/windows/SweetCherry-1.1.0-windows-x64-setup.exe` | Installer |
-| `dist/windows/SweetCherry-1.1.0-windows-x64.zip` | Portable ZIP |
-| `dist/windows/SweetCherry-1.1.0-notices.zip` | Lisans/atıf ZIP'i |
-| `dist/windows/SHA256SUMS.txt` | Üç ZIP/EXE ürün dosyasının checksum'ları |
-| `release/SweetCherry/windows-bundle.json` veya portable paketin içindeki aynı dosya | Sürüm/runtime/commit manifest'i |
+| `dist/windows/SweetCherry-1.2.0-windows-x64-setup.exe` | Windows kurulum sihirbazı |
+| `dist/windows/SweetCherry-1.2.0-windows-x64.zip` | Portable uygulama |
+| `dist/windows/SweetCherry-1.2.0-notices.zip` | Lisans ve atıflar |
+| `dist/windows/SHA256SUMS.txt` | Üç uygulama/lisans dosyasının SHA-256 değerleri |
+| `release/SweetCherry/windows-bundle.json` | Sürüm, commit ve Java bilgisi |
 
-Gerekirse artifact içinde windows-bundle.json dosyasını adına göre bulun. Dosya adları 1.1.0 olmalı; SNAPSHOT veya 1.0.0 paketini karıştırmayın. Manifest'teki commit v1.1.0 commit'iyle aynı olmalı.
+Manifest’te `applicationVersion` **1.2.0**, `commit` aşağıdaki etiket commit’i ile aynı olmalı:
 
-Son paketi ayrı, temiz bir klasörde açın. Launcher başlangıcı, giriş, demo açma, durdurma/yeniden başlatma ve ayar editörü erişimini kısaca kontrol edin. Kendi CTB'lerinizi/parolanızı yayın paketine koymayın. Pakette `THIRD-PARTY-NOTICES.md`, `licenses/`, runtime lisansları ve kılavuzların bulunduğunu doğrulayın. Checksum publisher imzası değildir; EXE'nin dijital imzası yoktur.
+```bat
+git rev-parse "v1.2.0^{commit}"
+```
 
-## 4. GitHub Release taslağı
+Portable ZIP’i ayrı temiz klasöre açıp launcher, giriş, demo açma ve uygulamayı durdurmayı kısaca deneyin.
+Bu son paket kontrolüdür; kapsamlı manuel testleri baştan tekrarlamak gerekmez. Paketler, kaynak kodundaki
+471 testten ayrı olarak son etiket üzerinden doğrulanır. `THIRD-PARTY-NOTICES.md`, `licenses/`,
+Java runtime ve iki hızlı başlangıç CTB’si pakette bulunmalı. SHA-256 değerleri eklenen dosyalarla eşleşmeli.
+Kullanılmış kurulum klasörünüzü veya kendi CTB/ayar/parola dosyalarınızı ZIP’leyip yüklemeyin.
 
-1. Releases → Draft a new release.
-2. Mevcut v1.1.0 etiketi; başlık SweetCherry 1.1.0.
-3. [İngilizce release açıklaması](../releases/v1.1.0.md) içeriğini kullanın.
-4. Yukarıdaki beş asset'i yükleyin. GitHub Source code ZIP/tar.gz dosyalarını kendisi ekler; toplamda yedi asset görünür.
-5. Stable olarak yayımlayacağımız için prerelease işaretlemeyin; Latest seçilebilir.
-6. Görev ve son paket kontrolü başarılı olduktan sonra Publish release.
+## 5. GitHub Release taslağını oluştur
 
-Bu belge veya yama yayın işlemini otomatik yapmaz. Taslağı/paketleri görmeden yayımlanmış saymayın.
+GitHub → **Releases → Draft a new release**:
 
-## 5. Yayın sonrası
+1. Tag: mevcut **v1.2.0**.
+2. Title: **SweetCherry 1.2.0**.
+3. Description: [documentation/releases/v1.2.0.md](../releases/v1.2.0.md) dosyasının Markdown içeriği.
+4. Yukarıdaki beş dosyayı assets bölümüne yükleyin; yüklemelerin bitmesini bekleyin.
+5. **Set as a pre-release** işaretli olmasın. **Set as the latest release** seçili olsun.
+6. **Save draft** ile kontrol edebilirsiniz. Son kontrol tamamlanınca **Publish release**.
 
-README'deki `/releases/latest` bağlantısı son kararlı sürüme gider. İsterseniz geliştirmeye devam ederken main sürümünü 1.1.1-SNAPSHOT yapın; aynı tag/paket değiştirilmez. Henüz ayrı nightly/development download kanalı oluşturulmadı. Yeni özellikler, VPS demo ve geniş güvenlik incelemesi sonraki işlerdir; 1.1.0 için yeni feature hedefi değildir.
+GitHub iki Source code arşivini otomatik ekler; toplamda yedi asset görülmesi normaldir.
+Bu belgeler/komutlar release’i otomatik yayımlamaz; son Publish release işlemini arayüzden siz yaparsınız.
+
+## 6. Yayın sonrası
+
+README’nin `/releases/latest` bağlantısı yeni kararlı sürüme gider. 1.1.0 indirmelerini ve etiketini
+koruyun. Yayımlanmış v1.2.0 etiketini taşımayın veya paketlerini sessizce başka derlemeyle değiştirmeyin;
+yeni düzeltme gerekiyorsa 1.2.1 olur. Bir sonraki geliştirmede main sürümü isteğe bağlı olarak
+`1.2.1-SNAPSHOT` yapılabilir; bunu şimdi yapmak yayın için şart değildir. Ayrı nightly kanalı gerekmiyor.

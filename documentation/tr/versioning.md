@@ -1,6 +1,6 @@
 # Sürümleme ve release akışı
 
-Uygulama sürümünün tek kaynağı `pom.xml` içindeki proje `<version>` alanıdır; Spring Boot parent sürümü değildir. `application.yml` içindeki `info.app.version: "@project.version@"` Maven resource filtering ile doldurulur. Git bilgileri ayrıca `git.properties` dosyasına yazılır. JAR dışındaki YAML'de eski bir sabit `info.app.version` varsa kaldırın.
+Uygulama sürümünün tek kaynağı `pom.xml` içindeki proje `<version>` alanıdır; Spring Boot parent sürümü değildir. Actuator sürüm bilgisi derleme metadatasından alınır; dış YAML içinde çözülmemiş `@project.version@` kalırsa bu metin sürüm olarak gösterilmez. Git bilgileri ayrıca `git.properties` dosyasına yazılır. JAR dışındaki YAML'de eski bir sabit `info.app.version` varsa kaldırın.
 
 İlk yayın **1.0.0**, Git etiketi **v1.0.0** olarak hazırlanmıştır. Her commit için sürüm artırılmaz; derlemeler commit kimliğiyle ayrılır.
 
@@ -12,13 +12,13 @@ Uygulama sürümünün tek kaynağı `pom.xml` içindeki proje `<version>` alan�
 
 Bu numaralandırma bütün CherryTree özelliklerinin uygulandığı veya hatasızlık garantisi verildiği anlamına gelmez. Sınırlamalar sürüm notlarında açıklanır. Kaynak: https://semver.org/
 
-Yayın hazırlığını commit/push edin, etiketi aynı commit'e koyun ve son dağıtımı o etiketten oluşturun. Yayımlanmış etiketi taşımayın; aynı sürümün dosyalarını farklı bir derlemeyle değiştirmeyin. Düzeltme yeni bir sürüm olur. 1.1.0 yayımlandıktan sonra main üzerinde sıradaki çalışma sürümü `1.1.1-SNAPSHOT` olabilir. Yeni özellikler birikirse sonraki yayın hazırlığında `1.2.0` seçilebilir.
+Yayın hazırlığını commit/push edin, etiketi aynı commit'e koyun ve son dağıtımı o etiketten oluşturun. Yayımlanmış etiketi taşımayın; aynı sürümün dosyalarını farklı bir derlemeyle değiştirmeyin. Düzeltme yeni bir sürüm olur. 1.2.0, 1.1.0 sonrası biriken uyumlu yeni özellikleri ve düzeltmeleri kapsar. 1.2.0 yayımlandıktan sonra main üzerinde sıradaki çalışma sürümü `1.2.1-SNAPSHOT` olabilir; sonraki yayında kapsamına göre 1.2.1 veya 1.3.0 seçilir.
 
 Adım adım işlem ve asset listesi: [yayın hazırlığı](release-checklist.md). 1.0.0 hazırlığındaki geçici yorum arşivi daha önce yedeklenip kaldırılmıştır; bu adım her release için tekrarlanmaz. Git geçmişi korunur.
 
 ## 1.1.0 ve sonrası çalışma
 
-1.1.0 uyumlu yeni özellikleri ve hata düzeltmelerini birlikte içerir. Normal değişiklikleri main dalına commit/push etmeye devam edin; her commit için etiket gerekmez. Yalnız yayın hazırlığı tamamlandığında yeni sürüm etiketi oluşturun. Yayımlanmış 1.0.0/1.1.0 etiketlerini ve paketlerini değiştirmeyin.
+1.1.0 uyumlu yeni özellikleri ve hata düzeltmelerini birlikte içerir. Normal değişiklikleri main dalına commit/push etmeye devam edin; her commit için etiket gerekmez. Yalnız yayın hazırlığı tamamlandığında yeni sürüm etiketi oluşturun. Yayımlanmış sürümlerin etiketlerini ve paketlerini değiştirmeyin.
 
 Nightly veya development build kanalı zorunlu değildir. Şu anda yalnız kararlı release indirme kanalı var. İleride development paketleri sunulursa tarih/commit ve deneme sürümü olduğu açıkça belirtilir; stable latest bağlantısı bunlarla karıştırılmaz.
 

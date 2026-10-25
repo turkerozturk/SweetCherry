@@ -19,7 +19,8 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 ## Features and documentation
 
 - Rich-text editing, images and attachments, external links, tables, and formatted web-page paste.
-- Node movement, duplication, shared-node hierarchy, and bookmarks.
+- Node movement by arrows or parent ID, duplication, shared-node hierarchy, and reorderable bookmarks.
+- Preview and import exported CTBs into a writable database, preserving hierarchy and remapping internal IDs.
 - Tenant configuration wizard, SQLite/MariaDB/MySQL/PostgreSQL connections, and application settings editors.
 - Markmap, Mermaid, Freeplane/FreeMind exports, and PDF export with hierarchical navigation.
 - Local use or configurable network access; offline sun and moon calculations.
@@ -28,7 +29,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 ## Release information
 
-[Changelog](CHANGELOG.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
+[Changelog](CHANGELOG.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
 
 Development builds are not currently published as a separate download channel. Use the stable release for ordinary use; source builds from `main` may include unreleased changes.
 

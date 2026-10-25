@@ -4,6 +4,17 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.2.0]
+
+- Import exported CTBs into the active writable SQLite, PostgreSQL or InnoDB MySQL/MariaDB database after a count preview and confirmation. Remap tree/content/object/bookmark IDs and internal node links; preserve hierarchy, shared groups and timestamps; roll back failed writes.
+- Make CTB import byte/record limits configurable. Show measured sizes/counts and offending internal links with source IDs, titles, fields and missing target IDs before writing.
+- Add **Move to** after Delete in desktop/mobile readers: choose a parent occurrence ID, retain the subtree, append it last, and reject self/descendant/stale destinations. `0` selects the database root.
+- Add Save and continue to both editors; reload the saved revision before further editing.
+- Add configurable database icons across trees, connection selectors and applicable mind-map roots; fix wizard binding and add a searchable illustrated icon picker.
+- Sort CTB selection choices by newest filesystem modification time, followed by other sources alphabetically. Sort the tenant table by display name and show CTB modification dates.
+- Place the node title/icon below breadcrumbs and buttons; move rich-text tools into a resizable desktop sidebar and a mobile drawer while preserving selection. Make rendered table borders visible.
+- Decode Windows SQLite file URIs correctly, including encoded spaces and Turkish characters; remove excess space above node content.
+
 - Use browser language unless an initial language is configured; complete node-properties translations, add mobile navigation help and a distinct empty-content notice.
 - Fix object IDs on HTTP clients without randomUUID; recognize PNG/JPEG cloud files with missing MIME types and explain upload failures separately.
 - Prefer HTML in the explicit clipboard action where supported, handle mobile beforeinput paste data, and explain HTTP/plain-text clipboard limitations.
@@ -20,6 +31,11 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 - Resolve Actuator app.version from artifact build metadata even when external YAML contains an unresolved Maven token.
 
 - Make node modification dates consistent across content editing, property saves, moves, creation, bookmarks and shared-node operations; preserve timestamps on no-op content saves and CTB exports. See `documentation/tr/node-timestamps.md` for the rules and manual checks.
+
+### Validation
+
+- Maintainer reported 471 passing Java tests and manual move/subtree checks on the final feature commit. Relevant move-control JavaScript tests and Chromium desktop/mobile viewport checks also passed during implementation.
+- Windows packaging is rebuilt from the release tag before publication. Existing limitations and upgrade precautions are listed in `documentation/releases/v1.2.0.md`.
 
 ## [1.1.0]
 
