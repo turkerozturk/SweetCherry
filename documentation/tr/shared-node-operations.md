@@ -84,3 +84,7 @@ Eski sürümlerden kalmış, silinmiş düğümlere ait bookmark kayıtları oku
 
 - Ortak/yeni CTB’ye kopyalamada parent/master eşleme uygulanır; dış master’ın yerini hedefte bir içerik kopyası alır. Dört seçenek ve manuel kabul listesi: [CTB dışa aktarma](ctb-export.md#paylaşımlı-konumların-ctbye-aktarılması).
 - Metin içindeki internal linkler: silinen kimlikler yeni master kimliğine otomatik çevrilmez. Bookmark temizliği ile metin bağlantılarının korunması ayrı konulardır.
+
+## ID ile taşıma
+
+Gerçek ve paylaşımlı konumlar, kendi alt ağaçlarıyla birlikte bilinen bir parent ID’sine taşınabilir. [Şuraya taşı düğmesi ve kontrol listesi](move-to-parent.md).

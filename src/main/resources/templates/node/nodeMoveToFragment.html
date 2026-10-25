@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
+<div th:fragment="moveTo(view)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" data-node-move-to>
+<button type="button" class="btn btn-sm btn-outline-primary" data-move-to-open th:attr="aria-controls=|node-move-to-${requestedNodeId}|" aria-haspopup="dialog"><i class="fas fa-folder-open" aria-hidden="true"></i> <span th:text="#{node.moveTo.title}"></span></button>
+<dialog class="node-move-to-dialog" th:id="|node-move-to-${requestedNodeId}|" th:attr="aria-labelledby=|node-move-to-title-${requestedNodeId}|">
+<form method="post" th:action="@{/nodes/move/{id}/to(id=${requestedNodeId})}"
+      th:attr="data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-loading=#{node.moveTo.loading},data-state-error=#{node.move.error},data-invalid=#{node.moveTo.invalid},data-missing=#{node.moveTo.missing},data-cycle=#{node.moveTo.cycle},data-stale=#{node.moveTo.stale},data-denied=#{node.moveTo.denied},data-failed=#{node.moveTo.failed}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<input type="hidden" name="revision" value="">
+<input type="hidden" name="view" th:value="${view}">
+<input type="hidden" name="returnUrl" th:value="${view == 'tree'} ? @{/tree(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})} : @{/nodes/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}">
+<h2 class="h5" th:id="|node-move-to-title-${requestedNodeId}|" th:text="#{node.moveTo.title}"></h2>
+<p><strong th:text="${node.name}"></strong> (<span th:text="${requestedNodeId}"></span>)</p>
+<label class="form-label" th:for="|node-move-to-parent-${requestedNodeId}|" th:text="#{node.moveTo.parent}"></label>
+<input class="form-control" type="text" name="parentId" inputmode="numeric" pattern="[0-9]{1,19}" maxlength="19" required autocomplete="off" th:id="|node-move-to-parent-${requestedNodeId}|" th:attr="aria-describedby=|node-move-to-help-${requestedNodeId}|">
+<p class="small text-body-secondary mt-2" th:id="|node-move-to-help-${requestedNodeId}|" th:text="#{node.moveTo.help}"></p>
+<p data-move-to-message role="status" aria-live="polite" class="small"></p>
+<div class="d-flex justify-content-end gap-2">
+<button type="button" class="btn btn-outline-secondary" data-move-to-close th:text="#{node.moveTo.cancel}"></button>
+<button type="submit" class="btn btn-primary" disabled th:text="#{node.moveTo.submit}"></button>
+</div>
+</form>
+</dialog>
+</div>
+</body></html>

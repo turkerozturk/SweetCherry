@@ -93,6 +93,7 @@ class NodeMoveServiceTest {
         when(properties.writable()).thenReturn(false);
         assertThatThrownBy(()->service.state(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.move(1,NodeMoveService.Direction.UP,"revision")).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(()->service.moveTo(1,2,"revision")).isInstanceOf(AccessDeniedException.class);
     }
 
     @Test void movingSharedOccurrenceTouchesItsMasterButNotOtherContent() throws Exception {
@@ -114,6 +115,61 @@ class NodeMoveServiceTest {
         try(var statement=connection.createStatement();var row=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=1")) {
             row.next();assertThat(row.getLong(1)).isGreaterThan(100);
         }
+    }
+
+    private void moveTo(long id, long parent) throws Exception {
+        NodeMoveService.moveTo(connection,id,parent,NodeMoveService.state(NodeMoveService.read(connection),id).revision());
+    }
+    @Test void chosenParentGetsEntireRealSubtreeLastAndOnlyMovedContentTimestampChanges() throws Exception {
+        try(var statement=connection.createStatement()){statement.execute("INSERT INTO children VALUES(10,2,12,3)");}
+        moveTo(1,2);location(1,2,2);location(10,2,1);location(4,1,5);location(2,0,1);
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT node_id,txt,ts_lastsave FROM node ORDER BY node_id")) {
+            rows.next();assertThat(rows.getString(2)).isEqualTo("content");assertThat(rows.getLong(3)).isGreaterThan(100);
+            while(rows.next())assertThat(rows.getLong(3)).isEqualTo(100);
+        }
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT node_id FROM bookmark ORDER BY node_id")) {
+            rows.next();assertThat(rows.getLong(1)).isEqualTo(2);rows.next();assertThat(rows.getLong(1)).isEqualTo(9);assertThat(rows.next()).isFalse();
+        }
+    }
+    @Test void chosenSharedParentUsesOccurrenceIdAndSharedSourceKeepsItsOwnChildren() throws Exception {
+        moveTo(4,9);location(4,9,1);
+        moveTo(9,2);location(9,2,1);location(4,9,1);location(1,0,1);
+        assertThat(NodeMoveService.read(connection).stream().filter(row->row.id()==9).findFirst().orElseThrow().master()).isEqualTo(1);
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=1")) {
+            rows.next();assertThat(rows.getLong(1)).isGreaterThan(100);
+        }
+    }
+    @Test void chosenRootAppendsButExistingParentDoesNotReorderOrTouchDates() throws Exception {
+        var before=NodeMoveService.read(connection);moveTo(2,0);assertThat(NodeMoveService.read(connection)).isEqualTo(before);
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=2")) {
+            rows.next();assertThat(rows.getLong(1)).isEqualTo(100);
+        }
+        moveTo(4,0);location(4,0,5);
+    }
+    @Test void invalidChosenParentsAndStaleRevisionNeverWrite() throws Exception {
+        var before=NodeMoveService.read(connection);var revision=NodeMoveService.state(before,1).revision();
+        for(long parent:new long[]{1,4,999,-1}) {
+            assertThatThrownBy(()->NodeMoveService.moveTo(connection,1,parent,revision)).isInstanceOf(ResponseStatusException.class);
+            assertThat(NodeMoveService.read(connection)).isEqualTo(before);
+        }
+        assertThatThrownBy(()->NodeMoveService.moveTo(connection,1,2,"stale")).isInstanceOf(ResponseStatusException.class);
+        assertThat(NodeMoveService.read(connection)).isEqualTo(before);
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT ts_lastsave FROM node WHERE node_id=1")) {
+            rows.next();assertThat(rows.getLong(1)).isEqualTo(100);
+        }
+    }
+    @Test void sharedMasterRelationshipAloneIsNotAHierarchyCycle() throws Exception {
+        moveTo(1,9);location(1,9,1);location(4,1,5);
+        // Now 9 really is an ancestor of 4; moving it there must be rejected.
+        var before=NodeMoveService.read(connection);
+        assertThatThrownBy(()->moveTo(9,4)).isInstanceOf(ResponseStatusException.class);
+        assertThat(NodeMoveService.read(connection)).isEqualTo(before);
+    }
+    @Test void missingSharedTargetMasterRejectsBeforeRenumberingEitherGroup() throws Exception {
+        try(var statement=connection.createStatement()){statement.execute("UPDATE children SET master_id=999 WHERE node_id=9");}
+        var before=NodeMoveService.read(connection);
+        assertThatThrownBy(()->moveTo(2,9)).isInstanceOf(ResponseStatusException.class);
+        assertThat(NodeMoveService.read(connection)).isEqualTo(before);
     }
 
 }

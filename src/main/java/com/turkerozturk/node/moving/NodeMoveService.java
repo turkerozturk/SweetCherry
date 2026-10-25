@@ -38,6 +38,14 @@ public class NodeMoveService {
         entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> move(connection, id, direction, revision));
         entityManager.clear();
     }
+
+    /** Moves an occurrence and its existing subtree to the end of a chosen parent's children. */
+    @Transactional
+    public void moveTo(long id, long parentId, String revision) {
+        requireWritable();
+        entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> moveTo(connection,id,parentId,revision));
+        entityManager.clear();
+    }
     private void requireWritable() {
         if (!properties.writable()) throw new AccessDeniedException("The selected CTB is read-only.");
     }
@@ -110,16 +118,47 @@ public class NodeMoveService {
                 target = siblings(rows,targetParent); insertAt = target.indexOf(parent)+1;
             }
             // A shared parent has no node row of its own; validate its master content.
-            if (targetParent != 0) try (var query = connection.prepareStatement("SELECT node_id FROM node WHERE node_id = ?")) {
-                var parent = selected(rows,targetParent);
-                query.setLong(1,parent.master == 0 ? parent.id : parent.master);
-                try (var result = query.executeQuery()) { if (!result.next()) throw conflict(); }
-            }
+            requireParentContent(connection,rows,targetParent);
             source.remove(at); target.add(insertAt,node);
             write(connection,source,node.parent); write(connection,target,targetParent);
         }
         com.turkerozturk.node.NodeTimestamps.touchOccurrence(connection,id,
                 com.turkerozturk.node.NodeTimestamps.now());
+    }
+
+    /** Validates everything before writing; following parent IDs avoids content/master-based cycles. */
+    static void moveTo(Connection connection, long id, long parentId, String expected) throws SQLException {
+        if (id <= 0 || parentId < 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid node ID");
+        var rows = read(connection);
+        if (!revision(rows).equals(expected)) throw conflict();
+        var node = selected(rows,id);
+        var index = new HashMap<Long,Row>();
+        for (var row : rows) index.put(row.id,row);
+        if (parentId != 0) selected(rows,parentId);
+        for (long ancestor=parentId; ancestor!=0; ancestor=index.get(ancestor).parent) {
+            if (ancestor == id) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "A node cannot be moved into itself or its descendants.");
+        }
+        requireParentContent(connection,rows,parentId);
+        // An already-selected parent is a no-op, retaining order and modified date.
+        if (node.parent == parentId) return;
+        var source = siblings(rows,node.parent);
+        var target = siblings(rows,parentId);
+        source.remove(node);
+        target.add(node);
+        write(connection,source,node.parent);
+        write(connection,target,parentId);
+        com.turkerozturk.node.NodeTimestamps.touchOccurrence(connection,id,
+                com.turkerozturk.node.NodeTimestamps.now());
+    }
+
+    private static void requireParentContent(Connection connection, List<Row> rows, long parentId) throws SQLException {
+        if (parentId == 0) return;
+        var parent = selected(rows,parentId);
+        try (var query = connection.prepareStatement("SELECT node_id FROM node WHERE node_id = ?")) {
+            query.setLong(1,parent.master == 0 ? parent.id : parent.master);
+            try (var result = query.executeQuery()) { if (!result.next()) throw conflict(); }
+        }
     }
     private static void write(Connection connection, List<Row> rows, long parent) throws SQLException {
         try (var statement = connection.prepareStatement("UPDATE children SET father_id = ?, sequence = ? WHERE node_id = ?")) {
