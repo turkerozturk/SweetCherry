@@ -5,7 +5,7 @@ masaüstü ağaç görünümünde ve mobil okuyucuda aynı şekilde çalışır.
 veri kaynağı gerekir.
 
 1. Taşınacak düğümü açın ve **Şuraya taşı** düğmesine basın.
-2. Yeni üst düğümün ağaç ID’sini girin. Paylaşımlı düğüm hedeflenecekse master’ın değil,
+2. Yeni üst düğümün ağaç ID’sini girin veya kutunun sağındaki **Panodan yapıştır / Paste from clipboard** ikonuna basın. İkon yalnız ID alanını doldurur; taşıma için **Taşı** düğmesine basılır. Pano erişimi HTTPS/localhost ve tarayıcı izni gerektirebilir; erişim yoksa elle yapıştırılabilir. Geçersiz pano içeriği alanı değiştirmez. Paylaşımlı düğüm hedeflenecekse master’ın değil,
    o paylaşımlı konumun ID’sini kullanın. `0`, veritabanının sanal kökünü belirtir.
 3. **Taşı** ile onaylayın. Düğüm, mevcut alt ağacıyla beraber hedefin en son çocuğu olur;
    aynı düğüm seçili kalır ve ağaç/navigasyon yenilenir. **İptal** veya Escape değişiklik yapmaz.
@@ -33,7 +33,7 @@ sonuç belirsiz olabilir: tekrar denemeden önce sayfayı yenileyip konumu kontr
 ## English
 
 **Move to**, immediately after **Delete**, opens a parent-ID dialog in both desktop and mobile
-readers. An ADMIN session and a writable database are required. Enter a real or shared tree
+readers. The clipboard icon beside the ID field pastes a numeric ID without moving anything; use **Move** to confirm. Clipboard access may require HTTPS/localhost and browser permission; manual paste remains available. An ADMIN session and a writable database are required. Enter a real or shared tree
 occurrence ID, or `0` for the database root. The selected occurrence and its subtree are appended
 to that parent's children; content, IDs, bookmarks and shared/master references are preserved.
 The moved occurrence's content/master modified timestamp is updated. Selecting its existing

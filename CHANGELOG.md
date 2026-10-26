@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add a clipboard-paste icon beside the Move to parent-ID field without widening the dialog; validate numeric clipboard text and explain manual-paste fallback when access is unavailable.
+
 ## [1.2.0]
 
 - Import exported CTBs into the active writable SQLite, PostgreSQL or InnoDB MySQL/MariaDB database after a count preview and confirmation. Remap tree/content/object/bookmark IDs and internal node links; preserve hierarchy, shared groups and timestamps; roll back failed writes.
