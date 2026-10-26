@@ -34,4 +34,15 @@ class NodeMoveToControllerTest {
         }
     }
 
+    @Test void bookmarkPickerReturnsLightweightMetadataWithoutCaching() throws Exception {
+        var service=mock(NodeMoveService.class);
+        when(service.bookmarkTargets(2)).thenReturn(java.util.List.of(new NodeMoveService.BookmarkTarget("9","A < B","ct_java",true,"#3584E4")));
+        var mvc=MockMvcBuilders.standaloneSetup(new NodeMoveController(service)).build();
+        mvc.perform(get("/nodes/move/2/bookmarks")).andExpect(status().isOk())
+            .andExpect(header().string("Cache-Control","no-store"))
+            .andExpect(jsonPath("$[0].nodeId").value("9")).andExpect(jsonPath("$[0].name").value("A < B"))
+            .andExpect(jsonPath("$[0].bold").value(true)).andExpect(jsonPath("$[0].color").value("#3584E4"));
+        verify(service).bookmarkTargets(2);verifyNoMoreInteractions(service);
+    }
+
 }

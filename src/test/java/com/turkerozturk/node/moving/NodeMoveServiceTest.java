@@ -94,6 +94,7 @@ class NodeMoveServiceTest {
         assertThatThrownBy(()->service.state(1)).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.move(1,NodeMoveService.Direction.UP,"revision")).isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(()->service.moveTo(1,2,"revision")).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(()->service.bookmarkTargets(1)).isInstanceOf(AccessDeniedException.class);
     }
 
     @Test void movingSharedOccurrenceTouchesItsMasterButNotOtherContent() throws Exception {
@@ -170,6 +171,44 @@ class NodeMoveServiceTest {
         var before=NodeMoveService.read(connection);
         assertThatThrownBy(()->moveTo(2,9)).isInstanceOf(ResponseStatusException.class);
         assertThat(NodeMoveService.read(connection)).isEqualTo(before);
+    }
+
+    private void bookmarkMetadataColumns() throws Exception {
+        try(var statement=connection.createStatement()) {
+            statement.execute("ALTER TABLE node ADD COLUMN name TEXT");
+            statement.execute("ALTER TABLE node ADD COLUMN is_ro INTEGER DEFAULT 0");
+            statement.execute("ALTER TABLE node ADD COLUMN is_richtxt INTEGER DEFAULT 0");
+            statement.execute("ALTER TABLE node ADD COLUMN syntax TEXT DEFAULT 'plain-text'");
+            statement.execute("ALTER TABLE bookmark ADD COLUMN sequence INTEGER DEFAULT 1");
+        }
+    }
+    @Test void bookmarkTargetsUseOccurrenceIdsAndMasterStylingInBookmarkOrderWithoutReadingContent() throws Exception {
+        bookmarkMetadataColumns();
+        try(var statement=connection.createStatement()) {
+            statement.execute("UPDATE node SET name='Java & <notes>',is_ro=49,is_richtxt="+(0x3584E4L*8+7)+" WHERE node_id=1");
+            statement.execute("UPDATE node SET name='Second' WHERE node_id=2");
+            statement.execute("UPDATE bookmark SET sequence=2 WHERE node_id=2");
+            statement.execute("INSERT INTO bookmark VALUES(999,3)");
+            statement.execute("INSERT INTO children VALUES(10,0,50,999)");
+            statement.execute("INSERT INTO bookmark VALUES(10,4)");
+            // The picker must work even when the note text column is absent.
+            statement.execute("ALTER TABLE node DROP COLUMN txt");
+        }
+        var before=NodeMoveService.read(connection);
+        var targets=NodeMoveService.bookmarkTargets(connection,4);
+        assertThat(targets).extracting(NodeMoveService.BookmarkTarget::nodeId).containsExactly("9","2");
+        assertThat(targets.get(0)).isEqualTo(new NodeMoveService.BookmarkTarget("9","Java & <notes>","ct_java",true,"#3584E4"));
+        assertThat(targets.get(1).bold()).isFalse();assertThat(targets.get(1).color()).isEqualTo("#000000");
+        assertThat(NodeMoveService.read(connection)).isEqualTo(before);
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT MIN(ts_lastsave),MAX(ts_lastsave) FROM node")) {
+            rows.next();assertThat(rows.getLong(1)).isEqualTo(100);assertThat(rows.getLong(2)).isEqualTo(100);
+        }
+    }
+    @Test void noBookmarksReturnsEmptyButDeletedSourceIsRejected() throws Exception {
+        bookmarkMetadataColumns();
+        try(var statement=connection.createStatement()){statement.execute("DELETE FROM bookmark");}
+        assertThat(NodeMoveService.bookmarkTargets(connection,1)).isEmpty();
+        assertThatThrownBy(()->NodeMoveService.bookmarkTargets(connection,999)).isInstanceOf(ResponseStatusException.class);
     }
 
 }

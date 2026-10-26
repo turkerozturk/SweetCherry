@@ -4,7 +4,7 @@
 <button type="button" class="btn btn-sm btn-outline-primary" data-move-to-open th:attr="aria-controls=|node-move-to-${requestedNodeId}|" aria-haspopup="dialog"><i class="fas fa-folder-open" aria-hidden="true"></i> <span th:text="#{node.moveTo.title}"></span></button>
 <dialog class="node-move-to-dialog" th:id="|node-move-to-${requestedNodeId}|" th:attr="aria-labelledby=|node-move-to-title-${requestedNodeId}|">
 <form method="post" th:action="@{/nodes/move/{id}/to(id=${requestedNodeId})}"
-      th:attr="data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-loading=#{node.moveTo.loading},data-state-error=#{node.move.error},data-invalid=#{node.moveTo.invalid},data-missing=#{node.moveTo.missing},data-cycle=#{node.moveTo.cycle},data-stale=#{node.moveTo.stale},data-denied=#{node.moveTo.denied},data-failed=#{node.moveTo.failed},data-clipboard-error=#{node.moveTo.clipboardError}">
+      th:attr="data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-loading=#{node.moveTo.loading},data-state-error=#{node.move.error},data-invalid=#{node.moveTo.invalid},data-missing=#{node.moveTo.missing},data-cycle=#{node.moveTo.cycle},data-stale=#{node.moveTo.stale},data-denied=#{node.moveTo.denied},data-failed=#{node.moveTo.failed},data-clipboard-error=#{node.moveTo.clipboardError},data-bookmarks-url=@{/nodes/move/{id}/bookmarks(id=${requestedNodeId})},data-icon-base=@{/img/ctbicons/},data-bookmarks-loading=#{node.moveTo.bookmarksLoading},data-bookmarks-empty=#{node.moveTo.bookmarksEmpty},data-bookmarks-error=#{node.moveTo.bookmarksError}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" value="">
 <input type="hidden" name="view" th:value="${view}">
@@ -15,6 +15,11 @@
 <div class="input-group">
 <input class="form-control" type="text" name="parentId" inputmode="numeric" pattern="[0-9]{1,19}" maxlength="19" required autocomplete="off" th:id="|node-move-to-parent-${requestedNodeId}|" th:attr="aria-describedby=|node-move-to-help-${requestedNodeId}|">
 <button type="button" class="btn btn-outline-secondary" data-move-to-paste disabled th:title="#{node.moveTo.paste}" th:attr="aria-label=#{node.moveTo.paste}"><i class="fas fa-paste" aria-hidden="true"></i></button>
+<button type="button" class="btn btn-outline-secondary" data-move-to-bookmarks disabled aria-expanded="false" th:title="#{node.moveTo.bookmarks}" th:attr="aria-label=#{node.moveTo.bookmarks},aria-controls=|node-move-to-bookmarks-${requestedNodeId}|"><i class="fas fa-bookmark" aria-hidden="true"></i></button>
+</div>
+<div data-move-to-bookmarks-panel class="node-move-to-bookmarks mt-2" hidden th:id="|node-move-to-bookmarks-${requestedNodeId}|">
+<p data-move-to-bookmarks-status role="status" aria-live="polite" class="small m-2"></p>
+<div data-move-to-bookmarks-list role="group" th:attr="aria-label=#{node.moveTo.bookmarks}"></div>
 </div>
 <p class="small text-body-secondary mt-2" th:id="|node-move-to-help-${requestedNodeId}|" th:text="#{node.moveTo.help}"></p>
 <p data-move-to-message role="status" aria-live="polite" class="small"></p>

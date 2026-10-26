@@ -18,6 +18,16 @@ public class NodeMoveController {
     @ResponseBody
     public NodeMoveService.State state(@PathVariable long id) { return service.state(id); }
 
+    @GetMapping("/nodes/move/{id}/bookmarks")
+    @ResponseBody
+    public ResponseEntity<java.util.List<NodeMoveService.BookmarkTarget>> bookmarks(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore()).body(service.bookmarkTargets(id));
+        } catch (ResponseStatusException error) {
+            return ResponseEntity.status(error.getStatusCode()).build();
+        }
+    }
+
     @PostMapping("/nodes/move/{id}/to")
     @ResponseBody
     public ResponseEntity<Void> moveTo(@PathVariable long id, @RequestParam String parentId, @RequestParam String revision) {

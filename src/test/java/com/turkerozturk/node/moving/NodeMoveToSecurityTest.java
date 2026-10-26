@@ -34,6 +34,10 @@ class NodeMoveToSecurityTest {
                 .with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
             mvc.perform(post("/nodes/move/2/to").session(session).param("parentId","9").param("revision","snapshot").param("_tenantView","old")
                 .with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
+            mvc.perform(get("/nodes/move/2/bookmarks").session(session).param("_tenantView","current").with(user("reader").roles("USER")))
+                .andExpect(status().isForbidden());
+            mvc.perform(get("/nodes/move/2/bookmarks").session(session).param("_tenantView","old").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isConflict());
             var service=context.getBean(NodeMoveService.class);verifyNoInteractions(service);
             mvc.perform(post("/nodes/move/2/to").session(session).param("parentId","9").param("revision","snapshot").param("_tenantView","current")
                 .with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isNoContent());

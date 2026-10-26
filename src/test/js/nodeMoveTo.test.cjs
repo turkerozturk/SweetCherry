@@ -6,12 +6,12 @@ const path=require('node:path');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function setup(postResponse={status:204}) {
     const handlers={},requests=[],assignments=[];
-    const submit={disabled:true},close={disabled:false},paste={disabled:true};
+    const submit={disabled:true},close={disabled:false},paste={disabled:true},bookmarks={disabled:true,setAttribute(){}},panel={hidden:true};
     const area={textContent:'',classList:{toggle(){}}};
     const form={dataset:{stateUrl:'/nodes/move/2/state',loading:'Loading',stateError:'State error',invalid:'Invalid',missing:'Missing',cycle:'Cycle',stale:'Stale',denied:'Denied',failed:'Failed'},
         elements:{parentId:{value:'',focus(){},readOnly:false},revision:{value:''},_tenantView:{value:'current-tenant'},_csrf:{value:'csrf-token'},returnUrl:{value:'/tree?nodeId=2&_tenantView=current-tenant'}},
         action:'https://example.test/nodes/move/2/to',reset(){this.elements.parentId.value='';this.elements.revision.value='';},reportValidity(){return true;},
-        querySelector(selector){return selector==='[data-move-to-message]'?area:selector==='[type="submit"]'?submit:selector==='[data-move-to-paste]'?paste:close;},matches(){return true;}};
+        querySelector(selector){return selector==='[data-move-to-message]'?area:selector==='[type="submit"]'?submit:selector==='[data-move-to-paste]'?paste:selector==='[data-move-to-bookmarks]'?bookmarks:selector==='[data-move-to-bookmarks-panel]'?panel:close;},matches(){return true;}};
     const dialog={open:false,showModal(){this.open=true;},close(){this.open=false;},querySelector(){return form;}};
     const group={querySelector(){return dialog;}};
     const opener={closest(){return group;}},closer={disabled:false,closest(){return dialog;}};

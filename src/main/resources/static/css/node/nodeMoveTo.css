@@ -1,3 +1,10 @@
 .node-move-to-dialog {width:min(28rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto;padding:1.25rem;border:1px solid #adb5bd;border-radius:.5rem;color:#212529;background:#fff;box-shadow:0 .5rem 2rem #0004}
 .node-move-to-dialog::backdrop {background:#0007}
 .node-move-to-dialog p {overflow-wrap:anywhere}
+
+.node-move-to-bookmarks{max-height:14rem;overflow:auto;border:1px solid #adb5bd;border-radius:.25rem}
+.node-move-to-bookmark{display:flex;align-items:center;gap:.4rem;width:100%;padding:.45rem .5rem;border:0;border-bottom:1px solid #dee2e6;background:#fff;text-align:left}
+.node-move-to-bookmark:hover,.node-move-to-bookmark:focus-visible{background:#e9f2ff;outline:2px solid #86b7fe;outline-offset:-2px}
+.node-move-to-bookmark img{flex:none;object-fit:contain}
+.node-move-to-bookmark-name{min-width:0;overflow-wrap:anywhere}
+.node-move-to-bookmark-id{flex:none;white-space:nowrap;color:#495057}

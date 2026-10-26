@@ -36,6 +36,9 @@ class NodeMoveToTemplateTest {
                 assertThat(doc.selectFirst("input[name=_tenantView]").val()).isEqualTo("token");
                 assertThat(doc.selectFirst("label").attr("for")).isEqualTo(doc.selectFirst("input[name=parentId]").id());
                 assertThat(doc.select("unsafe")).isEmpty();
+                assertThat(doc.selectFirst("[data-move-to-bookmarks]").parent().hasClass("input-group")).isTrue();
+                assertThat(doc.selectFirst("form").attr("data-bookmarks-url")).isEqualTo("/app/nodes/move/9/bookmarks");
+                assertThat(doc.selectFirst("form").attr("data-icon-base")).isEqualTo("/app/img/ctbicons/");
                 assertThat(html).doesNotContain("??node.moveTo.");
             }
         }

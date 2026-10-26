@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Choose a Move to parent from styled bookmark shortcuts, retaining each real/shared occurrence ID and requiring explicit Move confirmation.
+
 - Add a clipboard-paste icon beside the Move to parent-ID field without widening the dialog; validate numeric clipboard text and explain manual-paste fallback when access is unavailable.
 
 ## [1.2.0]

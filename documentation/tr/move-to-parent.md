@@ -7,6 +7,10 @@ veri kaynağı gerekir.
 1. Taşınacak düğümü açın ve **Şuraya taşı** düğmesine basın.
 2. Yeni üst düğümün ağaç ID’sini girin veya kutunun sağındaki **Panodan yapıştır / Paste from clipboard** ikonuna basın. İkon yalnız ID alanını doldurur; taşıma için **Taşı** düğmesine basılır. Pano erişimi HTTPS/localhost ve tarayıcı izni gerektirebilir; erişim yoksa elle yapıştırılabilir. Geçersiz pano içeriği alanı değiştirmez. Paylaşımlı düğüm hedeflenecekse master’ın değil,
    o paylaşımlı konumun ID’sini kullanın. `0`, veritabanının sanal kökünü belirtir.
+   Pano ikonunun yanındaki **Yer işaretlerinden seç** ikonuyla açılan listeden de hedef seçebilirsiniz.
+   Liste yer işareti sırasındadır; ad, ikon, kalınlık, renk ve `[ağaç ID’si]` görünür. Seçim yalnız
+   ID kutusunu doldurur. Paylaşımlı yer işaretlerinde master’ın değil, konumun ID’si kullanılır.
+   Bozuk/eksik konumlar gösterilmez. Liste her açılışta güncellenir ve not içeriklerini/ekleri yüklemez.
 3. **Taşı** ile onaylayın. Düğüm, mevcut alt ağacıyla beraber hedefin en son çocuğu olur;
    aynı düğüm seçili kalır ve ağaç/navigasyon yenilenir. **İptal** veya Escape değişiklik yapmaz.
 
@@ -40,3 +44,5 @@ The moved occurrence's content/master modified timestamp is updated. Selecting i
 parent is a no-op, retaining order and timestamps. Self/descendant destinations and stale tree
 snapshots are rejected before writing. Cancel and Escape do not move anything. After a network
 failure, reload and check the location before retrying.
+
+The bookmark icon beside Paste opens the current bookmarks in bookmark order, with title styling and `[occurrence ID]`. Choosing an entry only fills the parent-ID field; **Move** still confirms the operation. Missing entries are skipped. Shared bookmarks use the shared occurrence ID, not the master ID. The existing cycle/stale-tree checks remain in effect.
