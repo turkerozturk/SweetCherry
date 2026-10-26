@@ -71,4 +71,14 @@ class TreeWorkspaceTest {
                 java.util.Locale.ENGLISH, null, "desktop")).isEqualTo("redirect:/tree?_tenantView=old-token");
     }
 
+    @Test void workspaceWidthUsesConfigurationAndKeepsOnlyTheDesktopSettingBounded() {
+        var model = new ExtendedModelMap();
+        assertThat(controller.treeWorkspace(model, 0)).isEqualTo("node/treeWorkspace");
+        assertThat(model.get("treeDefaultWidth")).isEqualTo(600);
+        ReflectionTestUtils.setField(controller,"treeDefaultWidth",450);
+        controller.treeWorkspace(model,0);assertThat(model.get("treeDefaultWidth")).isEqualTo(450);
+        ReflectionTestUtils.setField(controller,"treeDefaultWidth",9999);
+        controller.treeWorkspace(model,0);assertThat(model.get("treeDefaultWidth")).isEqualTo(1900);
+    }
+
 }

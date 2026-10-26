@@ -50,7 +50,7 @@
         <table class="bookmarks-table table table-bordered border-success table-sm">
             <thead>
             <tr>
-                <th scope="col" class="bookmark-sequence" th:text="#{bookmarks.grid.th.sequence}">Sequence</th>
+                <th scope="col" class="bookmark-sequence" th:text="#{bookmarks.grid.th.sequence}">#</th>
 
                 <th scope="col" class="bookmark-date" th:text="#{bookmarks.grid.th.lastModifiedDate}">LAst Modified Date</th>
                 <!--  <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.icon}">Icon</th> -->
@@ -71,7 +71,7 @@
 
                 <td th:text="${#dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd')}"
                     th:title="${bookmark.node.lastSaveTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
-                    class="text-center"
+                    class="bookmark-date text-center"
                 ></td>
 
                 <!-- <td><a th:href="@{/nodes/{nodeId}(nodeId=${bookmark.nodeId})}" th:text="${bookmark.nodeId}"></a></td> -->

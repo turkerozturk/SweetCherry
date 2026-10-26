@@ -35,15 +35,23 @@
     });
     const splitter = document.getElementById('workspace-splitter');
     const storageKey = 'sweetcherry-tree:' + token;
-    let state = {expanded: [], selected: 0, width: 300, top: 0, left: 0};
-    try { state = {...state, ...JSON.parse(sessionStorage.getItem(storageKey) || '{}')}; } catch (_) { }
+    const widthKey = 'sweetcherry-tree-width';
+    const defaultWidth = Math.max(20, Math.min(1900, Number(workspace.dataset.defaultTreeWidth) || 600));
+    const preferred = value => {
+        const width = Number(value);
+        return Number.isFinite(width) && width >= 20 && width <= 1900 ? Math.round(width) : defaultWidth;
+    };
+    let preferredWidth = defaultWidth;
+    try { preferredWidth = preferred(localStorage.getItem(widthKey)); } catch (_) { }
+    let state = {expanded: [], selected: 0, width: preferredWidth, top: 0, left: 0};
+    try { state = {...state, ...JSON.parse(sessionStorage.getItem(storageKey) || '{}'), width: preferredWidth}; } catch (_) { }
     const expanded = new Set(Array.isArray(state.expanded) ? state.expanded : []);
     let controller;
     let stopped = false;
     const navigationRevision = window.SweetCherryNavigationRevision();
 
     function save() {
-        try { sessionStorage.setItem(storageKey, JSON.stringify({...state, expanded: [...expanded], top: pane.scrollTop, left: pane.scrollLeft})); } catch (_) { }
+        try { const {width, ...navigation} = state; sessionStorage.setItem(storageKey, JSON.stringify({...navigation, expanded: [...expanded], top: pane.scrollTop, left: pane.scrollLeft})); } catch (_) { }
     }
     function url(path, params = {}) {
         const target = new URL(path, location.origin);
@@ -245,8 +253,9 @@
     pane.addEventListener('scroll', save, {passive: true});
 
     function setWidth(value) {
-        const maximum = Math.max(160, Math.min(700, workspace.clientWidth - 240));
-        state.width = Math.max(160, Math.min(maximum, Number(value) || 300));
+        const maximum = Math.max(20, Math.min(1900, workspace.clientWidth - 28));
+        const requested = Number.isFinite(Number(value)) ? Number(value) : defaultWidth;
+        state.width = Math.round(Math.max(20, Math.min(maximum, requested)));
         workspace.style.setProperty('--tree-width', state.width + 'px');
         splitter.setAttribute('aria-valuenow', String(state.width));
         splitter.setAttribute('aria-valuemax', String(maximum));
@@ -258,18 +267,29 @@
     splitter.addEventListener('pointermove', event => {
         if (splitter.hasPointerCapture(event.pointerId)) setWidth(event.clientX - workspace.getBoundingClientRect().left);
     });
-    function endResize() { document.body.classList.remove('resizing'); save(); }
+    function rememberWidth() {
+        preferredWidth = state.width;
+        try { localStorage.setItem(widthKey, String(preferredWidth)); } catch (_) { }
+        save();
+    }
+    function endResize() { document.body.classList.remove('resizing'); rememberWidth(); }
     splitter.addEventListener('pointerup', endResize);
     splitter.addEventListener('pointercancel', endResize);
     splitter.addEventListener('keydown', event => {
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-            event.preventDefault(); setWidth(state.width + (event.key === 'ArrowRight' ? 20 : -20)); save();
+            event.preventDefault(); setWidth(state.width + (event.key === 'ArrowRight' ? 20 : -20)); rememberWidth();
         }
     });
-    window.addEventListener('resize', () => setWidth(state.width));
+    window.addEventListener('resize', () => setWidth(preferredWidth));
+    window.addEventListener('storage', event => {
+        if (event.key === widthKey || event.key === null) {
+            preferredWidth = preferred(event.newValue);
+            setWidth(preferredWidth);
+        }
+    });
     /** Restores expanded branches only within this browser tab and selected CTB. */
     async function initialize() {
-        setWidth(state.width);
+        setWidth(preferredWidth);
         try {
             const revisionResponse = await request(url('/nodes/navigation/revision'));
             await navigationRevision.check((await revisionResponse.json()).revision, async () => {});

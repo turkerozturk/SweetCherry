@@ -8,3 +8,5 @@
 .node-move-to-bookmark img{flex:none;object-fit:contain}
 .node-move-to-bookmark-name{min-width:0;overflow-wrap:anywhere}
 .node-move-to-bookmark-id{flex:none;white-space:nowrap;color:#495057}
+
+.node-move-to-bookmark[hidden]{display:none}

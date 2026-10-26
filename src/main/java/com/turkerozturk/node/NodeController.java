@@ -405,12 +405,16 @@ public class NodeController {
     public record NavigationChild(long nodeId, String name, String iconName,
                                   boolean hasChildren, String titleColor, boolean readOnly, boolean bold) { }
 
+    @Value("${myapp.tree.default-width:600}")
+    private int treeDefaultWidth = 600;
+
     /** Opens a persistent desktop tree with content loaded independently. */
     @GetMapping("/tree")
     @RequiresTenant
     public String treeWorkspace(Model model, @RequestParam(defaultValue = "0") long nodeId) {
         if (nodeId < 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         model.addAttribute("initialNodeId", nodeId);
+        model.addAttribute("treeDefaultWidth", Math.max(20, Math.min(1900, treeDefaultWidth)));
         model.addAttribute("viewMode", "tree");
         return "node/treeWorkspace";
     }

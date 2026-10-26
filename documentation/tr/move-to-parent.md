@@ -46,3 +46,7 @@ snapshots are rejected before writing. Cancel and Escape do not move anything. A
 failure, reload and check the location before retrying.
 
 The bookmark icon beside Paste opens the current bookmarks in bookmark order, with title styling and `[occurrence ID]`. Choosing an entry only fills the parent-ID field; **Move** still confirms the operation. Missing entries are skipped. Shared bookmarks use the shared occurrence ID, not the master ID. The existing cycle/stale-tree checks remain in effect.
+
+Yer işareti listesinin üstündeki arama kutusu, yalnız düğüm adını büyük/küçük harf ve aksan farklarını yok sayarak filtreler; `[ID]` araması yapmaz. Temizlendiğinde tüm yer işaretleri görünür. Arama alanında Enter taşıma başlatmaz.
+
+The bookmark chooser has an instant title filter (case/accent insensitive). It does not search IDs or query the database on each keystroke. Clearing the filter restores the list; Enter in that field never submits a move.

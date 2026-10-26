@@ -161,6 +161,9 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  tree:
+    # Desktop /tree only. Saved browser width takes precedence; other splitters are unaffected.
+    default-width: 600 # Pixels, clamped to 20..1900 and the available viewport width.
   ctb-import:
     # Server-side CTB file AND decoded field bytes; not an HTTP upload limit. Restart after editing.
     max-bytes: 67108864 # 64 MiB; raise only with enough Java heap and physical RAM.

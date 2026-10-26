@@ -1,6 +1,6 @@
 .tree-workspace-page {height:100vh;height:100dvh;display:flex;flex-direction:column;margin:0;overflow:hidden}
 #workspace-header {flex:none}
-#tree-workspace {display:grid;grid-template-columns:var(--tree-width,300px) 8px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
+#tree-workspace {display:grid;grid-template-columns:var(--tree-width,600px) 8px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
 #workspace-tree-pane {overflow:auto;min-width:0;background:#f4f7fa;border-right:1px solid #d1d9e0;padding:.5rem}
 .workspace-database {display:block;font-weight:bold;margin-bottom:.5rem;white-space:nowrap;color:#111}
 #workspace-tree,#workspace-tree ul {list-style:none;margin:0;padding:0}

@@ -17,6 +17,25 @@
         message(form, '');
         form.elements.parentId.focus();
     }
+    // Match title text only (not the displayed ID), ignoring case and accents.
+    function filterBookmarks(form) {
+        const panel = form.querySelector('[data-move-to-bookmarks-panel]');
+        if (panel.dataset.loaded !== 'true') return;
+        const normalize = value => value.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/ı/g, 'i');
+        const query = normalize(form.querySelector('[data-move-to-bookmarks-filter]').value.trim());
+        const choices = [...form.querySelectorAll('[data-bookmark-target]')];
+        let visible = 0;
+        choices.forEach(choice => {
+            const name = choice.querySelector('.node-move-to-bookmark-name').textContent;
+            choice.hidden = !normalize(name).includes(query);
+            if (!choice.hidden) visible++;
+        });
+        form.querySelector('[data-move-to-bookmarks-status]').textContent = !choices.length
+            ? form.dataset.bookmarksEmpty : visible ? '' : form.dataset.bookmarksNoMatch;
+    }
+    document.addEventListener('input', event => {
+        if (event.target.matches('[data-move-to-bookmarks-filter]')) filterBookmarks(event.target.closest('form'));
+    });
     async function bookmarks(button) {
         const form = button.closest('form'), dialog = button.closest('dialog');
         if (button.disabled || form.dataset.phase !== 'ready' || form.dataset.pasting === 'true') return;
@@ -25,6 +44,8 @@
         const list = form.querySelector('[data-move-to-bookmarks-list]');
         const status = form.querySelector('[data-move-to-bookmarks-status]');
         list.replaceChildren();
+        panel.dataset.loaded = 'false';
+        form.querySelector('[data-move-to-bookmarks-filter]').value = '';
         status.textContent = form.dataset.bookmarksLoading;
         status.classList.remove('text-danger');
         panel.hidden = false;
@@ -65,7 +86,8 @@
                 choice.append(name, number);
                 list.append(choice);
             }
-            status.textContent = list.childElementCount ? '' : form.dataset.bookmarksEmpty;
+            panel.dataset.loaded = 'true';
+            filterBookmarks(form);
         } catch (_) {
             if (current()) {
                 status.textContent = form.dataset.bookmarksError;
@@ -166,6 +188,9 @@
     // Escape closes this dialog, not an underlying mobile navigation drawer.
     document.addEventListener('keydown', event => {
         const dialog = event.target.closest('.node-move-to-dialog');
+        if (dialog && event.key === 'Enter' && event.target.matches('[data-move-to-bookmarks-filter]')) {
+            event.preventDefault(); return;
+        }
         if (!dialog || event.key !== 'Escape') return;
         event.stopPropagation();
         if (dialog.querySelector('form').dataset.phase === 'saving') event.preventDefault();

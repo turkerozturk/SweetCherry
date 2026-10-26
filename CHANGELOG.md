@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Filter Move to bookmark shortcuts by title; compact bookmark date/order columns and headings without wrapping drag handles.
+- Remember only the desktop tree-pane width across tabs, add `myapp.tree.default-width` (600 px), and expand its range to 20–1900 px within the available viewport. Other splitters retain their existing behavior.
+
 - Choose a Move to parent from styled bookmark shortcuts, retaining each real/shared occurrence ID and requiring explicit Move confirmation.
 
 - Add a clipboard-paste icon beside the Move to parent-ID field without widening the dialog; validate numeric clipboard text and explain manual-paste fallback when access is unavailable.

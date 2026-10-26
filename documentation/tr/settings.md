@@ -76,3 +76,5 @@ Gerçek WARN/ERROR mesajları ve login güvenlik kayıtları gizlenmez. Bütün 
 ## Ayarları arayüzden düzenleme
 
 Seçilmiş güvenlik dışı alanlar için [Uygulama Ayarları ve yeniden başlatma](application-settings-ui.md) sayfasına bakın.
+
+Masaüstü `/tree` ayırıcısının varsayılan genişliği ve sekmeler arasında hatırlanması: [desktop-tree-width.md](desktop-tree-width.md).
