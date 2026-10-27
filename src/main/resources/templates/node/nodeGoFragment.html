@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<div th:fragment="dialog" th:if="${currentTenantName != null}" data-node-go>
+<dialog class="node-move-to-dialog" id="node-go-dialog" aria-labelledby="node-go-title">
+<form method="get" th:action="@{/nodes/go-to}" data-navigation="true"
+      th:attr="data-loading=#{node.moveTo.loading},data-invalid=#{node.go.invalid},data-missing=#{node.go.missing},data-stale=#{node.moveTo.stale},data-denied=#{node.moveTo.denied},data-failed=#{node.go.failed},data-clipboard-error=#{node.moveTo.clipboardError},data-bookmarks-url=@{/nodes/go-to/bookmarks},data-icon-base=@{/img/ctbicons/},data-bookmarks-loading=#{node.moveTo.bookmarksLoading},data-bookmarks-empty=#{node.moveTo.bookmarksEmpty},data-bookmarks-error=#{node.moveTo.bookmarksError},data-bookmarks-no-match=#{node.moveTo.bookmarksNoMatch}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<h2 class="h5" id="node-go-title" th:text="#{node.go.title}"></h2>
+<label class="form-label" for="node-go-id" th:text="#{node.go.id}"></label>
+<div class="input-group">
+<input class="form-control" type="text" name="parentId" inputmode="numeric" pattern="[1-9][0-9]{0,18}" maxlength="19" required autocomplete="off" id="node-go-id" aria-describedby="node-go-help">
+<button type="button" class="btn btn-outline-secondary" data-move-to-paste disabled th:title="#{node.moveTo.paste}" th:attr="aria-label=#{node.moveTo.paste}"><i class="fas fa-paste" aria-hidden="true"></i></button>
+<button type="button" class="btn btn-outline-secondary" data-move-to-bookmarks disabled aria-expanded="false" th:title="#{node.moveTo.bookmarks}" th:attr="aria-label=#{node.moveTo.bookmarks},aria-controls='node-go-bookmarks'"><i class="fas fa-bookmark" aria-hidden="true"></i></button>
+</div>
+<div data-move-to-bookmarks-panel class="node-move-to-bookmarks mt-2" hidden id="node-go-bookmarks">
+<label class="visually-hidden" for="node-go-filter" th:text="#{node.moveTo.bookmarksFilter}"></label>
+<input type="search" class="form-control form-control-sm" data-move-to-bookmarks-filter autocomplete="off" id="node-go-filter" th:placeholder="#{node.moveTo.bookmarksFilter}">
+<p data-move-to-bookmarks-status role="status" aria-live="polite" class="small m-2"></p>
+<div data-move-to-bookmarks-list role="group" th:attr="aria-label=#{node.moveTo.bookmarks}"></div>
+</div>
+<p class="small text-body-secondary mt-2" id="node-go-help" th:text="#{node.go.help}"></p>
+<p data-move-to-message role="status" aria-live="polite" class="small"></p>
+<div class="d-flex justify-content-end gap-2">
+<button type="button" class="btn btn-outline-secondary" data-move-to-close th:text="#{node.moveTo.cancel}"></button>
+<button type="submit" class="btn btn-primary" disabled th:text="#{node.go.submit}"></button>
+</div>
+</form>
+</dialog>
+</div></body></html>

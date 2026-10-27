@@ -2,6 +2,8 @@
 
 Bu belge SweetCherry'de görüntülenen CherryTree notlarının ortak bir koleksiyon CTB'sine veya ayrı bir CTB dosyasına aktarılmasını, mevcut davranışı ve ileride ele alınacak konuları açıklar.
 
+Düğüm sayfasındaki dört seçenek aktarım başlamadan önce onay ister; iptal dosya oluşturmaz veya değiştirmez. Dosya listesi ve silme sonucu Türkçe/İngilizcedir; sonuçtan listeye dönüş düğmesi vardır. [Arayüz ve manuel kontroller](node-id-navigation.md).
+
 ## Terimler
 
 CherryTree'deki her not bir **node** olarak adlandırılır. SweetCherry belgelerinde geçen **not**, **not düğümü**, **düğüm** ve **node** ifadeleri aynı kavramı anlatır.

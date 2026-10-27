@@ -5,7 +5,6 @@
     <th:block th:replace="~{common/meta :: headerMeta}"></th:block>
     <th:block th:replace="~{common/meta :: headerCssLibraries}"></th:block>
     <link rel="stylesheet" th:href="@{/css/node/treeWorkspace.css}"/>
-<link rel="stylesheet" th:href="@{/css/node/nodeMoveTo.css}"/>
 </head>
 <body class="tree-workspace-page">
 <header id="workspace-header"><th:block th:replace="~{common/header :: header}"></th:block></header>
@@ -23,9 +22,7 @@
 <script th:src="@{/js/node/navigationRevision.js}"></script>
 <script th:src="@{/js/node/treeWorkspace.js}"></script>
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
-<script th:src="@{/js/node/confirmNodeCreation.js}"></script>
 <script th:src="@{/js/node/nodeMove.js}"></script>
-<script th:src="@{/js/node/nodeMoveTo.js}"></script>
 <script th:src="@{/js/node/nodeDuplicate.js}"></script>
 <script th:src="@{/js/node/nodeBookmark.js}"></script>
 </body>

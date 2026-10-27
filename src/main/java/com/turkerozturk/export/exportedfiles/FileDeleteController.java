@@ -21,7 +21,9 @@
 package com.turkerozturk.export.exportedfiles;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Files;
@@ -29,7 +31,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.io.IOException;
 
-@RestController
+@Controller
 @RequestMapping("/delete")
 public class FileDeleteController {
 
@@ -40,21 +42,29 @@ public class FileDeleteController {
     private String exportingFolderName;
 
     @PostMapping("/{filename:.+}")
-    public ResponseEntity<String> deleteFile(@PathVariable String filename) {
+    public ModelAndView deleteFile(@PathVariable String filename) {
         final Path file;
         try {
             file = ExportedFilePaths.resolve(applicationPath, exportingFolderName, filename);
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest().body("Invalid export filename");
+            return result(HttpStatus.BAD_REQUEST, "exportedFiles.deleteInvalid", filename);
         }
         if (!Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS)) {
-            return ResponseEntity.notFound().build();
+            return result(HttpStatus.NOT_FOUND, "exportedFiles.deleteMissing", filename);
         }
         try {
             Files.delete(file);
-            return ResponseEntity.ok("File deleted successfully");
+            return result(HttpStatus.OK, "exportedFiles.deleteSuccess", filename);
         } catch (IOException exception) {
-            return ResponseEntity.status(500).body("Failed to delete file");
+            return result(HttpStatus.INTERNAL_SERVER_ERROR, "exportedFiles.deleteFailed", filename);
         }
+    }
+    private ModelAndView result(HttpStatus status, String message, String filename) {
+        var view = new ModelAndView("exportedFileResult");
+        view.setStatus(status);
+        view.addObject("deleteMessage", message);
+        view.addObject("deleteSucceeded", status == HttpStatus.OK);
+        view.addObject("filename", filename);
+        return view;
     }
 }

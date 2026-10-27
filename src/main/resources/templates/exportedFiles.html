@@ -3,23 +3,24 @@
       layout:decorate="~{_layoutMobile}">
 <head>
     <meta charset="UTF-8"/>
-    <title>Download Files</title>
+    <title th:text="#{exportedFiles.title}">Exported files</title>
 </head>
 <body>
 <section layout:fragment="content">
 
-    <h1>Download Files</h1>
+    <h1 th:text="#{exportedFiles.title}">Exported files</h1>
     <div th:if="${importError != null}" class="alert alert-warning" th:text="${#messages.msg(importError)}"></div>
 <div th:replace="~{common/ctbImportDiagnostics :: details}"></div>
     <div th:if="${importCount != null}" class="alert alert-success" th:text="#{ctbImport.success(${importCount})}"></div>
-    <table class="table table-striped">
+    <p th:if="${#lists.isEmpty(files)}" class="text-body-secondary" th:text="#{exportedFiles.empty}"></p>
+    <div class="table-responsive"><table class="table table-striped">
         <thead>
         <tr>
             <th>#</th>
-            <th>File Name</th>
-            <th>Creation Date</th>
-            <th>Size (bytes)</th>
-            <th>Actions</th>
+            <th th:text="#{exportedFiles.name}">File Name</th>
+            <th th:text="#{exportedFiles.modified}">Creation Date</th>
+            <th th:text="#{exportedFiles.size}">Size (bytes)</th>
+            <th th:text="#{exportedFiles.actions}">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -30,7 +31,7 @@
             <td th:text="${file.size}">123456</td>
             <td>
                 <a th:href="@{'/download/' + ${file.name}}" class="btn btn-success">
-                    <i class="fas fa-download"></i> Download
+                    <i class="fas fa-download" aria-hidden="true"></i> <span th:text="#{exportedFiles.download}">Download</span>
                 </a>
                 <form th:if="${importWritable and #authorization.expression('hasRole(''ADMIN'')') and #strings.endsWith(#strings.toLowerCase(file.name), '.ctb')}"
                       th:action="@{/exportedFiles/import/preview}" method="post" class="d-inline">
@@ -41,26 +42,17 @@
                     </button>
                 </form>
                 <form th:action="@{'/delete/' + ${file.name}}" method="post"
-                      class="d-inline delete-form" th:attr="data-filename=${file.name}">
+                      class="d-inline delete-form" th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:attr="data-confirm-message=#{exportedFiles.deleteConfirm(${file.name})}">
                     <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash-alt"></i> Delete
+                        <i class="fas fa-trash-alt" aria-hidden="true"></i> <span th:text="#{exportedFiles.delete}">Delete</span>
                     </button>
                 </form>
             </td>
         </tr>
         </tbody>
-    </table>
+    </table></div>
 
-    <script>
-        document.querySelectorAll('.delete-form').forEach(form => {
-            form.addEventListener('submit', event => {
-                const fileName = form.dataset.filename;
-                if (!confirm('Are you sure you want to delete ' + fileName + '?')) {
-                    event.preventDefault();
-                }
-            });
-        });
-    </script>
+
 
 </section>
 </body>

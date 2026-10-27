@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{exportedFiles.title}">Exported files</title></head>
+<body><section layout:fragment="content" class="container py-3">
+<h1 th:text="#{exportedFiles.title}">Exported files</h1>
+<p role="status" class="alert" th:classappend="${deleteSucceeded} ? 'alert-success' : 'alert-warning'" th:text="${#messages.msg(deleteMessage)}"></p>
+<p th:text="${filename}"></p>
+<a class="btn btn-primary" th:href="@{/exportedFiles}"><i class="fas fa-arrow-left" aria-hidden="true"></i> <span th:text="#{exportedFiles.back}">Back to exported files</span></a>
+</section></body></html>

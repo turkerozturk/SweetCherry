@@ -75,7 +75,7 @@
                         </a>
 
                         <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
-                              method="post" class="d-inline">
+                              method="post" class="d-inline" th:attr="data-confirm-message=#{exportnodes.confirmCollectionSingle(${node.name},${node.nodeId})}">
                             <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                             <input type="hidden" name="includeDescendants" value="false"/>
                             <button type="submit" class="btn btn-warning">
@@ -85,7 +85,7 @@
                         </form>
 
                         <form th:action="@{/expo/{nodeId}(nodeId=${node.nodeId})}"
-                              method="post" class="d-inline">
+                              method="post" class="d-inline" th:attr="data-confirm-message=#{exportnodes.confirmCollectionBranch(${node.name},${node.nodeId})}">
                             <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                             <input type="hidden" name="includeDescendants" value="true"/>
                             <button type="submit" class="btn btn-warning">
@@ -95,7 +95,7 @@
                         </form>
 
                         <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
-                              method="post" class="d-inline">
+                              method="post" class="d-inline" th:attr="data-confirm-message=#{exportnodes.confirmSeparateSingle(${node.name},${node.nodeId})}">
                             <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                             <input type="hidden" name="includeDescendants" value="false"/>
                             <button type="submit" class="btn btn-warning">
@@ -105,7 +105,7 @@
                         </form>
 
                         <form th:action="@{/exportWithSubNodes/{nodeId}(nodeId=${node.nodeId})}"
-                              method="post" class="d-inline">
+                              method="post" class="d-inline" th:attr="data-confirm-message=#{exportnodes.confirmSeparateBranch(${node.name},${node.nodeId})}">
                             <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                             <input type="hidden" name="includeDescendants" value="true"/>
                             <button type="submit" class="btn btn-warning">

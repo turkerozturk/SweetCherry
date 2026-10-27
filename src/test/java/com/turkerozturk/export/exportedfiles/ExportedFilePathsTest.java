@@ -25,7 +25,7 @@ class ExportedFilePathsTest {
         var controller=new FileDeleteController();
         org.springframework.test.util.ReflectionTestUtils.setField(controller,"applicationPath",workingDirectory.toString());
         org.springframework.test.util.ReflectionTestUtils.setField(controller,"exportingFolderName","exportedFiles");
-        assertThat(controller.deleteFile(name).getStatusCode().value()).isEqualTo(200);
+        assertThat(controller.deleteFile(name).getStatus().value()).isEqualTo(200);
         assertThat(java.nio.file.Files.exists(file)).isFalse();
     }
 

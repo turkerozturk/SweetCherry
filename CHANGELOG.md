@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add reader-safe Go to Node ID navigation with clipboard and filtered bookmark shortcuts. Translate exported-file actions/results, provide a return link after deletion, and confirm each CTB export before submitting.
+
 - Wrap every CTB export in a dated, bold source container. Remap internal links within the exported branch and redirect missing/excluded targets to a rich-text report, preserving copied content timestamps and shared hierarchy.
 
 - Filter Move to bookmark shortcuts by title; compact bookmark date/order columns and headings without wrapping drag handles.

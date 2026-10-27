@@ -39,26 +39,8 @@ public class NodeMoveService {
                 if (!rows.next()) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Tree node not found");
             }
         }
-        var targets = new ArrayList<BookmarkTarget>();
-        String sql = "SELECT b.node_id,n.name,n.is_ro,n.is_richtxt,n.syntax FROM bookmark b "
-                + "JOIN children c ON c.node_id=b.node_id JOIN node n ON n.node_id="
-                + "CASE WHEN COALESCE(c.master_id,0)=0 THEN c.node_id ELSE c.master_id END "
-                + "ORDER BY b.sequence,b.node_id";
-        try (var query = connection.prepareStatement(sql); var rows = query.executeQuery()) {
-            while (rows.next()) {
-                // Use the same icon/color decoding as the normal node views, without an entity load.
-                var display = new com.turkerozturk.node.Node();
-                display.setIsReadOnly16bit(rows.getLong(3));
-                display.setIsRichText(rows.getLong(4));
-                display.setSyntax(Objects.requireNonNullElse(rows.getString(5),"plain-text"));
-                display.parseNodeIconAndReadOnlyFlag();
-                display.parseNodeTitleColorAndBoldnessAndTextType();
-                targets.add(new BookmarkTarget(Long.toString(rows.getLong(1)),
-                        Objects.requireNonNullElse(rows.getString(2),""),display.getNodeIcon().getIconName(),
-                        display.isBoldnessBit(),String.format(Locale.ROOT,"#%06X",display.getTitleColor())));
-            }
-        }
-        return List.copyOf(targets);
+        return com.turkerozturk.bookmark.BookmarkShortcuts.read(connection).stream()
+                .map(item -> new BookmarkTarget(item.nodeId(), item.name(), item.iconName(), item.bold(), item.color())).toList();
     }
 
     /** Returns only moves that are valid for the current tree snapshot. */

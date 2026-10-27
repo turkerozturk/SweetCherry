@@ -116,6 +116,12 @@
         message(form, form.dataset.loading);
         dialog.showModal();
         form.elements.parentId.focus();
+        if (form.dataset.navigation === 'true') {
+            form.dataset.phase = 'ready';
+            message(form, '');
+            controls(form, false);
+            return;
+        }
         try {
             const url = new URL(form.dataset.stateUrl, window.location.href);
             url.searchParams.set('_tenantView', form.elements._tenantView.value);
@@ -148,7 +154,8 @@
             if (!window.isSecureContext || !navigator.clipboard?.readText) throw new Error('Clipboard unavailable');
             const value = (await navigator.clipboard.readText()).trim();
             if (!current()) return;
-            if (!/^[0-9]{1,19}$/.test(value) || BigInt(value) > 9223372036854775807n) {
+            if (!/^[0-9]{1,19}$/.test(value) || BigInt(value) > 9223372036854775807n
+                    || (form.dataset.navigation === 'true' && BigInt(value) === 0n)) {
                 message(form, form.dataset.invalid, true);
             } else {
                 fillParent(form, value);
@@ -167,6 +174,12 @@
         }
     }
     document.addEventListener('click', event => {
+        const go = event.target.closest('[data-node-go-open]');
+        if (go) {
+            const group = document.querySelector('[data-node-go]');
+            if (!go.disabled && group) open(group);
+            return;
+        }
         const opener = event.target.closest('[data-move-to-open]');
         if (opener) { open(opener.closest('[data-node-move-to]')); return; }
         const pasteButton = event.target.closest('[data-move-to-paste]');
@@ -197,15 +210,35 @@
     }, true);
     document.addEventListener('submit', async event => {
         const form = event.target;
-        if (!form.matches('[data-node-move-to] form')) return;
+        if (!form.matches('[data-node-move-to] form, [data-node-go] form')) return;
         event.preventDefault();
         if (form.dataset.phase !== 'ready' || form.dataset.pasting === 'true' || !form.reportValidity()) return;
         form.dataset.phase = 'saving';
         controls(form, true);
         message(form, form.dataset.loading);
         try {
-            const response = await fetch(form.action, {method:'POST', credentials:'same-origin', redirect:'error',
-                headers:{Accept:'application/json'}, body:new URLSearchParams(new FormData(form))});
+            const navigating = form.dataset.navigation === 'true';
+            let response;
+            if (navigating) {
+                const url = new URL(form.action, window.location.href);
+                url.searchParams.set('nodeId', form.elements.parentId.value.trim());
+                url.searchParams.set('_tenantView', form.elements._tenantView.value);
+                response = await fetch(url, {credentials:'same-origin',cache:'no-store',redirect:'error',headers:{Accept:'application/json'}});
+                if (response.ok && !response.redirected) {
+                    const destination = await response.json();
+                    const target = new URL(destination.url, window.location.href);
+                    if (target.origin !== new URL(window.location.href).origin) throw new Error('Invalid destination');
+                    // An editor's leave guard may cancel navigation; leave the dialog usable.
+                    form.dataset.phase = 'ready';
+                    controls(form, false);
+                    form.closest('dialog').close();
+                    window.location.assign(target.href);
+                    return;
+                }
+            } else {
+                response = await fetch(form.action, {method:'POST', credentials:'same-origin', redirect:'error',
+                    headers:{Accept:'application/json'}, body:new URLSearchParams(new FormData(form))});
+            }
             if (response.status === 204) {
                 window.location.assign(form.elements.returnUrl.value);
                 return;
