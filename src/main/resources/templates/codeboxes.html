@@ -2,20 +2,20 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layout}">
 <head>
-    <title>CodeBoxes</title>
+    <title th:text="#{objects.codeboxes}"></title>
 </head>
 <body>
 <section layout:fragment="content">
 
-<h1>CodeBox List</h1>
+<h1 th:text="#{objects.codeboxes}"></h1>
 
 <table class="table">
     <thead>
     <tr>
         <th>#</th>
-        <th>Node Id</th>
-        <th>Offset</th>
-        <th>Syntax</th>
+        <th th:text="#{objects.nodeId}">Node Id</th>
+        <th th:text="#{objects.offset}">Offset</th>
+        <th th:text="#{objects.syntax}">Syntax</th>
 
     </tr>
     </thead>

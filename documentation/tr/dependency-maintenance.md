@@ -37,6 +37,7 @@ Bu tablo `9908748` commit’indeki POM ile eşleştirilmiştir. “Korundu” if
 | MySQL JDBC | 9.0.0 | Boot yönetimindeki sürümle uyumluluk ve MySQL/MariaDB kullanım kapsamı ayrıca incelenir. Gerçek sunucu bağlantısı test edilmeden “uyumlu” sayılmaz. |
 | PDFBox | 3.0.8 (önce 3.0.1) | İkinci grupta 3.0.8 seçildi. Güvenlik sayfasındaki 2026 path-traversal duyuruları `examples` modülünü ilgilendirir; core kullanımımız otomatik olarak bu açık sayılmaz. Font/görsel/PDF çıktısı ayrı test grubu. |
 | OpenPDF ve extra fonts | 2.0.5 / 2.0.5 | Birlikte tutulur. 2.0.x Java 17; 2.1.x ve sonrası Java 21 ister. Yeni ana sürümler paket adı değişikliği de içerir. Java 17 dağıtımı korunurken doğrudan en yeni ana sürüme geçilmez. |
+| JLaTeXMath + Greek/Cyrillic fonts | 1.0.7 | `sweetcherry.jlatexmath.version`; Java 17’de offline PNG ve PDF vektör çizimi. Tam TeX motoru değildir. Demo formülü ve PNG fallback testleriyle doğrulanır. |
 | Flying Saucer PDF | 9.13.3 | OpenPDF ile çözülen transitif sürüm ve kullanılan HTML→PDF API'leri birlikte incelenir. |
 | jsoup | 1.23.2 | 2026-10-06 tarihinde güncellendi; 258 test başarılı. XML/HTML serileştirme davranışı rich-text okuma/önizleme/rendering çıktılarını etkileyebilir; node 53 ve boş/alias/plain-text senaryoları karşılaştırılır. |
 | Thymeleaf layout | 3.3.0 | Yerleşim ve fragment davranışlarıyla ayrı kontrol. |

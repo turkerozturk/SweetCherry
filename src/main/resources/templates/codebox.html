@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layout}">
 <head>
-    <title>Node's Codeboxes</title>
+    <title th:text="#{objects.codeboxes}"></title>
 
     <section layout:fragment="pageSpecificCssStyles">
 
@@ -13,30 +13,29 @@
 <body>
 <section layout:fragment="content">
 
-<h1>Codeboxes of Node #
-    <a th:href="@{/nodes/{nodeId}(nodeId=${codeboxes[0].id.nodeId})}"
+<h1 th:if="${codeboxes != null and !codeboxes.isEmpty()}"><span th:text="#{objects.codeboxesOf}"></span> <a th:href="@{/nodes/{nodeId}(nodeId=${codeboxes[0].id.nodeId})}"
        th:text="${codeboxes[0].id.nodeId}"
-    ></a>
-</h1>
+    ></a></h1>
 
-<p>
-    <b>Node Name: </b>
+<p th:if="${codeboxes != null and !codeboxes.isEmpty()}">
+    <b th:text="#{objects.nodeName}">Node name:</b>
     <span th:text="${codeboxes[0].node.name}"></span>
 </p>
 
+<p th:if="${codeboxes == null or codeboxes.isEmpty()}" class="text-body-secondary" th:text="#{objects.empty}"></p>
 <table class="table table-border">
     <thead>
     <tr>
-        <th>Node Id</th>
-        <th>Offset</th>
-        <th>Justification</th>
-        <th>Text(Highlighted)</th>
-        <th>Syntax</th>
-        <th>Width</th>
-        <th>Height</th>
-        <th>is_width_pix</th>
-        <th>do_highl_bra</th>
-        <th>do_show_linenum</th>
+        <th th:text="#{objects.nodeId}">Node Id</th>
+        <th th:text="#{objects.offset}">Offset</th>
+        <th th:text="#{objects.alignment}">Justification</th>
+        <th th:text="#{objects.highlighted}">Text(Highlighted)</th>
+        <th th:text="#{objects.syntax}">Syntax</th>
+        <th th:text="#{objects.width}">Width</th>
+        <th th:text="#{objects.height}">Height</th>
+        <th th:text="#{objects.widthPixels}">is_width_pix</th>
+        <th th:text="#{objects.highlightBrackets}">do_highl_bra</th>
+        <th th:text="#{objects.lineNumbers}">do_show_linenum</th>
     </tr>
     </thead>
     <tbody>
@@ -44,16 +43,16 @@
         <tr>
             <td th:text="${codebox.id.nodeId}"></td>
             <td th:text="${codebox.id.offset}"></td>
-            <td th:text="${codebox.justification}"></td>
+            <td th:text="${#lists.contains({'left','right','center','fill'}, codebox.justification)} ? ${#messages.msg('objects.align.' + codebox.justification)} : ${codebox.justification}"></td>
             <td>
                 <div th:utext="${codeHighLighter.mappedhighlightLanguage(codebox.syntax, codebox.txt)}">icerik</div>
             </td>
             <td th:text="${codebox.syntax}"></td>
             <td th:text="${codebox.width}"></td>
             <td th:text="${codebox.height}"></td>
-            <td th:text="${codebox.isWidthPix}"></td>
-            <td th:text="${codebox.doHighlBra}"></td>
-            <td th:text="${codebox.doShowLinenum}"></td>
+            <td th:text="${codebox.isWidthPix != null and codebox.isWidthPix != 0} ? #{node.meta.yes} : #{node.meta.no}"></td>
+            <td th:text="${codebox.doHighlBra != null and codebox.doHighlBra != 0} ? #{node.meta.yes} : #{node.meta.no}"></td>
+            <td th:text="${codebox.doShowLinenum != null and codebox.doShowLinenum != 0} ? #{node.meta.yes} : #{node.meta.no}"></td>
 
         </tr>
     </th:block>

@@ -2,27 +2,28 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layout}">
 <head>
-    <title>Node's Images</title>
+    <title th:text="#{objects.images}"></title>
 </head>
 <body>
 <section layout:fragment="content">
 
-<h1>Pictures of Node #<a th:href="@{/nodes/{nodeId}(nodeId=${images[0].nodeId})}" th:text="${images[0].nodeId}"></a></h1>
-    <p>
-        <b>Node Name: </b>
+<h1 th:if="${images != null and !images.isEmpty()}"><span th:text="#{objects.imagesOf}"></span> <a th:href="@{/nodes/{nodeId}(nodeId=${images[0].nodeId})}" th:text="${images[0].nodeId}"></a></h1>
+    <p th:if="${images != null and !images.isEmpty()}">
+        <b th:text="#{objects.nodeName}">Node name:</b>
         <span th:text="${images[0].node.name}"></span>
     </p>
+<p th:if="${images == null or images.isEmpty()}" class="text-body-secondary" th:text="#{objects.empty}"></p>
 <table border="1">
     <thead>
     <tr>
-        <th>Node Id</th>
-        <th>Offset</th>
-        <th>Justification</th>
-        <th>anchor</th>
-        <th class="col-1">Image</th>
-        <th>File Name</th>
-        <th>Link</th>
-        <th>Time</th>
+        <th th:text="#{objects.nodeId}">Node Id</th>
+        <th th:text="#{objects.offset}">Offset</th>
+        <th th:text="#{objects.alignment}">Justification</th>
+        <th th:text="#{objects.anchor}">anchor</th>
+        <th class="col-1" th:text="#{objects.image}">Image</th>
+        <th th:text="#{objects.filename}">File Name</th>
+        <th th:text="#{objects.link}">Link</th>
+        <th th:text="#{objects.time}">Time</th>
     </tr>
     </thead>
     <tbody>
@@ -30,7 +31,7 @@
         <tr>
             <td th:text="${image.nodeId}"></td>
             <td th:text="${image.offset}"></td>
-            <td th:text="${image.justification}"></td>
+            <td th:text="${#lists.contains({'left','right','center','fill'}, image.justification)} ? ${#messages.msg('objects.align.' + image.justification)} : ${image.justification}"></td>
             <td th:text="${image.anchor}"></td>
             <td>
             <!--    <img th:src="${'data:image/png;base64,' + #strings.encodeBase64(image.png)}" width="100"/> -->

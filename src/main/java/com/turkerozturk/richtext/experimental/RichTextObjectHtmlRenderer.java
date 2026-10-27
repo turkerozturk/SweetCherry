@@ -85,6 +85,7 @@ public final class RichTextObjectHtmlRenderer {
                         + Base64.getEncoder().encodeToString(bytes) + "\">";
             }
             case ATTACHMENT -> {
+                if (payload instanceof EmbeddedContent.Latex latex) yield renderLatex(latex.source());
                 if (!(payload instanceof EmbeddedContent.Attachment attachment)) throw mismatch(ref);
                 String label = "<span aria-hidden=\"true\">📎</span> " + escape(attachment.filename());
                 if (tenantView == null || tenantView.isBlank()) yield "<span class=\"rich-text-attachment\">" + label + "</span>";
@@ -106,6 +107,18 @@ public final class RichTextObjectHtmlRenderer {
                 yield renderTable(table);
             }
         };
+    }
+
+    private String renderLatex(String source) {
+        try {
+            var image=com.turkerozturk.richtext.latex.LatexRenderer.render(source);
+            String marker=pdfHeadings ? " data-sc-latex=\"" + Base64.getEncoder().encodeToString(image.math().getBytes(StandardCharsets.UTF_8)) + "\"" : "";
+            return "<img class=\"rich-text-latex\" alt=\"LaTeX\" title=\"" + escape(source)
+                    + "\" style=\"max-width:100%;height:auto;width:"+image.width()+"px\""+marker
+                    + " src=\"data:image/png;base64,"+Base64.getEncoder().encodeToString(image.png())+"\">";
+        } catch (IllegalArgumentException invalid) {
+            return "<code class=\"rich-text-latex-source\">"+escape(source)+"</code>";
+        }
     }
 
     /** Displays the final storage row as a header without changing the stored row order. */

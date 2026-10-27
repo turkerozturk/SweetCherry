@@ -62,6 +62,7 @@
 		<sweetcherry.htmx.version>4.0.0</sweetcherry.htmx.version>
 		<sweetcherry.sqlite-jdbc.version>3.53.4.0</sweetcherry.sqlite-jdbc.version>
 		<sweetcherry.mysql-connector.version>9.0.0</sweetcherry.mysql-connector.version>
+		<sweetcherry.jlatexmath.version>1.0.7</sweetcherry.jlatexmath.version>
 		<sweetcherry.openpdf.version>2.0.5</sweetcherry.openpdf.version>
 		<sweetcherry.flying-saucer.version>9.13.3</sweetcherry.flying-saucer.version>
 		<sweetcherry.jsoup.version>1.23.2</sweetcherry.jsoup.version>
@@ -211,6 +212,13 @@
 			<artifactId>pdfbox</artifactId>
 			<version>${pdfbox.version}</version>
 		</dependency>
+
+		<!-- Offline math rendering; no external TeX installation required. -->
+        <dependency>
+            <groupId>org.scilab.forge</groupId>
+            <artifactId>jlatexmath</artifactId>
+            <version>${sweetcherry.jlatexmath.version}</version>
+        </dependency>
 
 		<!-- OpenPDF -->
 		<!-- https://github.com/LibrePDF/OpenPDF -->

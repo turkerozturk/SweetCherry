@@ -9,6 +9,7 @@ public sealed interface EmbeddedContent {
         public PngImage { bytes = bytes.clone(); }
         @Override public byte[] bytes() { return bytes.clone(); }
     }
+    record Latex(String source) implements EmbeddedContent { }
     record Attachment(String filename) implements EmbeddedContent { }
     record Anchor(String name) implements EmbeddedContent { }
     record CodeBox(String text, String syntax) implements EmbeddedContent { }

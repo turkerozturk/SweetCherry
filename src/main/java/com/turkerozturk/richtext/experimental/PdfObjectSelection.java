@@ -17,7 +17,7 @@ public record PdfObjectSelection(boolean images, boolean codeboxes, boolean tabl
         return isLatex(payload) ? "latex" : ref.kind().name().toLowerCase(java.util.Locale.ROOT);
     }
     private boolean isLatex(EmbeddedContent payload) {
-        return payload instanceof EmbeddedContent.Attachment attachment
+        return payload instanceof EmbeddedContent.Latex || payload instanceof EmbeddedContent.Attachment attachment
                 && "__ct_special.tex".equals(attachment.filename());
     }
 }

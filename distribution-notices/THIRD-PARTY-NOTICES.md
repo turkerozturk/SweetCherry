@@ -1,8 +1,8 @@
-# SweetCherry 1.1.0 — third-party notices
+# SweetCherry — third-party notices
 
-SweetCherry is distributed under GNU GPL v3 or later. See the root `LICENSE` and [application source at v1.1.0](https://github.com/turkerozturk/SweetCherry/tree/v1.1.0). The application version and exact build commit are recorded in `windows-bundle.json` for each Windows package. License and attribution files are copied into the normal Maven distribution before bundling.
+SweetCherry is distributed under GNU GPL v3 or later. See the root `LICENSE` and [application source](https://github.com/turkerozturk/SweetCherry). The application version and exact build commit are recorded in `windows-bundle.json` for each Windows package. License and attribution files are copied into the normal Maven distribution before bundling.
 
-The dependency and copied-asset license inventory was prepared for 1.0.0. The declared Maven dependencies and copied third-party assets covered by this inventory are unchanged for 1.1.0; application code and documentation have changed. Runtime license files accompany the actual Java runtime bundled by the Windows workflow.
+The original dependency and copied-asset license inventory was prepared for 1.0.0 and retained for 1.1.0. Later additions are documented below with their own license files and source references; the original inventory is a historical snapshot. Runtime license files accompany the actual Java runtime bundled by the Windows workflow.
 
 Third-party components retain their own licenses. This inventory records the actual Windows bundle, original license files, source copyright notices and upstream references. It is an attribution record, not a legal certification. License alternatives in a POM are reproduced as declared, not a requirement to combine mutually alternative licenses.
 
@@ -206,3 +206,13 @@ Names below are declarations resolved from artifact/parent POM metadata, except 
 | webjars-locator-lite-1.1.3.jar | MIT | [sources](https://repo.maven.apache.org/maven2/org/webjars/webjars-locator-lite/1.1.3/webjars-locator-lite-1.1.3-sources.jar) |
 | jspecify-1.0.0.jar | The Apache License, Version 2.0 | [sources](https://repo.maven.apache.org/maven2/org/jspecify/jspecify/1.0.0/jspecify-1.0.0-sources.jar) |
 | spring-boot-jarmode-tools-3.5.16.jar | Apache License, Version 2.0 | [sources](https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-jarmode-tools/3.5.16/spring-boot-jarmode-tools-3.5.16-sources.jar) |
+
+## Added after the 1.2.0 release: JLaTeXMath 1.0.7
+
+LaTeX display uses `org.scilab.forge:jlatexmath:1.0.7` and its Greek/Cyrillic font artifacts.
+The original LICENSE/COPYING and bundled font notices are preserved under
+`licenses/jlatexmath-1.0.7/`. The included inventory records exact artifact hashes
+and Maven Central corresponding-source archive URLs. Upstream source and license:
+https://github.com/opencollab/jlatexmath . JLaTeXMath declares GPL v2 with the
+Classpath Exception; font notices remain separate. Only line endings and trailing whitespace in the extracted text copies are normalized for Git; the JARs retain the original files.
+No external TeX executable is bundled or invoked.

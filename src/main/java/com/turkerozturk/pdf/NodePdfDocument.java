@@ -61,7 +61,7 @@ public final class NodePdfDocument {
         content.select("script,style,link,iframe,object,embed,form,input,button").remove();
         for (var element : content.body().getAllElements()) {
             for (var attribute : new java.util.ArrayList<>(element.attributes().asList())) {
-                if (!java.util.Set.of("style", "href", "src", "id", "class", "colspan", "rowspan", "alt", "data-pdf-heading").contains(attribute.getKey()))
+                if (!java.util.Set.of("style", "href", "src", "id", "class", "colspan", "rowspan", "alt", "data-pdf-heading", "data-sc-latex").contains(attribute.getKey()))
                     element.removeAttr(attribute.getKey());
             }
             // Only parser-generated CSS is retained; never allow resource-fetching CSS.
@@ -115,6 +115,10 @@ public final class NodePdfDocument {
             totalImageBytes += bytes.length;
             if (totalImageBytes > limits.getMaxImageBytes()) throw tooLarge();
             int[] size = imageSize(bytes);
+            boolean latex=image.hasAttr("data-sc-latex");
+            if(latex) { size[0]=Math.max(1,size[0]/2);size[1]=Math.max(1,size[1]/2); }
+            // Monochrome mode retains the grayscale PNG rather than colored vector glyphs.
+            if(!options.colors()) image.removeAttr("data-sc-latex");
             // Fix explicit dimensions before layout: max-width alone is insufficient in this renderer.
             double width = options.paper().equals("A4") ? 793.7 : 816;
             double height = options.paper().equals("A4") ? 1122.5 : 1056;
@@ -123,8 +127,8 @@ public final class NodePdfDocument {
             if (!options.colors()) {
                 try {
                     var bitmap = ImageIO.read(new ByteArrayInputStream(bytes));
-                    var gray = new java.awt.image.BufferedImage(size[0], size[1], java.awt.image.BufferedImage.TYPE_INT_ARGB);
-                    for (int y = 0; y < size[1]; y++) for (int x = 0; x < size[0]; x++) {
+                    var gray = new java.awt.image.BufferedImage(bitmap.getWidth(), bitmap.getHeight(), java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                    for (int y = 0; y < bitmap.getHeight(); y++) for (int x = 0; x < bitmap.getWidth(); x++) {
                         int pixel = bitmap.getRGB(x, y);
                         int value = (int)(.299 * ((pixel >> 16) & 255) + .587 * ((pixel >> 8) & 255) + .114 * (pixel & 255));
                         gray.setRGB(x, y, (pixel & 0xff000000) | (value << 16) | (value << 8) | value);

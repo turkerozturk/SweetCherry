@@ -21,6 +21,10 @@ public final class EmbeddedContentAdapter {
         if (image.getAnchor() != null && !image.getAnchor().isEmpty()) {
             return new EmbeddedContent.Anchor(image.getAnchor());
         }
+        if (com.turkerozturk.richtext.latex.LatexRenderer.FILENAME.equals(image.getFileName())) {
+            try { return new EmbeddedContent.Latex(com.turkerozturk.richtext.latex.LatexRenderer.decode(image.getPng())); }
+            catch (IllegalArgumentException invalid) { return new EmbeddedContent.Attachment(image.getFileName()); }
+        }
         if (image.getFileName() != null && !image.getFileName().isEmpty()) {
             return new EmbeddedContent.Attachment(image.getFileName());
         }

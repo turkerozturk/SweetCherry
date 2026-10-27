@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Translate object browsing pages and handle empty object lists. Render CherryTree LaTeX attachments offline with JLaTeXMath as web PNGs and PDF vector outlines, with PNG/source fallback and unchanged editor storage. Include library/font notices.
+
 - Translate CTB export results and node-info booleans/content categories; keep the raw rich-text flag row in a Thymeleaf comment.
 - Add optional plain-text content notes to Freeplane/FreeMind export, including link targets and text representations of objects without reading image/attachment BLOBs.
 

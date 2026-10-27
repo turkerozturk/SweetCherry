@@ -259,4 +259,22 @@ class RichTextEditingServiceTest {
         verify(query).executeUpdate();
     }
 
+    @Test void latexAttachmentRemainsProtectedAndUnchangedAfterNoOpSave() throws Exception {
+        byte[] original="\\documentclass{article}\n\\begin{document}x^2\\end{document}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        when(node.getSyntax()).thenReturn("custom-colors");when(node.getIsRichText()).thenReturn(1L);
+        when(node.getTxt()).thenReturn("<node><rich_text>Text</rich_text></node>");
+        try(var insert=connection.prepareStatement("INSERT INTO image VALUES(12,1,'left','',?,'__ct_special.tex','',0)")) {
+            insert.setBytes(1,original);insert.executeUpdate();
+        }
+        var editor=service.open(12);
+        assertThat(editor.objects().get("image:1").label()).contains("__ct_special.tex");
+        String xml=new com.turkerozturk.richtext.experimental.RichTextXmlWriter().write(editor.document());
+        service.save(12,xml,editor.revision());
+        verify(query,never()).executeUpdate();
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT offset,png,filename FROM image")) {
+            assertThat(rows.next()).isTrue();assertThat(rows.getInt(1)).isEqualTo(1);
+            assertThat(rows.getBytes(2)).isEqualTo(original);assertThat(rows.getString(3)).isEqualTo("__ct_special.tex");
+        }
+    }
+
 }

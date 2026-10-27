@@ -2,20 +2,20 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layout}">
 <head>
-    <title>Images</title>
+    <title th:text="#{objects.images}"></title>
 </head>
 <body>
 <section layout:fragment="content">
 
-<h1>Images List</h1>
+<h1 th:text="#{objects.images}"></h1>
 
 <table border="1">
     <thead>
     <tr>
-        <th>Node Id</th>
-        <th>Offset</th>
-        <th>File Name</th>
-        <th>Link</th>
+        <th th:text="#{objects.nodeId}">Node Id</th>
+        <th th:text="#{objects.offset}">Offset</th>
+        <th th:text="#{objects.filename}">File Name</th>
+        <th th:text="#{objects.link}">Link</th>
 
     </tr>
     </thead>

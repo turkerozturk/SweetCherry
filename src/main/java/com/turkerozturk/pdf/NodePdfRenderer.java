@@ -35,6 +35,7 @@ public class NodePdfRenderer {
                     return resource;
                 }
             });
+            renderer.getSharedContext().setReplacedElementFactory(new LatexPdfElements(renderer.getSharedContext().getReplacedElementFactory()));
             renderer.setDocument(document, null);
             renderer.layout();
             var output = new ByteArrayOutputStream();
