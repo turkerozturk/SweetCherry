@@ -40,6 +40,9 @@ public class MindMapExportController {
     private com.turkerozturk.multipledatabases.TenantIcons tenantIcons;
     private String databaseIcon(){return tenantIcons==null ? com.turkerozturk.multipledatabases.TenantIcons.DEFAULT : tenantIcons.icon(TenantContext.getCurrentTenant());}
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private MindMapTextContent textContent;
+
     private final ChildrenRepository childrenRepository;
     private final NodeRepository nodeRepository;
 
@@ -83,7 +86,8 @@ public class MindMapExportController {
                     name = "includeColors",
                     defaultValue = "true"
             ) boolean includeColors,
-            @RequestParam(name = "iconMode", required = false) String iconMode
+            @RequestParam(name = "iconMode", required = false) String iconMode,
+            @RequestParam(name = "includeContent", defaultValue = "false") boolean includeContent
     ) throws XMLStreamException, IOException {
 
         boolean bundleIcons = includeIcons;
@@ -111,7 +115,7 @@ public class MindMapExportController {
         if (nodeId != 0 && rootChildren == null) throw new ResponseStatusException(NOT_FOUND);
         String rootName = nodeId == 0 ? databaseName() : findDisplayNode(rootChildren).getName();
         byte[] mindMapContent = createMindMap(rootChildren, rootName, maximumLevel,
-                foldMode, includeIcons, includeColors);
+                foldMode, includeIcons, includeColors, includeContent);
         String filename = sanitizeFilename(rootName) + "-" + nodeId + ".mm";
         if (bundleIcons) {
             mindMapContent = new MindMapIconArchive().create(filename, mindMapContent);
@@ -140,6 +144,13 @@ public class MindMapExportController {
                 .body(mindMapContent);
     }
 
+    /** Existing callers omit content unless explicitly requested. */
+    public ResponseEntity<byte[]> exportMindMap(long nodeId, Integer maximumLevel,
+            String foldModeValue, boolean includeIcons, boolean includeColors, String iconMode)
+            throws XMLStreamException, IOException {
+        return exportMindMap(nodeId, maximumLevel, foldModeValue, includeIcons, includeColors, iconMode, false);
+    }
+
     /** Retains the original Java-call contract: including icons also bundles their files. */
     public ResponseEntity<byte[]> exportMindMap(long nodeId, Integer maximumLevel,
             String foldModeValue, boolean includeIcons, boolean includeColors)
@@ -159,7 +170,8 @@ public class MindMapExportController {
             Integer maximumLevel,
             FoldMode foldMode,
             boolean includeIcons,
-            boolean includeColors
+            boolean includeColors,
+            boolean includeContent
     ) throws XMLStreamException {
 
         ByteArrayOutputStream output =
@@ -210,13 +222,13 @@ public class MindMapExportController {
                 if (maximumLevel == null || maximumLevel > 0) {
                     for (Children child : childrenRepository.findByFatherIdOrderBySequenceAsc(0L)) {
                         writeNodeRecursively(writer, child, 1, maximumLevel, foldMode,
-                                includeIcons, includeColors, visitedNodeIds);
+                                includeIcons, includeColors, includeContent, visitedNodeIds);
                     }
                 }
                 writer.writeEndElement();
             } else {
                 writeNodeRecursively(writer, root, 0, maximumLevel, foldMode,
-                        includeIcons, includeColors, visitedNodeIds);
+                        includeIcons, includeColors, includeContent, visitedNodeIds);
             }
 
             writer.writeCharacters("\n");
@@ -239,6 +251,7 @@ public class MindMapExportController {
             FoldMode foldMode,
             boolean includeIcons,
             boolean includeColors,
+            boolean includeContent,
             Set<Long> visitedNodeIds
     ) throws XMLStreamException {
 
@@ -287,17 +300,17 @@ public class MindMapExportController {
                 )
         );
 
-        if (isRootNode) {
-            writer.writeAttribute("STYLE", "oval");
-                if(includeIcons) {
-                    writer.writeStartElement("hook");writer.writeAttribute("NAME","ExternalObject");
-                    writer.writeAttribute("URI","ctbicons/"+databaseIcon()+".png");writer.writeAttribute("SIZE","1.0");writer.writeEndElement();
-                }
-        }
+        if (isRootNode) writer.writeAttribute("STYLE", "oval");
 
         String color = displayNode.getTitleColorAsHtmlHex();
         if (includeColors && isValidHtmlColor(color)) {
             writer.writeAttribute("COLOR", color);
+        }
+
+        // All node attributes must precede the first child hook/font/note element.
+        if (isRootNode && includeIcons) {
+            writer.writeStartElement("hook");writer.writeAttribute("NAME","ExternalObject");
+            writer.writeAttribute("URI","ctbicons/"+databaseIcon()+".png");writer.writeAttribute("SIZE","1.0");writer.writeEndElement();
         }
 
         writeFontElement(
@@ -312,6 +325,21 @@ public class MindMapExportController {
 
         if (includeIcons) {
             writeIconHook(writer, displayNode);
+        }
+
+        if (includeContent) {
+            String content = textContent.text(displayNode.getNodeId(), displayNode.getSyntax(), displayNode.getTxt());
+            writer.writeStartElement("richcontent");
+            writer.writeAttribute("TYPE", "NOTE");
+            writer.writeStartElement("html");
+            writer.writeEmptyElement("head");
+            writer.writeStartElement("body");
+            writer.writeStartElement("pre");
+            writer.writeCharacters(content);
+            writer.writeEndElement(); // pre
+            writer.writeEndElement(); // body
+            writer.writeEndElement(); // html
+            writer.writeEndElement(); // richcontent
         }
 
         boolean mayWriteChildren =
@@ -336,6 +364,7 @@ public class MindMapExportController {
                         foldMode,
                         includeIcons,
                         includeColors,
+                        includeContent,
                         visitedNodeIds
                 );
             }

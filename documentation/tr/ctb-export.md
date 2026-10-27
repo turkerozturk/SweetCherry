@@ -225,3 +225,51 @@ tek düğüm, shared düğüm ve tüm veritabanı aktarımında kullanılabilir.
 `/exportedFiles` sayfasındaki **İçe aktar** işlemi, bir CTB’nin tüm kayıtlarını
 yazılabilir aktif veritabanına önizleme ve onayla ekler. ID ve paylaşımlı düğüm
 eşleme kuralları ile manuel kontroller: [CTB içe aktarma](ctb-import.md).
+
+## Freeplane / FreeMind: içeriği düz metin notu olarak dahil etme
+
+`/mindmap-export` formundaki **İçeriği düz metin notları olarak dahil et** seçeneği
+varsayılan olarak kapalıdır. Kapalıyken önceki gibi yalnız başlıklar aktarılır;
+nesne içerikleri için ek sorgu yapılmaz. Açıldığında her gerçek/shared konumun
+master içeriği kendi **Not / Note** alanına yazılır. Ana harita başlığı değişmez.
+Freeplane’de not panelini açarak içeriği görebilirsiniz.
+
+- Plain text ve kod türündeki düğüm metni olduğu gibi, rich text ise biçimlendirmesiz
+  metin olarak aktarılır. Türkçe/Unicode ve satır sonları korunur.
+- Bağlantı metninin ardından parantez içinde hedef yazılır. Aynı bağlantının farklı
+  biçimli ardışık metin parçaları birleştirilir. Internal bağlantılarda kaynak konum
+  `/nodes/ID#anchor` olarak gösterilir; oturum/tenant token’ı eklenmez. Bunlar harita
+  içinde yeniden eşlenmiş, tıklanabilir internal linkler değildir.
+- Resimler `[Image (...)]`, ekler dosya adı, anchor’lar adıyla gösterilir. Varsa
+  nesne offset’i, kaynak master ID’si, zaman bilgisi ve link hedefi eklenir.
+  Resim/attachment BLOB alanları okunmaz veya haritaya gömülmez.
+- Kod kutuları dil adı ve metinleriyle; tablolar başlık satırı önce olacak biçimde
+  sekmeyle ayrılmış hücreler ve satır sonlarıyla yazılır. LaTeX’in dosya/nesne bilgisi
+  metin olarak kalır; resim veya denklem oluşturulmaz.
+- Düz metin, `richcontent TYPE="NOTE"` içindeki XHTML `pre` alanında XML-escaped
+  olarak saklanır. Not içinde script, resim veya tıklanabilir HTML üretilmez;
+  bağlantılar ve dosyalar dışarıdan indirilmez.
+- Seviye sınırı ve shared konum hiyerarşisi değişmez. Sentetik veritabanı kökünün
+  kendine ait içeriği olmadığından notu olmaz. Üç ikon seçeneği ve ZIP ile kullanılabilir.
+- İçeriği dahil etmek çıktı boyutunu ve işlem süresini artırır. Geçersiz XML,
+  tablo veya nesne offset’i sessizce atlanmaz; ilgili kaynak içerik ID’siyle aktarım
+  reddedilir. Kaynak veritabanına yazılmaz.
+
+Biçim kaynağı: [Freeplane dosya biçimi](https://docs.freeplane.org/attic/old-mediawiki-content/Current_Freeplane_File_Format.html),
+[NoteBuilder.java](https://github.com/freeplane/freeplane/blob/master/freeplane/src/main/java/org/freeplane/features/note/NoteBuilder.java).
+
+Manuel kontrol: seçeneğin varsayılan kapalı olduğunu; açıkken Freeplane not panelinde
+Türkçe metin/satır sonları, URL’ler, resim/ek etiketleri, tablo ve kod metnini kontrol
+edin. Shared bir kökün kendi çocuklarının aktarılıp master’ın başka konumdaki
+çocuklarının gelmediğini doğrulayın. ID boşken tüm veritabanını ve ikonlu ZIP’i de deneyin.
+
+### English — include content
+
+The optional **Include content as plain-text notes** checkbox is off by default.
+When enabled, each exported occurrence gets its content in the Freeplane/FreeMind
+**Note** field, leaving node titles and hierarchy unchanged. Unicode/line breaks
+are preserved; links show their targets in parentheses. Images, attachments and
+anchors become descriptive labels; code boxes and tables become text. Binary data
+is never selected or embedded, and no external URL is fetched. Shared occurrences
+use master content but keep their own children. Depth and icon/ZIP settings still
+apply. Open Freeplane’s note panel to see the exported content.

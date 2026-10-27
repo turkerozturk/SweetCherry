@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Translate CTB export results and node-info booleans/content categories; keep the raw rich-text flag row in a Thymeleaf comment.
+- Add optional plain-text content notes to Freeplane/FreeMind export, including link targets and text representations of objects without reading image/attachment BLOBs.
+
 - Add reader-safe Go to Node ID navigation with clipboard and filtered bookmark shortcuts. Translate exported-file actions/results, provide a return link after deletion, and confirm each CTB export before submitting.
 
 - Wrap every CTB export in a dated, bold source container. Remap internal links within the exported branch and redirect missing/excluded targets to a rich-text report, preserving copied content timestamps and shared hierarchy.

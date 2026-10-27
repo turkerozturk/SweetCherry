@@ -1,34 +1,14 @@
-<html xmlns:th="http://www.thymeleaf.org">
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
-      layout:decorate="~{_layout}">
-<head>
-    <meta charset="UTF-8"/>
-    <title>>Export Node</title>
-</head>
-<body>
-
-<section layout:fragment="content">
-
-
-
-            <pre th:text="${contentText}"></pre>
-
-            <br />
-
-
-    <a href="/exportedFiles"
-       th:title="#{root.exportedFiles.description}"
-    >
-        <span th:text="#{root.exportedFiles}"></span>
-    </a>
-    <br />
-    <br />
-
-    <a href="javascript:history.back()">Önceki Sayfaya Dön</a>
-
-
-</section>
-
-
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><meta charset="UTF-8"><title th:text="#{export.result.title}">CTB export result</title></head>
+<body><section layout:fragment="content" class="container py-3">
+<h1 th:text="#{export.result.title}"></h1>
+<div role="status" class="alert" th:classappend="${exportStatus == 'success'} ? 'alert-success' : 'alert-info'">
+<p th:if="${exportStatus == 'success'}" th:text="#{export.result.success(${exportCount})}"></p>
+<p th:if="${exportStatus == 'success'}"><span th:text="#{export.result.file}"></span> <span th:text="${exportFilename}"></span></p>
+<p th:if="${exportStatus == 'failed'}" th:text="#{export.result.failed}"></p>
+<p th:if="${exportStatus == 'none'}" th:text="#{export.result.none}"></p>
+</div>
+<a class="btn btn-primary" th:href="@{/exportedFiles}" th:title="#{root.exportedFiles.description}" th:text="#{root.exportedFiles}"></a>
+<button type="button" class="btn btn-outline-secondary" onclick="history.back()" th:text="#{export.result.back}"></button>
+</section></body></html>

@@ -30,4 +30,18 @@ class CtbExportControllerTest {
         assertThat(new ExportManipulatedRecursiveController(service).exportPage(11)).isEqualTo("redirect:/nodes/11");
         verifyNoInteractions(service);
     }
+    @Test void flashStoresStructuredResultAndDirectVisitShowsTranslatedEmptyState() throws Exception {
+        var service=mock(CtbExportService.class);
+        when(service.export(11,true,true)).thenReturn(new CtbExportService.Result(7,"Türkçe.ctb"));
+        var flash=new org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap();
+        new ExportManipulatedRecursiveController(service).export1(11,true,flash);
+        assertThat(flash.getFlashAttributes().get("exportStatus")).isEqualTo("success");
+        assertThat(flash.getFlashAttributes().get("exportCount")).isEqualTo(7);
+        assertThat(flash.getFlashAttributes().get("exportFilename")).isEqualTo("Türkçe.ctb");
+        assertThat(flash.getFlashAttributes()).doesNotContainKey("contentText");
+        var model=new org.springframework.ui.ExtendedModelMap();
+        assertThat(new ExportManipulatedRecursiveController(service).exportResult(model)).isEqualTo("expo");
+        assertThat(model).containsEntry("exportStatus","none");
+    }
+
 }

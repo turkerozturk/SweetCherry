@@ -48,11 +48,12 @@ public class ExportRecursiveController {
             RedirectAttributes redirectAttributes) {
         try {
             var result = service.export(nodeId, includeDescendants, false);
-            redirectAttributes.addFlashAttribute("contentText", "Export successful. Exported node count: "
-                    + result.count() + ". File: " + result.filename());
+            redirectAttributes.addFlashAttribute("exportStatus", "success");
+            redirectAttributes.addFlashAttribute("exportCount", result.count());
+            redirectAttributes.addFlashAttribute("exportFilename", result.filename());
         } catch (IOException | SQLException failure) {
             logger.error("CTB export failed", failure);
-            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            redirectAttributes.addFlashAttribute("exportStatus", "failed");
         }
         return "redirect:/export-result";
     }

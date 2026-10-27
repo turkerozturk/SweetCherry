@@ -8,13 +8,13 @@
 <div th:fragment="nodeMetaDataFragment">
 
     <!-- Node Meta Popup (Hidden by default) -->
-    <th:block th:if="${node}">
+    <th:block th:if="${node}" th:with="contentType=${#messages.msg(node.syntax == 'custom-colors' ? 'node.type.richText' : (node.syntax == 'plain-text' ? 'node.type.plainText' : 'node.type.code'))}">
 
 
         <div id="nodeMeta"></div>
         <h4><img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}"
                  th:alt="${'/img/icons/' + node.nodeIcon.iconName}"
-                 th:title="${'Content rendered as: ' + node.syntax}"
+                 th:title="#{node.meta.contentTypeTitle(${contentType})}"
                  class="iconcss"/>
             <span th:text="${node.name}"
                   id="nodeName"
@@ -33,7 +33,7 @@
             <tbody>
             <tr>
                 <th th:text="#{node.meta.isMasterNode}">Node Id</th>
-                <td th:text="${node.isMasterNode}"></td>
+                <td th:text="${node.isMasterNode} ? #{node.meta.yes} : #{node.meta.no}"></td>
             </tr>
             <th:block th:if="${sharedNodeIds}">
                 <tr>
@@ -55,7 +55,7 @@
             </tr>
             <tr>
                 <th th:text="#{node.meta.syntax}">Syntax</th>
-                <td th:text="${node.syntax}"></td>
+                <td th:text="${contentType}"></td>
             </tr>
             <tr>
                 <th th:text="#{node.meta.isReadOnly}">Is Read Only</th>
@@ -63,10 +63,13 @@
                 <td th:unless="${node.isReadOnly}" th:text="#{node.meta.no}">No</td>
 
             </tr>
+            <!--/*
             <tr>
                 <th th:text="#{node.meta.isRichText}">Is Rich Text</th>
                 <td th:text="${node.isRichText}"></td>
             </tr>
+            */-->
+
             <tr>
                 <th th:text="#{node.meta.hasCodeBox}">Has Code Box</th>
                 <td>

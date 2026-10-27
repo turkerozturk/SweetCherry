@@ -49,18 +49,19 @@ public class ExportManipulatedRecursiveController {
             RedirectAttributes redirectAttributes) {
         try {
             var result = service.export(nodeId, includeDescendants, true);
-            redirectAttributes.addFlashAttribute("contentText", "Export successful. Exported node count: "
-                    + result.count() + ". File: " + result.filename());
+            redirectAttributes.addFlashAttribute("exportStatus", "success");
+            redirectAttributes.addFlashAttribute("exportCount", result.count());
+            redirectAttributes.addFlashAttribute("exportFilename", result.filename());
         } catch (IOException | SQLException failure) {
             logger.error("CTB export failed", failure);
-            redirectAttributes.addFlashAttribute("contentText", "Export failed.");
+            redirectAttributes.addFlashAttribute("exportStatus", "failed");
         }
         return "redirect:/export-result";
     }
 
     @GetMapping("/export-result")
     public String exportResult(Model model) {
-        if (!model.containsAttribute("contentText")) model.addAttribute("contentText", "No export operation was performed.");
+        if (!model.containsAttribute("exportStatus")) model.addAttribute("exportStatus", "none");
         return "expo";
     }
 

@@ -25,6 +25,9 @@
 <option value="references" th:text="#{mindmap.export.iconsReferences}"></option>
 <option value="bundle" th:text="#{mindmap.export.iconsBundle}"></option></select>
 <div class="form-text" th:text="#{mindmap.export.iconsHelp}"></div></div>
+<div class="form-check mb-3"><input class="form-check-input" type="checkbox" name="includeContent" id="includeContent" value="true">
+<label class="form-check-label" for="includeContent" th:text="#{mindmap.export.content}"></label>
+<div class="form-text" th:text="#{mindmap.export.contentHelp}"></div></div>
 <button class="btn btn-primary" type="submit" th:text="#{mindmap.export.download}"></button>
 </form></div></div>
 </section></body></html>
