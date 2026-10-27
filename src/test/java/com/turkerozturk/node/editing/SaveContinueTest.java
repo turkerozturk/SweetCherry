@@ -18,8 +18,8 @@ class SaveContinueTest {
     @Test void richSaveAndContinueKeepsAllPayloadAndRevisionChecks()throws Exception {
         var service=mock(RichTextEditingService.class);var mvc=MockMvcBuilders.standaloneSetup(new RichTextEditingController(service)).build();
         mvc.perform(post("/nodes/richtext/edit/12").param("xml","<node/>").param("revision","r1").param("images","{image}").param("tables","{table}").param("continueEditing","true")).andExpect(redirectedUrl("/nodes/richtext/edit/12"));
-        verify(service).save(12,"<node/>","r1","{image}","{}","{table}","[]",false);
-        doThrow(new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT)).when(service).save(12,"<node/>","stale","{}","{}","{}","[]",false);
+        verify(service).save(12,"<node/>","r1","{image}","{}","{table}","[]",false,"{}");
+        doThrow(new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT)).when(service).save(12,"<node/>","stale","{}","{}","{}","[]",false,"{}");
         mvc.perform(post("/nodes/richtext/edit/12").param("xml","<node/>").param("revision","stale").param("continueEditing","true")).andExpect(status().isConflict());
     }
 }

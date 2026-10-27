@@ -11,6 +11,7 @@
     let selection = [0, 0];
     const pendingImages = {}, pendingFiles = {};
     let tableChanges = {};
+    let codeboxChanges = {};
     let deletedKeys = [];
     const uploadLimit = window.richEditorMaxFileBytes || 9000000;
     let readingImage = false;
@@ -38,12 +39,12 @@
     let historyIndex = -1;
     let composing = false;
     const snapshot = () => ({runs: runs.map(run => ({text: run.text, attributes: {...run.attributes}})),
-        selection: [...selection], deleted:[...deletedKeys], tables:JSON.parse(JSON.stringify(tableChanges))});
+        selection: [...selection], deleted:[...deletedKeys], tables:JSON.parse(JSON.stringify(tableChanges)), codeboxes:JSON.parse(JSON.stringify(codeboxChanges))});
 
     /** Captures text and formatting as one editor state, discarding the obsolete redo branch. */
     function commitHistory() {
         const next = snapshot();
-        if (historyIndex >= 0 && JSON.stringify(history[historyIndex].runs) === JSON.stringify(next.runs) && JSON.stringify(history[historyIndex].tables) === JSON.stringify(next.tables)) return;
+        if (historyIndex >= 0 && JSON.stringify(history[historyIndex].runs) === JSON.stringify(next.runs) && JSON.stringify(history[historyIndex].tables) === JSON.stringify(next.tables) && JSON.stringify(history[historyIndex].codeboxes) === JSON.stringify(next.codeboxes)) return;
         history.splice(historyIndex + 1);
         history.push(next);
         if (history.length > 200) history.shift();
@@ -67,6 +68,7 @@
         const state = history[historyIndex];
         runs = state.runs.map(run => ({text: run.text, attributes: {...run.attributes}}));
         tableChanges = JSON.parse(JSON.stringify(state.tables || {}));
+        codeboxChanges = JSON.parse(JSON.stringify(state.codeboxes || {}));
         deletedKeys = [...(state.deleted || [])];
         previous = runs.map(run => run.text).join('');
         input.value = previous;
@@ -267,6 +269,43 @@
         });
     }
 
+    const codeboxButton=document.getElementById('richCodebox'),codeboxDialog=document.getElementById('richCodeboxDialog');
+    let openCodebox;
+    if(codeboxButton && codeboxDialog) {
+        const text=document.getElementById('richCodeboxText'),search=document.getElementById('richCodeboxSearch');
+        const list=document.getElementById('richCodeboxLanguages'),selected=document.getElementById('richCodeboxSelected');
+        const error=document.getElementById('richCodeboxError');
+        let codeboxKey,codeboxSelection,syntax='plain-text';
+        function selectLanguage(value){syntax=value;selected.textContent=value;list.querySelectorAll('input').forEach(input=>input.checked=input.value===value);}
+        list.addEventListener('change',event=>{if(event.target.matches('input[type=radio]'))selectLanguage(event.target.value);});
+        search.addEventListener('input',()=>{const q=search.value.toLocaleLowerCase();list.querySelectorAll('label').forEach(label=>label.hidden=!label.textContent.toLocaleLowerCase().includes(q) && !label.querySelector('input').value.toLocaleLowerCase().includes(q));});
+        openCodebox=key=>{
+            captureSelection();codeboxSelection=[...selection];codeboxKey=key;
+            const value=key ? codeboxChanges[key] || window.richEditorObjects[key].codebox : {text:'',syntax:'plain-text'};
+            text.value=value.text;selectLanguage(value.syntax);search.value='';search.dispatchEvent(new Event('input'));error.hidden=true;
+            codeboxDialog.showModal();text.focus();
+        };
+        function closeCodebox(){codeboxDialog.close();selection=[...codeboxSelection];focusEditor();restoreSelection();}
+        codeboxButton.addEventListener('pointerdown',event=>event.preventDefault());
+        codeboxButton.addEventListener('click',()=>openCodebox(null));
+        document.getElementById('richCodeboxCancel').addEventListener('click',closeCodebox);
+        codeboxDialog.addEventListener('cancel',event=>{event.preventDefault();closeCodebox();});
+        document.getElementById('richCodeboxApply').addEventListener('click',()=>{
+            if(text.value.length>200000 || !codeboxKey && runs.filter(run=>(run.attributes.__sweet_object||'').startsWith('new-')).length>=10){error.hidden=false;return;}
+            const value={text:text.value,syntax};
+            if(!codeboxKey){
+                closeCodebox();captureSelection();
+                if(!replace(selection[0],selection[1],'\uFFFC'))return;
+                codeboxKey='new-codebox:'+window.RichTextEditorSupport.objectId(crypto);
+                let offset=0;
+                for(const run of runs){if(offset===selection[0] && run.text==='\uFFFC' && !run.attributes.__sweet_object){run.attributes={__sweet_object:codeboxKey};break;}offset+=count(run.text);}
+                window.richEditorObjects[codeboxKey]={label:codeboxButton.textContent,codebox:value};
+                previous=runs.map(run=>run.text).join('');input.value=previous;selection=[selection[0]+1,selection[0]+1];
+            }else closeCodebox();
+            codeboxChanges[codeboxKey]=value;render();commitHistory();focusEditor();restoreSelection();
+        });
+    }
+
     const tableButton=document.getElementById('richTable'),tableDialog=document.getElementById('richTableDialog');
     let openTable;
     if (tableButton && tableDialog) {
@@ -369,6 +408,13 @@
                 const span = document.createElement('span'); span.dataset.richCaret = 'true';
                 span.appendChild(document.createTextNode('\u200B')); return span;
             };
+            if (object.codebox && openCodebox) {
+                const code=codeboxChanges[key] || object.codebox;
+                const source=document.createElement('pre');source.textContent=code.text;
+                source.style.whiteSpace='pre-wrap';source.style.maxHeight='12rem';source.style.overflow='auto';slot.appendChild(source);
+                const button=document.createElement('button');button.type='button';button.textContent=codeboxButton.dataset.edit+' ('+code.syntax+')';
+                button.addEventListener('pointerdown',event=>event.preventDefault());button.addEventListener('click',()=>openCodebox(key));slot.appendChild(button);
+            }
             if (object.tableRows && openTable) {
                 const button=document.createElement('button');button.type='button';button.textContent=tableButton.dataset.edit;
                 button.addEventListener('pointerdown',event=>event.preventDefault());
@@ -483,6 +529,8 @@
         if (readingImage) { event.preventDefault(); return; }
         const tablesInput=document.getElementById('richTables');
         const activeKeys=runs.map(run=>run.attributes.__sweet_object);
+        const codeboxesInput=document.getElementById('richCodeboxes');
+        if(codeboxesInput)codeboxesInput.value=JSON.stringify(Object.fromEntries(Object.entries(codeboxChanges).filter(([key])=>activeKeys.includes(key))));
         if(tablesInput)tablesInput.value=JSON.stringify(Object.fromEntries(Object.entries(tableChanges).filter(([key])=>activeKeys.includes(key))));
         const filesInput = document.getElementById('richFiles');
         if (filesInput) filesInput.value = JSON.stringify(Object.fromEntries(runs.filter(run=>pendingFiles[run.attributes.__sweet_object]).map(run=>[run.attributes.__sweet_object,pendingFiles[run.attributes.__sweet_object]])));
@@ -717,7 +765,8 @@
         }
         const active=new Set(runs.map(run=>run.attributes.__sweet_object));
         const tables=Object.fromEntries(Object.entries(tableChanges).filter(([key,rows])=>active.has(key) && JSON.stringify(rows)!==JSON.stringify(window.richEditorObjects?.[key]?.tableRows)).sort(([a],[b])=>a.localeCompare(b)));
-        return JSON.stringify({runs:normalized,deleted:[...deletedKeys].sort(),tables});
+        const codeboxes=Object.fromEntries(Object.entries(codeboxChanges).filter(([key,value])=>active.has(key) && (key.startsWith('new-codebox:') || JSON.stringify(value)!==JSON.stringify(window.richEditorObjects?.[key]?.codebox))).sort(([a],[b])=>a.localeCompare(b)));
+        return JSON.stringify({runs:normalized,deleted:[...deletedKeys].sort(),tables,codeboxes});
     }
     // Layout controls can move focus without changing the content model or undo history.
     window.RichTextSelectionBridge={

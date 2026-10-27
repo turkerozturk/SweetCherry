@@ -28,8 +28,8 @@ public class RichTextEditingService {
     public RichTextEditingService(NodePropertiesService properties, EmbeddedUploadPolicy uploads) { this.properties = properties; this.uploads = uploads; }
 
     public record Editor(Node node, RichTextDocument document, String revision, Map<String, ObjectInfo> objects, int maxEmbeddedFileBytes) { }
-    public record ObjectInfo(String label, String imageUrl, List<List<String>> tableRows) { }
-    static record Stored(ProtectedRichTextCodec.Reference reference, Object[] values) { }
+    public record ObjectInfo(String label, String imageUrl, List<List<String>> tableRows, RichTextCodeboxes.Value codebox) { }
+    static record Stored(ProtectedRichTextCodec.Reference reference, Object[] values, Map<String, Object> columns) { }
 
     /** Checks actual object tables as well as read-only and alias restrictions before offering an editor. */
     @Transactional(readOnly = true)
@@ -55,7 +55,7 @@ public class RichTextEditingService {
                 try { tableRows = RichTextTableCodec.open(tableXml(object)); }
                 catch (IllegalArgumentException ignored) { /* Unsupported table remains protected and untouched. */ }
             }
-            info.put(object.reference().key(), new ObjectInfo(label, imageUrl, tableRows));
+            info.put(object.reference().key(), new ObjectInfo(label, imageUrl, tableRows, table.equals("codebox") ? codebox(object) : null));
         }
         return new Editor(node, new ProtectedRichTextCodec().open(document, references(objects)), revision(node, objects), info, uploads.fileBytes());
     }
@@ -98,6 +98,13 @@ public class RichTextEditingService {
     @Transactional
     public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson,
             String tableJson, String deletedJson, boolean allowObjectDeletion) {
+        save(id, xml, expectedRevision, imageJson, fileJson, tableJson, deletedJson, allowObjectDeletion, "{}");
+    }
+
+    /** Codebox changes share revision validation, object offsets, undo state and the same atomic transaction. */
+    @Transactional
+    public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson,
+            String tableJson, String deletedJson, boolean allowObjectDeletion, String codeboxJson) {
         Node node = editableNode(id);
         var objects = storedObjects(id);
         if (!revision(node, objects).equals(expectedRevision)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Node changed; reload the editor.");
@@ -106,6 +113,7 @@ public class RichTextEditingService {
         Map<String, byte[]> images;
         Map<String, PendingRichTextFiles.File> files;
         Map<String, String> tables;
+        Map<String, RichTextCodeboxes.Value> codeboxes;
         java.util.Set<String> deleted;
         List<Stored> survivors;
         try {
@@ -128,8 +136,18 @@ public class RichTextEditingService {
                 tableXmls.put(entry.getKey(), RichTextTableCodec.write(entry.getValue(), original == null ? null : tableXml(original)));
             }
             tables = Map.copyOf(tableXmls);
+            codeboxes = RichTextCodeboxes.decode(codeboxJson);
+            for (var entry : codeboxes.entrySet()) {
+                Stored original = objects.stream().filter(object -> object.reference().key().equals(entry.getKey())).findFirst().orElse(null);
+                if (deleted.contains(entry.getKey()) || !entry.getKey().startsWith("new-codebox:") && original == null)
+                    throw new IllegalArgumentException("Unknown/deleted codebox");
+                if (!RichTextCodeboxes.supported(entry.getValue().syntax())
+                        && (original == null || !codebox(original).syntax().equals(entry.getValue().syntax())))
+                    throw new IllegalArgumentException("Unsupported codebox syntax");
+            }
             var keys = new java.util.HashSet<String>(images.keySet()); keys.addAll(files.keySet());
             tables.keySet().stream().filter(key -> key.startsWith("new-table:")).forEach(keys::add);
+            codeboxes.keySet().stream().filter(key -> key.startsWith("new-codebox:")).forEach(keys::add);
             if (keys.size() > 10) throw new IllegalArgumentException("Too many new objects");
             saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(survivors), keys);
             var original = "custom-colors".equals(node.getSyntax()) ? new RichTextXmlReader().read(node.getTxt())
@@ -148,6 +166,8 @@ public class RichTextEditingService {
                 saved.offsets().get(object.reference()) == object.reference().offset());
         if ("custom-colors".equals(node.getSyntax()) && (node.getIsRichText() & 1L) != 0
                 && deleted.isEmpty() && images.isEmpty() && files.isEmpty()
+                && codeboxes.entrySet().stream().allMatch(entry -> objects.stream().anyMatch(object ->
+                    object.reference().key().equals(entry.getKey()) && codebox(object).equals(entry.getValue())))
                 && unchangedTables && unchangedOffsets
                 && RichTextChanges.sameText(new RichTextXmlReader().read(node.getTxt()), saved.text())) return;
         int updated = entityManager.createNativeQuery("UPDATE node SET txt = :xml, syntax = 'custom-colors', "
@@ -200,6 +220,23 @@ public class RichTextEditingService {
         }
         if (tables.keySet().stream().anyMatch(key -> key.startsWith("new-table:"))) entityManager.createNativeQuery("UPDATE node SET has_table = 1 WHERE node_id = :id")
                 .setParameter("id", id).executeUpdate();
+        for (var entry : codeboxes.entrySet()) {
+            boolean fresh = entry.getKey().startsWith("new-codebox:");
+            var reference = fresh ? null : objects.stream().map(Stored::reference).filter(ref -> ref.key().equals(entry.getKey())).findFirst().orElseThrow();
+            int offset = fresh ? saved.newImages().get(entry.getKey()) : saved.offsets().get(reference);
+            entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
+                String sql = fresh ? "INSERT INTO codebox (txt, syntax, node_id, " + JdbcIdentifiers.quote(connection,"offset")
+                        + ", justification, width, height, is_width_pix, do_highl_bra, do_show_linenum) VALUES (?, ?, ?, ?, 'left', 300, 150, 1, 1, 0)"
+                        : "UPDATE codebox SET txt = ?, syntax = ? WHERE node_id = ? AND " + JdbcIdentifiers.quote(connection,"offset") + " = ?";
+                try (var statement = connection.prepareStatement(sql)) {
+                    statement.setString(1, entry.getValue().text()); statement.setString(2, entry.getValue().syntax());
+                    statement.setLong(3, id); statement.setInt(4, offset);
+                    if (statement.executeUpdate() != 1) throw new java.sql.SQLException("Codebox changed; reload the editor");
+                }
+            });
+        }
+        if (codeboxes.keySet().stream().anyMatch(key -> key.startsWith("new-codebox:")))
+            entityManager.createNativeQuery("UPDATE node SET has_codebox = 1 WHERE node_id = :id").setParameter("id", id).executeUpdate();
         if (!deleted.isEmpty()) entityManager.unwrap(org.hibernate.Session.class).doWork(connection -> {
             try (var statement = connection.prepareStatement("UPDATE node SET "
                     + "has_image = CASE WHEN EXISTS(SELECT 1 FROM image WHERE node_id = ?) THEN 1 ELSE 0 END, "
@@ -210,6 +247,12 @@ public class RichTextEditingService {
             }
         });
         entityManager.clear();
+    }
+
+    private static RichTextCodeboxes.Value codebox(Stored object) {
+        Object text = object.columns().get("txt"), syntax = object.columns().get("syntax");
+        String source = text instanceof byte[] bytes ? new String(bytes, StandardCharsets.UTF_8) : text == null ? "" : text.toString();
+        return new RichTextCodeboxes.Value(source, syntax == null ? "plain-text" : syntax.toString());
     }
 
     /** SQLite may expose table XML as text or UTF-8 binary, depending on how the CTB was written. */
@@ -244,7 +287,9 @@ public class RichTextEditingService {
                             row[column - 1] = table.equals("image") && metadata.getColumnName(column).equalsIgnoreCase("png")
                                     ? rows.getBytes(column) : rows.getObject(column);
                         }
-                        result.add(new Stored(new ProtectedRichTextCodec.Reference(table, rows.getInt(1)), row));
+                        var columns = new java.util.HashMap<String, Object>();
+                        for (int column = 2; column <= row.length; column++) columns.put(metadata.getColumnName(column).toLowerCase(java.util.Locale.ROOT), row[column - 1]);
+                        result.add(new Stored(new ProtectedRichTextCodec.Reference(table, rows.getInt(1)), row, java.util.Collections.unmodifiableMap(columns)));
                     }
                 }
             }

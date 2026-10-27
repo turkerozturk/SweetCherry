@@ -17,6 +17,7 @@ public class RichTextEditingController {
     @GetMapping("/nodes/richtext/edit/{id}")
     public String open(@PathVariable long id, Model model) {
         model.addAttribute("editor", service.open(id));
+        model.addAttribute("codeboxLanguages", RichTextCodeboxes.languages());
         return "node/richtext-edit";
     }
 
@@ -24,12 +25,16 @@ public class RichTextEditingController {
         return save(id,xml,revision,images,files,tables,deleted,allowObjectDeletion,false);
     }
 
+    public String save(long id,String xml,String revision,String images,String files,String tables,String deleted,boolean allowObjectDeletion,boolean continueEditing) {
+        return save(id,xml,revision,images,files,tables,deleted,allowObjectDeletion,continueEditing,"{}");
+    }
+
     @PostMapping("/nodes/richtext/edit/{id}")
     public String save(@PathVariable long id, @RequestParam String xml, @RequestParam String revision,
             @RequestParam(defaultValue = "{}") String images, @RequestParam(defaultValue = "{}") String files, @RequestParam(defaultValue = "{}") String tables,
             @RequestParam(defaultValue = "[]") String deleted, @RequestParam(defaultValue = "false") boolean allowObjectDeletion,
-            @RequestParam(defaultValue="false") boolean continueEditing) {
-        service.save(id, xml, revision, images, files, tables, deleted, allowObjectDeletion);
+            @RequestParam(defaultValue="false") boolean continueEditing, @RequestParam(defaultValue="{}") String codeboxes) {
+        service.save(id, xml, revision, images, files, tables, deleted, allowObjectDeletion, codeboxes);
         return continueEditing ? "redirect:/nodes/richtext/edit/"+id : "redirect:/nodes/" + id;
     }
 }

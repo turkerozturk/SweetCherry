@@ -16,6 +16,11 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
     const ids = Object.fromEntries(['richPasteImage','richClipboardHint','richAutoLink','richAutoLinkError','richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
+    if (options.codeboxes) {
+        for (const id of ['richCodebox','richCodeboxDialog','richCodeboxText','richCodeboxSearch','richCodeboxLanguages','richCodeboxSelected','richCodeboxError','richCodeboxCancel','richCodeboxApply','richCodeboxes']) ids[id]=element(id);
+        ids.richCodeboxLanguages.querySelectorAll=()=>[];
+        ids.richCodeboxSearch.dispatchEvent=()=>{};
+    }
     if (visual) { ids.richVisualMode=element('richVisualMode'); ids.richVisualMode.checked=true; }
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
@@ -35,7 +40,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, window:windowObject={isSecureContext:options.secure!==false,RichTextEditorSupport:require('../../main/resources/static/js/node/richTextEditorSupport.js'),RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
+    vm.runInNewContext(source, {document, URL, Event:class {}, window:windowObject={isSecureContext:options.secure!==false,RichTextEditorSupport:require('../../main/resources/static/js/node/richTextEditorSupport.js'),RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
         RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
         crypto:options.crypto||{randomUUID:()=> uuid++===0?'test-uuid':'test-uuid-'+uuid},
         navigator:{clipboard:options.clipboardReader},
@@ -351,4 +356,29 @@ test('clipboard button preserves HTML on secure contexts and explains HTTP witho
  const reader={read:async()=>{reads++;return [{types:['text/html','text/plain'],getType:async type=>new Blob([type==='text/html'?'<b>Rich</b>':'Plain'])}];}};
  const secure=editor(undefined,undefined,undefined,clipboard,false,{clipboardReader:reader});await secure.fire('richPasteImage','click');assert.equal(secure.runs()[0].attributes.weight,'heavy');
  const http=editor(undefined,undefined,undefined,clipboard,false,{secure:false,clipboardReader:reader});http.ids.richClipboardHint.dataset.http='Use HTTPS or native paste';await http.fire('richPasteImage','click');assert.equal(reads,1);assert.equal(http.ids.richClipboardHint.textContent,'Use HTTPS or native paste');assert.equal(http.dirty(),false);
+});
+
+
+test('codebox insert, edit, undo/redo and payload exclusion after undo use editor history', () => {
+    const e=editor([{text:'AB',attributes:{}}],undefined,{},undefined,false,{codeboxes:true});
+    e.select(1,1);e.fire('richCodebox','click');e.ids.richCodeboxText.value='const x = "<tag>";';
+    e.fire('richCodeboxLanguages','change',{target:{matches:()=>true,value:'javascript'}});
+    e.fire('richCodeboxApply','click');
+    const key=e.runs().find(run=>run.attributes.__sweet_object).attributes.__sweet_object;
+    assert.match(key,/^new-codebox:/);assert.equal(e.dirty(),true);
+    assert.deepEqual(JSON.parse(e.ids.richCodeboxes.value)[key],{text:'const x = "<tag>";',syntax:'javascript'});
+    e.key('z');assert.equal(text(e.runs()),'AB');assert.deepEqual(JSON.parse(e.ids.richCodeboxes.value),{});
+    e.key('y');assert.equal(text(e.runs()),'A\uFFFCB');
+});
+
+test('existing codebox edits restore on undo and cancel does not make editor dirty', () => {
+    const e=editor([{text:'\uFFFC',attributes:{__sweet_object:'codebox:0'}}],undefined,
+      {'codebox:0':{label:'codebox',codebox:{text:'old',syntax:'java'}}},undefined,false,{codeboxes:true});
+    // Open the protected slot's edit button from its rendered preview.
+    function buttons(node){return [node,...(node.childNodes||[]).flatMap(buttons)];}
+    let edit=buttons(e.ids.richPreview).find(node=>node.textContent?.includes('(java)'));
+    edit.click();e.ids.richCodeboxText.value='changed';e.fire('richCodeboxCancel','click');assert.equal(e.dirty(),false);
+    edit.click();e.ids.richCodeboxText.value='changed';e.fire('richCodeboxApply','click');
+    assert.equal(e.dirty(),true);e.runs();assert.equal(JSON.parse(e.ids.richCodeboxes.value)['codebox:0'].text,'changed');
+    e.key('z');assert.equal(e.dirty(),false);e.runs();assert.deepEqual(JSON.parse(e.ids.richCodeboxes.value),{});
 });

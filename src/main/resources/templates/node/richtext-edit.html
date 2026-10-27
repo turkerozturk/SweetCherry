@@ -12,6 +12,7 @@
 <input type="hidden" name="images" id="richImages" value="{}">
 <input type="hidden" name="files" id="richFiles" value="{}">
 <input type="hidden" name="deleted" id="richDeleted" value="[]">
+<input type="hidden" name="codeboxes" id="richCodeboxes" value="{}">
 <input type="hidden" name="tables" id="richTables" value="{}">
 <div class="actions rich-savebar"><button type="button" id="richToolsToggle" aria-controls="richControls" aria-expanded="false" th:text="#{editor.controls}"></button><button type="submit" th:text="#{richtext.edit.save}"></button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 <div id="richEditorShell" class="rich-editor-shell">
@@ -44,6 +45,7 @@
 <button type="button" id="richWebImport" th:title="#{richtext.webImport}" th:aria-label="#{richtext.webImport}">🌐</button>
 <button type="button" id="richAddFile" th:text="#{richtext.edit.addFile}"></button>
 <button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
+<button type="button" id="richCodebox" th:text="#{richtext.codebox.add}" th:attr="data-edit=#{richtext.codebox.edit}"></button>
 <button type="button" id="richSeparator" th:title="#{editor.separator.help}">33~</button>
 <button type="button" id="richObjects" th:text="#{richtext.edit.objects}"></button>
 </div>
@@ -83,6 +85,22 @@
 <div id="richObjectList"></div>
 <button type="button" id="richObjectDelete" disabled th:text="#{richtext.edit.deleteSelected}"></button>
 <button type="button" id="richObjectCancel" th:text="#{richtext.edit.cancel}"></button>
+</dialog>
+<dialog id="richCodeboxDialog" class="rich-codebox-dialog" aria-labelledby="richCodeboxTitle">
+<h2 id="richCodeboxTitle" th:text="#{richtext.codebox.title}"></h2>
+<label for="richCodeboxSearch" th:text="#{richtext.codebox.search}"></label>
+<input id="richCodeboxSearch" type="search" autocomplete="off">
+<div id="richCodeboxLanguages" class="rich-codebox-languages" role="radiogroup" th:aria-label="#{richtext.codebox.language}">
+<label th:each="language : ${codeboxLanguages}" class="rich-codebox-language">
+<input type="radio" name="richCodeboxLanguage" th:value="${language.syntax}" form="richCodeboxStandalone">
+<img th:src="@{/img/ctbicons/{icon}.png(icon=${language.icon})}" width="20" height="20" alt="" loading="lazy">
+<span th:text="${language.syntax == 'plain-text' ? #messages.msg('node.type.plainText') : language.syntax}"></span>
+</label></div>
+<p><span th:text="#{richtext.codebox.language}"></span>: <strong id="richCodeboxSelected"></strong></p>
+<label for="richCodeboxText" th:text="#{richtext.codebox.text}"></label>
+<textarea id="richCodeboxText" spellcheck="false" maxlength="200000"></textarea>
+<p id="richCodeboxError" role="alert" hidden th:text="#{richtext.codebox.error}"></p>
+<div class="actions"><button type="button" id="richCodeboxApply" th:text="#{richtext.edit.linkApply}"></button><button type="button" id="richCodeboxCancel" th:text="#{richtext.edit.cancel}"></button></div>
 </dialog>
 <dialog id="richTableDialog" style="max-width:95vw;max-height:90vh" aria-labelledby="richTableTitle">
 <h2 id="richTableTitle" th:text="#{richtext.edit.table}"></h2>

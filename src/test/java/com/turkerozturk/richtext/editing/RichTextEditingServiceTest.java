@@ -23,7 +23,7 @@ class RichTextEditingServiceTest {
         try (var statement = connection.createStatement()) {
             statement.execute("CREATE TABLE image (node_id INTEGER, offset INTEGER, justification TEXT, anchor TEXT, png BLOB, filename TEXT, link TEXT, time INTEGER)");
             statement.execute("CREATE TABLE grid (node_id INTEGER, offset INTEGER, justification TEXT, txt TEXT, col_min INTEGER, col_max INTEGER)");
-            statement.execute("CREATE TABLE codebox (node_id INTEGER, offset INTEGER, txt TEXT)");
+            statement.execute("CREATE TABLE codebox (node_id INTEGER, offset INTEGER, justification TEXT, txt TEXT, syntax TEXT, width INTEGER, height INTEGER, is_width_pix INTEGER, do_highl_bra INTEGER, do_show_linenum INTEGER)");
         }
         var session = mock(org.hibernate.Session.class);
         when(entityManager.unwrap(org.hibernate.Session.class)).thenReturn(session);
@@ -43,6 +43,54 @@ class RichTextEditingServiceTest {
         when(query.setParameter(anyString(), any())).thenReturn(query);
         when(query.getSingleResult()).thenReturn(0L);
         when(query.executeUpdate()).thenReturn(1);
+    }
+
+    @Test void insertsCodeboxAtUnicodeOffsetWithRequestedDefaults() throws Exception {
+        service.save(12, "<node><rich_text>😀</rich_text><rich_text __sweet_object='new-codebox:test'>\uFFFC</rich_text></node>",
+                service.open(12).revision(), "{}", "{}", "{}", "[]", false,
+                "{\"new-codebox:test\":{\"text\":\"x &lt; y\",\"syntax\":\"plain-text\"}}");
+        try(var statement=connection.createStatement();var rows=statement.executeQuery("SELECT * FROM codebox")) {
+            assertThat(rows.next()).isTrue();assertThat(rows.getInt("offset")).isEqualTo(1);
+            assertThat(rows.getString("txt")).isEqualTo("x &lt; y");assertThat(rows.getString("syntax")).isEqualTo("plain-text");
+            assertThat(rows.getString("justification")).isEqualTo("left");
+            assertThat(rows.getInt("width")).isEqualTo(300);assertThat(rows.getInt("height")).isEqualTo(150);
+            assertThat(rows.getInt("is_width_pix")).isEqualTo(1);assertThat(rows.getInt("do_show_linenum")).isZero();
+            assertThat(rows.next()).isFalse();
+        }
+        verify(entityManager).createNativeQuery("UPDATE node SET has_codebox = 1 WHERE node_id = :id");
+    }
+
+    @Test void codeboxEditPreservesMetadataAndMovesOffsets() throws Exception {
+        try(var s=connection.createStatement()){s.execute("INSERT INTO codebox VALUES(12,1,'right','old','legacy-lang',700,250,0,0,1)");}
+        var editor=service.open(12);
+        assertThat(editor.objects().get("codebox:1").codebox()).isEqualTo(new RichTextCodeboxes.Value("old","legacy-lang"));
+        service.save(12,"<node><rich_text>AB</rich_text><rich_text __sweet_object='codebox:1'>\uFFFC</rich_text><rich_text>ext</rich_text></node>",
+                editor.revision(),"{}","{}","{}","[]",false,"{\"codebox:1\":{\"text\":\"new & code\",\"syntax\":\"python3\"}}");
+        try(var s=connection.createStatement();var rows=s.executeQuery("SELECT * FROM codebox")) {
+            assertThat(rows.next()).isTrue();assertThat(rows.getInt("offset")).isEqualTo(2);
+            assertThat(rows.getString("txt")).isEqualTo("new & code");assertThat(rows.getString("syntax")).isEqualTo("python3");
+            assertThat(rows.getString("justification")).isEqualTo("right");assertThat(rows.getInt("width")).isEqualTo(700);
+            assertThat(rows.getInt("height")).isEqualTo(250);assertThat(rows.getInt("is_width_pix")).isZero();
+            assertThat(rows.getInt("do_highl_bra")).isZero();assertThat(rows.getInt("do_show_linenum")).isEqualTo(1);
+        }
+    }
+
+    @Test void unchangedCodeboxSaveDoesNotTouchModifiedDate() throws Exception {
+        try(var s=connection.createStatement()){s.execute("INSERT INTO codebox VALUES(12,1,'left','same','legacy-lang',300,150,1,1,0)");}
+        when(node.getSyntax()).thenReturn("custom-colors");when(node.getIsRichText()).thenReturn(1L);
+        when(node.getTxt()).thenReturn("<node><rich_text>Text</rich_text></node>");
+        service.save(12,"<node><rich_text>T</rich_text><rich_text __sweet_object='codebox:1'>\uFFFC</rich_text><rich_text>ext</rich_text></node>",
+                service.open(12).revision(),"{}","{}","{}","[]",false,"{\"codebox:1\":{\"text\":\"same\",\"syntax\":\"legacy-lang\"}}");
+        verify(query,never()).executeUpdate();
+    }
+
+    @Test void invalidCodeboxesAreRejectedBeforeAnyWrite() {
+        String revision=service.open(12).revision();
+        for(String json:java.util.List.of("{\"codebox:999\":{\"text\":\"x\",\"syntax\":\"java\"}}",
+                "{\"new-codebox:test\":{\"text\":\"x\",\"syntax\":\"custom-colors\"}}")) {
+            assertThatThrownBy(()->service.save(12,"<node/>",revision,"{}","{}","{}","[]",false,json)).isInstanceOf(ResponseStatusException.class);
+        }
+        verify(query,never()).executeUpdate();
     }
 
     @org.junit.jupiter.api.AfterEach void closeConnection() throws Exception { connection.close(); }
@@ -207,7 +255,7 @@ class RichTextEditingServiceTest {
             statement.execute("CREATE TABLE node (node_id INTEGER, has_image INTEGER, has_table INTEGER, has_codebox INTEGER)");
             statement.execute("INSERT INTO node VALUES (12,1,1,1)");
             statement.execute("INSERT INTO grid VALUES (12,2,'left','<table><row><cell>X</cell></row></table>',200,200)");
-            statement.execute("INSERT INTO codebox VALUES (12,3,'code')");
+            statement.execute("INSERT INTO codebox (node_id,offset,txt) VALUES (12,3,'code')");
         }
         var revision = service.open(12).revision();
         service.save(12, "<node><rich_text>Text</rich_text></node>", revision, "{}", "{}", "{}",

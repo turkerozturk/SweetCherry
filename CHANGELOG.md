@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add and edit embedded codeboxes in the rich-text editor with searchable language icons, atomic saves and undo/redo.
+
 - Translate object browsing pages and handle empty object lists. Render CherryTree LaTeX attachments offline with JLaTeXMath as web PNGs and PDF vector outlines, with PNG/source fallback and unchanged editor storage. Include library/font notices.
 
 - Translate CTB export results and node-info booleans/content categories; keep the raw rich-text flag row in a Thymeleaf comment.
