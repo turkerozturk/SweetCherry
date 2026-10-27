@@ -1,15 +1,15 @@
-# SweetCherry 1.1.0 — installation and first use
+# SweetCherry 1.3.0 — installation and first use
 
 SweetCherry is an open-source web companion for CherryTree CTB note databases. It provides browser views, mind maps, editing, and exports. It does not replace CherryTree. The supported starting point is an unencrypted SQLite `.ctb` file; `.ctd`, `.ctx`, and `.ctz` files are outside this guide.
 
 ## Windows 10/11, 64-bit
 
-Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.1.0). Choose one product asset:
+Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.3.0). Choose one product asset:
 
 | Asset | Use |
 | --- | --- |
-| `SweetCherry-1.1.0-windows-x64-setup.exe` | Folder selection wizard and optional shortcuts |
-| `SweetCherry-1.1.0-windows-x64.zip` | Extract and run without an installation wizard |
+| `SweetCherry-1.3.0-windows-x64-setup.exe` | Folder selection wizard and optional shortcuts |
+| `SweetCherry-1.3.0-windows-x64.zip` | Extract and run without an installation wizard |
 
 Both include a Windows x64 Java 17 runtime. You do not need to install Java. The automatically generated **Source code** archives contain source, not the ready-to-run application. Do not run the installer from inside a ZIP.
 
@@ -90,7 +90,7 @@ After stopping, you may copy or move the application folder. Recreate shortcuts 
 
 ## Other systems and source builds
 
-The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.1.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.1.0.zip), extract it, and run:
+The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.3.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.3.0.zip), extract it, and run:
 
 - Windows: `first-run.bat`
 - Linux/Raspberry Pi: `sh ./first-run.sh`
@@ -108,7 +108,7 @@ The first build needs internet access to download Maven/dependencies. Scripts pr
 
 ## Known limits
 
-Raw content search operates on stored `node.txt`, including rich-text XML. Search results use POST; browser Back may require resubmission or show an expired-document message. Internal node links in CTB exports are not rewritten to new node IDs. Shared tree parent/master relationships are remapped separately and are supported. Codebox editing and broader rich-text compatibility remain future work.
+Raw content search operates on stored `node.txt`, including rich-text XML. Search results use POST; browser Back may require resubmission or show an expired-document message. CTB exports now add a source container: supported internal links within the selected branch are remapped, and missing/excluded targets point to the container report. Shared hierarchy is preserved. Embedded codebox text and syntax can be edited; broader rich-text compatibility remains limited. LaTeX uses offline JLaTeXMath; unsupported expressions show source text rather than breaking the page.
 
 ## Bundled quick-start guides
 

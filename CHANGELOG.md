@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.3.0]
+
 - Add and edit embedded codeboxes in the rich-text editor with searchable language icons, atomic saves and undo/redo.
 
 - Translate object browsing pages and handle empty object lists. Render CherryTree LaTeX attachments offline with JLaTeXMath as web PNGs and PDF vector outlines, with PNG/source fallback and unchanged editor storage. Include library/font notices.
@@ -21,6 +23,12 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 - Choose a Move to parent from styled bookmark shortcuts, retaining each real/shared occurrence ID and requiring explicit Move confirmation.
 
 - Add a clipboard-paste icon beside the Move to parent-ID field without widening the dialog; validate numeric clipboard text and explain manual-paste fallback when access is unavailable.
+
+### Validation
+
+- The maintainer confirmed the new features manually and reported successful GitHub Actions on feature commit `cd1f7f26fccad968f2c8f07ce8fcde34aff9d627` (513 Java tests in Actions; 515 locally, all passing). The count difference alone does not establish a defect; local test reports/source files must be compared to identify it.
+- Relevant editor JavaScript tests and Chromium desktop/mobile viewport checks passed during implementation. Two existing duplication JavaScript test failures were reproduced against the unchanged baseline; they are not included in the passing editor subset.
+- Windows release packages must be rebuilt and checked from the final `v1.3.0` tag. See `documentation/releases/v1.3.0.md` for changes, upgrade notes and limitations.
 
 ## [1.2.0]
 

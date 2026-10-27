@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.turkerozturk</groupId>
 	<artifactId>SweetCherry</artifactId>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<name>SweetCherry</name>
 	<description>A web companion and viewer for CherryTree CTB note databases</description>
 	<url>https://github.com/turkerozturk/SweetCherry</url>

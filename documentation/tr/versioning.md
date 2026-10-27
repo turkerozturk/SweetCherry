@@ -12,7 +12,7 @@ Uygulama sürümünün tek kaynağı `pom.xml` içindeki proje `<version>` alan�
 
 Bu numaralandırma bütün CherryTree özelliklerinin uygulandığı veya hatasızlık garantisi verildiği anlamına gelmez. Sınırlamalar sürüm notlarında açıklanır. Kaynak: https://semver.org/
 
-Yayın hazırlığını commit/push edin, etiketi aynı commit'e koyun ve son dağıtımı o etiketten oluşturun. Yayımlanmış etiketi taşımayın; aynı sürümün dosyalarını farklı bir derlemeyle değiştirmeyin. Düzeltme yeni bir sürüm olur. 1.2.0, 1.1.0 sonrası biriken uyumlu yeni özellikleri ve düzeltmeleri kapsar. 1.2.0 yayımlandıktan sonra main üzerinde sıradaki çalışma sürümü `1.2.1-SNAPSHOT` olabilir; sonraki yayında kapsamına göre 1.2.1 veya 1.3.0 seçilir.
+Yayın hazırlığını commit/push edin, etiketi aynı commit'e koyun ve son dağıtımı o etiketten oluşturun. Yayımlanmış etiketi taşımayın; aynı sürümün dosyalarını farklı bir derlemeyle değiştirmeyin. Düzeltme yeni bir sürüm olur. 1.3.0; 1.2.0 sonrasındaki kod kutusu düzenleme, LaTeX gösterimi, gezinme, harita içeriği ve CTB export iyileştirmelerini kapsar. Yeni özellikler bulunduğu için yalnız düzeltme numarası olan 1.2.1 yerine 1.3.0 seçilmiştir. 1.3.0 yayımlandıktan sonra main üzerinde sıradaki çalışma sürümü isteğe bağlı `1.3.1-SNAPSHOT` olabilir; sonraki yayında kapsamına göre 1.3.1 veya 1.4.0 seçilir.
 
 Adım adım işlem ve asset listesi: [yayın hazırlığı](release-checklist.md). 1.0.0 hazırlığındaki geçici yorum arşivi daha önce yedeklenip kaldırılmıştır; bu adım her release için tekrarlanmaz. Git geçmişi korunur.
 

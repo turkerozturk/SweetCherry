@@ -18,18 +18,18 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 ## Features and documentation
 
-- Rich-text editing, images and attachments, external links, tables, and formatted web-page paste.
-- Node movement by arrows or parent ID, duplication, shared-node hierarchy, and reorderable bookmarks.
+- Rich-text editing, images and attachments, external links, tables, embedded codebox editing, and formatted web-page paste.
+- Node movement by arrows or parent ID with clipboard/bookmark shortcuts, Go to Node ID, duplication, shared-node hierarchy, and reorderable bookmarks.
 - Preview and import exported CTBs into a writable database, preserving hierarchy and remapping internal IDs.
 - Tenant configuration wizard, SQLite/MariaDB/MySQL/PostgreSQL connections, and application settings editors.
-- Markmap, Mermaid, Freeplane/FreeMind exports, and PDF export with hierarchical navigation.
+- Markmap, Mermaid, Freeplane/FreeMind export with optional content notes, and PDF export with hierarchical navigation. Offline LaTeX rendering in content and PDF.
 - Local use or configurable network access; offline sun and moon calculations.
 
 [CTB export](documentation/tr/ctb-export.md) · [Shared nodes](documentation/tr/shared-node-operations.md) · [Network access](documentation/tr/network-access.md) · [Optional features](documentation/tr/optional-features.md) · [Versioning](documentation/tr/versioning.md)
 
 ## Release information
 
-[Changelog](CHANGELOG.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
+[Changelog](CHANGELOG.md) · [1.3.0 release notes](documentation/releases/v1.3.0.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
 
 Development builds are not currently published as a separate download channel. Use the stable release for ordinary use; source builds from `main` may include unreleased changes.
 
