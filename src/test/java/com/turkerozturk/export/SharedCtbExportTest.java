@@ -27,7 +27,7 @@ class SharedCtbExportTest {
             assertThat(first.count()).isEqualTo(1);
             assertThat(service.export(11,true,false).count()).isEqualTo(7);
             try(var target=DriverManager.getConnection("jdbc:sqlite:"+file)) {
-                assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(7);valid(target);
+                assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(8);valid(target);
             }
             try(var files=Files.list(file.getParent())) {
                 assertThat(files.filter(path->path.toString().endsWith(".old")).count()).isEqualTo(1);
@@ -41,7 +41,7 @@ class SharedCtbExportTest {
             assertThat(service.export(11,false,true).count()).isEqualTo(1);
             assertThat(service.export(11,true,true).count()).isEqualTo(7);
             try(var target=DriverManager.getConnection("jdbc:sqlite:"+directory.resolve("exports/exportednodes.ctb"))) {
-                assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(8);valid(target);
+                assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(10);valid(target);
             }
         }
     }
@@ -64,7 +64,7 @@ class SharedCtbExportTest {
             assertThatThrownBy(()->service.export(11,true,true))
                     .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
             try(var target=DriverManager.getConnection("jdbc:sqlite:"+directory.resolve("exports/exportednodes.ctb"))) {
-                assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(1);valid(target);
+                assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(2);valid(target);
             }
         }
     }
@@ -86,14 +86,14 @@ class SharedCtbExportTest {
                 assertThat(rows.next()).isTrue();
             }
             assertThat(service.export(11,true,true).count()).isEqualTo(7);
-            assertThat(number(source,"SELECT COUNT(*) FROM children")).isEqualTo(26);
+            assertThat(number(source,"SELECT COUNT(*) FROM children")).isEqualTo(27);
             valid(source);
             source.commit();
             holder.addCustomProperties("Fixture",java.util.Map.of("custom.isWritable","false"));
             assertThatThrownBy(()->service.export(11,true,true))
                 .isInstanceOfSatisfying(org.springframework.web.server.ResponseStatusException.class,
                     failure -> assertThat(failure.getStatusCode().value()).isEqualTo(403));
-            assertThat(number(source,"SELECT COUNT(*) FROM children")).isEqualTo(26);
+            assertThat(number(source,"SELECT COUNT(*) FROM children")).isEqualTo(27);
         }
     }
     @Test void inPlaceFailureRollsBackOnlyItsOwnChanges() throws Exception {
@@ -128,7 +128,7 @@ class SharedCtbExportTest {
             }
             assertThat(CtbExportSql.copy(source,target,11,false,false)).isEqualTo(1);
             assertThat(number(target,"SELECT master_id FROM children WHERE node_id=11")).isZero();
-            assertThat(number(target,"SELECT father_id FROM children WHERE node_id=11")).isZero();
+            assertThat(number(target,"SELECT father_id FROM children WHERE node_id=11")).isEqualTo(12);
             assertThat(text(target,"SELECT name FROM node WHERE node_id=11")).isEqualTo("Node 2");
             assertThat(text(target,"SELECT hex(png) FROM image WHERE node_id=11")).isEqualTo("00FF10");
             assertThat(number(target,"SELECT COUNT(*) FROM image WHERE anchor IS NULL AND time IS NULL")).isEqualTo(1);
@@ -173,7 +173,7 @@ class SharedCtbExportTest {
             assertThat(number(target,"SELECT COUNT(*) FROM node WHERE node_id=6")).isZero();
             assertThat(text(target,"SELECT name FROM node WHERE node_id=8")).isEqualTo("Node 1");
             CtbExportSql.copy(source,target,11,true,true);
-            assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(16);
+            assertThat(number(target,"SELECT COUNT(*) FROM children")).isEqualTo(18);
             assertThat(number(target,"SELECT COUNT(*) FROM children WHERE father_id=0")).isEqualTo(2);
             valid(target);
         }
@@ -193,7 +193,7 @@ class SharedCtbExportTest {
     @Test void realSingleCopiesOnlySelectedNode() throws Exception {
         try(var source=fixture();var target=target()) {
             assertThat(CtbExportSql.copy(source,target,2,false,true)).isEqualTo(1);
-            assertThat(text(target,"SELECT name FROM node")).isEqualTo("Node 2");
+            assertThat(text(target,"SELECT name FROM node WHERE node_id=1")).isEqualTo("Node 2");
             valid(target);
         }
     }
@@ -226,7 +226,7 @@ class SharedCtbExportTest {
                     for(String sql:SqliteSchemaLoader.load().split(";")) if(!sql.isBlank())statement.execute(sql);
                 }
                 CtbExportSql.copy(source,target,11,descendants,collection);
-                try(var statement=target.createStatement();var rows=statement.executeQuery("SELECT name,ts_creation,ts_lastsave FROM node")) {
+                try(var statement=target.createStatement();var rows=statement.executeQuery("SELECT name,ts_creation,ts_lastsave FROM node WHERE name NOT LIKE '% [node:%'")) {
                     while(rows.next()) try(var find=source.prepareStatement("SELECT ts_creation,ts_lastsave FROM node WHERE name=?")) {
                         find.setString(1,rows.getString(1));try(var original=find.executeQuery()) {
                             assertThat(original.next()).isTrue();assertThat(rows.getLong(2)).isEqualTo(original.getLong(1));assertThat(rows.getLong(3)).isEqualTo(original.getLong(2));

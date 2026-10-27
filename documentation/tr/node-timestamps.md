@@ -13,7 +13,7 @@ Bu kurallar SweetCherry'nin yazma işlemleri içindir; CherryTree ile birebir ay
 | İptal / editörü açma / görüntüleme / reddedilen işlem | Korunur | Korunur |
 | Düğümü taşı (`/nodes/move/{id}`) | Taşınan düğümde şimdi | Oluşturulma korunur |
 | Çoğalt (`/nodes/duplicate/{id}`), yalnız veya alt ağaç | Orijinaller korunur | Yeni gerçek düğümlerin iki tarihi de şimdi |
-| Ortak CTB'ye veya yeni CTB'ye export; yalnız veya alt ağaç | Kaynakta korunur | Hedefte kaynağın iki tarihi aynen korunur |
+| Ortak CTB'ye veya yeni CTB'ye export; yalnız veya alt ağaç | Kaynakta korunur | Hedefte kopyalanan düğümlerin iki tarihi aynen korunur; yeni kapsayıcının iki tarihi şimdi |
 | Kardeş düğüm oluştur (`/nodes/siblings/{id}`) | Seçilen düğümde şimdi; kök olmayan parent da yeni çocuk aldığı için güncellenir | Yeni düğümün iki tarihi de şimdi |
 | Alt düğüm oluştur (`/nodes/children/{id}`) | Parent düğümde şimdi | Yeni düğümün iki tarihi de şimdi |
 | Kök düğüm oluştur | Başka düğüm güncellenmez | Yeni düğümün iki tarihi de şimdi |

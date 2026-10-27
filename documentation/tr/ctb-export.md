@@ -54,13 +54,7 @@ Dört seçenek de hem masaüstü hem mobil düğüm görünümünde bulunur.
 
 ## Düğüm kimlikleri neden değişir?
 
-Kaynak CTB'deki `node_id` değerleri hedefte aynen korunmaz. Güncel algoritma:
-
-1. `exportednodes.ctb` içindeki en büyük `children.node_id` değerini bulur.
-2. Bu değerin bir fazlasını işlem için başlangıç/ofset değeri yapar. Boş dosyada başlangıç değeri `1` olur.
-3. Aktarılan her düğüm için `yeni node_id = başlangıç değeri + kaynak node_id` hesabını kullanır.
-
-Bu nedenle kimlikler arasındaki boşluklar rastgele değildir; kaynak düğümlerin kimlikleri ve önceki en büyük hedef kimliği tarafından oluşur. Aynı ofset bir dalın bütün düğümlerine uygulandığı için dal içindeki baba/çocuk ve shared-node referansları yeni kimliklere taşınabilir. Bununla birlikte, yalnız tek düğüm aktarımlarında gereğinden büyük ve seyrek kimlikler üretilebilir.
+Ortak CTB’ye aktarırken yeni kimlikler hedefteki `node` ve `children` tablolarının en büyük kimliğinden sonra, ağaç sırasıyla ayrılır. `father_id`, `master_id`, bookmark ve nesne kimlikleri bu eşlemeyi kullanır. Ayrı CTB’de aktarılan konumların kaynak kimlikleri korunur. Her iki durumda kapsayıcı düğüme, aktarılan konumlarla çakışmayan ayrı bir kimlik verilir.
 
 ## Dosyayı indirme ve silme
 
@@ -84,7 +78,7 @@ Dört seçenek gerçek ve paylaşımlı konumlarda kullanılabilir. Kapsam, seç
 
 **Hedef CTB’de dışarıda kalan kaynak master’a bağımlı shared bağlantı bırakılmaz.** İlk konumda master içeriği materialize edilir; aynı grubun her konumu için ayrı içerik kopyası oluşturulmaz. Kaynak veritabanı değişmez. Hedefin içeriği kaynaktan bağımsızdır; kaynaktaki sonraki düzenlemeler export dosyasını değiştirmez.
 
-Ortak CTB’ye eklerken kimlikler `node` ve `children` tablolarındaki en büyük kimlikten sonra ayrılır. Parent, master, nesne ve bookmark kimlikleri aynı eşlemeye göre yazılır. Her export yeni bir bağımsız grup ekler; önceki export grubuyla birleştirme yapılmaz. Yeni ayrı CTB’de kaynak ağaç kimlikleri korunur; seçilen kökün ebeveyni `0` olur.
+Ortak CTB’ye eklerken kimlikler `node` ve `children` tablolarındaki en büyük kimlikten sonra ayrılır. Parent, master, nesne ve bookmark kimlikleri aynı eşlemeye göre yazılır. Her export yeni bir bağımsız grup ekler; önceki export grubuyla birleştirme yapılmaz. Yeni ayrı CTB’de kaynak ağaç kimlikleri korunur; seçilen kökün ebeveyni yeni kapsayıcı düğümdür. Yalnız kapsayıcı `father_id=0` ile eklenir.
 
 İçerik ve nesneler JDBC üzerinden kopyalanır; binary resim/attachment verileri ve SQL NULL değerleri korunur. Hedefe yazma transaction içindedir. Ortak CTB’de hata varsa eklenen satırlar geri alınır. Ayrı CTB geçici dosyada tamamlanır; ancak başarılı olduğunda mevcut çıktı `.old` olarak taşınır ve yeni çıktı yerleştirilir. Bu geçmiş export dosyaları uygulamanın not veritabanını otomatik yedeklediği anlamına gelmez.
 
@@ -97,7 +91,26 @@ SweetCherry aynı grup yaklaşımını bağımsız JDBC koduyla uygular; CherryT
 
 ### Metin içindeki linkler ve anchor’lar
 
-Ağaçtaki parent/master bağlantıları ile rich-text içindeki internal node linkleri ayrı konulardır. Metin içindeki node ID’leri otomatik yeniden yazılmaz. Ortak CTB’de kimlikler değiştiği veya bağlantı hedefi kapsam dışında kaldığı için internal linklerin hedefi korunmayabilir. Dış URL’ler, nesne verileri ve mevcut anchor içeriği aynen kopyalanır. Bu sınırlama shared ağaç ilişkilerinin eksik aktarılması anlamına gelmez.
+Dört CTB seçeneği de her başarılı aktarım için **bir kapsayıcı düğüm** oluşturur. Ortak dosyada her işlem yeni bir kapsayıcı ekler; önceki aktarımlarla birleştirme yapılmaz. Seçilen düğüm, kendi alt ağacı korunarak kapsayıcının tek çocuğu olur. Kapsayıcı kökte son sıradadır (`father_id=0`), kalın başlıklıdır ve rich-text içeriğe sahiptir.
+
+Başlık: `yyyy-mm-dd hh:mm:ss from:<kaynak veritabanının görünen adı> [node:<seçilen kaynak konum ID’si>]`.
+Başlıktaki tarih/saat uygulamanın çalışma saat dilimindedir. Kapsayıcının oluşturulma ve güncellenme tarihleri aynı güncel Unix saniyesidir. **Kopyalanan düğümlerin iki tarihi, kaynak içerikleri ve kaynak bağlantıları değişmez.** Sonuç ekranındaki düğüm sayısı, kaynakta seçilen konum sayısıdır; ek kapsayıcı bu sayıya dahil değildir.
+
+Rich-text `link="node ID ..."` attribute’ları ve resim nesnelerinin `image.link` alanları işlenir:
+
+- Hedef konum da bu aktarımın içindeyse bağlantı onun **hedefteki konum ID’sine** çevrilir. Shared konumun kendi kimliği kullanılır; varsa anchor eki korunur.
+- Kaynakta bulunmayan hedef (**orphan**) veya kaynakta bulunup bu aktarımın dışında kalan gerçek/shared hedef için bağlantı kapsayıcıya çevrilir. Eski anchor eki kaldırılır; raporda olmayan bir anchor’a gitmeye çalışılmaz.
+- Hedef CTB’de aynı sayısal ID’ye sahip eski bir düğüm olması bu kararı değiştirmez. Başka bir export grubuna yanlışlıkla bağlantı kurulmaz.
+- Master’ı dışarıda kalmış bir shared konumun içeriğinin aktarılması, dışarıdaki master konumunu da aktarılmış yapmaz. O master’a giden metin bağlantısı da kapsayıcıya yönlenir.
+- Web URL’leri, dosya/klasör bağlantıları ve plain-text içindeki benzer yazılar değiştirilmez. Görünen bağlantı metni, biçimi ve nesne offset’leri korunur. Geçersiz rich-text XML varsa eksik bir aktarım üretmek yerine transaction geri alınır.
+
+Kapsayıcı içeriği, bağlantının bulunduğu **kaynak içerik düğümünün** ID’si/başlığı altında şu listeyi gösterir:
+
+`Source type | Source ID | Source target name | Internal link text`
+
+Türler `orphan`, `node`, `shared node` değerleridir. ID ve ad, **bağlantının kaynaktaki hedefini** anlatır; shared hedefte ad master’dan gelir. Orphan hedefin bilinmeyen adı `—` olur. Birden fazla biçimli metin parçasına yayılan aynı bağlantının görünür metni birleştirilir. Birden çok ayrı bağlantı ayrı satırlarda kalır. Resim bağlantısında metin yerine nesne offset’i ve varsa dosya adı yazılır. Kaynakta sorunlu/kapsam dışı bağlantı yoksa rapor bunu belirtir; kapsayıcı yine oluşturulur. Rapor taşınabilir CTB içeriği olduğu için İngilizcedir ve kaynak bağlantılarını tıklanabilir olarak yeniden üretmez.
+
+Önceki export dosyaları geriye dönük değiştirilmez.
 
 ### Manuel kabul listesi
 
@@ -105,12 +118,27 @@ Ağaçtaki parent/master bağlantıları ile rich-text içindeki internal node l
 
 Önceki sürümle üretilmiş export dosyaları kendiliğinden onarılmaz. Manuel doğrulamaya boş bir ortak CTB ile başlayın; gerekiyorsa eski `exportednodes.ctb` dosyasını ayrı bir yere taşıyın. Kaynak test CTB’sini değiştirmeyin.
 
-1. Shared 11’de dört seçeneği deneyin: yalnız düğümde bir gerçek kök, alt ağaçta 11, 12, 13, 14, 15, 18, 19 bulunmalı. Master 2’nin çocuğu 3 gelmemeli.
+1. Shared 11’de dört seçeneği deneyin: yalnız düğümde kapsayıcı altında bir gerçek düğüm, alt ağaçta kapsayıcı altında 11, 12, 13, 14, 15, 18, 19 bulunmalı. Master 2’nin çocuğu 3 gelmemeli.
 2. Çıktıları CherryTree’de açın. 18’in altında 19 kalmalı; hedefte olmayan master’a referans bulunmamalı.
 3. 10’u 11’in altına taşıyıp alt ağacı aktarın: 18 ve 10 aynı hedef içeriğe bağlanmalı, biri gerçek master olmalı.
 4. Gerçek 1’i 11’in altına taşıyıp aktarın: 18 ve 10 bu gerçek düğümün hedefteki kimliğine bağlanmalı.
 5. Kaynak master’a resim/attachment, tablo, kod kutusu ekleyin; aktarılan gerçek master’da nesneleri kontrol edin. Shared konuma eklenen bookmark kendi hedef konumunda kalmalı.
-6. Ortak CTB’ye aynı dalı iki kez ekleyin; iki bağımsız kök ve geçerli parent/master bağlantıları bulunmalı.
+6. Ortak CTB’ye aynı dalı iki kez ekleyin; iki bağımsız kapsayıcı kök ve geçerli parent/master bağlantıları bulunmalı.
+
+### Kapsayıcı ve internal linkler için manuel kontrol
+
+1. Kaynak düğümde kendi alt düğümüne, dışarıdaki gerçek düğüme, dışarıdaki shared konuma ve var olmayan bir ID’ye rich-text link ekleyin. Bir bağlantıyı kalın/italik parçalara bölün; Türkçe, `&` ve `<` içeren metin de kullanın.
+2. Dört seçeneği deneyin. Kapsayıcı başlığı, kalınlığı, iki güncel tarihi, kökteki sırası ve kendi altındaki seçilen dalı kontrol edin. Tek düğüm aktarımında onun kaynak çocuklarına giden linkler de kapsam dışıdır.
+3. CherryTree veya SweetCherry’de çıktıyı açın: dal içi link doğru gerçek/shared konuma gitmeli; diğerleri kapsayıcıya gitmeli. Raporda hedef türü, kaynak ID’si, hedef adı ve görünen link metni doğru olmalı. Web bağlantıları ve görünür metin değişmemeli.
+4. Ortak CTB’ye aynı dalı iki kez ekleyin. Her kopyanın linkleri kendi dalına/kapsayıcısına gitmeli; başka gruptaki aynı/eski ID’ye gitmemeli. Ortak CTB aktif kaynakken de tekrar deneyin.
+5. Resme internal link atayın; görüntü, dosya, offset ve yerleşim korunurken link aynı kurala uymalı. Kaynak XML ve tarihlerinin hiç değişmediğini kontrol edin.
+6. Hiç internal link içermeyen düğümde de kapsayıcı ve boş rapor açıklaması bulunmalı. Çıktıyı tekrar içe aktarma önizlemesi kapsayıcıya yönlenen linkleri orphan saymamalı.
+
+### English summary — export containers
+
+Every single-node/subtree export to a new or common CTB creates a bold, rich-text, top-level container named `yyyy-mm-dd hh:mm:ss from:<source database name> [node:<source occurrence ID>]`. Its creation/modification timestamps are current; copied node timestamps are preserved. The selected branch is placed under it without changing its internal hierarchy or shared groups.
+
+Rich-text and image node links within the selected branch are remapped to exported occurrence IDs. Missing source targets and existing targets outside the export point to the container, with their old anchor suffix removed. The report groups these links by source content node and lists source target type (`orphan`, `node`, `shared node`), target ID, target/master name and visible link text. Exported aliases do not implicitly include their external master occurrence. External URLs, visible text, object offsets and source data remain unchanged. Repeated exports have separate containers; the reported exported-node count excludes the container. Existing export files are not retroactively repaired.
 
 ## SweetCherry içinde veri kaynağı olarak açma
 
@@ -123,7 +151,6 @@ Bağlantı tanım dosyalarını `allTenants` klasörüne yüklemek için SweetCh
 ## Kalan işler
 
 - İsteğe bağlı yinelenen export kontrolü.
-- Rich-text içindeki internal node linklerinin hedef kimliklere uyarlanması ve kapsam dışı hedefler için politika.
 - Export hedefinin ayrıca aktif tenant veya CherryTree’de açık olması senaryosunun doğrulanması. Export dosyasını incelemeden/değiştirmeden önce kullanmakta olan programda kapatın.
 
 ## Freeplane / FreeMind dışa aktarma

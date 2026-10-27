@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Wrap every CTB export in a dated, bold source container. Remap internal links within the exported branch and redirect missing/excluded targets to a rich-text report, preserving copied content timestamps and shared hierarchy.
+
 - Filter Move to bookmark shortcuts by title; compact bookmark date/order columns and headings without wrapping drag handles.
 - Remember only the desktop tree-pane width across tabs, add `myapp.tree.default-width` (600 px), and expand its range to 20–1900 px within the available viewport. Other splitters retain their existing behavior.
 
