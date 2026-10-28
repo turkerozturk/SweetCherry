@@ -7,3 +7,9 @@
 .rich-codebox-language{display:flex;align-items:center;gap:.4rem;padding:.2rem}
 .rich-codebox-language[hidden]{display:none}
 .rich-codebox-language img{object-fit:contain}
+
+.rich-internal-dialog{width:42rem;max-width:94vw;max-height:90vh;overflow:auto;box-sizing:border-box}
+.rich-internal-dialog>input,.rich-internal-dialog>select{display:block;width:100%;box-sizing:border-box;margin:.3rem 0 .7rem}
+.rich-internal-id{display:flex;gap:.4rem;margin:.3rem 0 .7rem}.rich-internal-id input{min-width:0;flex:1}
+.rich-internal-matches{max-height:14rem;overflow:auto}.rich-internal-target{display:flex;align-items:center;gap:.4rem;padding:.4rem;text-align:left;overflow-wrap:anywhere}
+.rich-internal-matches button{width:100%;background:var(--bs-body-bg,#fff);border:1px solid #999}.rich-internal-target img{flex:none;object-fit:contain}

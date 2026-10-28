@@ -60,7 +60,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         ids.richText.selectionStart = ids.richText.selectionEnd = value.length;
         fire('richText','input');
     }
-    return {ids, align, fire, select, runs, key, type, symbol, dirty:()=>dirty(), bridge:()=>windowObject.RichTextImportBridge};
+    return {ids, align, fire, select, runs, key, type, symbol, dirty:()=>dirty(), internal:()=>windowObject.RichTextInternalLinkBridge, bridge:()=>windowObject.RichTextImportBridge};
 }
 
 function text(runs) {return runs.map(run => run.text).join('');}
@@ -381,4 +381,26 @@ test('existing codebox edits restore on undo and cancel does not make editor dir
     edit.click();e.ids.richCodeboxText.value='changed';e.fire('richCodeboxApply','click');
     assert.equal(e.dirty(),true);e.runs();assert.equal(JSON.parse(e.ids.richCodeboxes.value)['codebox:0'].text,'changed');
     e.key('z');assert.equal(e.dirty(),false);e.runs();assert.deepEqual(JSON.parse(e.ids.richCodeboxes.value),{});
+});
+
+
+test('internal link insertion and default-label replacement form one undo step',()=>{
+ const e=editor([{text:'A😀B',attributes:{weight:'heavy'}}]);e.select(1,1);
+ const ticket=e.internal().open();e.internal().apply(ticket,'Target','node 11');
+ assert.equal(text(e.runs()),'ATarget😀B');assert.equal(e.runs()[1].attributes.link,'node 11');
+ assert.equal(e.runs()[1].attributes.weight,'heavy');e.key('z');assert.equal(text(e.runs()),'A😀B');assert.equal(e.dirty(),false);
+ e.key('y');assert.equal(text(e.runs()),'ATarget😀B');
+});
+test('caret expands contiguous formatted internal link; edit and remove preserve formatting',()=>{
+ const e=editor([{text:'A',attributes:{link:'node 11',weight:'heavy'}},{text:'B',attributes:{link:'node 11',style:'italic'}},{text:'C',attributes:{link:'webs https://example.org'}}]);
+ e.select(1,1);let ticket=e.internal().open();assert.equal(ticket.text,'AB');assert.equal(ticket.link,'node 11');
+ e.internal().apply(ticket,'AB','node 22 çapa');assert.equal(e.runs()[0].attributes.link,'node 22 çapa');assert.equal(e.runs()[1].attributes.style,'italic');
+ ticket=e.internal().open();e.internal().apply(ticket,ticket.text,null);
+ assert.equal(e.runs()[0].attributes.link,undefined);assert.equal(e.runs()[1].attributes.link,undefined);assert.equal(e.runs()[2].attributes.link,'webs https://example.org');
+ e.key('z');assert.equal(e.runs()[0].attributes.link,'node 22 çapa');
+});
+test('internal link dialog rejects object selections and stale editor changes',()=>{
+ const e=editor([{text:'X',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}}],undefined,{'image:1':{label:'Image'}});
+ e.select(0,2);assert.throws(()=>e.internal().open(),/objects/);
+ e.select(0,1);const ticket=e.internal().open();e.fire('bold','click');assert.throws(()=>e.internal().apply(ticket,'X','node 11'),/changed/);
 });

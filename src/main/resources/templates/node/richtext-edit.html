@@ -56,6 +56,7 @@
 <button type="button" data-insert-symbol="•" th:title="#{editor.insertBullet}" th:aria-label="#{editor.insertBullet}">•</button>
 </div>
 <button type="button" id="richLink" th:text="#{richtext.edit.link}"></button>
+<button type="button" id="richInternalLink" th:text="#{richtext.internal.button}" th:title="#{richtext.internal.help}"></button>
 <button type="button" id="richAutoLink" th:text="#{editor.linkSelection}" th:title="#{editor.linkSelectionHelp}"></button>
 <button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
 <label><input type="checkbox" id="richAllowDeletion" name="allowObjectDeletion" value="true"><span id="richDeletionIcon">🔒</span><span th:text="#{richtext.edit.allowDeletion}"></span></label>
@@ -112,6 +113,22 @@
 <p id="richTableError" role="alert" hidden th:text="#{richtext.edit.tableError}"></p>
 <div class="actions"><button type="button" id="richTableApply" th:text="#{richtext.edit.linkApply}"></button><button type="button" id="richTableCancel" th:text="#{richtext.edit.cancel}"></button></div>
 </dialog>
+<dialog id="richInternalDialog" class="rich-internal-dialog" aria-labelledby="richInternalTitle"
+ th:attr="data-target=@{/nodes/richtext/links/target},data-matches=@{/nodes/richtext/links/matches},data-icons=@{/img/ctbicons/},data-error=#{richtext.internal.error},data-invalid=#{richtext.internal.invalid},data-missing=#{richtext.internal.missing},data-empty=#{richtext.internal.empty},data-changed=#{richtext.internal.changed},data-objects=#{richtext.internal.objects},data-loading=#{richtext.internal.loading},data-limit=#{richtext.internal.limit},data-anchor-missing=#{richtext.internal.anchorMissing},data-clipboard=#{richtext.internal.clipboard}">
+<h2 id="richInternalTitle" th:text="#{richtext.internal.button}"></h2>
+<p class="note" th:text="#{richtext.internal.help}"></p>
+<label for="richInternalId" th:text="#{richtext.internal.id}"></label>
+<div class="rich-internal-id"><input id="richInternalId" type="text" inputmode="numeric" maxlength="19" autocomplete="off"><button type="button" id="richInternalPaste" th:title="#{richtext.internal.paste}" th:aria-label="#{richtext.internal.paste}">📋</button><button type="button" id="richInternalLookup" th:text="#{richtext.internal.lookup}"></button></div>
+<div id="richInternalTarget"></div>
+<label for="richInternalText" th:text="#{richtext.internal.text}"></label>
+<input id="richInternalText" type="text" maxlength="10000" autocomplete="off">
+<button type="button" id="richInternalSearch" th:text="#{richtext.internal.search}"></button>
+<div id="richInternalMatches" class="rich-internal-matches"></div>
+<label for="richInternalAnchor" th:text="#{richtext.internal.anchor}"></label>
+<select id="richInternalAnchor"><option value="" th:text="#{richtext.internal.whole}"></option></select>
+<p id="richInternalStatus" role="status" aria-live="polite"></p>
+<div class="actions"><button type="button" id="richInternalApply" th:text="#{richtext.internal.apply}"></button><button type="button" id="richInternalRemove" th:text="#{richtext.internal.remove}"></button><button type="button" id="richInternalCancel" th:text="#{richtext.edit.cancel}"></button></div>
+</dialog>
 <dialog id="richLinkDialog" aria-labelledby="richLinkTitle">
 <h2 id="richLinkTitle" th:text="#{richtext.edit.link}"></h2>
 <label for="richLinkUrl" th:text="#{richtext.edit.linkUrl}"></label>
@@ -140,5 +157,6 @@
 <script th:src="@{/js/node/richTextEditorSupport.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
 <script th:src="@{/js/node/richTextWebImport.js}"></script>
+<script th:src="@{/js/node/richTextInternalLink.js}"></script>
 <script th:src="@{/js/node/richTextEditorLayout.js}"></script>
 </body></html>

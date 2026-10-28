@@ -152,7 +152,13 @@ public class RichTextEditingService {
             saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(survivors), keys);
             var original = "custom-colors".equals(node.getSyntax()) ? new RichTextXmlReader().read(node.getTxt())
                     : new RichTextDocument(List.of());
-            ExternalRichTextLinks.validateChanges(saved.text(), original);
+            entityManager.unwrap(org.hibernate.Session.class).doWork(connection ->
+                ExternalRichTextLinks.validateChanges(saved.text(), original, link -> {
+                    if (link.startsWith("node ")) {
+                        try { InternalRichTextTargets.validate(connection,link); }
+                        catch(java.sql.SQLException error){throw new IllegalStateException("Cannot validate internal link",error);}
+                    } else ExternalRichTextLinks.validate(link);
+                }));
             canonical = new RichTextXmlWriter().write(saved.text());
         }
         catch (IllegalArgumentException error) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid rich-text XML", error); }

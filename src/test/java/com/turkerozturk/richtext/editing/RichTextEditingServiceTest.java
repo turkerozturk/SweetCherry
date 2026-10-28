@@ -93,6 +93,28 @@ class RichTextEditingServiceTest {
         verify(query,never()).executeUpdate();
     }
 
+    @Test void newInternalLinkUsesSharedOccurrenceAndValidatesAnchorOnSave() throws Exception {
+        try(var sql=connection.createStatement()) {
+            sql.execute("CREATE TABLE node(node_id INTEGER,name TEXT,is_ro INTEGER,is_richtxt INTEGER,syntax TEXT)");
+            sql.execute("CREATE TABLE children(node_id INTEGER,master_id INTEGER)");
+            sql.execute("INSERT INTO node VALUES(22,'Target',0,0,'plain-text')");
+            sql.execute("INSERT INTO children VALUES(22,0),(32,22)");
+            sql.execute("INSERT INTO image VALUES(22,0,'left','anchor',NULL,'','',0)");
+        }
+        var revision=service.open(12).revision();
+        service.save(12,"<node><rich_text link='node 32 anchor'>Target</rich_text></node>",revision);
+        verify(query).setParameter(eq("xml"),contains("<rich_text link=\"node 32 anchor\">Target</rich_text>"));
+    }
+    @Test void missingInternalTargetIsRejectedBeforeAnyWrite() throws Exception {
+        try(var sql=connection.createStatement()) {
+            sql.execute("CREATE TABLE node(node_id INTEGER,name TEXT,is_ro INTEGER,is_richtxt INTEGER,syntax TEXT)");
+            sql.execute("CREATE TABLE children(node_id INTEGER,master_id INTEGER)");
+        }
+        var revision=service.open(12).revision();
+        assertThatThrownBy(()->service.save(12,"<node><rich_text link='node 999'>Missing</rich_text></node>",revision)).isInstanceOf(ResponseStatusException.class);
+        verify(query,never()).executeUpdate();
+    }
+
     @org.junit.jupiter.api.AfterEach void closeConnection() throws Exception { connection.close(); }
 
     private void addImage() {

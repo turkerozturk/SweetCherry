@@ -448,8 +448,8 @@
             span.dataset.richAttributes = JSON.stringify(a);
             if (a.weight === 'heavy') span.style.fontWeight = 'bold';
             if (a.style === 'italic') span.style.fontStyle = 'italic';
-            span.style.textDecoration = [a.underline === 'single' || (a.link || '').startsWith('webs ') ? 'underline' : '', a.strikethrough === 'true' ? 'line-through' : ''].filter(Boolean).join(' ');
-            if ((a.link || '').startsWith('webs ')) {
+            span.style.textDecoration = [a.underline === 'single' || /^(webs|node) /.test(a.link || '') ? 'underline' : '', a.strikethrough === 'true' ? 'line-through' : ''].filter(Boolean).join(' ');
+            if (/^(webs|node) /.test(a.link || '')) {
                 span.title=a.link.slice(5); if (!a.foreground) span.style.color='#3584e4';
             }
             if (a.family === 'monospace') span.style.fontFamily = 'monospace';
@@ -778,6 +778,50 @@
         insert(ticket,items){
             if(readingImage||composing||contentSignature()!==ticket.content)throw new Error('changed');
             selection=[...ticket.selection];focusEditor();restoreSelection();return pasteStructured(items);
+        }
+    };
+    /** Internal-link dialogs edit the same run model as other tools, as a single undo step. */
+    window.RichTextInternalLinkBridge={
+        open(){
+            if(readingImage||composing)throw new Error('busy');
+            captureSelection();
+            let offset=0;
+            const segments=runs.map(run=>{const start=offset;offset+=count(run.text);return {run,start,end:offset};});
+            if(selection[0]===selection[1]){
+                const caret=selection[0];
+                let index=segments.findIndex(item=>item.start<=caret && caret<item.end && (item.run.attributes.link||'').startsWith('node '));
+                if(index<0)index=segments.findIndex(item=>item.end===caret && (item.run.attributes.link||'').startsWith('node '));
+                if(index>=0){let first=index,last=index;const link=segments[index].run.attributes.link;
+                    while(first>0 && segments[first-1].run.attributes.link===link)first--;
+                    while(last+1<segments.length && segments[last+1].run.attributes.link===link)last++;
+                    selection=[segments[first].start,segments[last].end];}
+            }
+            const text=sub(previous,...selection);
+            if(text.includes('\uFFFC'))throw new Error('objects');
+            const selected=segments.filter(item=>item.end>selection[0] && item.start<selection[1]);
+            const links=[...new Set(selected.map(item=>item.run.attributes.link||''))];
+            return {selection:[...selection],text,link:links.length===1 && links[0].startsWith('node ')?links[0]:'',content:contentSignature()};
+        },
+        restore(ticket){selection=[...ticket.selection];focusEditor();restoreSelection();},
+        apply(ticket,text,link){
+            if(readingImage||composing||contentSignature()!==ticket.content)throw new Error('changed');
+            if(text.includes('\uFFFC')||text.length>10000||link!==null && !/^node [1-9][0-9]*(?: .+)?$/.test(link))throw new Error('invalid');
+            let [start,end]=ticket.selection;
+            if(text!==ticket.text){if(!replace(start,end,text))throw new Error('objects');end=start+count(text);}
+            let offset=0;const output=[];
+            for(const run of runs){const finish=offset+count(run.text);
+                if(run.attributes.__sweet_object||finish<=start||offset>=end)output.push(run);
+                else{
+                    const from=Math.max(start,offset)-offset,to=Math.min(end,finish)-offset;
+                    if(from)output.push({text:sub(run.text,0,from),attributes:{...run.attributes}});
+                    const attrs={...run.attributes};
+                    if(link!==null)attrs.link=link;else if((attrs.link||'').startsWith('node '))delete attrs.link;
+                    output.push({text:sub(run.text,from,to),attributes:attrs});
+                    if(to<count(run.text))output.push({text:sub(run.text,to),attributes:{...run.attributes}});
+                }offset=finish;
+            }
+            runs=output;previous=runs.map(run=>run.text).join('');input.value=previous;selection=[start,end];
+            render();focusEditor();restoreSelection();commitHistory();
         }
     };
     const initialContent=contentSignature();

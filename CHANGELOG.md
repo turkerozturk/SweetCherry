@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add/edit rich-text internal links by occurrence ID or exact selected-title matches, with styled target choices, existing-anchor selection, save-time target checks and undo/redo.
+
 ## [1.3.0]
 
 - Add and edit embedded codeboxes in the rich-text editor with searchable language icons, atomic saves and undo/redo.

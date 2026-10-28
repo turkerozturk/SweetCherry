@@ -10,11 +10,16 @@ final class ExternalRichTextLinks {
 
     /** Allows unchanged legacy/internal links; validates every newly introduced nonempty link value. */
     static void validateChanges(RichTextDocument edited, RichTextDocument original) {
+        validateChanges(edited,original,ExternalRichTextLinks::validate);
+    }
+
+    static void validateChanges(RichTextDocument edited, RichTextDocument original, java.util.function.Consumer<String> validateNew) {
         Set<String> existing = original.runs().stream().map(run -> run.attributes().get("link"))
                 .filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
+        var checked = new java.util.HashSet<String>();
         for (var run : edited.runs()) {
             String link = run.attributes().get("link");
-            if (link != null && !link.isEmpty() && !existing.contains(link)) validate(link);
+            if (link != null && !link.isEmpty() && !existing.contains(link) && checked.add(link)) validateNew.accept(link);
         }
     }
 
