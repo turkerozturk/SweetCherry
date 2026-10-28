@@ -1,0 +1,10 @@
+.editor-recovery {border:1px solid #adb5bd;border-radius:.35rem;padding:.4rem .6rem;margin:.4rem 0;font-size:.875rem;background:#f8f9fa;color:#212529;overflow-wrap:anywhere;}
+.editor-recovery p {margin:.3rem 0;}
+.editor-recovery summary {cursor:pointer;}
+.editor-recovery label {display:inline-flex;gap:.3rem;align-items:center;margin:.3rem .6rem .3rem 0;}
+.recovery-controls {display:flex;gap:.35rem;flex-wrap:wrap;margin:.3rem 0;}
+.recovery-controls select {max-width:100%;min-width:0;}
+.editor-recovery button {font:inherit;}
+#recoveryLogin {margin-inline-start:.5rem;}
+
+#editorRecovery {flex:none;max-height:35dvh;overflow:auto;}

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
-<head><title>Düğüm içeriğini düzenle</title></head>
+<head><title>Düğüm içeriğini düzenle</title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"></head>
 <body>
 <section layout:fragment="content" class="container py-3">
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
@@ -9,7 +9,8 @@
     <p><strong th:text="${node.name}">Düğüm adı</strong>
         <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>
     <p class="text-muted">Bu alan düz metindir. Satır sonları ve kod metni olduğu gibi kaydedilir.</p>
-    <form id="plainEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
+    <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>
+<form id="plainEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
         <div class="mb-3 d-flex gap-2">
             <button type="submit" class="btn btn-primary" th:text="#{richtext.edit.save}">Kaydet</button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button>
@@ -25,6 +26,7 @@
                   spellcheck="false" th:text="${node.txt}"></textarea>
 
     </form>
+<script th:src="@{/js/common/editorRecovery.js}"></script>
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>
 <script th:src="@{/js/node/plainTextEditor.js}"></script>
 </section>

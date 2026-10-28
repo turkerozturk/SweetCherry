@@ -825,5 +825,23 @@
         }
     };
     const initialContent=contentSignature();
+    window.EditorRecovery?.install(form,{
+        base:form.querySelector('[name="revision"]').value,
+        dirty:()=>contentSignature()!==initialContent,
+        busy:()=>readingImage||composing,
+        snapshot:()=>({state:snapshot(),history,historyIndex,pendingImages,pendingFiles,newObjects:Object.fromEntries(Object.entries(window.richEditorObjects||{}).filter(([key])=>key.startsWith('new-')).map(([key,value])=>[key,{label:value.label,tableRows:value.tableRows,codebox:value.codebox}])),allowObjectDeletion:!!deletionLock?.checked}),
+        restore:draft=>{
+            if(!draft || !draft.state || !Array.isArray(draft.state.runs) || !Array.isArray(draft.history) || draft.history.length<1 || draft.history.length>200 || !Number.isInteger(draft.historyIndex) || draft.historyIndex<0 || draft.historyIndex>=draft.history.length)throw new Error('draft');
+            for(const state of [draft.state,...draft.history])if(!Array.isArray(state.runs) || state.runs.some(run=>typeof run.text!=='string'||!run.attributes))throw new Error('draft');
+            history.splice(0,history.length,...draft.history);historyIndex=draft.historyIndex;
+            Object.keys(pendingImages).forEach(key=>delete pendingImages[key]);Object.assign(pendingImages,draft.pendingImages||{});
+            Object.keys(pendingFiles).forEach(key=>delete pendingFiles[key]);Object.assign(pendingFiles,draft.pendingFiles||{});
+            for(const [key,value] of Object.entries(draft.newObjects||{}))if(key.startsWith('new-'))window.richEditorObjects[key]={...value,...(pendingImages[key]?{imageUrl:pendingImages[key]}:{})};
+            const state=draft.state;runs=state.runs;selection=state.selection;deletedKeys=state.deleted||[];
+            tableChanges=state.tables||{};codeboxChanges=state.codeboxes||{};
+            if(deletionLock)deletionLock.checked=!!draft.allowObjectDeletion;
+            previous=runs.map(run=>run.text).join('');input.value=previous;render();updateHistoryButtons();focusEditor();restoreSelection();
+        }
+    });
     window.EditorLeaveGuard.install(form,()=>readingImage || contentSignature()!==initialContent);
 })();

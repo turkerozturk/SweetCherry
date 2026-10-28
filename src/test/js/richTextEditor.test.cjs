@@ -25,7 +25,8 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const align = element('align'); align.dataset = {choice:'justification'};
     const symbol=element('symbol');symbol.dataset={insertSymbol:'☐'};
-    let saved, dirty, windowObject, uuid=0;
+    let saved, dirty, windowObject, recovery, uuid=0;
+    ids.richEditForm.querySelector=()=>({value:"initial-revision"});
     const document = {
         getElementById: id => ids[id],
         querySelectorAll: selector => selector === '[data-insert-symbol]' ? [symbol] : selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
@@ -40,7 +41,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, Event:class {}, window:windowObject={isSecureContext:options.secure!==false,RichTextEditorSupport:require('../../main/resources/static/js/node/richTextEditorSupport.js'),RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
+    vm.runInNewContext(source, {document, URL, Event:class {}, window:windowObject={EditorRecovery:options.recovery?{install:(form,adapter)=>recovery=adapter}:undefined,isSecureContext:options.secure!==false,RichTextEditorSupport:require('../../main/resources/static/js/node/richTextEditorSupport.js'),RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
         RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
         crypto:options.crypto||{randomUUID:()=> uuid++===0?'test-uuid':'test-uuid-'+uuid},
         navigator:{clipboard:options.clipboardReader},
@@ -60,7 +61,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         ids.richText.selectionStart = ids.richText.selectionEnd = value.length;
         fire('richText','input');
     }
-    return {ids, align, fire, select, runs, key, type, symbol, dirty:()=>dirty(), internal:()=>windowObject.RichTextInternalLinkBridge, bridge:()=>windowObject.RichTextImportBridge};
+    return {ids, align, fire, select, runs, key, type, symbol, recovery:()=>recovery,dirty:()=>dirty(), internal:()=>windowObject.RichTextInternalLinkBridge, bridge:()=>windowObject.RichTextImportBridge};
 }
 
 function text(runs) {return runs.map(run => run.text).join('');}
@@ -403,4 +404,18 @@ test('internal link dialog rejects object selections and stale editor changes',(
  const e=editor([{text:'X',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}}],undefined,{'image:1':{label:'Image'}});
  e.select(0,2);assert.throws(()=>e.internal().open(),/objects/);
  e.select(0,1);const ticket=e.internal().open();e.fire('bold','click');assert.throws(()=>e.internal().apply(ticket,'X','node 11'),/changed/);
+});
+
+test('rich recovery preserves formatted history and staged image metadata/payload',async()=>{
+ const e=editor(undefined,undefined,undefined,undefined,false,{recovery:true});
+ e.select(1,3);e.fire('bold','click');
+ e.select(0,0);e.ids.richImageFile.files=[{name:'draft.png',type:'image/png',size:1,data:'data:image/png;base64,YQ=='}];
+ e.fire('richImageFile','change');await new Promise(resolve=>setImmediate(resolve));
+ const draft=JSON.parse(JSON.stringify(e.recovery().snapshot()));
+ assert.equal(Object.keys(draft.pendingImages).length,1);assert.equal(Object.values(draft.newObjects)[0].label,'draft.png');
+ const fresh=editor(undefined,undefined,undefined,undefined,false,{recovery:true});fresh.recovery().restore(draft);
+ assert.equal(fresh.dirty(),true);assert.equal(fresh.ids.richText.value.startsWith('\uFFFC'),true);
+ fresh.runs();assert.equal(Object.keys(JSON.parse(fresh.ids.richImages.value)).length,1);
+ fresh.key('z');assert.equal(fresh.ids.richText.value,'A😀B\nC');assert.equal(fresh.runs()[1].attributes.weight,'heavy');
+ fresh.key('z');assert.equal(fresh.dirty(),false);fresh.key('y');fresh.key('y');assert.equal(fresh.ids.richText.value.startsWith('\uFFFC'),true);
 });

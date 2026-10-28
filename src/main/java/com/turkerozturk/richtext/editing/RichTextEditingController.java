@@ -37,4 +37,12 @@ public class RichTextEditingController {
         service.save(id, xml, revision, images, files, tables, deleted, allowObjectDeletion, codeboxes);
         return continueEditing ? "redirect:/nodes/richtext/edit/"+id : "redirect:/nodes/" + id;
     }
+    /** Explicit receipt only after the existing transactional save returns successfully. */
+    @org.springframework.web.bind.annotation.PostMapping(value="/nodes/richtext/edit/{id}", headers="X-SweetCherry-Editor-Save=1")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public org.springframework.http.ResponseEntity<java.util.Map<String,Object>> saveWithReceipt(@PathVariable long id, @RequestParam String xml, @RequestParam String revision, @RequestParam(defaultValue="{}") String images, @RequestParam(defaultValue="{}") String files, @RequestParam(defaultValue="{}") String tables, @RequestParam(defaultValue="[]") String deleted, @RequestParam(defaultValue="false") boolean allowObjectDeletion, @RequestParam(defaultValue="false") boolean continueEditing, @RequestParam(defaultValue="{}") String codeboxes, jakarta.servlet.http.HttpServletRequest request) {
+        String redirect=save(id,xml,revision,images,files,tables,deleted,allowObjectDeletion,continueEditing,codeboxes);
+        return org.springframework.http.ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .body(java.util.Map.of("saved",true,"redirect",request.getContextPath()+redirect.substring("redirect:".length())));
+    }
 }

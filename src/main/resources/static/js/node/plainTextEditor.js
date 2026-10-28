@@ -34,5 +34,17 @@
         if(composing)return;capture();input.focus();
         input.setRangeText('~'.repeat(33)+'\n',input.selectionStart,input.selectionEnd,'end');commit();
     }]].forEach(([button,action])=>{button.addEventListener('pointerdown',event=>event.preventDefault());button.addEventListener('click',action);});
-    buttons();window.EditorLeaveGuard.install(form,()=>input.value!==initial);
+    buttons();
+    window.EditorRecovery?.install(form,{
+        base:initial,
+        dirty:()=>input.value!==initial,
+        busy:()=>composing,
+        snapshot:()=>{capture();return {history,index,text:input.value,start:input.selectionStart,end:input.selectionEnd};},
+        restore:state=>{
+            if(!state || typeof state.text!=='string' || !Array.isArray(state.history) || state.history.length<1 || state.history.length>200 || !Number.isInteger(state.index) || state.index<0 || state.index>=state.history.length || state.history.some(item=>typeof item.text!=='string'))throw new Error('draft');
+            history=state.history;index=state.index;input.value=state.text;
+            input.focus();input.setSelectionRange(state.start,state.end);buttons();
+        }
+    });
+    window.EditorLeaveGuard.install(form,()=>input.value!==initial);
 })();

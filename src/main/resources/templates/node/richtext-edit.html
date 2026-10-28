@@ -2,9 +2,10 @@
 <html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
-<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"></head>
+<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"></head>
 <body>
 <header class="rich-page-header"><h1 th:text="#{richtext.edit.title}"></h1><strong th:text="${editor.node.name}"></strong></header>
+<div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>
 <form id="richEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/richtext/edit/{id}(id=${editor.node.nodeId})}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" th:value="${editor.revision}">
@@ -152,6 +153,7 @@
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/node/richTextClipboard.js"></script>
+<script th:src="@{/js/common/editorRecovery.js}"></script>
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>
 <script th:src="@{/js/node/richTextImageClipboard.js}"></script>
 <script th:src="@{/js/node/richTextEditorSupport.js}"></script>

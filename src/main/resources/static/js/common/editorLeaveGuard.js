@@ -3,6 +3,7 @@
     window.EditorLeaveGuard = {
         install(form, isDirty) {
             let leaving = false;
+            form.addEventListener('editor:saved', () => { leaving = true; });
             const message = form.dataset.leaveMessage;
             window.addEventListener('beforeunload', event => {
                 if (!leaving && isDirty()) { event.preventDefault(); event.returnValue = ''; }

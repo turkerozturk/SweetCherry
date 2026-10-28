@@ -35,4 +35,12 @@ public class NodeContentEditingController {
         service.update(nodeId, text);
         return continueEditing ? "redirect:/nodes/content/"+nodeId : "redirect:/nodes/" + nodeId;
     }
+    /** Explicit receipt only after the existing transactional save returns successfully. */
+    @org.springframework.web.bind.annotation.PostMapping(value="/nodes/content/{nodeId}", headers="X-SweetCherry-Editor-Save=1")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public org.springframework.http.ResponseEntity<java.util.Map<String,Object>> saveWithReceipt(@PathVariable long nodeId, @RequestParam("text") String text, @RequestParam(defaultValue="false") boolean continueEditing, jakarta.servlet.http.HttpServletRequest request) {
+        String redirect=save(nodeId,text,continueEditing);
+        return org.springframework.http.ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .body(java.util.Map.of("saved",true,"redirect",request.getContextPath()+redirect.substring("redirect:".length())));
+    }
 }

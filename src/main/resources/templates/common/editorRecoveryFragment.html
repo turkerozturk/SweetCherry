@@ -1,0 +1,15 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<aside th:fragment="recovery" id="editorRecovery" class="editor-recovery" th:attr="data-scope=${editorRecoveryScope},data-ready=#{editor.recovery.ready},data-disabled=#{editor.recovery.disabled},data-stored=#{editor.recovery.stored},data-storage-failed=#{editor.recovery.storageFailed},data-found=#{editor.recovery.found},data-choose=#{editor.recovery.choose},data-current=#{editor.recovery.current},data-changed=#{editor.recovery.changed},data-restore-confirm=#{editor.recovery.restoreConfirm},data-discard-confirm=#{editor.recovery.discardConfirm},data-restored=#{editor.recovery.restored},data-discarded=#{editor.recovery.discarded},data-invalid=#{editor.recovery.invalid},data-saving=#{editor.recovery.saving},data-save-failed=#{editor.recovery.saveFailed},data-saved-changed=#{editor.recovery.savedChanged}">
+ <details><summary th:text="#{editor.recovery.title}">Recovery drafts</summary>
+ <p th:text="#{editor.recovery.help}"></p>
+ <label><input id="recoveryEnabled" type="checkbox" checked> <span th:text="#{editor.recovery.enabled}"></span></label>
+ <label><span th:text="#{editor.recovery.interval}"></span> <input id="recoveryInterval" type="number" value="5" min="1" max="300" style="width:5em"></label>
+ <div class="recovery-controls"><select id="recoveryDrafts" th:aria-label="#{editor.recovery.choose}"></select>
+ <button type="button" id="recoveryRestore" disabled th:text="#{editor.recovery.restore}"></button>
+ <button type="button" id="recoveryDownload" disabled th:text="#{editor.recovery.download}"></button>
+ <button type="button" id="recoveryDiscard" disabled th:text="#{editor.recovery.discard}"></button>
+ <button type="button" id="recoveryRescue" th:text="#{editor.recovery.downloadCurrent}"></button></div>
+ </details>
+ <span id="recoveryStatus" role="status" aria-live="polite" th:text="#{editor.recovery.starting}"></span>
+ <a id="recoveryLogin" th:href="@{/login}" target="_blank" rel="noopener" hidden th:text="#{editor.recovery.login}"></a>
+</aside></body></html>
