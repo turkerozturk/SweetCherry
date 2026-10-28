@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add editable node tags with an on-demand searchable multi-select picker, exact de-duplication on property save, compact property layout, and a read-only Tags view with ANY/ALL matching, shared-occurrence navigation and explicit original-property editing.
+
 - Add a read-only Internal Links report under View Mode with source/target occurrence navigation, breadcrumb tooltips, validity/anchor diagnostics, statistics, search and pagination; inspect rich text and object links without loading image BLOBs.
 
 - Add/edit rich-text internal links by occurrence ID or exact selected-title matches, with styled target choices, existing-anchor selection, save-time target checks and undo/redo.

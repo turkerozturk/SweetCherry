@@ -60,20 +60,25 @@ public class NodePropertiesController {
         return "node/nodeProperties";
     }
 
+    public String save(long nodeId,String name,boolean bold,String color,NodeIcon icon,boolean contentReadOnly,NodeType nodeType,String codeSyntax) {
+        return save(nodeId,name,bold,color,icon,contentReadOnly,nodeType,codeSyntax,null);
+    }
+
     @PostMapping("/nodes/properties/{nodeId}")
     public String save(@PathVariable long nodeId, @RequestParam String name,
                        @RequestParam(defaultValue = "false") boolean bold,
                        @RequestParam String color, @RequestParam NodeIcon icon,
                        @RequestParam(defaultValue = "false") boolean contentReadOnly,
                        @RequestParam(required = false) NodeType nodeType,
-                       @RequestParam(required = false) String codeSyntax) {
+                       @RequestParam(required = false) String codeSyntax,@RequestParam(required=false) String tags) {
         TitleColor selected;
         try {
             selected = "KEEP".equals(color) ? null : TitleColor.valueOf(color);
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid title color");
         }
-        service.update(nodeId, name, bold, selected, icon, contentReadOnly, nodeType, codeSyntax);
+        if(tags==null)service.update(nodeId,name,bold,selected,icon,contentReadOnly,nodeType,codeSyntax);
+        else service.update(nodeId,name,bold,selected,icon,contentReadOnly,nodeType,codeSyntax,tags);
         return "redirect:/nodes/" + nodeId;
     }
 }

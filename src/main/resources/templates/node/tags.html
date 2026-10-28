@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{tags.viewTitle}"></title><section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/tags.css}"></section></head>
+<body><section layout:fragment="content" class="container-fluid tags-page p-3">
+<h1 th:text="#{tags.viewTitle}"></h1><p th:text="#{tags.viewHelp}"></p>
+<p th:text="#{tags.statistics(${tagView.catalogue.size()},${tagView.taggedContents},${tagView.taggedPlaces})}"></p>
+<form th:action="@{/nodes/tags}" method="get" class="mb-3"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<details open><summary th:text="#{tags.choose}"></summary>
+<div data-tag-browser><label for="tagViewFilter" th:text="#{tags.filter}"></label><input id="tagViewFilter" class="form-control form-control-sm" type="search" data-tag-filter autocomplete="off">
+<div class="tag-choice-list" data-tag-list><label th:each="tag : ${tagChoices}" class="tag-choice"><input type="checkbox" name="tag" th:value="${tag}" th:checked="${tagView.options.tags.contains(tag)}"><span data-tag-label th:text="${tag}"></span></label></div>
+<div class="tag-summary" data-tag-summary aria-live="polite"></div></div></details>
+<div class="d-flex flex-wrap align-items-end gap-2 mt-2"><div><label for="tagViewMode" th:text="#{tags.match}"></label><select id="tagViewMode" class="form-select form-select-sm" name="mode"><option value="any" th:selected="${tagView.options.mode == 'any'}" th:text="#{tags.any}"></option><option value="all" th:selected="${tagView.options.mode == 'all'}" th:text="#{tags.all}"></option></select></div>
+<div><label for="tagViewLimit" th:text="#{tags.perPage}"></label><input id="tagViewLimit" class="form-control form-control-sm" type="number" style="width:7rem" min="1" max="1000" name="limit" th:value="${tagView.options.limit}" required></div>
+<button type="submit" class="btn btn-sm btn-primary" th:text="#{tags.show}"></button><a class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/tags(_tenantView=${tenantViewToken})}" th:text="#{tags.reset}"></a></div></form>
+<p th:if="${invalidOptions == true}" class="alert alert-warning" th:text="#{tags.invalidOptions}"></p>
+<p th:text="#{tags.range(${tagView.first()},${tagView.last()},${tagView.matched})}"></p>
+<p th:if="${tagView.matched == 0}" class="alert alert-info" th:text="#{tags.noNodes}"></p>
+<p th:if="${tagView.options.page > tagView.pages()}" class="alert alert-warning"><span th:text="#{tags.outsidePage}"></span> <a th:href="@{/nodes/tags(tag=${tagView.options.tags},mode=${tagView.options.mode},limit=${tagView.options.limit},_tenantView=${tenantViewToken})}" th:text="#{tags.firstPage}"></a></p>
+<div th:if="${!tagView.rows.isEmpty()}" class="table-responsive"><table class="table table-sm tags-table"><thead><tr><th th:text="#{tags.node}"></th><th th:text="#{tags.label}"></th><th th:if="${canEditTags}" th:text="#{tags.properties}"></th></tr></thead>
+<tbody><tr th:each="row : ${tagView.rows}"><td><a th:href="@{/nodes/{id}(id=${row.id},_tenantView=${tenantViewToken})}" th:title="${row.breadcrumb}"><img th:src="@{/img/ctbicons/{name}.png(name=${row.icon})}" width="20" height="20" alt="" loading="lazy"> <span th:style="|font-weight:${row.bold ? 'bold' : 'normal'};color:${row.color}|" th:text="${row.name.isEmpty() ? #messages.msg('tags.unnamed') : row.name}"></span> <span class="text-nowrap" th:text="|[${row.id}]|"></span></a> <small th:if="${row.shared}" class="badge text-bg-secondary" th:text="#{tags.shared}"></small></td>
+<td><span th:each="tag : ${row.tags}" class="badge tag-badge" th:text="${tag}"></span></td>
+<td th:if="${canEditTags}"><a th:if="${row.propertiesAvailable}" class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/properties/{id}(id=${row.contentId},_tenantView=${tenantViewToken})}" th:title="${row.shared ? #messages.msg('tags.editMasterHelp',row.contentId) : #messages.msg('tags.properties')}" th:text="${row.shared ? #messages.msg('tags.masterProperties') : #messages.msg('tags.properties')}"></a></td>
+</tr></tbody></table></div>
+<nav class="d-flex flex-wrap align-items-center gap-2" th:aria-label="#{tags.pages}">
+<a th:if="${tagView.options.page > 1 && tagView.options.page <= tagView.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/tags(tag=${tagView.options.tags},mode=${tagView.options.mode},limit=${tagView.options.limit},page=${tagView.options.page - 1},_tenantView=${tenantViewToken})}" th:text="#{tags.previous}"></a><span th:text="#{tags.page(${tagView.options.page},${tagView.pages()})}"></span><a th:if="${tagView.options.page < tagView.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/tags(tag=${tagView.options.tags},mode=${tagView.options.mode},limit=${tagView.options.limit},page=${tagView.options.page + 1},_tenantView=${tenantViewToken})}" th:text="#{tags.next}"></a>
+</nav></section><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/node/tags.js}"></script></section></body></html>

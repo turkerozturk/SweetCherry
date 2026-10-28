@@ -72,12 +72,22 @@ public class NodePropertiesService {
     @Transactional
     public void update(long nodeId, String name, boolean bold, TitleColor color,
                        NodeIcon icon, boolean contentReadOnly, NodeType nodeType, String codeSyntax) {
+        update(nodeId,name,bold,color,icon,contentReadOnly,nodeType,codeSyntax,null);
+    }
+
+    /** Optional tags preserve legacy callers; submitted values are normalized and saved with the other properties. */
+    @Transactional
+    public void update(long nodeId,String name,boolean bold,TitleColor color,NodeIcon icon,boolean contentReadOnly,
+            NodeType nodeType,String codeSyntax,String tags) {
         if (!writable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
         if (name == null || name.isBlank() || name.length() > 255 || icon == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid node properties");
         }
+        String normalizedTags=null;
+        if(tags!=null)try{normalizedTags=com.turkerozturk.node.tags.NodeTags.normalize(tags);}
+        catch(IllegalArgumentException invalid){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid tags",invalid);}
         Node node = realNode(nodeId);
         String oldSyntax = node.getSyntax();
         String newSyntax = requestedSyntax(node, nodeType, codeSyntax);
@@ -94,6 +104,7 @@ public class NodePropertiesService {
         long concatIconIdAndIsReadOnly = BitOperation.concatIconIdAndIsReadOnly(iconIdAndIsReadOnly);
         // Explicit columns avoid merging the entity's bookmark/children relationships.
         String sql = "UPDATE node SET name = :name, is_richtxt = :rich, is_ro = :icon, ts_lastsave = :timestamp"
+                + (tags!=null ? ", tags = :tags" : "")
                 + (syntaxChanged ? ", syntax = :syntax" : "")
                 + " WHERE node_id = :id"
                 + (syntaxChanged ? (oldSyntax == null ? " AND syntax IS NULL" : " AND syntax = :oldSyntax")
@@ -104,6 +115,7 @@ public class NodePropertiesService {
                 .setParameter("icon", concatIconIdAndIsReadOnly)
                 .setParameter("timestamp", com.turkerozturk.node.NodeTimestamps.now())
                 .setParameter("id", nodeId);
+        if(tags!=null)query.setParameter("tags",normalizedTags);
         if (syntaxChanged) {
             query.setParameter("syntax", newSyntax);
             if (oldSyntax != null) {

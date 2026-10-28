@@ -1,109 +1,50 @@
 <!DOCTYPE html>
-<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
-      layout:decorate="~{_layoutMobile}">
-<head><title th:text="#{node.properties.title}">Node properties</title></head>
-<body>
-<section layout:fragment="content" class="container py-3">
-    <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
-    <h1 th:text="#{node.properties.title}">Node properties</h1>
-    <form th:action="@{/nodes/properties/{nodeId}(nodeId=${node.nodeId})}" method="post">
-        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
-        <div class="mb-3">
-            <label for="nodeName" class="form-label" th:text="#{node.properties.name}">Node name</label>
-            <input id="nodeName" class="form-control" name="name" type="text" required maxlength="255"
-                   th:value="${node.name}"/>
-        </div>
-        <div class="form-check mb-3">
-            <input id="bold" class="form-check-input" type="checkbox" name="bold" value="true" th:checked="${bold}"/>
-            <label class="form-check-label" for="bold" th:text="#{node.properties.bold}">Bold title</label>
-        </div>
-        <fieldset class="mb-3">
-            <legend class="fs-5" th:text="#{titlecolor.label}">Title color</legend>
-            <label th:if="${originalColor != null}" th:title="${originalColor}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
-                <input type="radio" name="color" value="KEEP" th:checked="${selectedColor == 'KEEP'}"/>
-                <span th:style="|background-color: ${originalColor}; width: 1.5rem; height: 1.5rem; border: 1px solid #666; display: inline-block;|" aria-hidden="true"></span>
-                <span th:text="#{titlecolor.keep}">Current color</span>
-            </label>
-            <label th:each="item : ${colors}" th:title="${item.hex()}" class="d-inline-flex align-items-center gap-1 me-2 mb-2">
-                <input type="radio" name="color" th:value="${item.name()}"
-                       th:checked="${selectedColor == item.name()}"/>
-                <span th:if="${item.name() != 'NONE'}" th:style="|background-color: ${item.hex()}; width: 1.5rem; height: 1.5rem; border: 1px solid #666; display: inline-block;|" aria-hidden="true"></span>
-                <span th:text="${#messages.msg('titlecolor.' + item.name())}">Color</span>
-            </label>
-        </fieldset>
-        <div class="mb-3" data-icon-picker>
-            <label for="propertyIconSearch" class="form-label" th:text="#{search.icon}">Icon</label>
-            <input id="propertyIconSearch" type="search" class="form-control mb-1" data-icon-search th:placeholder="#{icon.search}" th:attr="aria-label=#{icon.search}"/>
-            <details class="position-relative" data-icon-details>
-                <summary class="form-control" th:text="#{search.icon.choose}">Choose icon</summary>
-                <div class="border rounded p-2" style="max-height:16rem;overflow:auto">
-                    <label th:each="item : ${icons}" class="icon-choice d-flex align-items-center gap-2 py-1">
-                        <input type="radio" name="icon" th:value="${item.name()}" th:checked="${selectedIconId == item.iconIdIn16bit}"/>
-                        <img th:if="${item.name() != 'OTHER'}" th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="20" height="20" alt="" loading="lazy"/>
-                        <span data-icon-label th:text="${item.name() == 'OTHER'} ? #{icon.none} : ${item.iconNameForHuman}"></span>
-                    </label>
-                </div>
-            </details>
-            <div data-icon-selected class="d-flex flex-wrap gap-1 mt-1" aria-live="polite" th:attr="aria-label=#{icon.selected}"></div>
-            <small class="form-text" th:text="#{icon.defaultHelp}"></small>
-        </div>
-        <div class="form-check mb-3">
-            <input id="contentReadOnly" class="form-check-input" type="checkbox" name="contentReadOnly"
-                   value="true" th:checked="${contentReadOnly}"/>
-            <label class="form-check-label" for="contentReadOnly" th:text="#{node.properties.readOnly}">CherryTree content read-only flag</label>
-        </div>
-        <fieldset class="mb-3">
-            <legend class="fs-5" th:text="#{node.properties.type}">Node type</legend>
-            <div class="form-check">
-                <input id="typeRichText" class="form-check-input" type="radio" name="nodeType" value="RICH_TEXT"
-                       th:checked="${nodeType.name() == 'RICH_TEXT'}" disabled/>
-                <label class="form-check-label" for="typeRichText" th:text="#{node.properties.richLocked}">Rich Text (currently not editable)</label>
-            </div>
-            <div class="form-check">
-                <input id="typePlainText" class="form-check-input" type="radio" name="nodeType" value="PLAIN_TEXT"
-                       th:checked="${nodeType.name() == 'PLAIN_TEXT'}" th:disabled="${syntaxLocked}"/>
-                <label class="form-check-label" for="typePlainText" th:text="#{node.type.plainText}">Plain Text</label>
-            </div>
-            <div class="form-check">
-                <input id="typeCode" class="form-check-input" type="radio" name="nodeType" value="CODE"
-                       th:checked="${nodeType.name() == 'CODE'}" th:disabled="${syntaxLocked}"/>
-                <label class="form-check-label" for="typeCode" th:text="#{node.properties.code}">Automatic syntax highlighting</label>
-            </div>
-            <label for="codeSyntax" class="form-label mt-2" th:text="#{node.properties.codeLanguage}">Code language</label>
-            <select id="codeSyntax" name="codeSyntax" class="form-select" required
-                    th:attr="data-locked=${syntaxLocked}"
-                    th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}">
-                <option value="" th:selected="${nodeType.name() != 'CODE'}" th:text="#{node.properties.chooseLanguage}">Choose a language</option>
-                <option th:each="item : ${syntaxOptions}" th:value="${item}"
-                        th:selected="${node.syntax == item}" th:text="${item}">java</option>
-            </select>
-            <small th:if="${syntaxLocked}" class="form-text" th:text="#{node.properties.syntaxLocked}">
-                Rich Text veya içerik salt okunur durumundayken düğüm tipi değiştirilemez.
-            </small>
-        </fieldset>
-        <button type="submit" class="btn btn-primary" th:text="#{richtext.edit.save}">Save</button>
-        <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}">Cancel</a>
-    </form>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{node.properties.title}"></title>
+<section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/tags.css}"></section></head>
+<body><section layout:fragment="content" class="container py-2 node-properties">
+<div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
+<h1 class="fs-4" th:text="#{node.properties.title}"></h1>
+<form id="nodePropertiesForm" th:action="@{/nodes/properties/{nodeId}(nodeId=${node.nodeId})}" method="post">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div class="property-actions mb-2"><button type="submit" class="btn btn-sm btn-primary" th:text="#{richtext.edit.save}"></button> <a class="btn btn-sm btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
+<div class="row g-2">
+<div class="col-md-6">
+<label for="nodeName" class="form-label" th:text="#{node.properties.name}"></label>
+<input id="nodeName" class="form-control form-control-sm" name="name" type="text" required maxlength="255" th:value="${node.name}">
+<label for="nodeTags" class="form-label mt-2" th:text="#{tags.label}"></label>
+<div class="input-group input-group-sm"><input id="nodeTags" class="form-control" name="tags" type="text" maxlength="20000" th:value="${node.tags}" th:attr="aria-label=#{tags.label}">
+<button id="nodeTagsChoose" class="btn btn-outline-secondary" type="button" th:title="#{tags.choose}" th:aria-label="#{tags.choose}"><i class="fas fa-tags" aria-hidden="true"></i></button></div>
+<small class="form-text" th:text="#{tags.help}"></small>
+<div class="d-flex flex-wrap gap-2 mt-2">
+<div class="form-check"><input id="bold" class="form-check-input" type="checkbox" name="bold" value="true" th:checked="${bold}"><label class="form-check-label" for="bold" th:text="#{node.properties.bold}"></label></div>
+<div class="form-check"><input id="contentReadOnly" class="form-check-input" type="checkbox" name="contentReadOnly" value="true" th:checked="${contentReadOnly}"><label class="form-check-label" for="contentReadOnly" th:text="#{node.properties.readOnly}"></label></div>
+</div></div>
+<fieldset class="col-md-6"><legend class="fs-6" th:text="#{titlecolor.label}"></legend>
+<label th:if="${originalColor != null}" th:title="${originalColor}" class="property-color">
+<input type="radio" name="color" value="KEEP" th:checked="${selectedColor == 'KEEP'}"><span class="property-swatch" th:style="|background-color:${originalColor}|" aria-hidden="true"></span><span th:text="#{titlecolor.keep}"></span></label>
+<label th:each="item : ${colors}" th:title="${item.hex()}" class="property-color"><input type="radio" name="color" th:value="${item.name()}" th:checked="${selectedColor == item.name()}"><span th:if="${item.name() != 'NONE'}" class="property-swatch" th:style="|background-color:${item.hex()}|" aria-hidden="true"></span><span th:text="${#messages.msg('titlecolor.' + item.name())}"></span></label>
+</fieldset>
+<div class="col-md-6" data-icon-picker>
+<label for="propertyIconSearch" class="form-label" th:text="#{search.icon}"></label><input id="propertyIconSearch" type="search" class="form-control form-control-sm mb-1" data-icon-search th:placeholder="#{icon.search}" th:attr="aria-label=#{icon.search}">
+<details class="position-relative" data-icon-details><summary class="form-control form-control-sm" th:text="#{search.icon.choose}"></summary>
+<div class="border rounded p-2 property-icon-list"><label th:each="item : ${icons}" class="icon-choice d-flex align-items-center gap-2 py-1"><input type="radio" name="icon" th:value="${item.name()}" th:checked="${selectedIconId == item.iconIdIn16bit}"><img th:if="${item.name() != 'OTHER'}" th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="20" height="20" alt="" loading="lazy"><span data-icon-label th:text="${item.name() == 'OTHER'} ? #{icon.none} : ${item.iconNameForHuman}"></span></label></div></details>
+<div data-icon-selected class="d-flex flex-wrap gap-1 mt-1" aria-live="polite" th:attr="aria-label=#{icon.selected}"></div><small class="form-text" th:text="#{icon.defaultHelp}"></small>
+</div>
+<fieldset class="col-md-6"><legend class="fs-6" th:text="#{node.properties.type}"></legend>
+<div class="form-check"><input id="typeRichText" class="form-check-input" type="radio" name="nodeType" value="RICH_TEXT" th:checked="${nodeType.name() == 'RICH_TEXT'}" disabled><label class="form-check-label" for="typeRichText" th:text="#{node.properties.richLocked}"></label></div>
+<div class="form-check"><input id="typePlainText" class="form-check-input" type="radio" name="nodeType" value="PLAIN_TEXT" th:checked="${nodeType.name() == 'PLAIN_TEXT'}" th:disabled="${syntaxLocked}"><label class="form-check-label" for="typePlainText" th:text="#{node.type.plainText}"></label></div>
+<div class="form-check"><input id="typeCode" class="form-check-input" type="radio" name="nodeType" value="CODE" th:checked="${nodeType.name() == 'CODE'}" th:disabled="${syntaxLocked}"><label class="form-check-label" for="typeCode" th:text="#{node.properties.code}"></label></div>
+<label for="codeSyntax" class="form-label mt-1" th:text="#{node.properties.codeLanguage}"></label><select id="codeSyntax" name="codeSyntax" class="form-select form-select-sm" required th:attr="data-locked=${syntaxLocked}" th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}"><option value="" th:selected="${nodeType.name() != 'CODE'}" th:text="#{node.properties.chooseLanguage}"></option><option th:each="item : ${syntaxOptions}" th:value="${item}" th:selected="${node.syntax == item}" th:text="${item}"></option></select>
+<small th:if="${syntaxLocked}" class="form-text" th:text="#{node.properties.syntaxLocked}"></small>
+</fieldset></div></form>
+<dialog id="nodeTagsDialog" class="node-tags-dialog" aria-labelledby="nodeTagsDialogTitle" th:attr="data-endpoint=@{/nodes/tags/catalog},data-loading=#{tags.loading},data-error=#{tags.error},data-empty=#{tags.noChoices},data-changed=#{tags.changed},data-too-long=#{tags.tooLong}">
+<h2 id="nodeTagsDialogTitle" class="fs-5" th:text="#{tags.choose}"></h2>
+<div data-tag-browser><label for="nodeTagsSearch" th:text="#{tags.filter}"></label><input id="nodeTagsSearch" type="search" class="form-control form-control-sm" data-tag-filter autocomplete="off"><div id="nodeTagsList" class="tag-choice-list" data-tag-list></div><div class="tag-summary" data-tag-summary aria-live="polite"></div></div>
+<p id="nodeTagsStatus" role="status" aria-live="polite"></p>
+<button id="nodeTagsApply" type="button" class="btn btn-sm btn-primary" th:text="#{tags.apply}"></button> <button id="nodeTagsCancel" type="button" class="btn btn-sm btn-secondary" th:text="#{richtext.edit.cancel}"></button>
+</dialog>
 </section>
-<section layout:fragment="pageSpecificJsScripts">
-    <style>.icon-choice[hidden] { display: none !important; }</style>
-    <script defer th:src="@{/js/icon-picker.js}"></script>
-    <script>
-        (() => {
-            const codeRadio = document.getElementById('typeCode');
-            const codeSyntax = document.getElementById('codeSyntax');
-            if (!codeRadio || !codeSyntax) return;
-
-            /** Activates the language list only for editable code nodes. */
-            function syncLanguageList() {
-                codeSyntax.disabled = codeSyntax.dataset.locked === 'true' || !codeRadio.checked;
-            }
-
-            document.querySelectorAll('input[name="nodeType"]').forEach(radio =>
-                radio.addEventListener('change', syncLanguageList));
-            syncLanguageList();
-        })();
-    </script>
-</section>
-</body>
-</html>
+<section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/icon-picker.js}"></script><script defer th:src="@{/js/node/tags.js}"></script>
+<script>(()=>{const radio=document.getElementById('typeCode'),syntax=document.getElementById('codeSyntax');if(!radio||!syntax)return;function sync(){syntax.disabled=syntax.dataset.locked==='true'||!radio.checked;}document.querySelectorAll('input[name="nodeType"]').forEach(item=>item.addEventListener('change',sync));sync();})();</script>
+</section></body></html>

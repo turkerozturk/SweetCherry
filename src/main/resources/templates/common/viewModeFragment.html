@@ -11,6 +11,7 @@
     <li th:if="${currentTenantName}"><hr class="dropdown-divider"></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/timeline/modified(_tenantView=${tenantViewToken})}"><i class="fas fa-clock"></i> <span th:text="#{timeline.recentModified}">Recently Modified</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/internal-links(_tenantView=${tenantViewToken})}"><i class="fas fa-link"></i> <span th:text="#{internalReport.title}">Internal Links</span></a></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/tags(_tenantView=${tenantViewToken})}"><i class="fas fa-tags"></i> <span th:text="#{tags.viewTitle}">Tags</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/timeline/created(_tenantView=${tenantViewToken})}"><i class="fas fa-plus"></i> <span th:text="#{timeline.recentCreated}">Recently Added</span></a></li>
     <li><hr class="dropdown-divider"></li>
     <li class="node-zoom-controls" role="group" th:aria-label="#{view.contentZoom}">

@@ -237,4 +237,18 @@ class NodePropertiesServiceTest {
         verify(query).setParameter(eq("timestamp"),any(Long.class));verify(query).executeUpdate();
     }
 
+    @Test void savesNormalizedTagsAndAllowsClearingWithoutTouchingContent() {
+        var node=new Node();node.setSyntax("plain-text");node.setTags("old");var query=mock(Query.class);var service=serviceWith(node,query);
+        service.update(12,"Name",false,TitleColor.NONE,NodeIcon.OTHER,false,null,null,"  foo Türkçe foo Tag tag  ");
+        verify(query).setParameter("tags","foo Türkçe Tag tag");verify(query).setParameter(eq("timestamp"),any(Long.class));
+        service.update(12,"Name",false,TitleColor.NONE,NodeIcon.OTHER,false,null,null,"");verify(query).setParameter("tags","");
+    }
+    @Test void oldCallersDoNotEraseTagsAndInvalidTagsNeverWrite() {
+        var node=new Node();node.setSyntax("plain-text");node.setTags("keep");var query=mock(Query.class);var service=serviceWith(node,query);
+        service.update(12,"Name",false,TitleColor.NONE,NodeIcon.OTHER,false);verify(query,never()).setParameter(eq("tags"),any());
+        clearInvocations(query);
+        assertThatThrownBy(()->service.update(12,"Name",false,TitleColor.NONE,NodeIcon.OTHER,false,null,null,"x".repeat(20001))).isInstanceOf(ResponseStatusException.class);
+        verify(query,never()).executeUpdate();
+    }
+
 }
