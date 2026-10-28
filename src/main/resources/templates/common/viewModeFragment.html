@@ -13,6 +13,9 @@
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/internal-links(_tenantView=${tenantViewToken})}"><i class="fas fa-link"></i> <span th:text="#{internalReport.title}">Internal Links</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/tags(_tenantView=${tenantViewToken})}"><i class="fas fa-tags"></i> <span th:text="#{tags.viewTitle}">Tags</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/timeline/created(_tenantView=${tenantViewToken})}"><i class="fas fa-plus"></i> <span th:text="#{timeline.recentCreated}">Recently Added</span></a></li>
+    <li th:if="${currentTenantName}"><hr class="dropdown-divider"></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/calendar/week(_tenantView=${tenantViewToken})}"><i class="fas fa-calendar-week"></i> <span th:text="#{calendar.week}">Weekly calendar</span></a></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/calendar/month(_tenantView=${tenantViewToken})}"><i class="fas fa-calendar-alt"></i> <span th:text="#{calendar.month}">Monthly calendar</span></a></li>
     <li><hr class="dropdown-divider"></li>
     <li class="node-zoom-controls" role="group" th:aria-label="#{view.contentZoom}">
         <button type="button" class="btn btn-sm btn-outline-secondary" data-node-zoom="out" th:title="#{view.zoomOut}" th:aria-label="#{view.zoomOut}"><i class="fas fa-search-minus" aria-hidden="true"></i></button>

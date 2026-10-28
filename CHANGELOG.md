@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add weekly/monthly Created-date calendars, optional tag filters, mobile day lists, content dialogs and guarded timestamp editing with Modified tracking.
+
 - Browser-local recovery drafts for both editors; failed saves keep unsaved content open.
 
 - Add editable node tags with an on-demand searchable multi-select picker, exact de-duplication on property save, compact property layout, and a read-only Tags view with ANY/ALL matching, shared-occurrence navigation and explicit original-property editing.

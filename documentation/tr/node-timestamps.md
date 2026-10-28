@@ -10,6 +10,7 @@ Bu kurallar SweetCherry'nin yazma işlemleri içindir; CherryTree ile birebir ay
 | Zengin metni kaydet (`/nodes/richtext/edit/{id}`) | Metin, biçim, nesne konumu, yükleme/silme veya tablo hücreleri değişmişse şimdi | Oluşturulma korunur |
 | İçerikte değişiklik yapıp Geri Al ile başlangıç içeriğine dön, Kaydet | Korunur | Korunur |
 | Özellikleri kaydet (`/nodes/properties/{id}`) | Alanlar aynı olsa bile başarılı Kaydet işleminde şimdi | Oluşturulma korunur |
+| Takvimde Oluşturulma tarihini değiştir (`/nodes/calendar/{id}/created`) | Gerçek içerik düğümünde şimdi; aynı dakika değişmemişse korunur | Girilen yıl/ay/gün/saat/dakika; shared konumların ortak master tarihi değişir |
 | İptal / editörü açma / görüntüleme / reddedilen işlem | Korunur | Korunur |
 | Düğümü taşı (`/nodes/move/{id}`) | Taşınan düğümde şimdi | Oluşturulma korunur |
 | Çoğalt (`/nodes/duplicate/{id}`), yalnız veya alt ağaç | Orijinaller korunur | Yeni gerçek düğümlerin iki tarihi de şimdi |

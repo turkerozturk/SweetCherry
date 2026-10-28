@@ -161,6 +161,10 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  calendar:
+    first-day-of-week: MONDAY # 1=Monday ... 7=Sunday, or an English day name.
+    time-zone: system # JVM/system time zone; or e.g. Europe/Istanbul.
+    max-entries: 10000 # Visible tree occurrences per calendar range (maximum 50000).
   tree:
     # Desktop /tree only. Saved browser width takes precedence; other splitters are unaffected.
     default-width: 600 # Pixels, clamped to 20..1900 and the available viewport width.
