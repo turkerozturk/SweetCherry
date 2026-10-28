@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{internalReport.title}"></title>
+<section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/internalLinks.css}"></section></head>
+<body><section layout:fragment="content" class="internal-report container-fluid">
+<h1 th:text="#{internalReport.title}"></h1>
+<p class="text-muted" th:text="#{internalReport.help}"></p>
+<div class="internal-report-stats">
+<div><strong th:text="${report.links}"></strong><span th:text="#{internalReport.links}"></span></div>
+<div><strong th:text="${report.sourceContents}"></strong><span th:text="#{internalReport.contents}"></span></div>
+<div><strong th:text="${report.sourcePlaces}"></strong><span th:text="#{internalReport.places}"></span></div>
+<div><strong th:text="${report.broken()}"></strong><span th:text="#{internalReport.broken}"></span></div>
+</div>
+<p class="small" th:text="#{internalReport.breakdown(${report.missingNodes},${report.missingAnchors},${report.invalidLinks})}"></p>
+<form method="get" th:action="@{/nodes/internal-links}" class="internal-report-filters">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div><label for="internalReportSearch" th:text="#{internalReport.search}"></label><input id="internalReportSearch" class="form-control" type="search" name="q" maxlength="500" th:value="${report.options.query}"></div>
+<div><label for="internalReportStatus" th:text="#{internalReport.status}"></label><select id="internalReportStatus" class="form-select" name="status">
+<option value="all" th:selected="${report.options.status == 'all'}" th:text="#{internalReport.all}"></option>
+<option value="broken" th:selected="${report.options.status == 'broken'}" th:text="#{internalReport.onlyBroken}"></option>
+<option value="ok" th:selected="${report.options.status == 'ok'}" th:text="#{internalReport.onlyOk}"></option></select></div>
+<div><label for="internalReportLimit" th:text="#{internalReport.limit}"></label><input id="internalReportLimit" class="form-control" style="width:7rem" type="number" name="limit" min="1" max="1000" required th:value="${report.options.limit}"></div>
+<button class="btn btn-primary" type="submit" th:text="#{internalReport.show}"></button>
+</form>
+<p th:if="${invalidOptions == true}" class="alert alert-warning" th:text="#{internalReport.invalidOptions}"></p>
+<details th:if="${report.unreadable > 0}" class="alert alert-warning">
+<summary th:text="#{internalReport.unreadable(${report.unreadable})}"></summary>
+<p th:text="#{internalReport.unreadableHelp}"></p>
+<ul><li th:each="issue : ${report.issues}"><th:block th:replace="~{node/internal-link-place :: place(${issue.source},'')}"></th:block> — <span th:text="${#messages.msg('internalReport.' + issue.reason)}"></span></li></ul>
+</details>
+<p th:text="#{internalReport.range(${report.first()},${report.last()},${report.matched})}"></p>
+<p th:if="${report.matched == 0}" class="alert alert-info" th:text="#{internalReport.empty}"></p>
+<p th:if="${report.options.page > report.pages()}" class="alert alert-warning"><span th:text="#{internalReport.outsidePage}"></span> <a th:href="@{/nodes/internal-links(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},_tenantView=${tenantViewToken})}" th:text="#{internalReport.firstPage}"></a></p>
+<div th:if="${!report.rows.isEmpty()}" class="table-responsive"><table class="table table-sm internal-report-table">
+<thead><tr><th th:text="#{internalReport.source}"></th><th th:text="#{internalReport.linkText}"></th><th th:text="#{internalReport.target}"></th><th th:text="#{internalReport.status}"></th></tr></thead>
+<tbody><tr th:each="row : ${report.rows}">
+<td th:attr="data-label=#{internalReport.source}"><th:block th:replace="~{node/internal-link-place :: place(${row.source},'')}"></th:block></td>
+<td th:title="${row.rawLink}" th:attr="data-label=#{internalReport.linkText}"><span class="internal-report-label" th:text="${row.label.isEmpty() ? #messages.msg('internalReport.emptyLabel') : row.label}"></span>
+<small class="d-block text-muted" th:text="${#messages.msg('internalReport.' + row.kind)} + ' · ' + ${row.offset}"></small></td>
+<td th:attr="data-label=#{internalReport.target}"><th:block th:if="${row.target != null}"><th:block th:replace="~{node/internal-link-place :: place(${row.target},${row.fragment})}"></th:block></th:block>
+<span th:if="${row.target == null}" th:text="|[${row.targetId}]|"></span>
+<small th:if="${!row.anchor.isEmpty()}" class="d-block" th:text="|⚓ ${row.anchor}|"></small></td>
+<td th:attr="data-label=#{internalReport.status}"><span class="badge" th:classappend="${row.status == 'ok' ? 'text-bg-success' : 'text-bg-warning'}" th:text="${#messages.msg('internalReport.' + row.status)}"></span></td>
+</tr></tbody></table></div>
+<nav class="internal-report-pagination" th:aria-label="#{internalReport.pages}">
+<a th:if="${report.options.page > 1 && report.options.page <= report.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/internal-links(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},page=${report.options.page - 1},_tenantView=${tenantViewToken})}" th:text="#{internalReport.previous}"></a>
+<span th:text="#{internalReport.page(${report.options.page},${report.pages()})}"></span>
+<a th:if="${report.options.page < report.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/internal-links(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},page=${report.options.page + 1},_tenantView=${tenantViewToken})}" th:text="#{internalReport.next}"></a>
+</nav>
+</section></body></html>

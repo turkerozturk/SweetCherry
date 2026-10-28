@@ -1,0 +1,10 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="place(location,fragment)">
+<a th:if="${location.available}" th:href="@{/nodes/{id}(id=${location.id},_tenantView=${tenantViewToken})} + ${fragment}" th:title="${location.breadcrumb}">
+<img th:src="@{/img/ctbicons/{name}.png(name=${location.icon})}" width="20" height="20" alt="" loading="lazy">
+<span th:style="|font-weight:${location.bold ? 'bold' : 'normal'};color:${location.color}|" th:text="${location.name.isEmpty() ? #messages.msg('internalReport.unnamed') : location.name}"></span>
+<span class="internal-report-id" th:text="|[${location.id}]|"></span></a>
+<span th:unless="${location.available}" th:title="${location.breadcrumb}"><span th:text="${location.name}"></span> <span th:text="|[${location.id}]|"></span></span>
+<small th:if="${location.shared}" class="badge text-bg-secondary" th:text="#{internalReport.shared}"></small>
+<small th:unless="${location.available}" class="badge text-bg-warning" th:text="#{internalReport.notInTree}"></small>
+</th:block></body></html>
