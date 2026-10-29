@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.4.0]
+
 - Render Markdown-syntax nodes with safe HTML across node/calendar/template/PDF views; extend the source editor with Markdown tools and preview while retaining history and recovery drafts.
 
 - Add weekly/monthly Created-date calendars, optional tag filters, mobile day lists, content dialogs and guarded timestamp editing with Modified tracking.

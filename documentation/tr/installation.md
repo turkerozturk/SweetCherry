@@ -1,9 +1,9 @@
-# SweetCherry 1.3.0 — hazır Windows paketini kullanma
+# SweetCherry 1.4.0 — hazır Windows paketini kullanma
 
-[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.3.0) Windows 10/11 **64 bit** için bir ürün dosyası indirin:
+[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.4.0) Windows 10/11 **64 bit** için bir ürün dosyası indirin:
 
-- `SweetCherry-1.3.0-windows-x64-setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
-- `SweetCherry-1.3.0-windows-x64.zip`: tamamını çıkarıp `SweetCherry.exe` çalıştırabileceğiniz portable paket.
+- `SweetCherry-1.4.0-windows-x64-setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
+- `SweetCherry-1.4.0-windows-x64.zip`: tamamını çıkarıp `SweetCherry.exe` çalıştırabileceğiniz portable paket.
 
 İkisinde de Java 17 vardır; ayrıca Java kurmanız gerekmez. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
 
