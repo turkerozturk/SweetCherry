@@ -305,10 +305,10 @@
                                 th:utext="${#strings.replace(mapKeyValue.value.data, newlinechar, '&lt;br /&gt;')}"
                                 class="nodetextformatting">icerik
                             </td>
-                            <td th:if="${mapKeyValue.value.syntax eq 'custom-colors'}"
+                            <td th:if="${(mapKeyValue.value.syntax eq 'custom-colors' or mapKeyValue.value.syntax eq 'markdown')}"
                                 th:utext="${mapKeyValue.value.data}">icerik
                             </td>
-                            <td th:unless="${mapKeyValue.value.syntax eq 'plain-text' or mapKeyValue.value.syntax eq 'custom-colors'}"
+                            <td th:unless="${mapKeyValue.value.syntax eq 'plain-text' or (mapKeyValue.value.syntax eq 'custom-colors' or mapKeyValue.value.syntax eq 'markdown')}"
                                 th:utext=" '<b>' + ${mapKeyValue.value.syntax} + '</b> yapisinda icerikler su anda gosterilmiyor. Yazilim gelistikce bu ozellik uygulamaya gececektir...' ">
                                 icerik
                             </td>

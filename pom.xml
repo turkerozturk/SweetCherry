@@ -65,6 +65,7 @@
 		<sweetcherry.jlatexmath.version>1.0.7</sweetcherry.jlatexmath.version>
 		<sweetcherry.openpdf.version>2.0.5</sweetcherry.openpdf.version>
 		<sweetcherry.flying-saucer.version>9.13.3</sweetcherry.flying-saucer.version>
+		<sweetcherry.flexmark.version>0.64.8</sweetcherry.flexmark.version>
 		<sweetcherry.jsoup.version>1.23.2</sweetcherry.jsoup.version>
 		<sweetcherry.bootstrap.version>5.3.8</sweetcherry.bootstrap.version>
 		<sweetcherry.jquery-ui.version>1.14.2+1</sweetcherry.jquery-ui.version>
@@ -248,6 +249,12 @@
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
         </dependency>
+
+		<!-- Markdown node rendering only; codebox syntax handling is unchanged. -->
+		<dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><version>${sweetcherry.flexmark.version}</version></dependency>
+		<dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-ext-tables</artifactId><version>${sweetcherry.flexmark.version}</version></dependency>
+		<dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-ext-gfm-strikethrough</artifactId><version>${sweetcherry.flexmark.version}</version></dependency>
+		<dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-ext-gfm-tasklist</artifactId><version>${sweetcherry.flexmark.version}</version></dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
 		<dependency>

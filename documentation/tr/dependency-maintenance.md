@@ -39,6 +39,7 @@ Bu tablo `9908748` commit’indeki POM ile eşleştirilmiştir. “Korundu” if
 | OpenPDF ve extra fonts | 2.0.5 / 2.0.5 | Birlikte tutulur. 2.0.x Java 17; 2.1.x ve sonrası Java 21 ister. Yeni ana sürümler paket adı değişikliği de içerir. Java 17 dağıtımı korunurken doğrudan en yeni ana sürüme geçilmez. |
 | JLaTeXMath + Greek/Cyrillic fonts | 1.0.7 | `sweetcherry.jlatexmath.version`; Java 17’de offline PNG ve PDF vektör çizimi. Tam TeX motoru değildir. Demo formülü ve PNG fallback testleriyle doğrulanır. |
 | Flying Saucer PDF | 9.13.3 | OpenPDF ile çözülen transitif sürüm ve kullanılan HTML→PDF API'leri birlikte incelenir. |
+| Flexmark core + tables, GFM strikethrough/tasklist | 0.64.8 | 2026-10-29: Java 17 ile node-level Markdown render/önizleme. `sweetcherry.flexmark.version`; `flexmark-all` ve EasyMDE eklenmedi. jsoup allowlist ile HTML/URL temizliği, kaynak koruma, PDF ve editör geçmişi test edilir. BSD 2-Clause lisans ve kaynak adresleri dağıtım notlarında. |
 | jsoup | 1.23.2 | 2026-10-06 tarihinde güncellendi; 258 test başarılı. XML/HTML serileştirme davranışı rich-text okuma/önizleme/rendering çıktılarını etkileyebilir; node 53 ve boş/alias/plain-text senaryoları karşılaştırılır. |
 | Thymeleaf layout | 3.3.0 | Yerleşim ve fragment davranışlarıyla ayrı kontrol. |
 | Thymeleaf security extras | 3.1.1.RELEASE | Eski yorumda geçici bug override'ı var. Boot BOM'da 3.1.5.RELEASE görülüyor; admin/user görünürlük ve sunucu yetki testleriyle ayrı güncelleme adayı. Eski yorum ancak neden çözüldüğü doğrulanınca arşivlenerek değiştirilir. |

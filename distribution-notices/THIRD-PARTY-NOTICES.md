@@ -216,3 +216,28 @@ and Maven Central corresponding-source archive URLs. Upstream source and license
 https://github.com/opencollab/jlatexmath . JLaTeXMath declares GPL v2 with the
 Classpath Exception; font notices remain separate. Only line endings and trailing whitespace in the extracted text copies are normalized for Git; the JARs retain the original files.
 No external TeX executable is bundled or invoked.
+
+## Markdown node rendering (2026-10-29)
+
+Flexmark Java 0.64.8 is used under the BSD 2-Clause License, including the Atlassian and Vladimir Schneider copyright notices. See [original license](licenses/upstream-reference/flexmark-java-LICENSE.txt), [upstream](https://github.com/vsch/flexmark-java) and the versioned source archives below. The core and the table/strike-through/task-list extensions are selected; `flexmark-all`, PDF/DOCX converters, emoji assets and EasyMDE are not included. Existing jsoup 1.23.2 remains unchanged.
+
+| Maven artifact (`com.vladsch.flexmark`, version 0.64.8) | Source |
+|---|---|
+| `flexmark` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark/0.64.8/flexmark-0.64.8-sources.jar) |
+| `flexmark-ext-gfm-strikethrough` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-strikethrough/0.64.8/flexmark-ext-gfm-strikethrough-0.64.8-sources.jar) |
+| `flexmark-ext-gfm-tasklist` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tasklist/0.64.8/flexmark-ext-gfm-tasklist-0.64.8-sources.jar) |
+| `flexmark-ext-tables` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-ext-tables/0.64.8/flexmark-ext-tables-0.64.8-sources.jar) |
+| `flexmark-util` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util/0.64.8/flexmark-util-0.64.8-sources.jar) |
+| `flexmark-util-ast` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-ast/0.64.8/flexmark-util-ast-0.64.8-sources.jar) |
+| `flexmark-util-builder` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-builder/0.64.8/flexmark-util-builder-0.64.8-sources.jar) |
+| `flexmark-util-collection` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-collection/0.64.8/flexmark-util-collection-0.64.8-sources.jar) |
+| `flexmark-util-data` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-data/0.64.8/flexmark-util-data-0.64.8-sources.jar) |
+| `flexmark-util-dependency` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-dependency/0.64.8/flexmark-util-dependency-0.64.8-sources.jar) |
+| `flexmark-util-format` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-format/0.64.8/flexmark-util-format-0.64.8-sources.jar) |
+| `flexmark-util-html` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-html/0.64.8/flexmark-util-html-0.64.8-sources.jar) |
+| `flexmark-util-misc` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-misc/0.64.8/flexmark-util-misc-0.64.8-sources.jar) |
+| `flexmark-util-options` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-options/0.64.8/flexmark-util-options-0.64.8-sources.jar) |
+| `flexmark-util-sequence` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-sequence/0.64.8/flexmark-util-sequence-0.64.8-sources.jar) |
+| `flexmark-util-visitor` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-visitor/0.64.8/flexmark-util-visitor-0.64.8-sources.jar) |
+
+The transitive `org.jetbrains:annotations:24.0.1` uses Apache License 2.0; see [Apache 2.0](licenses/upstream-reference/Apache-2.0.txt), [source copyright header](licenses/source-notices/annotations-24.0.1/SOURCE-COPYRIGHT-HEADERS.txt) and the [versioned sources](https://repo.maven.apache.org/maven2/org/jetbrains/annotations/24.0.1/annotations-24.0.1-sources.jar). The earlier JAR inventory remains a historical release snapshot; these additions are recorded here.

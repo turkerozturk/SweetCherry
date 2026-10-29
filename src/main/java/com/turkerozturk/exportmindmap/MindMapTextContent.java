@@ -20,6 +20,7 @@ public class MindMapTextContent {
 
     @Transactional(readOnly = true)
     public String text(long contentId, String syntax, String text) {
+        if(com.turkerozturk.markdown.NodeMarkup.supports(syntax))return com.turkerozturk.markdown.NodeMarkup.text(syntax,text);
         if (!"custom-colors".equals(syntax)) return Objects.toString(text, "");
         return entityManager.unwrap(Session.class).doReturningWork(connection -> text(connection, contentId, text));
     }

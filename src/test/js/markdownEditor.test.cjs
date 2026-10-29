@@ -1,0 +1,14 @@
+const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
+function editor(fetcher){
+ const handlers={},elements={},changes=[],requests=[],timers=[];for(const id of ['markdownTools','plainEditForm','nodeText','markdownPreviewPane','markdownPreview','markdownPreviewStatus','markdownAutoPreview','markdownPreviewToggle','markdownRefresh','markdownShell'])elements[id]={value:'hello',hidden:id==='markdownPreviewPane',checked:true,dataset:{previewUrl:'/nodes/markdown/1/preview',loading:'loading',failed:'failed'},selectionStart:0,selectionEnd:5,addEventListener(type,handler){handlers[id+':'+type]=handler;},setAttribute(){},classList:{toggle(){}}};
+ const button={dataset:{mdBefore:'**',mdAfter:'**'},addEventListener(type,handler){handlers['bold:'+type]=handler;}};elements.markdownTools.querySelectorAll=()=>[button];elements.plainEditForm.querySelector=selector=>({value:selector.includes('_csrf')?'csrf':'token'});elements.markdownPreviewToggle.click=()=>handlers['markdownPreviewToggle:click']();
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/markdown/markdownEditor.js'),'utf8'),{document:{getElementById:id=>elements[id]},window:{PlainTextEditorBridge:{replace:(start,end,text)=>changes.push({start,end,text})}},AbortController,URLSearchParams,setTimeout:(callback)=>{timers.push(callback);return timers.length;},clearTimeout(){},fetch:async(url,options)=>{requests.push({url,options});return fetcher(url,options);}});
+ return {elements,handlers,changes,requests,flush:()=>new Promise(r=>setImmediate(r))};
+}
+test('Markdown tools use the existing history bridge, preview never changes the source',async()=>{
+ const e=editor(async()=>({ok:true,headers:{get:()=> 'application/json'},json:async()=>({html:'<p>hello</p>'})}));await e.flush();assert.equal(e.elements.markdownPreview.innerHTML,'<p>hello</p>');assert.equal(e.elements.nodeText.value,'hello');e.handlers['bold:click']();assert.equal(e.changes[0].text,'**hello**');assert.equal(e.requests[0].options.body.get('_csrf'),'csrf');assert.equal(e.requests[0].options.body.get('_tenantView'),'token');
+});
+test('outdated results and offline errors do not replace source or current preview',async()=>{
+ let finish;const e=editor(()=>new Promise(resolve=>finish=resolve));e.elements.nodeText.value='newer';finish({ok:true,headers:{get:()=> 'application/json'},json:async()=>({html:'<p>old</p>'})});await e.flush();assert.equal(e.elements.markdownPreview.innerHTML,undefined);assert.equal(e.elements.nodeText.value,'newer');
+ const failed=editor(async()=>{throw new Error('offline');});await failed.flush();assert.equal(failed.elements.markdownPreviewStatus.textContent,'failed');assert.equal(failed.elements.nodeText.value,'hello');
+});

@@ -6,7 +6,7 @@
 <div class="dropdown" th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')">
 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" th:text="#{tree.edit}"></button>
 <div class="dropdown-menu">
-<a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="dropdown-item" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="#{tree.edit}"></span></a>
+<a th:if="${canDeleteNode == true and canEditNodeContent == true}" sec:authorize="hasRole('ADMIN')" class="dropdown-item" th:href="@{/nodes/content/{id}(id=${requestedNodeId})}" th:title="#{tree.editTitle}"><i class="fas fa-edit"></i> <span th:text="${node.syntax == 'markdown' ? #messages.msg('markdown.editShort') : #messages.msg('tree.edit')}"></span></a>
 <a th:if="${canDeleteNode == true and isSharedNode != true and node != null and (node.syntax == 'plain-text' or node.syntax == 'custom-colors') and node.isReadOnly16bit % 2 == 0}" sec:authorize="hasRole('ADMIN')" class="dropdown-item" th:href="@{/nodes/richtext/edit/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:title="#{richtext.edit.title}"><i class="fas fa-bold"></i> <span th:text="#{richtext.edit.short}"></span></a>
 <hr class="dropdown-divider">
 <th:block th:replace="~{node/nodeDuplicateFragment :: duplicateItems(${view},false)}"></th:block>

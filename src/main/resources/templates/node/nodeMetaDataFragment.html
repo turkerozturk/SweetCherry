@@ -8,7 +8,7 @@
 <div th:fragment="nodeMetaDataFragment">
 
     <!-- Node Meta Popup (Hidden by default) -->
-    <th:block th:if="${node}" th:with="contentType=${#messages.msg(node.syntax == 'custom-colors' ? 'node.type.richText' : (node.syntax == 'plain-text' ? 'node.type.plainText' : 'node.type.code'))}">
+    <th:block th:if="${node}" th:with="contentType=${#messages.msg(node.syntax == 'custom-colors' ? 'node.type.richText' : (node.syntax == 'plain-text' ? 'node.type.plainText' : (node.syntax == 'markdown' ? 'markdown.editShort' : 'node.type.code')))}">
 
 
         <div id="nodeMeta"></div>

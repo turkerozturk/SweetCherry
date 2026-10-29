@@ -97,6 +97,7 @@ public class CalendarService {
         if(node==null)throw new ResponseStatusException(HttpStatus.NOT_FOUND,"missingNode");
         if(node.getTxt()!=null&&node.getTxt().length()>2000000)throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE,"largeContent");
         if("custom-colors".equals(node.getSyntax()))return rendering.renderLive(node,token);
+        if(com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax()))return com.turkerozturk.markdown.NodeMarkup.render(node.getSyntax(),node.getTxt(),token);
         return new org.jsoup.nodes.Element("pre").text(Objects.requireNonNullElse(node.getTxt(),"")).outerHtml();
     }
 }

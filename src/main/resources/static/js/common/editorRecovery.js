@@ -54,13 +54,14 @@
             const empty=document.createElement('option');empty.value='';empty.textContent=message('choose');choices.append(empty);
             for(const record of records){const option=document.createElement('option');option.value=record.id;option.textContent=new Date(record.updated).toLocaleString()+(record.id===id?' ('+message('current')+')':'');choices.append(option);}
             if(records.some(record=>record.id===previous))choices.value=previous;
-            else if(records.length && !ready){choices.value=records[0].id;say('found');}
+            else if(records.length && (!ready || !previous)){choices.value=records[0].id;say('found');}
             buttons();
         }
         choices.addEventListener('change',buttons);
+        panel.querySelector?.('details')?.addEventListener('toggle',()=>{if(db&&panel.querySelector('details').open)refresh().catch(()=>say('storageFailed'));});
         async function persist(force=false) {
             if(!db || writing || saving || !force && !enabled.checked || editor.busy?.())return;
-            if(!editor.dirty()){if(last){await operation(db,'readwrite',store=>store.delete(id));last='';await refresh();}return;}
+            if(!editor.dirty()){if(last){await operation(db,'readwrite',store=>store.delete(id));last='';await refresh();}else if(panel.querySelector?.('details')?.open)await refresh();return;}
             writing=true;
             try {
                 const payload=editor.snapshot(), serialized=JSON.stringify(payload);

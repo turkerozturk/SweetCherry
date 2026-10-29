@@ -60,6 +60,7 @@ public class NodePdfExportService {
             if (text.length() > limits.getMaxNodeTextCharacters()) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
             String html;
             if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = renderRichText(node, objects);
+            else if (com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax())) html=com.turkerozturk.markdown.NodeMarkup.forPdf(node.getSyntax(),text);
             else {
                 var fragment = org.jsoup.Jsoup.parseBodyFragment("");
                 fragment.body().appendElement("div").text(text);
@@ -112,6 +113,7 @@ public class NodePdfExportService {
                     throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
                 String html;
                 if ("custom-colors".equals(node.getSyntax()) && !text.isBlank()) html = renderRichText(node, objects);
+                else if (com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax())) html=com.turkerozturk.markdown.NodeMarkup.forPdf(node.getSyntax(),text);
                 else {
                     var fragment = org.jsoup.Jsoup.parseBodyFragment("");
                     fragment.outputSettings().prettyPrint(false);

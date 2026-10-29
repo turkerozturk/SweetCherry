@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
-<head><title>Düğüm içeriğini düzenle</title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"></head>
+<head><title th:text="${node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle')}"></title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"></head>
 <body>
 <section layout:fragment="content" class="container py-3">
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
-    <h1>Düğüm içeriğini düzenle</h1>
+    <h1 th:text="${node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle')}"></h1>
     <p><strong th:text="${node.name}">Düğüm adı</strong>
         <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>
-    <p class="text-muted">Bu alan düz metindir. Satır sonları ve kod metni olduğu gibi kaydedilir.</p>
+    <p class="text-muted" th:text="${node.syntax == 'markdown' ? #messages.msg('markdown.sourceHelp') : #messages.msg('markdown.plainHelp')}"></p>
     <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>
 <form id="plainEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
@@ -16,19 +16,38 @@
             <button type="submit" class="btn btn-primary" th:text="#{richtext.edit.save}">Kaydet</button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button>
             <a class="btn btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}">İptal</a>
         </div>
-        <label for="nodeText" class="form-label">İçerik</label>
+        <label for="nodeText" class="form-label" th:text="#{markdown.contentLabel}"></label>
         <div class="d-flex gap-2 mb-2" role="group" th:aria-label="#{editor.tools}">
         <button type="button" id="plainUndo" class="btn btn-outline-secondary" th:title="#{richtext.edit.undo}" th:aria-label="#{richtext.edit.undo}"><i class="fas fa-undo" aria-hidden="true"></i></button>
         <button type="button" id="plainRedo" class="btn btn-outline-secondary" th:title="#{richtext.edit.redo}" th:aria-label="#{richtext.edit.redo}"><i class="fas fa-redo" aria-hidden="true"></i></button>
         <button type="button" id="plainSeparator" class="btn btn-outline-secondary mb-2" th:title="#{editor.separator.help}">33~</button>
         </div>
-        <textarea id="nodeText" name="text" class="form-control font-monospace" rows="20"
-                  spellcheck="false" th:text="${node.txt}"></textarea>
+<div th:if="${node.syntax == 'markdown'}" id="markdownTools" class="markdown-toolbar" th:attr="data-preview-url=@{/nodes/markdown/{id}/preview(id=${node.nodeId})},data-loading=#{markdown.loading},data-failed=#{markdown.failed}">
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-before="**" data-md-after="**" th:title="#{richtext.edit.bold}"><b>B</b></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-before="_" data-md-after="_" th:title="#{richtext.edit.italic}"><i>I</i></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-before="~~" data-md-after="~~" th:title="#{richtext.edit.strike}"><s>S</s></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-prefix="# " th:title="#{markdown.heading}">H</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-prefix="- " th:title="#{markdown.list}">•</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-prefix="- [ ] " th:title="#{markdown.task}">☐</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-prefix="&gt; " th:title="#{markdown.quote}">❯</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-before="`" data-md-after="`" th:title="#{markdown.code}">&lt;/&gt;</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-before="[" data-md-after="](https://)" th:title="#{markdown.link}"><i class="fas fa-link" aria-hidden="true"></i></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-md-before="![" data-md-after="](https://)" th:title="#{markdown.image}"><i class="fas fa-image" aria-hidden="true"></i></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" th:attr="data-md-text=#{markdown.tableSource}" th:title="#{markdown.table}"><i class="fas fa-table" aria-hidden="true"></i></button>
+<button type="button" id="markdownPreviewToggle" class="btn btn-sm btn-outline-primary" aria-controls="markdownPreviewPane" aria-expanded="false" th:text="#{markdown.preview}"></button>
+</div>
+<div id="markdownShell" th:classappend="${node.syntax == 'markdown'} ? 'md-editor-shell'">
+<div>        <textarea id="nodeText" name="text" class="form-control font-monospace" rows="20"
+                  spellcheck="false" th:text="${node.txt}"></textarea></div>
+<section th:if="${node.syntax == 'markdown'}" id="markdownPreviewPane" hidden>
+<div class="markdown-preview-heading"><h2 th:text="#{markdown.preview}"></h2><label><input type="checkbox" id="markdownAutoPreview" checked> <span th:text="#{markdown.autoPreview}"></span></label><button id="markdownRefresh" type="button" class="btn btn-sm btn-outline-secondary" th:text="#{markdown.refresh}"></button></div><p id="markdownPreviewStatus" role="status" aria-live="polite"></p><div id="markdownPreview" class="markdown-preview"></div>
+</section></div>
 
     </form>
 <script th:src="@{/js/common/editorRecovery.js}"></script>
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>
 <script th:src="@{/js/node/plainTextEditor.js}"></script>
+<script th:if="${node.syntax == 'markdown'}" th:src="@{/js/markdown/markdownEditor.js}"></script>
 </section>
 </body>
 </html>

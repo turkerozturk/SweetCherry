@@ -36,7 +36,7 @@ public class DataNode {
         this.nodeId = node.getNodeId();
         this.label = node.getName();
         this.syntax = node.getSyntax();
-        this.data = node.getTxtAsHtml();
+        this.data = com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax()) ? com.turkerozturk.markdown.NodeMarkup.render(node.getSyntax(),node.getTxt()) : node.getTxtAsHtml();
         this.creationDateTime = DateTimeHelper.convertTimestampToHumanReadable(node.getCreationTimestamp());
         this.modificationDateTime = DateTimeHelper.convertTimestampToHumanReadable(node.getLastSaveTimestamp());
         this.humanFriendlyLabel = humanFriendlyLabel;

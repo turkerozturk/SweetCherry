@@ -100,6 +100,7 @@ public final class NodePdfDocument {
                 var uri = URI.create(href);
                 if (("/nodes/" + contentId).equals(uri.getPath()) && uri.getRawFragment() != null)
                     link.attr("href", "#" + uri.getRawFragment());
+                else if (uri.getScheme()==null && (uri.getPath()==null || uri.getPath().isEmpty()) && uri.getRawFragment()!=null) { /* Safe in-document Markdown heading link. */ }
                 else if (!("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme())) || uri.getHost() == null)
                     link.removeAttr("href");
             } catch (IllegalArgumentException invalid) { link.removeAttr("href"); }

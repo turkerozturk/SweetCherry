@@ -36,7 +36,7 @@ public class TemplatePdfExportService {
                     throw new IllegalArgumentException("PDF value too large");
                 String html = "custom-colors".equals(node.getSyntax()) && !text.isBlank()
                         ? richText.renderForPdf(node, "")
-                        : new Element("div").text(text).outerHtml();
+                        : com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax()) ? com.turkerozturk.markdown.NodeMarkup.forPdf(node.getSyntax(),text) : new Element("div").text(text).outerHtml();
                 values.put(data.getNodeId(), html);
             }
         }
