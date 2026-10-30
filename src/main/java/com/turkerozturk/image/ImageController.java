@@ -65,7 +65,7 @@ public class ImageController {
     @GetMapping("/attachments")
     @RequiresTenant
     public String getAllAttachments(Model model,
-                                    @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+                                    @CookieValue(value = "viewMode", defaultValue = "tree") String viewMode) {
         List<Image> images = imageService.getAttachedFiles();
         if(!images.isEmpty()) {
             model.addAttribute("images", images);

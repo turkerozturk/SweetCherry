@@ -3,9 +3,9 @@
 # LOCATION
 astronomy:
   enabled: true # Offline widget; configured location below is an example, not automatic GPS.
-  latitude: 40°59'21.5"N
-  longitude: 29°02'14.4"E
-  timezone: Europe/Istanbul
+  latitude: 51.4779 # Greenwich Royal Observatory, example location.
+  longitude: -0.0015
+  timezone: Europe/London
   # Legacy zonalOffset is no longer used; timezone includes daylight-saving rules.
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,7 +80,7 @@ server:
   # varsayilan olarak yalnizca bu bilgisayardan erisilebilir. Uzak erisim bilincli olarak
   # yapilandirilacaksa guvenli kimlik bilgileri ve HTTPS ile birlikte degistirilmelidir.
   address: 127.0.0.1
-  port: 443
+  port: 8443 # Unprivileged default; native HTTPS still requires explicit SSL configuration.
  # ssl:
  #   certificate: "classpath:ssl-self-signed-certificate/certificate.crt"
  #   certificate-private-key: "classpath:ssl-self-signed-certificate/private.key"
@@ -202,6 +202,8 @@ myapp:
     enabled: false
   exportingFolderName: exportedFiles
   login:
+    # Prints generated admin credentials once to local process output, never to the web or myapp.log.
+    show-initial-password: true
     # Set only when a trusted reverse proxy overwrites X-SweetCherry-Client-IP.
     # Empty means use the direct TCP peer for login limits and security logs.
     trusted-proxy-address: ""

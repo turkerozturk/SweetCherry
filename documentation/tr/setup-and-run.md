@@ -156,11 +156,13 @@ SweetCherry açık kaldığı sürece komut penceresi/terminal de açık kalmal�
 
 Oturum sona erdiğinde sonraki istekte yeniden giriş ekranı açılır; girişten sonra CTB tekrar seçilir. Önceden açık sekmeler, başka bir CTB seçildikten sonra eski içerik olarak işaretlenir. Eski sekmedeki silme ve CTB export formları yeni seçilen CTB'ye uygulanmaz. CTB değiştirdikten sonra eski sekmeleri kapatıp yenilerini açın.
 
-Mevcut kaynak ayarındaki ana port `443` olduğundan scriptler, Linux/macOS'ta yönetici yetkisi gerektirmemesi ve çakışma riskini azaltması için onu `8443` olarak değiştirerek başlatır. SSL yapılandırılmadığı için bu yerel başlangıç senaryosunda adres `http://` ile açılır; `https://` kullanmayın.
+Yeni kurulumda ana port `8443` değerindedir; Linux scripti mevcut YAML port ayarını ezmez. Eski YAML'da `443` varsa normal kullanıcıyla çalıştırmak için `8443` yapın veya `--server.port=8443` verin. SSL yapılandırılmadığı için bu yerel başlangıç senaryosunda adres `http://` ile açılır; `https://` kullanmayın.
 
 ## Giriş yapma
 
-Giriş ekranında iki yerleşik hesap vardır. Uygulama ilk açıldığında, **çalışma klasöründe** `login-credentials.properties` oluşturur; parolaları bu dosyadan okuyun:
+Giriş ekranında iki yerleşik hesap vardır. Uygulama ilk açıldığında, **çalışma klasöründe** `login-credentials.properties` oluşturur; launcher içindeki **Admin Şifresini Kopyala** düğmesiyle giriş yapabilir veya parolaları bu dosyadan okuyabilirsiniz. İlk üretilen yönetici şifresi yerel süreç çıktısında bir kez gösterilir. Ayrıntılar: [İlk çalıştırma ve Linux launcher](first-start.md).
+
+Hesaplar:
 
 | Yetki | Kullanıcı adı | Şifre dosyasındaki anahtar |
 |---|---|---|

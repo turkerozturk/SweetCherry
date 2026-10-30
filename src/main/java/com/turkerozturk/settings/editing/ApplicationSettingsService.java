@@ -19,9 +19,9 @@ public class ApplicationSettingsService {
     public record Setting(String key,String type,String fallback,long maximum) {}
     public static final List<Setting> SETTINGS=List.of(
         new Setting("astronomy.enabled","boolean","true",0),
-        new Setting("astronomy.latitude","latitude","40.9893",0),
-        new Setting("astronomy.longitude","longitude","29.0373",0),
-        new Setting("astronomy.timezone","timezone","Europe/Istanbul",0),
+        new Setting("astronomy.latitude","latitude","51.4779",0),
+        new Setting("astronomy.longitude","longitude","-0.0015",0),
+        new Setting("astronomy.timezone","timezone","Europe/London",0),
         new Setting("myapp.openWebBrowserOnStartup","boolean","false",0),
         new Setting("myapp.syntax-highlighting.enabled","boolean","true",0),
         new Setting("myapp.debug","boolean","false",0),

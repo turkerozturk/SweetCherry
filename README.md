@@ -10,6 +10,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 [Download the latest stable release](https://github.com/turkerozturk/SweetCherry/releases/latest). The release page contains the Windows x64 installer and portable ZIP with Java 17 included. Windows users do not need to install Java separately. Extract the portable ZIP before running `SweetCherry.exe`.
 
+- [First-start help / İlk çalıştırma](documentation/tr/first-start.md)
 - [Installation and usage — English](documentation/en/setup-and-run.md)
 - [Kurulum ve kullanım — Türkçe](documentation/tr/installation.md)
 - [Build from source — Türkçe](documentation/tr/setup-and-run.md)

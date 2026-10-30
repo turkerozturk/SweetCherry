@@ -28,9 +28,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class LoginController {
+    @org.springframework.beans.factory.annotation.Value("${myapp.login.admin.name:admin}")
+    private String adminName = "admin";
     @GetMapping("/login")
     public String login(@RequestParam(value = "expired", required = false) String expired, Model model) {
         model.addAttribute("expired", expired != null);
+        model.addAttribute("loginAdminName", adminName);
         return "login/login";
     }
 }

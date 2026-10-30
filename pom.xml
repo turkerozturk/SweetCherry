@@ -537,6 +537,8 @@
 									<fileset dir="${project.basedir}/external">
 										<include name="run.bat"/>
 										<include name="run.sh"/>
+                                        <include name="launcher.sh"/>
+                                        <include name="install-desktop.sh"/>
 										<include name="run.command"/>
 									</fileset>
 								</copy>
@@ -568,6 +570,8 @@
 									</fileset>
 								</copy>
 								<chmod file="${project.basedir}/release/SweetCherry/run.sh" perm="755" osfamily="unix"/>
+                                <chmod file="${project.basedir}/release/SweetCherry/launcher.sh" perm="755" osfamily="unix"/>
+                                <chmod file="${project.basedir}/release/SweetCherry/install-desktop.sh" perm="755" osfamily="unix"/>
 								<chmod file="${project.basedir}/release/SweetCherry/run.command" perm="755" osfamily="unix"/>
 							</target>
 						</configuration>

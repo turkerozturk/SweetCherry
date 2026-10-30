@@ -59,7 +59,7 @@ public class ViewController {
     }
     /** Migrates historical cookies/options to the two maintained node views. */
     public static String normalizeMode(String mode) {
-        return "tree".equals(mode) || "desktop".equals(mode) ? "tree" : "reader";
+        return mode == null || mode.isBlank() || "tree".equals(mode) || "desktop".equals(mode) ? "tree" : "reader";
     }
 
     /** Preserves a selected real/shared node and its CTB token when entering the workspace. */

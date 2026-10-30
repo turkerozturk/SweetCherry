@@ -14,10 +14,8 @@ if [ ! -f SweetCherry.jar ]; then
 fi
 
 echo "Starting SweetCherry..."
-echo "Browser address: http://localhost:8080"
+echo "Default browser address: http://localhost:8080 (external YAML/arguments may change the port)"
 echo "Press Ctrl+C in this terminal to stop the application."
 exec java -jar SweetCherry.jar \
-  --server.port=8443 \
-  --server.http.port=8080 \
   --myapp.openWebBrowserOnStartup=true \
   "$@"

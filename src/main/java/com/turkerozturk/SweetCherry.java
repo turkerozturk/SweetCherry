@@ -59,6 +59,10 @@ public class SweetCherry implements CommandLineRunner {
     public static void main(String[] args) {
         startupArgs = args.clone();
 
+        // External YAML must exist before Spring's ConfigData processing, including on first launch.
+        com.turkerozturk.startup.ExternalConfiguration.initialize(java.nio.file.Path.of("."), SweetCherry.class.getClassLoader())
+                .forEach(System.err::println);
+
         com.turkerozturk.desktop.DesktopControl controls = null;
         if (com.turkerozturk.desktop.DesktopControl.requested(args)) {
             System.setProperty("java.awt.headless", "false");
@@ -73,6 +77,8 @@ public class SweetCherry implements CommandLineRunner {
             application.addListeners((org.springframework.context.ApplicationListener<ApplicationReadyEvent>) event -> {
                 ConfigurableApplicationContext readyContext = event.getApplicationContext();
                 int port = readyContext.getEnvironment().getProperty("server.http.port", Integer.class, 8080);
+                desktop.login(readyContext.getEnvironment().getProperty("myapp.login.admin.name", "admin"),
+                        readyContext.getBean(com.turkerozturk.login.SecurityConfig.class).adminPasswordForDesktop());
                 desktop.ready("http://localhost:" + port, readyContext::close,
                         readyContext.getEnvironment().getProperty("myapp.openWebBrowserOnStartup", Boolean.class, true));
             });
@@ -164,7 +170,7 @@ public class SweetCherry implements CommandLineRunner {
         logger.info("Application started ...");
         if (openWebBrowserOnStartup && !desktopMode) {
             logger.info("launching browser now");
-            browse("http://localhost:8080");
+            browse("http://localhost:" + httpPort);
         }
     }
 

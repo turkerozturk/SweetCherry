@@ -17,6 +17,14 @@ final class LocalLoginCredentials {
     private static final String USER = "user.password";
 
     static Properties load(Path file) throws IOException {
+        return loadWithStatus(file).credentials();
+    }
+
+    record Loaded(Properties credentials, boolean created) {
+        @Override public String toString() { return "Local login credentials [redacted]"; }
+    }
+
+    static Loaded loadWithStatus(Path file) throws IOException {
         if (Files.exists(file)) {
             Properties credentials = new Properties();
             try (InputStream input = Files.newInputStream(file)) {
@@ -26,7 +34,7 @@ final class LocalLoginCredentials {
                     || credentials.getProperty(USER, "").isBlank()) {
                 throw new IOException("Incomplete login credentials file: " + file);
             }
-            return credentials;
+            return new Loaded(credentials, false);
         }
 
         SecureRandom random = new SecureRandom();
@@ -47,7 +55,7 @@ final class LocalLoginCredentials {
         } catch (IOException exception) {
             throw new IOException("Cannot create login credentials file: " + file, exception);
         }
-        return credentials;
+        return new Loaded(credentials, true);
     }
 
     private static String password(SecureRandom random) {

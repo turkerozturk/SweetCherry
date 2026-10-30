@@ -9,7 +9,7 @@
 
 1. Kurucuda Documents/Desktop gibi yazılabilir bir klasör seçin. Varsayılan, kurucunun yanındaki `SweetCherry` klasörüdür. Yönetici yetkisi gerekmez.
 2. Uygulamayı başlatın. Kontrol penceresinde başlangıç durumunu bekleyin; hazır olduğunda `http://localhost:8080` açılır. **Tarayıcıda Aç** düğmesi de kullanılabilir.
-3. **Uygulama Klasörü** düğmesiyle `login-credentials.properties` dosyasını bulun. Kullanıcı adı `admin`, şifre `admin.password=` işaretinden sonraki değerdir. `user` hesabında `user.password=` değeri kullanılır. Anahtar adlarını kullanıcı adı olarak yazmayın.
+3. **Admin Şifresini Kopyala** düğmesine basıp tarayıcıdaki şifre alanına yapıştırın. Yönetici kullanıcı adı giriş sayfasında hazırdır. Parolalar ayrıca uygulama klasöründeki `login-credentials.properties` dosyasındadır; `admin.password` bir ayar anahtarıdır, kullanıcı adı değildir. [İlk çalıştırma yardımı](first-start.md).
 4. Girişten sonra demo veri kaynağını seçin. Kendi notlarınızdan önce örnek CTB ile ekranları tanıyabilirsiniz.
 5. Kapatmak için kontrol penceresindeki **SweetCherry’yi Durdur**, tepsi menüsü veya web arayüzündeki yönetici kapatma seçeneğini kullanın. Tarayıcıyı kapatmak uygulamayı durdurmaz.
 

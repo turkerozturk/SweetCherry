@@ -21,7 +21,7 @@ public class NodeNavigationController {
     @GetMapping("/nodes/go-to")
     public ResponseEntity<Destination> destination(@RequestParam(defaultValue="") String nodeId,
             @RequestParam String _tenantView,
-            @CookieValue(value="viewMode", defaultValue="reader") String mode,
+            @CookieValue(value="viewMode", defaultValue="tree") String mode,
             HttpServletRequest request) {
         final long id;
         try {

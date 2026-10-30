@@ -19,6 +19,9 @@ public final class DesktopControl {
     private JButton open;
     private JButton stop;
     private JButton settings;
+    private JButton copyLogin;
+    private volatile String adminName;
+    private volatile String adminPassword;
     private TrayIcon tray;
     private volatile String url;
     private volatile Runnable shutdown;
@@ -74,9 +77,21 @@ public final class DesktopControl {
         settings = new JButton(text("YAML Ayarları", "YAML Settings")); settings.setEnabled(false);
         settings.addActionListener(e -> new com.turkerozturk.desktop.config.DesktopYamlEditorDialog(frame).setVisible(true));
         files.add(settings);
+        copyLogin = new JButton(text("Admin Şifresini Kopyala", "Copy Admin Password")); copyLogin.setEnabled(false);
+        copyLogin.addActionListener(e -> {
+            try {
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new java.awt.datatransfer.StringSelection(adminPassword), null);
+                JOptionPane.showMessageDialog(frame, text("Şifre kopyalandı. Giriş sayfasındaki kullanıcı adı: ", "Password copied. Login-page username: ") + adminName
+                        + text("\nŞifre alanına yapıştırın. Pano içeriğini paylaşmayın.", "\nPaste into the password field. Keep clipboard contents private."));
+            } catch (Exception error) {
+                JTextField value = new JTextField(adminPassword, 32); value.setEditable(false);
+                JOptionPane.showMessageDialog(frame, new Object[]{text("Panoya erişilemedi. Şifreyi bu alandan kopyalayabilirsiniz:", "Clipboard unavailable. You can copy the password from this field:"), value});
+            }
+        });
+        files.add(copyLogin);
         JLabel loginHelp = new JLabel(text(
-                "<html>Varsayılan kullanıcı adları: <b>admin</b> ve <b>user</b>.<br>Şifreler uygulama klasöründeki <b>login-credentials.properties</b> dosyasındadır.<br><b>admin.password</b> bir ayar anahtarıdır; kullanıcı adı değildir.<br>Şifreyi dosyada değiştirip SweetCherry’yi yeniden başlatın.<br>application.yml içinde özel giriş ayarları varsa onlar kullanılır.</html>",
-                "<html>Default usernames: <b>admin</b> and <b>user</b>.<br>Passwords are in <b>login-credentials.properties</b> in the application folder.<br><b>admin.password</b> is a setting key, not a username.<br>Change the password in the file, then restart SweetCherry.<br>Custom login settings in application.yml take precedence.</html>"));
+                "<html>Giriş için <b>Admin Şifresini Kopyala</b> düğmesine basıp tarayıcıdaki şifre alanına yapıştırın.<br>Şifreler uygulama klasöründeki <b>login-credentials.properties</b> dosyasındadır.<br><b>admin.password</b> bir ayar anahtarıdır; kullanıcı adı değildir.<br>Şifreyi dosyada değiştirip SweetCherry’yi yeniden başlatın.<br>application.yml içinde özel giriş ayarları varsa onlar kullanılır.</html>",
+                "<html>Click <b>Copy Admin Password</b>, then paste into the browser's password field.<br>Passwords are in <b>login-credentials.properties</b> in the application folder.<br><b>admin.password</b> is a setting key, not a username.<br>Change the password in the file, then restart SweetCherry.<br>Custom login settings in application.yml take precedence.</html>"));
         panel.add(title); panel.add(Box.createVerticalStrut(12)); panel.add(status);
         panel.add(Box.createVerticalStrut(8)); panel.add(address); panel.add(Box.createVerticalStrut(8));
         panel.add(progress); panel.add(Box.createVerticalStrut(16)); panel.add(buttons);
@@ -103,6 +118,12 @@ public final class DesktopControl {
     }
 
     private void reveal() { frame.setVisible(true); frame.setState(Frame.NORMAL); frame.toFront(); }
+
+    /** Receives the effective credential after authentication configuration has been built. */
+    public void login(String username, String password) {
+        adminName = username; adminPassword = password;
+        SwingUtilities.invokeLater(() -> copyLogin.setEnabled(password != null));
+    }
 
     /** Enables controls only after the server reports ApplicationReadyEvent. */
     public void ready(String address, Runnable shutdown, boolean browse) {
@@ -152,12 +173,13 @@ public final class DesktopControl {
     private void stop() {
         if (!stopping.compareAndSet(false, true)) return;
         status.setText(text("SweetCherry kapatılıyor…", "Stopping SweetCherry…"));
-        open.setEnabled(false); stop.setEnabled(false); settings.setEnabled(false); progress.setIndeterminate(true);
+        open.setEnabled(false); stop.setEnabled(false); settings.setEnabled(false); copyLogin.setEnabled(false); progress.setIndeterminate(true);
         new Thread(shutdown, "sweetcherry-desktop-shutdown").start();
     }
 
     /** Removes desktop resources when shutdown also originates from the web interface. */
     public void closed() {
+        adminPassword = null;
         SwingUtilities.invokeLater(() -> {
             if (tray != null) SystemTray.getSystemTray().remove(tray);
             frame.dispose();
@@ -171,7 +193,8 @@ public final class DesktopControl {
             File notepad = new File(windows == null ? "C:\\Windows" : windows, "System32/notepad.exe");
             new ProcessBuilder(notepad.getAbsolutePath(), file.getCanonicalPath()).start();
         } else {
-            Desktop.getDesktop().open(file);
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) Desktop.getDesktop().open(file);
+            else new ProcessBuilder("xdg-open", file.getCanonicalPath()).start();
         }
     }
 
@@ -184,11 +207,15 @@ public final class DesktopControl {
             // Explorer can delegate to an existing process and return a nonzero exit code on success.
             new ProcessBuilder(explorer.getAbsolutePath(), folder.getCanonicalPath()).start();
         } else {
-            Desktop.getDesktop().open(folder);
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) Desktop.getDesktop().open(folder);
+            else new ProcessBuilder("xdg-open", folder.getCanonicalPath()).start();
         }
     }
 
-    private void openBrowser() { if (url != null) background(() -> Desktop.getDesktop().browse(URI.create(url))); }
+    private void openBrowser() { if (url != null) background(() -> {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) Desktop.getDesktop().browse(URI.create(url));
+        else new ProcessBuilder("xdg-open", url).start();
+    }); }
     private void background(Task task) {
         Thread thread = new Thread(() -> {
             try { task.run(); } catch (Exception error) {

@@ -50,7 +50,7 @@ public class BookmarkController {
     @GetMapping("/bookmarks")
     @RequiresTenant
     public String getAllChildrenAsHtml(Model model,
-                                       @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+                                       @CookieValue(value = "viewMode", defaultValue = "tree") String viewMode) {
         List<Bookmark> bookmarks = bookmarkService.getBookmarks();
 
         List<Bookmark> available = new ArrayList<>();

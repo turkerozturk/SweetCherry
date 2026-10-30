@@ -66,9 +66,21 @@ public class SecurityConfig {
     @Value("${myapp.login.admin.password:}")
     String loginAdminPassword;
 
+    @Value("${myapp.login.show-initial-password:true}")
+    private boolean showInitialPassword;
+
+    private String desktopAdminPassword;
+
+    /** Local Swing controls only; no controller or HTTP endpoint exposes this value. */
+    public String adminPasswordForDesktop() { return desktopAdminPassword; }
+
     @Bean
     InMemoryUserDetailsManager users() throws IOException {
-        Properties local = LocalLoginCredentials.load(Path.of("login-credentials.properties"));
+        var loaded = LocalLoginCredentials.loadWithStatus(Path.of("login-credentials.properties"));
+        Properties local = loaded.credentials();
+        desktopAdminPassword = loginAdminPassword.isBlank() ? local.getProperty("admin.password") : loginAdminPassword;
+        InitialLoginHint.print(System.out, loaded.created(), showInitialPassword,
+                !loginAdminPassword.isBlank(), loginAdminName, desktopAdminPassword);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return new InMemoryUserDetailsManager(
                 User.withUsername(loginUserName)

@@ -134,7 +134,7 @@ public class NodeController {
     @RequestMapping(value = "/nodesadvancedwithbinding", method = {RequestMethod.GET, RequestMethod.POST})
     @RequiresTenant
     public String postForm(@Valid FormSearch formSearch, BindingResult bindingResult, Model model,
-                           @CookieValue(value = "viewMode", defaultValue = "mobile") String viewMode) {
+                           @CookieValue(value = "viewMode", defaultValue = "tree") String viewMode) {
 
         // bilgi: GET ve POST metodlari arasinda fark olursa, ayirdetmek icin asagidaki iki satir kullanilabilir.
         // , HttpServletRequest request
@@ -265,7 +265,7 @@ public class NodeController {
     @GetMapping({"/", "/rootnode", "/nodes/0"})
     public String getRootNodesAsHtml(Model model, HttpServletRequest request, Locale locale,
                                      @RequestParam(value = "lang", required = false) String lang
-            , @CookieValue(value = "viewMode", defaultValue = "reader") String viewMode) {
+            , @CookieValue(value = "viewMode", defaultValue = "tree") String viewMode) {
 
         // bilgi dil degisikligi durumunda bu metoda yonleniyor. Geldigi sayfayi ogrenip geri yonlendiriyoruz oraya.
         // BASLA dil degisikligi yonlendirmesi
@@ -441,7 +441,7 @@ public class NodeController {
     @GetMapping("/nodes/{nodeId}")
     @RequiresTenant
     public String getNodeAsHtml(@PathVariable long nodeId, Model model, HttpServletRequest request,
-                                @CookieValue(value = "viewMode", defaultValue = "reader") String viewMode) {
+                                @CookieValue(value = "viewMode", defaultValue = "tree") String viewMode) {
         viewMode = com.turkerozturk.global.ViewController.normalizeMode(viewMode);
         if ("tree".equals(viewMode)) {
             var target = org.springframework.web.util.UriComponentsBuilder.fromPath("/tree").queryParam("nodeId", nodeId);

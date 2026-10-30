@@ -28,7 +28,7 @@ Extract the entire ZIP. Open the extracted `SweetCherry` folder and double-click
 
 ## First login
 
-Use **Application Folder** in the control window. First startup creates `login-credentials.properties` in that folder.
+Click **Copy Admin Password** in the control window, paste into the browser password field and sign in; the administrator username is prefilled. First startup also creates `login-credentials.properties` in the application folder. See [first-start help](../tr/first-start.md#english) for local console output, Linux desktop launching and configuration defaults.
 
 | Account | Username | Password entry |
 | --- | --- | --- |
@@ -96,7 +96,7 @@ The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a 
 - Linux/Raspberry Pi: `sh ./first-run.sh`
 - macOS: `sh ./first-run.sh` or `first-run.command`
 
-The first build needs internet access to download Maven/dependencies. Scripts produce `release/SweetCherry`. Later, run its `run.bat`, `run.sh`, or `run.command` from that folder; rebuilding is unnecessary. macOS has not been verified on a physical Mac.
+The first build needs internet access to download Maven/dependencies. Scripts produce `release/SweetCherry`. Later, run its `run.bat`, Linux `launcher.sh` (desktop) / `run.sh` (terminal), or macOS `run.command` from that folder; rebuilding is unnecessary. On Linux, `sh ./release/SweetCherry/install-desktop.sh` creates optional per-user shortcuts. macOS has not been verified on a physical Mac.
 
 ## Troubleshooting and network access
 
