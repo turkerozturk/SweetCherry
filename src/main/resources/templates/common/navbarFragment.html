@@ -83,6 +83,8 @@
                             </li>
 
                             <div class="dropdown-divider"></div>
+                            <li><button type="button" class="dropdown-item" th:disabled="${currentTenantName == null}" data-quick-switch-open aria-controls="quick-switch-dialog"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> <span th:text="#{quick.switch}">Quick switch</span> <kbd>/</kbd></button></li>
+                            <li sec:authorize="hasRole('ADMIN')"><button type="button" class="dropdown-item" th:disabled="${currentTenantName == null}" data-quick-note-open aria-controls="quick-note-dialog"><i class="fas fa-pen-to-square" aria-hidden="true"></i> <span th:text="#{quick.note}">Quick note</span></button></li>
                             <li>
                                 <button type="button" class="dropdown-item" th:disabled="${currentTenantName == null}" data-node-go-open aria-controls="node-go-dialog" aria-haspopup="dialog"><i class="fas fa-arrow-right-to-bracket" aria-hidden="true"></i> <span th:text="#{node.go.title}">Go to Node ID</span></button>
                             </li>
@@ -369,6 +371,9 @@
         </div>
     </nav>
     <th:block th:replace="~{node/nodeGoFragment :: dialog}"></th:block>
+    <th:block th:replace="~{node/quickNodesFragment :: dialogs}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/node/quickNodes.css}">
+    <script defer th:src="@{/js/node/quickNodes.js}"></script>
     <link rel="stylesheet" th:href="@{/css/node/nodeMoveTo.css}">
     <script defer th:src="@{/js/node/nodeMoveTo.js}"></script>
     <script defer th:src="@{/js/node/confirmNodeCreation.js}"></script>

@@ -21,6 +21,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/properties/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/calendar/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/markdown/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/quick/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/content/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/richtext/edit/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/move/")
@@ -40,6 +41,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
             return true;
         }
         if (!TenantContext.hasCurrentTenant()) {
+            if (quickApi(request)) { quickConflict(response); return false; }
             response.sendRedirect(request.getContextPath() + "/");
             return false;
         }
@@ -48,12 +50,25 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
             String expected = session == null ? null : (String) session.getAttribute(
                     TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
             if (expected == null || !expected.equals(pageToken)) {
+                // JSON clients must not enter an HTML /error dispatch that can lose the tenant thread context.
+                if (quickApi(request)) { quickConflict(response); return false; }
                 response.sendError(HttpServletResponse.SC_CONFLICT,
                         "Veri kaynağı değişti. Sayfayı yeniden açıp işlemi tekrar deneyin.");
                 return false;
             }
         }
         return true;
+    }
+
+    private boolean quickApi(HttpServletRequest request) {
+        return request.getRequestURI().startsWith(request.getContextPath() + "/nodes/quick/");
+    }
+
+    private void quickConflict(HttpServletResponse response) throws java.io.IOException {
+        response.setStatus(HttpServletResponse.SC_CONFLICT);
+        response.setHeader("Cache-Control", "no-store");
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\":\"stale-source\"}");
     }
 
     private boolean requiresTenant(HandlerMethod handlerMethod) {

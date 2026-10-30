@@ -1,0 +1,48 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
+<div th:fragment="dialogs" th:if="${currentTenantName != null}" data-quick-nodes
+ th:attr="data-search-url=@{/nodes/quick/search},data-options-url=@{/nodes/quick/options},data-create-url=@{/nodes/quick/create},data-go-url=@{/nodes/go-to},data-icon-base=@{/img/ctbicons/},data-token=${tenantViewToken},data-loading=#{quick.loading},data-empty=#{quick.empty},data-more=#{quick.more},data-scan=#{quick.scan},data-failed=#{quick.failed},data-stale=#{quick.stale},data-denied=#{quick.denied},data-invalid=#{quick.invalid},data-discard=#{quick.discard},data-uncertain=#{quick.uncertain},data-saved=#{quick.saved},data-shared=#{quick.shared}">
+<dialog id="quick-switch-dialog" class="quick-node-dialog" aria-labelledby="quick-switch-title">
+ <h2 class="h5" id="quick-switch-title" th:text="#{quick.switch}"></h2>
+ <form data-quick-switch>
+  <label for="quick-switch-query" th:text="#{quick.search}"></label>
+  <input id="quick-switch-query" type="search" class="form-control" maxlength="160" autocomplete="off" autofocus>
+  <p class="small text-body-secondary mt-2" th:text="#{quick.switchHelp}"></p>
+  <p data-search-status role="status" aria-live="polite" class="small"></p>
+  <div data-search-results class="quick-node-results" role="group" th:attr="aria-label=#{quick.results}"></div>
+  <button type="button" class="btn btn-outline-secondary mt-2" data-quick-close th:text="#{quick.close}"></button>
+ </form>
+</dialog>
+<dialog id="quick-note-dialog" class="quick-node-dialog" sec:authorize="hasRole('ADMIN')" aria-labelledby="quick-note-title">
+ <h2 class="h5" id="quick-note-title" th:text="#{quick.note}"></h2>
+ <form data-quick-note th:action="@{/nodes/quick/create}" method="post">
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+  <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+  <label for="quick-note-name" th:text="#{quick.title}"></label>
+  <input id="quick-note-name" class="form-control" name="title" maxlength="255" required autocomplete="off">
+  <label for="quick-note-text" class="mt-2" th:text="#{quick.text}"></label>
+  <textarea id="quick-note-text" class="form-control" name="text" rows="7" maxlength="200000"></textarea>
+  <div class="row g-2 mt-1">
+   <div class="col-sm-5"><label for="quick-note-syntax" th:text="#{quick.format}"></label>
+    <select id="quick-note-syntax" class="form-select" name="syntax"><option value="plain-text" th:text="#{quick.plain}"></option><option value="markdown">Markdown</option></select>
+   </div>
+   <div class="col-sm-7"><label for="quick-note-parent" th:text="#{quick.parent}"></label>
+    <input id="quick-note-parent" class="form-control" name="parentId" value="0" pattern="0|[1-9][0-9]{0,18}" maxlength="19" inputmode="numeric" required autocomplete="off">
+   </div>
+  </div>
+  <p class="small text-body-secondary mt-1" th:text="#{quick.parentHelp}"></p>
+  <details data-parent-picker>
+   <summary th:text="#{quick.findParent}"></summary>
+   <label class="visually-hidden" for="quick-parent-query" th:text="#{quick.search}"></label>
+   <input id="quick-parent-query" type="search" class="form-control mt-2" maxlength="160" autocomplete="off" th:placeholder="#{quick.search}">
+   <p data-search-status role="status" aria-live="polite" class="small mt-1"></p>
+   <div data-search-results class="quick-node-results" role="group" th:attr="aria-label=#{quick.results}"></div>
+  </details>
+  <p data-quick-status class="small mt-2" role="status" aria-live="polite"></p>
+  <a data-created-link class="d-none mb-2" target="_blank" rel="noopener noreferrer" th:text="#{quick.openCreated}"></a>
+  <div class="d-flex justify-content-end gap-2 mt-2">
+   <button type="button" class="btn btn-outline-secondary" data-quick-close th:text="#{quick.close}"></button>
+   <button type="submit" class="btn btn-primary" disabled th:text="#{quick.save}"></button>
+  </div>
+ </form>
+</dialog>
+</div></body></html>

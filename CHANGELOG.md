@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add title-based Quick switch with styled shared-occurrence results and a slash shortcut; add transactional Quick note capture in plain text/Markdown, searchable parent selection and per-source remembered destinations.
+
 - Initialize missing external YAML before startup without overwriting existing configuration; default fresh readers to the desktop tree and use Greenwich astronomy defaults. Add local launcher password copying, first-use login guidance and one-time generated-password console hints. Add detached Linux desktop launching and per-user shortcuts; use an unprivileged default main port.
 
 ## [1.4.0]
