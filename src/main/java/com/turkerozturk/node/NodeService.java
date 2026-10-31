@@ -349,82 +349,11 @@ public class NodeService {
                 icon.getIconIdIn16bit(), icon.getIconIdIn16bit() | 1)).distinct().toList();
     }
 
+    @Autowired private com.turkerozturk.node.filter.AdvancedNodeSearch advancedNodeSearch;
     public Page<Node> getFilteredFormNodes(FormSearch formSearch, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            if (debugEnabled) System.out.println("hata var:");
-            // Binding hatasi varsa, hataları yazdir. bilgi CHATGPT gosterdi:
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                if (debugEnabled) System.out.println("Field: " + error.getField());
-                if (debugEnabled) System.out.println("Code: " + error.getCode());
-                if (debugEnabled) System.out.println("Message: " + error.getDefaultMessage());
-            }
-        }
-
-        LinkedHashSet<NodeIcon> selectedNodeIcons = formSearch.getNodeIcons();
-        if(selectedNodeIcons != null) {
-            for (NodeIcon nodeIcon : selectedNodeIcons) {
-                if (debugEnabled) System.out.println(nodeIcon.name());
-            }
-        }
-
-
-
-
-        // ---------------------------------------------------------------------------------------------
-
-        Pageable pageable = PageRequest.of(formSearch.getPageNumber(), formSearch.getPageSize(), Sort.by("ts_lastsave").descending());
-
-        Page<Node> nodes;
-
-        // TODO LocalDateTime         LocalDateTime dateWithTime = date.withHour(23).withMinute(59).withSecond(59);
-        long tsCreationStart = DateTimeHelper.convertFormDateWithTimeToUnixEpochSeconds(
-                formSearch.getTsCreationStartFilter(), TimeEnum.START_OF_DAY);
-        long tsCreationEnd = DateTimeHelper.convertFormDateWithTimeToUnixEpochSeconds(
-                formSearch.getTsCreationEndFilter(), TimeEnum.END_OF_DAY);
-        long tsModificationStart = DateTimeHelper.convertFormDateWithTimeToUnixEpochSeconds(
-                formSearch.getTsModificationStartFilter(), TimeEnum.START_OF_DAY);
-        long tsModificationEnd = DateTimeHelper.convertFormDateWithTimeToUnixEpochSeconds(
-                formSearch.getTsModificationEndFilter(), TimeEnum.END_OF_DAY);
-
-
-
-        if (formSearch.getNodeIcons() == null || formSearch.getNodeIcons().isEmpty()) {
-            //nodeIcons = 0L;
-            nodes = getNodesWithCustomQuery(formSearch.getNameFilter(),
-                    formSearch.getTextFilter(),
-                    formSearch.getTagsFilter(),
-                    tsCreationStart, tsCreationEnd,
-                    tsModificationStart, tsModificationEnd,
-                    formSearch.getNodeIdStartFilter(), formSearch.getNodeIdEndFilter(),
-                    formSearch.getSyntaxFilter(),
-                    pageable);
-        } else {
-
-            LinkedHashSet<NodeIcon> nodeIconSet = formSearch.getNodeIcons();
-            //    if(nodeIconSet != null) {
-                /*
-                Integer[] iconIds = nodeIconSet.stream()
-                        .map(nodeIcon -> nodeIcon.getIconIdIn16bit())
-                        .toArray(Integer[]::new);
-*/
-            List<Integer> iconIds = iconFilterValues(nodeIconSet);
-
-
-            nodes = getNodesWithCustomQuery(iconIds, //nodeIcons
-                    formSearch.getNameFilter(),
-                    formSearch.getTextFilter(),
-                    formSearch.getTagsFilter(),
-                    tsCreationStart, tsCreationEnd,
-                    tsModificationStart, tsModificationEnd,
-                    formSearch.getNodeIdStartFilter(), formSearch.getNodeIdEndFilter(),
-                    formSearch.getSyntaxFilter(),
-                    pageable);
-
-        }
-
-        return nodes;
-
+        if(bindingResult.hasErrors())return Page.empty();
+        try{return advancedNodeSearch.search(formSearch);}
+        catch(IllegalArgumentException invalid){bindingResult.reject("advanced.invalid");return Page.empty();}
     }
 
 

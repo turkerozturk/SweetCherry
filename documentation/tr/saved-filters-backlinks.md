@@ -23,3 +23,6 @@ Sayfa başına 20 bağlantı gösterilir. Her açma/yenilemede en fazla 10.000 r
 - İki sekmede aynı kaydı değiştirin: eski revizyon reddedilmeli. Kaydı silin; sayfayı yenilediğinizde geri gelmemelidir.
 - Gerçek ve paylaşımlı hedeflere bağlantılar oluşturun; panelin tam konum / tüm konumlar ayrımını ve kaynak ağaç ID’lerini kontrol edin.
 - Masaüstü ve mobilde paneli açın, sayfalayın ve yenileyin; veritabanı değişmiş eski sekmeden istek kabul edilmemelidir.
+
+
+[Gelişmiş arama ve yeni eşleşme/sıralama seçenekleri](advanced-search.md).

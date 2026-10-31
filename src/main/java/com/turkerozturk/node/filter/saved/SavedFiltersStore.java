@@ -12,9 +12,12 @@ import java.util.*;
 /** Private per-user/source preferences; never writes to the note database. */
 @Service
 public class SavedFiltersStore {
-    public static final Set<String> FIELDS=Set.of("nameFilter","nameStartsWith","textFilter","tagsFilter","syntaxFilter",
+    private static final Set<String> LEGACY_FIELDS=Set.of("nameFilter","nameStartsWith","textFilter","tagsFilter","syntaxFilter",
             "nodeIdStartFilter","nodeIdEndFilter","tsCreationStartFilter","tsCreationEndFilter",
             "tsModificationStartFilter","tsModificationEndFilter","nodeIcons","pageSize");
+    private static final Map<String,List<String>> NEW_DEFAULTS=Map.of("query",List.of(""),"matchMode",List.of("phrase"),"tagMode",List.of("contains"),"sortBy",List.of("modified"),"sortDirection",List.of("desc"));
+    public static final Set<String> FIELDS;
+    static {var fields=new HashSet<>(LEGACY_FIELDS);fields.addAll(NEW_DEFAULTS.keySet());FIELDS=Set.copyOf(fields);}
     private static final int MAX_BYTES=1_048_576;
     public record Preset(String id,String name,Map<String,List<String>> fields) { }
     private record Document(int version,List<Preset> presets) { }
@@ -46,7 +49,7 @@ public class SavedFiltersStore {
                 validateFields(p.fields());
             }
         }catch(RuntimeException invalid){throw new IOException("Invalid saved filters",invalid);}
-        return new Snapshot(scope,hash(bytes),List.copyOf(doc.presets()));
+        return new Snapshot(scope,hash(bytes),doc.presets().stream().map(p->new Preset(p.id(),p.name(),validateFields(p.fields()))).toList());
     }
     public synchronized Snapshot save(String scope,String revision,String id,String name,Map<String,List<String>> fields) throws IOException {
         String label=name(name);Map<String,List<String>> values=validateFields(fields);final String supplied=id;
@@ -91,14 +94,15 @@ public class SavedFiltersStore {
         return value.strip();
     }
     static Map<String,List<String>> validateFields(Map<String,List<String>> fields){
-        if(fields==null||!FIELDS.equals(fields.keySet()))throw new IllegalArgumentException("Invalid fields");
+        if(fields==null||!fields.keySet().containsAll(LEGACY_FIELDS)||!FIELDS.containsAll(fields.keySet()))throw new IllegalArgumentException("Invalid fields");
         Map<String,List<String>> clean=new TreeMap<>();
         for(String key:FIELDS){
-            List<String> values=fields.get(key);if(values==null||values.size()>(key.equals("nodeIcons")?NodeIcon.values().length:1))throw new IllegalArgumentException("Invalid field values");
+            List<String> values=fields.containsKey(key)?fields.get(key):NEW_DEFAULTS.get(key);if(values==null||values.size()>(key.equals("nodeIcons")?NodeIcon.values().length:1))throw new IllegalArgumentException("Invalid field values");
             for(String value:values){
                 if(value==null||value.length()>8192||value.indexOf('\0')>=0)throw new IllegalArgumentException("Invalid value");
                 if(key.equals("nodeIcons"))NodeIcon.valueOf(value);
                 if(key.equals("nameStartsWith")&&!Set.of("true","false").contains(value))throw new IllegalArgumentException("Invalid checkbox");
+                if(key.equals("matchMode")&&!Set.of("all","any","phrase").contains(value)||key.equals("tagMode")&&!Set.of("all","any","contains").contains(value)||key.equals("sortBy")&&!Set.of("id","name","created","modified","tags","syntax").contains(value)||key.equals("sortDirection")&&!Set.of("asc","desc").contains(value))throw new IllegalArgumentException("Invalid search option");
             }
             clean.put(key,List.copyOf(values));
         }

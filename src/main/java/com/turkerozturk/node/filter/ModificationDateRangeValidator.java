@@ -32,7 +32,7 @@ public class ModificationDateRangeValidator implements ConstraintValidator<Valid
     @Override
     public boolean isValid(FormSearch formSearch, ConstraintValidatorContext context) {
 
-        if (formSearch.getTsModificationEndFilter().compareTo(formSearch.getTsModificationStartFilter()) < 0) {
+        if (formSearch.getTsModificationEndFilter()!=null && formSearch.getTsModificationStartFilter()!=null && formSearch.getTsModificationEndFilter().compareTo(formSearch.getTsModificationStartFilter()) < 0) {
             context.buildConstraintViolationWithTemplate("Modification end date cannot be earlier than modification start date")
                     .addPropertyNode("tsModificationEndFilter")
                     .addConstraintViolation();

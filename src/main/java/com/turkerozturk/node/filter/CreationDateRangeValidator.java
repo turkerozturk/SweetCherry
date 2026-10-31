@@ -32,7 +32,7 @@ public class CreationDateRangeValidator implements ConstraintValidator<ValidCrea
     @Override
     public boolean isValid(FormSearch formSearch, ConstraintValidatorContext context) {
 
-        if (formSearch.getTsCreationEndFilter().compareTo(formSearch.getTsCreationStartFilter()) < 0) {
+        if (formSearch.getTsCreationEndFilter()!=null && formSearch.getTsCreationStartFilter()!=null && formSearch.getTsCreationEndFilter().compareTo(formSearch.getTsCreationStartFilter()) < 0) {
             context.buildConstraintViolationWithTemplate("Creation end date cannot be earlier than creation start date")
                     .addPropertyNode("tsCreationEndFilter")
                     .addConstraintViolation();

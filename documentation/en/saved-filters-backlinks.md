@@ -9,3 +9,6 @@ Open Backlinks in the node reader to scan incoming CherryTree rich-text and obje
 Scanning happens only on opening/refreshing the panel: 20 links/page, at most 10,000 rich-text contents and 32 Mi characters per scan, with 2 million characters per content. Image BLOBs are not read. Unreadable/oversized content or scan limits display an incomplete-results warning. Old database/session tokens are rejected.
 
 Manual checks: save Unicode/punctuation and multiple icons, alter fields then apply without duplicated values; check persistence, user/source isolation, update/delete and stale-tab conflicts. Test exact/shared-family backlinks, source occurrence IDs, anchor/object links, empty results, mobile layout and source switching.
+
+
+[Advanced search and matching/sorting options](advanced-search.md).

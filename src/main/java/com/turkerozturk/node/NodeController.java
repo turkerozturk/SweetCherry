@@ -131,6 +131,9 @@ public class NodeController {
      * @param viewMode
      * @return
      */
+    @Autowired private com.turkerozturk.node.tags.NodeTagService searchTagService;
+    @Autowired private com.turkerozturk.node.filter.AdvancedNodeSearch advancedSearch;
+
     @RequestMapping(value = "/nodesadvancedwithbinding", method = {RequestMethod.GET, RequestMethod.POST})
     @RequiresTenant
     public String postForm(@Valid FormSearch formSearch, BindingResult bindingResult, Model model,
@@ -144,17 +147,10 @@ public class NodeController {
 
 
 
-        int[] pages = new int[nodes.getTotalPages()];
-        for (int i = 0; i < pages.length; i++) {
-            pages[i] = i;
-        }
-
-        //--------------------------------------------------------------------------------------
-        model.addAttribute("pages", pages);
-        model.addAttribute("pageNumber", formSearch.getPageNumber());
+        model.addAttribute("pageNumber", nodes.getNumber());
         model.addAttribute("nodes", nodes);
-        // -------------------------------------------------------------------------------------
-
+        model.addAttribute("searchTags", searchTagService.catalogue());
+        model.addAttribute("searchSyntaxes", advancedSearch.syntaxes());
         model.addAttribute("viewMode", viewMode);
         if ("mobile".equals(viewMode)) {
             return "nodesadvancedwithbindingMobile";
