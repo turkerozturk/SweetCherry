@@ -21,9 +21,10 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 - Markdown rendering and editing with preview, internal-link editing and reports, searchable tags, and weekly/monthly node calendars.
 - Browser-local recovery drafts for unsaved editor content.
+- [Advanced raw-content search](documentation/en/advanced-search.md) with multiword/tag matching, sortable results and breadcrumbs; [saved filters and on-demand backlinks](documentation/en/saved-filters-backlinks.md).
 - Rich-text editing, images and attachments, external links, tables, embedded codebox editing, and formatted web-page paste.
 - [Quick switch by title and quick plain-text/Markdown capture](documentation/tr/quick-notes.md) with searchable, remembered parent destinations.
-- Node movement by arrows or parent ID with clipboard/bookmark shortcuts, Go to Node ID, duplication, shared-node hierarchy, and reorderable bookmarks.
+- Node movement by arrows or parent ID with clipboard/bookmark shortcuts, Go to Node ID, duplication, shared-node hierarchy, and reorderable bookmarks with Created/Modified dates.
 - Preview and import exported CTBs into a writable database, preserving hierarchy and remapping internal IDs.
 - Tenant configuration wizard, SQLite/MariaDB/MySQL/PostgreSQL connections, and application settings editors.
 - Markmap, Mermaid, Freeplane/FreeMind export with optional content notes, and PDF export with hierarchical navigation. Offline LaTeX rendering in content and PDF.
@@ -33,7 +34,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 ## Release information
 
-[Changelog](CHANGELOG.md) · [1.4.0 release notes](documentation/releases/v1.4.0.md) · [1.3.0 release notes](documentation/releases/v1.3.0.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
+[Changelog](CHANGELOG.md) · [1.5.0 release notes](documentation/releases/v1.5.0.md) · [1.4.0 release notes](documentation/releases/v1.4.0.md) · [1.3.0 release notes](documentation/releases/v1.3.0.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
 
 Development builds are not currently published as a separate download channel. Use the stable release for ordinary use; source builds from `main` may include unreleased changes.
 

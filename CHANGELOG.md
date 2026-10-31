@@ -4,6 +4,15 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.5.0]
+
+- Redesign advanced POST search with title/raw-content all-word, any-word and phrase matching; exact-tag ANY/ALL filters, searchable tag/icon choices, sortable SQL pagination, occurrence breadcrumbs and compact date columns. Retain raw node.txt filtering and current-page PDF export.
+- Add private per-user/source saved filters outside CTB, preserving earlier presets and rejecting stale preference updates.
+- Add on-demand incoming-link panels in desktop/mobile readers, distinguishing exact/shared target occurrences; bound content scans and report incomplete results. Restore independent tree-content scrolling around the panel.
+- Extend CherryTree icon identities through ID 263 and include the 18 original/converted icon pairs; keep existing IDs and code-language mappings unchanged.
+- Show node Created dates alongside Modified dates in bookmarks; keep mobile dates within the existing name column.
+- Ignore only the three root runtime YAML copies in Git, retaining source configuration files.
+
 - Add title-based Quick switch with styled shared-occurrence results and a slash shortcut; add transactional Quick note capture in plain text/Markdown, searchable parent selection and per-source remembered destinations.
 
 - Initialize missing external YAML before startup without overwriting existing configuration; default fresh readers to the desktop tree and use Greenwich astronomy defaults. Add local launcher password copying, first-use login guidance and one-time generated-password console hints. Add detached Linux desktop launching and per-user shortcuts; use an unprivileged default main port.
