@@ -272,7 +272,28 @@ public enum NodeIcon {
     CT_SHIP(484, 242, "ct_ship", "Ship"),
     CT_STACKOVERFLOW(486, 243, "ct_stackoverflow", "Stackoverflow"),
     CT_ZEBRA(488, 244, "ct_zebra", "Zebra"),
-    CT_POSTMAN(490, 245, "ct_postman", "Postman");
+    CT_POSTMAN(490, 245, "ct_postman", "Postman"),
+
+    // CherryTree ct_const.h: ID is stable; is_ro stores (ID << 1) plus its low read-only bit.
+    // Source: eeda668c02257a4a7ecd46fa8dcab5c7aa1cad3f
+    CT_SK(492, 246, "ct_sk", "Slovak"),
+    CT_VISIBLE(494, 247, "ct_visible", "Visible"),
+    CT_INVISIBLE(496, 248, "ct_invisible", "Invisible"),
+    CT_ARROW_LEFT(498, 249, "ct_arrow-left", "Arrow Left"),
+    CT_ARROW_RIGHT(500, 250, "ct_arrow-right", "Arrow Right"),
+    CT_ARROW_DOWN(502, 251, "ct_arrow-down", "Arrow Down"),
+    CT_ARROW_UP(504, 252, "ct_arrow-up", "Arrow Up"),
+    CT_JENKINS(506, 253, "ct_jenkins", "Jenkins"),
+    CT_POSTGRESQL(508, 254, "ct_postgresql", "PostgreSQL"),
+    CT_SPRING_BOOT(510, 255, "ct_spring-boot", "Spring Boot"),
+    CT_SNOWFLAKE(512, 256, "ct_snowflake", "Snowflake"),
+    CT_VIM(514, 257, "ct_vim", "Vim"),
+    CT_LOCALE(516, 258, "ct_locale", "Locale"),
+    CT_GEMINI(518, 259, "ct_gemini", "Gemini"),
+    CT_CHATGPT(520, 260, "ct_chatgpt", "ChatGPT"),
+    CT_COPILOT(522, 261, "ct_copilot", "Copilot"),
+    CT_CLAUDE(524, 262, "ct_claude", "Claude"),
+    CT_TA(526, 263, "ct_ta", "Tamil");
 
 
     private final Integer iconIdIn16bit;

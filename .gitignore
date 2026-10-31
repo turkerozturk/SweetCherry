@@ -58,3 +58,8 @@ login-credentials.properties
 
 # Private per-user saved search preferences
 /saved-filters/
+
+# Runtime configuration seeded alongside the JAR / IntelliJ working directory
+/application.yml
+/application-experiments.yml
+/application-operations.yml

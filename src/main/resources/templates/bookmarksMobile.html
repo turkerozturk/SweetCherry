@@ -77,12 +77,14 @@
                     <div class="bookmark-remove" th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')"><th:block th:replace="~{common/bookmarkRemoveFragment :: remove(${bookmark.nodeId})}"></th:block></div>
                     <div class="bookmark-details">
 
-                     <span th:text="${#dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd')}"
-                           th:title="${bookmark.node.lastSaveTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
-                           class="text-center"
-                     ></span>
-
-                    <br />
+                    <div class="bookmark-date-summary small text-muted d-flex flex-wrap gap-2 mb-1">
+                        <span><span th:text="#{bookmarks.grid.th.createdDate}"></span>: <time class="bookmark-created-date"
+                            th:text="${#dates.format(new java.util.Date(bookmark.node.creationTimestamp * 1000), 'yyyy-MM-dd')}"
+                            th:title="${bookmark.node.creationTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></time></span>
+                        <span><span th:text="#{bookmarks.grid.th.lastModifiedDate}"></span>: <time
+                            th:text="${#dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd')}"
+                            th:title="${bookmark.node.lastSaveTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></time></span>
+                    </div>
                     <!-- <td><a th:href="@{/nodes/{nodeId}(nodeId=${bookmark.nodeId})}" th:text="${bookmark.nodeId}"></a></td> -->
 
 

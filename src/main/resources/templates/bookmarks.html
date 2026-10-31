@@ -52,6 +52,7 @@
             <tr>
                 <th scope="col" class="bookmark-sequence" th:text="#{bookmarks.grid.th.sequence}">#</th>
 
+                <th scope="col" class="bookmark-date" th:text="#{bookmarks.grid.th.createdDate}">Created</th>
                 <th scope="col" class="bookmark-date" th:text="#{bookmarks.grid.th.lastModifiedDate}">LAst Modified Date</th>
                 <!--  <th scope="col" class="col-1" th:text="#{bookmarks.grid.th.icon}">Icon</th> -->
 
@@ -68,6 +69,10 @@
                 <td class="bookmark-order-cell"><span th:text="${bookmark.sequence}"></span>
                     <button type="button" class="bookmark-drag" th:if="${canWriteBookmarks == true}" sec:authorize="hasRole('ADMIN')" th:title="#{bookmarks.reorder}" th:aria-label="#{bookmarks.reorder}">↕</button>
                 </td>
+
+                <td th:text="${#dates.format(new java.util.Date(bookmark.node.creationTimestamp * 1000), 'yyyy-MM-dd')}"
+                    th:title="${bookmark.node.creationTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
+                    class="bookmark-date bookmark-created-date text-center"></td>
 
                 <td th:text="${#dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd')}"
                     th:title="${bookmark.node.lastSaveTimestamp + ', ' + #dates.format(new java.util.Date(bookmark.node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"
