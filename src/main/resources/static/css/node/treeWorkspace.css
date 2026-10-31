@@ -44,3 +44,38 @@
 
 .workspace-node-title{display:flex;gap:.4rem;align-items:center;padding:.35rem 0 .5rem}
 .workspace-node-title img{flex:none;object-fit:contain}
+
+/* Backlinks wrappers must pass the available height to the reading scroller. */
+#workspace-content .node-related-shell,
+#workspace-content .node-related-layout {
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    min-width:0;
+    overflow:hidden;
+}
+#workspace-content .node-related-layout > .node-backlinks {
+    flex:none;
+    min-height:0;
+    max-height:45%;
+    overflow:auto;
+    margin:.35rem 1rem;
+}
+#workspace-content .node-related-layout > .workspace-rendered {
+    flex:1;
+    min-height:0;
+    overflow:auto;
+}
+@container (min-width:850px) {
+    #workspace-content .node-related-layout:has(> .node-backlinks[open]) {
+        display:grid;
+        grid-template-columns:minmax(0,1fr) 17rem;
+        grid-template-rows:minmax(0,1fr);
+        align-items:stretch;
+    }
+    #workspace-content .node-related-layout > .node-backlinks[open] {
+        max-height:none;
+        margin:.35rem;
+    }
+}
