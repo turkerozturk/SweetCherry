@@ -22,6 +22,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/calendar/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/markdown/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/quick/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/saved-filters")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/content/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/richtext/edit/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/move/")
@@ -41,7 +42,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
             return true;
         }
         if (!TenantContext.hasCurrentTenant()) {
-            if (quickApi(request)) { quickConflict(response); return false; }
+            if (dialogApi(request)) { quickConflict(response); return false; }
             response.sendRedirect(request.getContextPath() + "/");
             return false;
         }
@@ -51,7 +52,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                     TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
             if (expected == null || !expected.equals(pageToken)) {
                 // JSON clients must not enter an HTML /error dispatch that can lose the tenant thread context.
-                if (quickApi(request)) { quickConflict(response); return false; }
+                if (dialogApi(request)) { quickConflict(response); return false; }
                 response.sendError(HttpServletResponse.SC_CONFLICT,
                         "Veri kaynağı değişti. Sayfayı yeniden açıp işlemi tekrar deneyin.");
                 return false;
@@ -60,8 +61,10 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private boolean quickApi(HttpServletRequest request) {
-        return request.getRequestURI().startsWith(request.getContextPath() + "/nodes/quick/");
+    private boolean dialogApi(HttpServletRequest request) {
+        String path=request.getRequestURI();String context=request.getContextPath();
+        return path.startsWith(context + "/nodes/quick/") || path.startsWith(context + "/nodes/backlinks/")
+                || path.startsWith(context + "/nodes/saved-filters");
     }
 
     private void quickConflict(HttpServletResponse response) throws java.io.IOException {

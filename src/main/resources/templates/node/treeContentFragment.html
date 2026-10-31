@@ -20,7 +20,7 @@
         <th:block th:replace="~{node/nodeToolbarFragment :: controls('tree')}"></th:block>
         <h1 class="workspace-node-title" th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}"><img th:if="${node.nodeIcon != null and node.nodeIcon.iconName != 'zero'}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="26" height="26" alt=""><span th:text="${node.name}"></span></h1>
         </header>
-        <div class="workspace-rendered" tabindex="0" th:attr="aria-label=#{tree.content}"><th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block></div>
+        <div class="node-related-shell"><div class="node-related-layout"><div th:replace="~{node/backlinks :: panel}"></div><div class="workspace-rendered" tabindex="0" th:attr="aria-label=#{tree.content}"><th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block></div></div></div>
         <th:block th:replace="~{node/offcanvasFragment :: offcanvasFragment}"></th:block>
     </th:block>
     <template data-workspace-status>

@@ -16,10 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class InternalLinkReportService {
     @PersistenceContext private EntityManager entityManager;
     static final int MAX_XML_CHARACTERS = 2_000_000;
-    public record Options(String query, String status, int limit, int page) {
+    public record Options(String query, String status, int limit, int page, Long targetId, boolean includeShared) {
+        public Options(String query,String status,int limit,int page){this(query,status,limit,page,null,false);}
         public Options {
             if(query==null || query.length()>500 || !Set.of("all","broken","ok").contains(status)
-                    || limit<1 || limit>1000 || page<1 || page>1_000_000) throw new IllegalArgumentException("Invalid report options");
+                    || limit<1 || limit>1000 || page<1 || page>1_000_000 || targetId!=null&&targetId<=0) throw new IllegalArgumentException("Invalid report options");
         }
     }
     public record Place(long id, String name, String icon, boolean bold, String color, boolean shared,
@@ -60,6 +61,10 @@ public class InternalLinkReportService {
                 contentPlaces.computeIfAbsent(content,key->new ArrayList<>()).add(id);
             }
         }
+        if(options.targetId()!=null) {
+            Branch requested=branches.get(options.targetId());
+            if(requested==null||!metadata.containsKey(requested.content()))return null;
+        }
         var anchors=new HashMap<Long,Set<String>>();var objectLinks=new HashMap<Long,List<Link>>();
         String sql="SELECT node_id,"+JdbcIdentifiers.quote(connection,"offset")+",filename,anchor,link FROM image WHERE "
                 + "(anchor IS NOT NULL AND anchor<>'') OR (link IS NOT NULL AND link<>'')";
@@ -76,8 +81,13 @@ public class InternalLinkReportService {
         for(long id:branches.keySet())places.put(id,place(id,branches,metadata,false));
         var result=new Collector(options,places,branches,metadata,anchors);
         var reader=new RichTextXmlReader();
-        try(var query=connection.prepareStatement("SELECT node_id,txt FROM node WHERE syntax='custom-colors' ORDER BY node_id")) {
+        boolean panel=options.targetId()!=null;
+        String contents=panel ? "SELECT node_id,CASE WHEN LENGTH(txt)<=2000000 THEN txt ELSE NULL END,LENGTH(txt) FROM node WHERE syntax='custom-colors' ORDER BY node_id"
+                : "SELECT node_id,txt FROM node WHERE syntax='custom-colors' ORDER BY node_id";
+        long inspectedCharacters=0;int inspectedNodes=0;
+        try(var query=connection.prepareStatement(contents)) {
             query.setFetchSize(50);
+            if(panel)query.setMaxRows(10001);
             try(var rows=query.executeQuery()) {
                 while(rows.next()) {
                     long id=rows.getLong(1);String xml=rows.getString(2);
@@ -85,6 +95,14 @@ public class InternalLinkReportService {
                     if(sources.isEmpty()) {
                         var meta=metadata.get(id);
                         sources=List.of(new Place(id,meta.name(),meta.icon(),meta.bold(),meta.color(),false,false,meta.name()+" ["+id+"]"));
+                    }
+                    if(panel) {
+                        long size=rows.getLong(3);
+                        if(inspectedNodes++>=10000 || inspectedCharacters+(size<=MAX_XML_CHARACTERS?size:0)>33_554_432) {
+                            result.issue(id,sources.get(0),"scanLimit");break;
+                        }
+                        if(size>MAX_XML_CHARACTERS)result.issue(id,sources.get(0),"tooLarge");
+                        else inspectedCharacters+=size;
                     }
                     boolean found=false;
                     if(xml!=null&&!xml.isBlank()) {
@@ -132,12 +150,20 @@ public class InternalLinkReportService {
         final Map<Long,Meta> metadata;final Map<Long,Place> detailed=new HashMap<>();
         final Options options;final Map<Long,Place> places;final Map<Long,Branch> branches;final Map<Long,Set<String>> anchors;
         final List<Row> rows=new ArrayList<>();final List<Issue> issues=new ArrayList<>();final Set<Long> sources=new HashSet<>();
+        final Set<Long> targets;
         final String query;long links,sourceContents,missingNodes,missingAnchors,invalidLinks,matched,unreadable;
-        Collector(Options options,Map<Long,Place> places,Map<Long,Branch> branches,Map<Long,Meta> metadata,Map<Long,Set<String>> anchors){this.metadata=metadata;this.options=options;this.places=places;this.branches=branches;this.anchors=anchors;query=normalize(options.query());}
+        Collector(Options options,Map<Long,Place> places,Map<Long,Branch> branches,Map<Long,Meta> metadata,Map<Long,Set<String>> anchors){
+            this.metadata=metadata;this.options=options;this.places=places;this.branches=branches;this.anchors=anchors;query=normalize(options.query());
+            if(options.targetId()==null)targets=null;
+            else if(!options.includeShared())targets=Set.of(options.targetId());
+            else {targets=new HashSet<>();long content=branches.get(options.targetId()).content();for(var b:branches.values())if(b.content()==content)targets.add(b.id());}
+        }
         Place details(Place value){return value==null||!branches.containsKey(value.id())?value:detailed.computeIfAbsent(value.id(),id->place(id,branches,metadata,true));}
-        void issue(long id,Place source,String reason){unreadable++;if(issues.size()<100)issues.add(new Issue(id,details(source),reason));}
+        void issue(long id,Place source,String reason){unreadable++;if(issues.size()<100||reason.equals("scanLimit"))issues.add(new Issue(id,details(source),reason));}
         void add(List<Place> sourcePlaces,Link link) {
-            Parsed parsed=parse(link.value());Place target=parsed.number()==null?null:places.get(parsed.number());
+            Parsed parsed=parse(link.value());
+            if(targets!=null&&(parsed.number()==null||!targets.contains(parsed.number())))return;
+            Place target=parsed.number()==null?null:places.get(parsed.number());
             if(target==null&&parsed.number()!=null&&metadata.containsKey(parsed.number())) {
                 Meta meta=metadata.get(parsed.number());target=new Place(parsed.number(),meta.name(),meta.icon(),meta.bold(),meta.color(),false,false,meta.name()+" ["+parsed.number()+"]");
             }

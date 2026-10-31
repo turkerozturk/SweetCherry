@@ -25,6 +25,13 @@ class InternalLinkReportServiceTest {
     private InternalLinkReportService.Report report(String q,String status,int limit,int page)throws Exception {
         return InternalLinkReportService.inspect(connection,new InternalLinkReportService.Options(q,status,limit,page));
     }
+    @Test void backlinksDistinguishExactOccurrenceAndSharedContent()throws Exception {
+        var exact=InternalLinkReportService.inspect(connection,new InternalLinkReportService.Options("","all",20,1,11L,false));
+        assertThat(exact.rows()).hasSize(4).allMatch(row->row.targetId().equals("11"));
+        var group=InternalLinkReportService.inspect(connection,new InternalLinkReportService.Options("","all",20,1,11L,true));
+        assertThat(group.rows()).hasSize(8);assertThat(group.rows()).anyMatch(row->row.targetId().equals("2"));
+        assertThat(InternalLinkReportService.inspect(connection,new InternalLinkReportService.Options("","all",20,1,999L,false))).isNull();
+    }
     @Test void listsSharedOccurrencesAndObjectsWithExactAnchorStatusAndMergedText()throws Exception {
         var report=report("","all",50,1);
         assertThat(report.links()).isEqualTo(12);assertThat(report.sourceContents()).isEqualTo(1);assertThat(report.sourcePlaces()).isEqualTo(2);

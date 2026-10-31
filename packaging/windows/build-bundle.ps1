@@ -19,7 +19,7 @@ if (!(Test-Path (Join-Path $bundle 'application.yml'))) {
 foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','THIRD-PARTY-NOTICES.md','licenses','CTBDATA/demo.ctb','allTenants/demo.txt','CTBDATA/sweetcherry-hizli-baslangic.ctb','CTBDATA/sweetcherry-quickstart-en.ctb','allTenants/quickstart-tr.txt','allTenants/quickstart-en.txt')) {
     if (!(Test-Path (Join-Path $bundle $name))) { throw "Missing distribution file: $name. Run Maven package first." }
 }
-if (Test-Path (Join-Path $bundle 'login-credentials.properties')) { throw 'Do not package an already-used distribution.' }
+if ((Test-Path (Join-Path $bundle 'login-credentials.properties')) -or (Test-Path (Join-Path $bundle 'saved-filters'))) { throw 'Do not package an already-used distribution.' }
 if ((Get-FileHash $RuntimeArchive -Algorithm SHA256).Hash -ne $RuntimeSha256) { throw 'Runtime checksum mismatch.' }
 [xml]$pom = Get-Content (Join-Path $repo 'pom.xml') -Raw
 $version = [string]$pom.project.version

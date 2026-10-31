@@ -58,6 +58,7 @@
 
 
     <h1 th:text="#{search.title}">Nodes</h1>
+<div th:replace="~{node/savedFilters :: filters}"></div>
 
 
 
@@ -90,6 +91,7 @@
                           th:object="${formSearch}"
                           method="post"
                           class="form-inline">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 
 
                         <div class="row">
@@ -191,7 +193,7 @@
 
                                             <label class="col-form-check-label sr-only"
                                                    for="nameStartsWith">İle Başlayan:</label>
-                                            <input type="checkbox" id="nameStartsWith"
+                                            <input type="checkbox" id="nameStartsWith" value="true" th:checked="*{nameStartsWith}"
                                                    name="nameStartsWith"
                                                    class="form-check"
                                             />

@@ -1,0 +1,6 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="filters" data-saved-filters class="border rounded p-2 mb-2" th:attr="data-url=@{/nodes/saved-filters(_tenantView=${tenantViewToken})},data-delete-url=@{/nodes/saved-filters/delete(_tenantView=${tenantViewToken})},data-error=#{saved.error},data-confirm=#{saved.confirm},data-empty=#{saved.empty}">
+<label th:text="#{saved.title}"></label>
+<select data-presets class="form-select form-select-sm" th:attr="aria-label=#{saved.title}"></select>
+<input data-name maxlength="80" class="form-control form-control-sm" th:placeholder="#{saved.name}" th:attr="aria-label=#{saved.name}">
+<div class="d-flex gap-1 flex-wrap mt-1"><button type="button" data-save class="btn btn-sm btn-primary" th:text="#{saved.save}"></button><button type="button" data-apply class="btn btn-sm btn-secondary" th:text="#{saved.apply}"></button><button type="button" data-delete class="btn btn-sm btn-outline-danger" th:text="#{saved.delete}"></button><button type="button" data-reload class="btn btn-sm btn-outline-secondary" th:text="#{saved.reload}"></button></div><small data-status role="status"></small>
+</div>

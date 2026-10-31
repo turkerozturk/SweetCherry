@@ -55,3 +55,6 @@ login-credentials.properties
 
 # Windows distribution build output
 /dist/
+
+# Private per-user saved search preferences
+/saved-filters/

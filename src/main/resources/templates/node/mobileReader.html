@@ -20,6 +20,7 @@
 <nav id="readerDrawer" hidden th:attr="aria-label=#{reader.contextNavigation}"><th:block th:replace="~{node/readerContextNavigation :: contextNavigation}"></th:block></nav>
 <main id="readerContent">
 <p th:if="${isSharedNode == true}" class="alert alert-info py-1"><span th:text="#{node.sharedReference}"></span> <span th:text="${requestedNodeId}"></span> → <a th:href="@{/nodes/{id}(id=${masterNodeId})}" th:text="${masterNodeId}"></a></p>
+<div th:if="${node != null}" th:replace="~{node/backlinks :: panel}"></div>
 <th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block>
 <th:block th:if="${node == null}"><th:block th:replace="~{node/rootWelcomeFragment :: welcome}"></th:block></th:block>
 </main>
