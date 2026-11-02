@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{ctbBackup.delete.title}"></title><th:block layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/backup/ctbBackups.css}"></th:block></head>
+<body><section layout:fragment="content" class="container-fluid py-3">
+<h1 th:text="#{ctbBackup.delete.title}"></h1>
+<p class="alert alert-warning" th:text="#{ctbBackup.delete.warning}"></p>
+<p th:text="#{ctbBackup.delete.summary(${#lists.size(deletion.items)},${deletion.eligible},${#numbers.formatDecimal(deletion.bytes / 1048576.0,1,2)})}"></p>
+<p class="small text-body-secondary" th:text="#{ctbBackup.delete.recheck}"></p>
+<div class="table-responsive"><table class="backup-list table table-striped align-middle">
+<thead><tr><th th:text="#{ctbBackup.created}"></th><th th:text="#{ctbBackup.source}"></th><th th:text="#{ctbBackup.delete.file}"></th><th th:text="#{ctbBackup.auto.status}"></th></tr></thead>
+<tbody><tr th:each="item : ${deletion.items}">
+<td th:attr="data-label=#{ctbBackup.created}" th:text="${item.backup != null ? item.backup.date() : '—'}"></td>
+<td th:attr="data-label=#{ctbBackup.source}" th:text="${item.backup != null ? item.backup.sourceName : '—'}"></td>
+<td th:attr="data-label=#{ctbBackup.delete.file}" style="overflow-wrap:anywhere"><code th:text="'backup-' + ${item.id} + '.ctb'"></code></td>
+<td th:attr="data-label=#{ctbBackup.auto.status}"><span th:if="${item.reason == null}" th:text="#{ctbBackup.delete.eligible}"></span><span th:if="${item.reason != null}" class="text-danger" th:text="${#messages.msg(item.reason)}"></span></td>
+</tr></tbody></table></div>
+<div class="d-flex flex-wrap gap-2">
+<form method="post" th:action="@{/system/backups/delete/confirm}"><input type="hidden" name="token" th:value="${deletion.token}">
+<button class="btn btn-danger" type="submit" th:disabled="${deletion.eligible == 0}" th:text="#{ctbBackup.delete.confirm}"></button></form>
+<a class="btn btn-outline-secondary" th:href="@{/system/backups}" th:text="#{ctbBackup.delete.cancel}"></a>
+</div>
+</section></body></html>

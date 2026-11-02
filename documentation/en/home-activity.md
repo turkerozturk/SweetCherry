@@ -1,13 +1,13 @@
 # Database opening and home activity
 
-After a database is selected, SweetCherry opens the virtual root by default. This is not a real node and does not change the CTB schema or any node timestamps.
+After a database is selected, the bundled YAML now opens the most recently modified node by default. Set `open-latest-modified: false` to keep opening the virtual root. The virtual root is not a real node; neither option changes the CTB schema or node timestamps.
 
 Add or edit this section under the existing `myapp` key in the external `application.yml` beside `SweetCherry.jar`, then restart:
 
 ```yaml
 myapp:
   home:
-    open-latest-modified: false
+    open-latest-modified: true
     modified-minimum: 5
     created-minimum: 5
 ```
@@ -18,11 +18,11 @@ myapp:
 * Shared occurrences use their own IDs and full hierarchy paths, with their master's name, icon, title style and timestamps. Links include the current database view token. Content text and embedded binaries are not loaded to build these lists.
 * Recently Modified, Recently Added and Bookmarks remain available as buttons. Long root-page lists scroll inside the desktop content pane; mobile uses normal page scrolling.
 
-Existing external YAML files are not overwritten. If the new keys are absent, the defaults above apply.
+Existing external YAML files are not overwritten. An explicit `false` in your external `application.yml` still wins: change it to `true` and restart if you want the new default. Missing keys inherit the bundled YAML values above.
 
 ## Manual checks
 
-1. Select a database with the default settings: home opens. Enable latest-node opening and restart: selecting a database opens its newest modified occurrence. Switch to a different database and verify its node opens, rather than one from the previous database. Read-only databases work too.
+1. Select a database with the bundled defaults: its newest modified occurrence opens. Set the option to false and restart: home opens instead. Switch to a different database and verify its node opens, rather than one from the previous database. Read-only databases work too.
 2. Open the virtual root explicitly. Verify both lists, full clickable paths, icons, bold/color styling and dates in Turkish and English, including shared occurrences under different parents.
 3. With fewer than five entries today, verify older entries fill to five. With more than five today, verify all are displayed. Check a zero minimum, a different minimum, an empty database, and future creation dates.
 4. Check desktop scrolling and narrow mobile layout. Confirm these reads do not change creation or modification dates.

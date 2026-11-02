@@ -171,7 +171,7 @@ myapp:
       keep-last: 0 # 0 = unlimited; only automatic backups of the same physical source are pruned.
       tenants: []
   home:
-    open-latest-modified: false # After database selection only; false keeps the virtual root.
+    open-latest-modified: true # After database selection only; false keeps the virtual root.
     modified-minimum: 5 # All today's occurrences, filled with older ones to this minimum; 0 hides the list.
     created-minimum: 5 # Uses myapp.calendar.time-zone (system by default).
   calendar:

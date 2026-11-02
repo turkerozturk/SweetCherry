@@ -36,6 +36,8 @@ class CtbBackupTemplateTest {
             if(running)assertThat(doc.selectFirst("input[name=_tenantView]").attr("value")).isEqualTo("token");
             assertThat(doc.select(".backup-list td[data-label]")).hasSize(running?8:4);
             assertThat(doc.selectFirst("#ctb-backup-automatic")).isNotNull();
+            assertThat(doc.selectFirst("#ctb-backup-delete-selection").attr("method")).isEqualTo("post");
+            assertThat(doc.selectFirst("input[data-backup-select]").attr("form")).isEqualTo("ctb-backup-delete-selection");
             assertThat(doc.selectFirst("h1").text()).isEqualTo(lang.equals("tr")?"CTB yedekleri":"CTB backups");
         }
     }

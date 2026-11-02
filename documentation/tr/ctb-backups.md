@@ -37,7 +37,7 @@ myapp:
 
 Değişiklikten sonra yeniden başlatın. Bu anahtarlar yoksa da aynı varsayılanlar geçerlidir. Klasör **uygulamanın çalışma klasörüne** göre çözülür; mutlak yol da yazılabilir. `enabled: false` yeni yedek oluşturmayı kapatır; mevcut yedeklerin indirilmesi ve çalışma kopyasıyla kurtarma açık kalır. Klasör yalnız gerektiğinde oluşturulur. SweetCherry’yi çalıştıran hesabın izinleri ve yeterli boş alanı olmalıdır. Çalışma kopyası için yedek boyutu kadar ilave alan gerekir. Desteklenen sistemlerde yeni dosya/klasörler özel POSIX izinleriyle oluşturulur; mevcut klasörleri ve Windows/ağ paylaşımı ACL izinlerini ayrıca koruyun. Git deposu içindeki özel yedek klasörünü de Git’ten hariç tutun; varsayılan `/backups/` zaten hariçtir.
 
-Otomatik zamanlama ve saklama kuralı isteğe bağlıdır (aşağıya bakın). Elle yedek silme düğmesi ve düğüm sürüm geçmişi yoktur. Uygulama YAML dosyaları, giriş bilgileri, tenant config dosyaları ve notlardan dışarıya linklenmiş dosyalar bu CTB yedeğine dahil değildir. Yedekler notları ve ekleri içerdiğinden klasörü özel tutun. Asıl dosyayla aynı diskteki yedek, o diskin bozulmasına karşı koruma sağlamaz; indirilen kopyaları farklı cihaz/diskte de saklayın.
+Otomatik zamanlama ve saklama kuralı isteğe bağlıdır (aşağıya bakın). Elle yedek yönetimi aşağıda açıklanır. Düğüm sürüm geçmişi dahil değildir. Uygulama YAML dosyaları, giriş bilgileri, tenant config dosyaları ve notlardan dışarıya linklenmiş dosyalar bu CTB yedeğine dahil değildir. Yedekler notları ve ekleri içerdiğinden klasörü özel tutun. Asıl dosyayla aynı diskteki yedek, o diskin bozulmasına karşı koruma sağlamaz; indirilen kopyaları farklı cihaz/diskte de saklayın.
 
 ## Manuel kontrol
 
@@ -85,3 +85,21 @@ Saklama kuralı **yalnız yeni otomatik snapshot tamamlanıp doğrulandıktan so
 * Aralık dolmadan SweetCherry’yi yeniden başlatın: son başarılı kimlikli yedek sonraki işi ertelemeli. Eksik kaynak deneyin; tekrar beklemesi sırasında diğer zamanı gelen kaynak ilerlemeli.
 * `keep-last: 2` ile üç başarılı otomatik yedek alın. Yalnız o kaynağın son iki otomatik yedeği kalmalı. Elle alınmış yedek ve çalışma kopyası korunmalı. Sıfırda hepsi kalmalı.
 * Yeni işi başarısız duruma getirin: eski yedek silinmemeli. Eski otomatik dosyayı değiştirin veya tenant olarak tanıtın: temizlik atlayıp uyarmalı. Türkçe/İngilizce plan durumunu ve dar mobil görünümü de kontrol edin.
+
+
+## Eski yedekleri gözden geçirme ve silme
+
+ADMIN hesabıyla tek satırdaki **Sil…** düğmesini veya birden çok satırı seçip **Seçili yedekleri gözden geçir** düğmesini kullanın. Onay başına en fazla 200 kayıt seçilebilir. İlk POST yalnız onay sayfasını hazırlar: tam dosyalar, tarihler, kaynak adları, silinebilir sayı/boyut ve koruma nedenleri gösterilir. Önizlemeyi açmak veya iptal etmek yedek silmez.
+
+Onay, yalnız gözden geçirilmiş CTB ve yanındaki JSON katalog kaydını kalıcı siler. Oturuma bağlı, on dakika geçerli, tek kullanımlık bir anahtar kullanılır; aynı oturumdaki başka önizleme eskisinin yerini alır. Önizlemeden sonra oluşturulan dosya seçime eklenmez. Çift gönderim, başka oturum veya süresi dolmuş plan silmeyi tekrarlayamaz. Her dosya tekrar kontrol edilir; bulunamayan dosya, değişmiş katalog veya checksum uyuşmazlığı atlanır. Büyük checksum kontrolleri zaman alabilir. Sonuçta silinen/atlanan sayıları ve dosya bazında nedenler görünür; kısmi başarı açıktır.
+
+Elle silme, elle alınmış, otomatik ve eski yedekleri kapsayabilir. Yine de kayıtlı tenant dosyaları (tenant kapalı olsa bile), çalışan işin dosyası ve SQLite WAL/SHM/journal yan dosyaları bulunanlar korunur. Kayıtlı dosya koruması checksum öncesi ve sonrasında yenilenir. Asıl veritabanları, çalışma kopyaları, yarım dosyalar ve keyfi dosya adları silme hedefi değildir. Zorla silme seçeneği yoktur. Geçersiz/bozuk katalog kayıtları listelenmez; yöneticinin dosya sisteminde bilinçli incelemesini gerektirir. Dış programlar SweetCherry'nin koordinasyonuna katılmaz; düzenleme için ayrı çalışma kopyası açın.
+
+Otomatik yedekleme açıkken son kimlikli yedeği silerseniz kaynak sonraki kontrolde yeniden zamanı gelmiş sayılabilir. Gereken dosyaları kalıcı silmeden önce farklı disk/cihaza indirin. `open-latest-modified` tercihi bu yedek işlemlerini etkilemez.
+
+### Yönetim kontrolleri
+
+* Tek dosyayı önizleyip iptal edin: dosyalar ve checksum değişmemeli. Onaylayın: yalnız o CTB/katalog çifti kalkmalı.
+* Birden çok elle alınmış/otomatik/eski yedeği gözden geçirin. Onaydan önce yeni yedek oluşturun: yeni dosya korunmalı. Çift gönderim, on dakikalık süre ve başka tarayıcı oturumunu deneyin.
+* Boyutunu değiştirmeden dosyayı değiştirin, kataloğunu değiştirin, tenant olarak tanıtın veya journal yan dosyası oluşturun. Neden belirtilerek atlanmalı. Diğer geçerli seçim silinebilmeli.
+* Türkçe/İngilizce onayı, mobil seçimi, aktif tenant olmamasını, ADMIN/USER yetkilerini ve CSRF reddini kontrol edin.

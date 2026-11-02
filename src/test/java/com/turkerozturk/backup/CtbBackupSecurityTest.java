@@ -28,7 +28,7 @@ class CtbBackupSecurityTest {
             var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
             for(String path:new String[]{"/system/backups","/system/backups/status/id","/system/backups/id/download"})
                 mvc.perform(get(path).with(user("user").roles("USER"))).andExpect(status().isForbidden());
-            for(String path:new String[]{"/system/backups/start","/system/backups/id/open"}) {
+            for(String path:new String[]{"/system/backups/start","/system/backups/id/open","/system/backups/delete/preview","/system/backups/delete/confirm"}) {
                 mvc.perform(post(path).with(user("user").roles("USER")).with(csrf())).andExpect(status().isForbidden());
                 mvc.perform(post(path).with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
             }
@@ -36,7 +36,7 @@ class CtbBackupSecurityTest {
             TenantContext.setCurrentTenant("Selected");
             mvc.perform(post("/system/backups/start").session(session).with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
             mvc.perform(post("/system/backups/start").session(session).param("_tenantView","old").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
-            verifyNoInteractions(context.getBean(CtbBackupService.class));
+            verifyNoInteractions(context.getBean(CtbBackupService.class),context.getBean(CtbBackupDeletionService.class));
             mvc.perform(post("/system/backups/start").session(session).param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isFound()).andExpect(redirectedUrl("/system/backups"));
             verify(context.getBean(CtbBackupService.class)).start(any(),eq("Selected"));
             TenantContext.clear();
@@ -46,6 +46,8 @@ class CtbBackupSecurityTest {
     @Configuration @EnableWebSecurity @EnableWebMvc @EnableMethodSecurity
     static class Config implements WebMvcConfigurer {
         @Override public void addInterceptors(InterceptorRegistry registry) {registry.addInterceptor(new TenantRequiredInterceptor());}
+        @Bean CtbBackupDeletionService deletion(){return mock(CtbBackupDeletionService.class);}
+        @Bean CtbBackupDeletionController deleteController(CtbBackupDeletionService service){return new CtbBackupDeletionController(service);}
         @Bean CtbBackupSettings settings(){return new CtbBackupSettings();}
         @Bean CtbBackupService service(){return mock(CtbBackupService.class);}
         @Bean CtbBackupStore store(){return mock(CtbBackupStore.class);}

@@ -102,17 +102,34 @@ public class CtbBackupStore {
             Path target=folder.resolve("restored-"+UUID.randomUUID()+".ctb");move(copy,target);return target;
         } finally { Files.deleteIfExists(copy); }
     }
+    String revision(String id) throws IOException { get(id);return sha256(metadata(id)); }
+    String protection(String id,List<Path> protectedFiles) throws IOException {
+        get(id);Path file=file(id);
+        for(String suffix:List.of("-wal","-shm","-journal"))if(Files.exists(Path.of(file.toString()+suffix),NOFOLLOW_LINKS))return "ctbBackup.error.protected";
+        for(Path protectedFile:protectedFiles)if(Files.isSameFile(file,protectedFile))return "ctbBackup.error.protected";
+        return null;
+    }
     synchronized boolean deleteAutomatic(String id,String sourceKey,List<Path> protectedFiles) throws IOException {
-        Backup backup=checked(id); // Never remove an edited or damaged file as if it were our unchanged snapshot.
-        if(!backup.automatic() || !sourceKey.equals(backup.sourceKey()))return false;
-        Path file=file(id);
-        for(String suffix:List.of("-wal","-shm","-journal"))if(Files.exists(Path.of(file.toString()+suffix),NOFOLLOW_LINKS))return false;
-        for(Path protectedFile:protectedFiles)if(Files.isSameFile(file,protectedFile))return false;
-        Path retired=root().resolve("retired-"+id+".json");
+        Backup backup=checked(id);
+        if(!backup.automatic() || !sourceKey.equals(backup.sourceKey()) || protection(id,protectedFiles)!=null)return false;
+        return erase(id);
+    }
+    @FunctionalInterface interface ProtectedFiles { List<Path> paths() throws IOException; }
+    synchronized void deleteReviewed(String id,String expectedRevision,ProtectedFiles protectedFiles) throws IOException {
+        if(!Objects.equals(expectedRevision,revision(id)))throw new CtbBackupProblem("changed");
+        if(protection(id,protectedFiles.paths())!=null)throw new CtbBackupProblem("protected");
+        checked(id); // Bounded-memory checksum verification, including files changed without a size change.
+        if(!Objects.equals(expectedRevision,revision(id)))throw new CtbBackupProblem("changed");
+        if(protection(id,protectedFiles.paths())!=null)throw new CtbBackupProblem("protected");
+        erase(id);
+    }
+    private boolean erase(String id) throws IOException {
+        Path file=file(id);Path retired=root().resolve("retired-"+id+".json");
         move(metadata(id),retired);
         try { Files.delete(file); }
         catch(IOException|RuntimeException failure){move(retired,metadata(id));throw failure;}
-        Files.deleteIfExists(retired);return true;
+        try {Files.deleteIfExists(retired);}catch(IOException leftover){org.slf4j.LoggerFactory.getLogger(getClass()).warn("Retired CTB backup catalog could not be removed: job={}",id);}
+        return true;
     }
     static void force(Path file) throws IOException { try(var channel=FileChannel.open(file,WRITE,NOFOLLOW_LINKS)){channel.force(true);} }
 }

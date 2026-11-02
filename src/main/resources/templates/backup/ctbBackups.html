@@ -42,6 +42,16 @@
 <td th:attr="data-label=#{ctbBackup.auto.last}" th:text="${entry.last}"></td><td th:attr="data-label=#{ctbBackup.auto.next}" th:text="${entry.next}"></td>
 </tr></tbody></table></div>
 </section>
+<div th:if="${backupDeletion != null}" class="alert alert-info" role="status">
+<p class="mb-1" th:text="#{ctbBackup.delete.result(${backupDeletion.removed},${backupDeletion.skipped})}"></p>
+<details th:if="${backupDeletion.skipped > 0}"><summary th:text="#{ctbBackup.details}"></summary><ul class="mb-0"><li th:each="item : ${backupDeletion.items}" th:if="${!item.removed}"><code style="overflow-wrap:anywhere" th:text="${item.filename}"></code>: <span th:text="${#messages.msg(item.reason)}"></span></li></ul></details>
+</div>
+<form th:unless="${#lists.isEmpty(backups)}" id="ctb-backup-delete-selection" method="post" th:action="@{/system/backups/delete/preview}" class="border rounded p-2 mb-3">
+<label class="me-3"><input type="checkbox" id="ctb-backup-select-all"> <span th:text="#{ctbBackup.delete.selectAll}"></span></label>
+<span class="me-3"><span th:text="#{ctbBackup.delete.selected}"></span> <span id="ctb-backup-selected-count">0</span></span>
+<button type="submit" class="btn btn-sm btn-outline-danger" th:text="#{ctbBackup.delete.review}"></button>
+<small class="d-block mt-1" th:text="#{ctbBackup.delete.limit}"></small>
+</form>
 <p th:if="${#lists.isEmpty(backups)}" class="text-body-secondary fst-italic" th:text="#{ctbBackup.empty}"></p>
 <div class="table-responsive" th:unless="${#lists.isEmpty(backups)}"><table class="backup-list table table-striped align-middle">
 <thead><tr><th th:text="#{ctbBackup.created}"></th><th th:text="#{ctbBackup.source}"></th><th th:text="#{ctbBackup.size}"></th><th th:text="#{ctbBackup.actions}"></th></tr></thead>
@@ -50,8 +60,9 @@
 <td class="text-nowrap" th:attr="data-label=#{ctbBackup.size}" th:text="${#numbers.formatDecimal(backup.bytes / 1048576.0, 1, 2)} + ' MiB'"></td>
 <td th:attr="data-label=#{ctbBackup.actions}"><div class="d-flex flex-wrap gap-2">
 <a class="btn btn-sm btn-success" th:href="@{/system/backups/{id}/download(id=${backup.id})}"><i class="fa-solid fa-download" aria-hidden="true"></i> <span th:text="#{ctbBackup.download}"></span></a>
+<form method="post" th:action="@{/system/backups/delete/preview}"><input type="hidden" name="ids" th:value="${backup.id}"><button type="submit" class="btn btn-sm btn-outline-danger" th:text="#{ctbBackup.delete.one}"></button></form>
 <form method="post" th:action="@{/system/backups/{id}/open(id=${backup.id})}" th:attr="data-confirm-message=#{ctbBackup.openConfirm}"><button type="submit" class="btn btn-sm btn-outline-primary" th:text="#{ctbBackup.open}"></button></form>
-</div><details class="mt-2"><summary th:text="#{ctbBackup.details}"></summary>
+</div><label class="d-block small mt-2"><input type="checkbox" data-backup-select form="ctb-backup-delete-selection" name="ids" th:value="${backup.id}"> <span th:text="#{ctbBackup.delete.select}"></span></label><details class="mt-2"><summary th:text="#{ctbBackup.details}"></summary>
 <p class="small mb-1"><code th:text="${backup.fileName}" style="overflow-wrap:anywhere"></code></p>
 <p class="small mb-1">SHA-256: <code th:text="${backup.sha256}" style="overflow-wrap:anywhere"></code></p>
 <ul class="small mb-0"><li th:each="count : ${backup.counts.entrySet()}"><code th:text="${count.key}"></code>: <span th:text="${count.value}"></span></li></ul>
@@ -59,4 +70,5 @@
 <p class="alert alert-info mt-3" th:text="#{ctbBackup.restoreHelp}"></p>
 <p class="small text-body-secondary" th:text="#{ctbBackup.limits}"></p>
 <script th:src="@{/js/backup/ctbBackups.js}" defer></script>
+<script th:src="@{/js/backup/ctbBackupDeletion.js}" defer></script>
 </section></body></html>

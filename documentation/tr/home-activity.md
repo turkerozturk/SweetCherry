@@ -1,13 +1,13 @@
 # Veritabanı açılışı ve ana sayfadaki son düğümler
 
-Veritabanı seçildikten sonra varsayılan olarak sanal kök sayfası açılır. Bu gerçek bir düğüm değildir; özellik CTB şemasını veya düğüm tarihlerini değiştirmez.
+Dağıtımdaki YAML artık veritabanı seçildikten sonra varsayılan olarak son güncellenen düğümü açar. Sanal kökün açılmasını isterseniz `open-latest-modified: false` yapın. Sanal kök gerçek bir düğüm değildir; iki seçenek de CTB şemasını ve düğüm tarihlerini değiştirmez.
 
 `SweetCherry.jar` yanındaki harici `application.yml` dosyasında mevcut `myapp` bölümüne aşağıdaki ayarları ekleyin veya düzenleyin, ardından uygulamayı yeniden başlatın:
 
 ```yaml
 myapp:
   home:
-    open-latest-modified: false
+    open-latest-modified: true
     modified-minimum: 5
     created-minimum: 5
 ```
@@ -18,11 +18,11 @@ myapp:
 * Paylaşımlı konumlar kendi ID ve hiyerarşik yollarıyla listelenir; ad, ikon, başlık biçimi ve tarihler master'dan gelir. Bağlantılar geçerli veritabanı görünüm anahtarını taşır. Liste hazırlanırken düğüm metinleri ve gömülü ikili nesneler yüklenmez.
 * Son Güncellenenler, Son Eklenenler ve Yer İşaretleri bağlantıları düğme görünümündedir. Masaüstünde uzun listeler içerik alanında kayar; mobilde normal sayfa kaydırması kullanılır.
 
-Mevcut harici YAML dosyalarının üzerine yazılmaz. Yeni ayarlar yoksa yukarıdaki varsayılanlar kullanılır.
+Mevcut harici YAML dosyalarının üzerine yazılmaz. Harici `application.yml` dosyanızda açıkça `false` yazıyorsa bu değer önceliklidir; yeni varsayılanı isterseniz `true` yapıp yeniden başlatın. Eksik anahtarlar yukarıdaki dağıtım YAML değerlerini devralır.
 
 ## Manuel kontrol
 
-1. Varsayılan ayarla veritabanı seçildiğinde ana sayfanın açıldığını doğrulayın. Son düğüm açılışını etkinleştirip yeniden başlatın. Farklı veritabanlarını seçerken önceki veritabanının değil yeni seçilenin son düğümünün açıldığını kontrol edin. Salt okunur veritabanını da deneyin.
+1. Dağıtım varsayılanıyla son güncellenen düğümün açıldığını doğrulayın. Seçeneği false yapıp yeniden başlatınca ana sayfa açılmalı. Farklı veritabanlarını seçerken önceki veritabanının değil yeni seçilenin son düğümünün açıldığını kontrol edin. Salt okunur veritabanını da deneyin.
 2. Sanal kökü doğrudan açın. İki listede tam tıklanabilir yolları, ikonları, kalın/renkli başlıkları ve tarihleri Türkçe/İngilizce kontrol edin; farklı parent altındaki paylaşımlı konumları da deneyin.
 3. Bugün beşten az kayıt varsa eski kayıtlarla beşe tamamlanmasını, beşten fazla varsa tümünün gösterilmesini doğrulayın. Sıfır ve farklı sayı ayarlarını, boş veritabanını ve gelecekteki oluşturulma tarihlerini kontrol edin.
 4. Masaüstü kaydırmasını ve dar mobil görünümü deneyin. Görüntülemenin düğümlerin oluşturulma/güncellenme tarihlerini değiştirmediğini doğrulayın.

@@ -37,7 +37,7 @@ myapp:
 
 Restart after changes. Defaults also apply when these keys are absent. The directory is relative to the **application working directory**, or it can be an absolute path. New backup creation can be disabled with `enabled: false`; existing backup downloads and working-copy recovery remain available. No folder is created until needed. The account running SweetCherry needs access and sufficient free disk space. A working copy requires additional space roughly equal to the backup. New files/directories receive private POSIX permissions where supported; protect existing folders and Windows/network-share ACLs yourself. A custom folder inside a Git checkout should also be ignored by Git; the default `/backups/` is already ignored.
 
-Automatic scheduling and retention are optional (see below). There is no manual backup deletion button or per-node version history. Backups do not include application YAML, login credentials, tenant config files, or files linked externally from notes. Stored snapshots contain the notes and attachments themselves; keep the folder private. A backup beside the original does not protect against loss of that disk: keep downloaded copies on another device or storage medium as well.
+Automatic scheduling and retention are optional (see below). Manual backup management is described below. Per-node version history is not included. Backups do not include application YAML, login credentials, tenant config files, or files linked externally from notes. Stored snapshots contain the notes and attachments themselves; keep the folder private. A backup beside the original does not protect against loss of that disk: keep downloaded copies on another device or storage medium as well.
 
 ## Manual checks
 
@@ -85,3 +85,21 @@ Retention runs **only after a new automatic snapshot has been completed and veri
 * Restart SweetCherry before the interval is due: an existing successful keyed backup should postpone the next run. Try a missing source and verify another due source still progresses after retry backoff.
 * Set `keep-last: 2` and obtain three successful automatic backups. Only the two newest automatic backups of that source should remain. A manual backup and working copy must remain. With zero, all remain.
 * Cause the new job to fail: no old backups may be deleted. Modify an old automatic snapshot, or register it as a tenant: cleanup must skip it and report a warning. Test English/Turkish schedule state and narrow mobile layout.
+
+
+## Review and delete old backups
+
+As ADMIN, use **Delete…** for one row or select multiple rows and choose **Review selected backups**. Up to 200 entries can be reviewed together. The first POST only builds a confirmation page: it lists exact files, dates, source names, eligible count/size and any protection reasons. No backup is deleted by opening the preview or cancelling.
+
+Confirmation permanently removes only the reviewed CTB and its JSON catalog entry. It uses a session-bound, single-use token valid for ten minutes; another preview in the same session replaces it. Files created after preview are never added to that selection. Confirming twice, using another session or confirming an expired plan cannot repeat deletion. Every file is rechecked; a missing file, changed catalog or mismatched checksum is skipped. Large checksums can take time. Results show deleted/skipped counts and per-file reasons, so partial success is explicit.
+
+Manual deletion can include manual, automatic and legacy backups. It still refuses registered tenant files (even if the tenant is closed), running job outputs and files with SQLite WAL/SHM/journal sidecars. Configured-file protection is refreshed before and after checksum verification. Original databases, working copies, partial files and arbitrary filenames are not deletion targets. There is no force-delete option. Invalid/corrupted catalog entries remain excluded from the list and require deliberate filesystem inspection by the administrator. External programs do not participate in SweetCherry's coordination; open a separate working copy for editing.
+
+If automatic backup remains enabled and you delete the latest keyed backup, the source may become due again at the next check. Download anything you still need to another disk/device before permanently deleting it. Updating the source's `open-latest-modified` preference does not affect these backup operations.
+
+### Management checks
+
+* Preview a single file and cancel: files and checksum must be unchanged. Confirm it: only its CTB/catalog pair should disappear.
+* Review several manual/automatic/legacy backups. Create another backup before confirming: the newly created one must remain. Test double submit, ten-minute expiry and a second browser session.
+* Change a reviewed file without changing its size, change its catalog, register it as a tenant or create a journal sidecar. It must be skipped with a reason. A valid other selection should still be deletable.
+* Check English/Turkish confirmation, mobile selection, no active tenant, ADMIN/USER access and CSRF rejection.
