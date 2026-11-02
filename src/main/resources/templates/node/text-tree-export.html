@@ -1,0 +1,15 @@
+<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{textTree.title}"></title></head>
+<body><section layout:fragment="content" class="container py-3">
+<h1 class="fs-4" th:text="#{textTree.title}"></h1>
+<p><strong th:text="${rootName}"></strong> <span th:text="|[${nodeId}]|"></span></p>
+<div th:if="${textTreeError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg(textTreeError)}"></div>
+<p th:text="#{textTree.help}"></p>
+<ul><li th:text="#{textTree.folders}"></li><li th:text="#{textTree.leaves}"></li><li th:text="#{textTree.text}"></li><li th:text="#{textTree.names}"></li></ul>
+<form th:action="@{/nodes/export/text/{id}(id=${nodeId})}" method="post">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div class="form-check mb-3"><input id="textTreeDescendants" class="form-check-input" type="checkbox" name="includeDescendants" value="true" th:checked="${includeDescendants}"><label for="textTreeDescendants" class="form-check-label" th:text="#{textTree.descendants}"></label></div>
+<button class="btn btn-primary" type="submit"><i class="fas fa-file-archive" aria-hidden="true"></i> <span th:text="#{textTree.download}"></span></button>
+<a class="btn btn-outline-secondary" th:href="@{/nodes/{id}(id=${nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a>
+</form><p class="small text-muted mt-3" th:text="#{textTree.limits(${limits.maxNodes},${limits.maxDepth},${limits.maxNodeCharacters},${limits.maxTextBytes})}"></p>
+</section></body></html>

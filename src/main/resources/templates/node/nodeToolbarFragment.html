@@ -12,16 +12,14 @@
 <th:block th:replace="~{node/nodeDuplicateFragment :: duplicateItems(${view},false)}"></th:block>
 </div></div>
 <th:block th:replace="~{node/nodeMoveFragment :: moveControls(${view})}"></th:block>
-<div class="dropdown">
-<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">PDF</button>
-<div class="dropdown-menu">
+<div class="dropdown" data-node-export-menu>
+<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export" aria-hidden="true"></i> <span th:text="#{toolbar.export}">Export</span></button>
+<div class="dropdown-menu p-1">
+<h6 class="dropdown-header">PDF</h6>
 <a class="dropdown-item" th:href="@{/nodes/pdf/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{toolbar.pdfSingle}"></a>
 <a class="dropdown-item" th:href="@{/nodes/pdf/{id}/subtree(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{toolbar.pdfBranch}"></a>
-</div></div>
-            <div class="dropdown">
-                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export"></i> <span th:text="#{toolbar.ctb}">Export</span></button>
-                <div class="dropdown-menu p-1">
-                    <form th:action="@{/expo/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{exportnodes.confirmCollectionSingle(${node.name},${requestedNodeId})}">
+<hr class="dropdown-divider"><h6 class="dropdown-header" th:text="#{toolbar.ctb}"></h6>
+<form th:action="@{/expo/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{exportnodes.confirmCollectionSingle(${node.name},${requestedNodeId})}">
                         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
                         <input type="hidden" name="includeDescendants" value="false"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.collectionSingle}"></button>
@@ -42,9 +40,10 @@
                         <input type="hidden" name="includeDescendants" value="true"/>
                         <button class="dropdown-item" type="submit" th:text="#{exportnodes.separateBranch}"></button>
                     </form>
-                </div>
-            </div>
-
+<hr class="dropdown-divider">
+<a class="dropdown-item" th:href="@{/mindmap-export(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{toolbar.freeplane}"></a>
+<a class="dropdown-item" th:href="@{/nodes/export/text/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{textTree.menu}"></a>
+</div></div>
 <th:block th:replace="~{node/nodeMindMapFragment :: mindMapControls}"></th:block>
 <div class="dropdown" th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')">
 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" th:text="#{toolbar.add}"></button>

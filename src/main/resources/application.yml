@@ -161,6 +161,11 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  text-tree-export:
+    max-nodes: 10000
+    max-depth: 64
+    max-node-characters: 8388608
+    max-text-bytes: 67108864 # Total uncompressed UTF-8 file contents; ZIP is staged on disk.
   ctb-backup:
     enabled: true
     directory: backups/ctb # Full SQLite snapshots; relative to the application working directory.

@@ -38,3 +38,5 @@ button.reader-title:focus-visible {outline:2px solid #0d6efd;outline-offset:-2px
 #readerContent #nodeContent pre,#readerContent #nodeContent code,#readerContent #nodeContent [class*="codebox"],#readerContent #nodeContent [class*="code-box"] {max-width:100%}
 #readerContent #nodeContent pre,#readerContent #nodeContent [class*="codebox"],#readerContent #nodeContent [class*="code-box"] {overflow:auto}
 #readerContent #nodeContent iframe,#readerContent #nodeContent video,#readerContent #nodeContent object,#readerContent #nodeContent embed,#readerContent #nodeContent svg {max-width:100% !important}
+
+[data-node-export-menu]>.dropdown-menu{width:22rem;max-width:calc(100vw - 1rem);max-height:70dvh;overflow-y:auto}[data-node-export-menu] .dropdown-item{white-space:normal;overflow-wrap:anywhere}

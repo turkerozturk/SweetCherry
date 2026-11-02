@@ -27,6 +27,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 - Rich-text editing, images and attachments, external links, tables, embedded codebox editing, and formatted web-page paste.
 - [Quick switch by title and quick plain-text/Markdown capture](documentation/tr/quick-notes.md) with searchable, remembered parent destinations.
 - Node movement by arrows or parent ID with clipboard/bookmark shortcuts, Go to Node ID, duplication, shared-node hierarchy, and reorderable bookmarks with Created/Modified dates.
+- [Folder-tree text ZIP export](documentation/en/text-tree-export.md) with original leaf extensions and nested directories.
 - Preview and import exported CTBs into a writable database, preserving hierarchy and remapping internal IDs.
 - Tenant configuration wizard, SQLite/MariaDB/MySQL/PostgreSQL connections, and application settings editors.
 - Markmap, Mermaid, Freeplane/FreeMind export with optional content notes, and PDF export with hierarchical navigation. Offline LaTeX rendering in content and PDF.

@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Export a selected occurrence/subtree as a UTF-8 text ZIP with nested directories, safe collision handling, bounded temporary-file output and shared-occurrence hierarchy. Preserve code/Markdown source; flatten rich text without binary attachments. Consolidate PDF/CTB/Freeplane/text ZIP under Export in both readers.
+
 ## [1.6.0]
 
 - Add consistent full file-based CTB snapshots using the SQLite Online Backup API, integrity checks, SHA-256, record counts, downloads and recovery into a separate read-only working copy; leave source databases unchanged.
