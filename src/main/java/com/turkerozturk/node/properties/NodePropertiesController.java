@@ -3,6 +3,7 @@ package com.turkerozturk.node.properties;
 import com.turkerozturk.IconIdAndIsReadOnly;
 import com.turkerozturk.helpers.BitOperation;
 import com.turkerozturk.helpers.NodeIcon;
+import com.turkerozturk.helpers.CodeIcon;
 import com.turkerozturk.helpers.highlighter.CodeHighLighter;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.Node;
@@ -55,7 +56,11 @@ public class NodePropertiesController {
                 && !syntaxOptions.contains(node.getSyntax())) {
             syntaxOptions.add(0, node.getSyntax()); // Preserve an unsupported legacy syntax on other edits.
         }
+        syntaxOptions.sort(String.CASE_INSENSITIVE_ORDER);
         model.addAttribute("syntaxOptions", syntaxOptions);
+        var syntaxIcons = new java.util.LinkedHashMap<String,String>();
+        for(String syntax : syntaxOptions) syntaxIcons.put(syntax,CodeIcon.getCodeIconBySyntax(syntax).getNodeIcon().getIconName());
+        model.addAttribute("syntaxIcons", syntaxIcons);
         //model.addAttribute("contentReadOnly", (node.getIsReadOnly16bit() & 0x8000L) != 0);
         return "node/nodeProperties";
     }

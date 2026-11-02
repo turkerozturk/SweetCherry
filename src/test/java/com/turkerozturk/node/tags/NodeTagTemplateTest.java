@@ -38,6 +38,32 @@ class NodeTagTemplateTest {
   assertThat(unfilteredNext).doesNotContain("tag=");
   model.addAttribute("canEditTags",false);assertThat(render("node/tags.html",model,Locale.ENGLISH)).doesNotContain("/nodes/properties/2");
  }
+ @Test void languagePickerPreservesNativeSubmissionIconsAndUnsupportedLegacySyntax()throws Exception {
+  var service=mock(NodePropertiesService.class);when(service.writable()).thenReturn(true);
+  var node=new Node();node.setNodeId(2);node.setName("Code");node.setSyntax("legacy-example");when(service.realNode(2)).thenReturn(node);
+  var model=new ExtendedModelMap();new NodePropertiesController(service).edit(2,model);
+  for(Locale locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))) {
+   var html=org.jsoup.Jsoup.parse(render("node/nodeProperties.html",model,locale));
+   assertThat(html.select("select[name=codeSyntax]")).hasSize(1);
+   assertThat(html.select("#codeSyntax option[selected]").val()).isEqualTo("legacy-example");
+   assertThat(html.select("#propertySyntaxPicker [data-syntax=legacy-example] img").attr("src")).isEqualTo("/img/ctbicons/ct_code.png");
+   assertThat(html.select("#propertySyntaxPicker [data-syntax=markdown] img").attr("src")).isEqualTo("/img/ctbicons/ct_markdown.png");
+   assertThat(html.select("#propertyMarkdown[disabled]")).isEmpty();
+   assertThat(html.select("#propertySyntaxSearch").attr("placeholder")).doesNotStartWith("??");
+   assertThat(html.select(".property-syntax-choice").eachAttr("data-syntax")).isSortedAccordingTo(String.CASE_INSENSITIVE_ORDER);
+  }
+ }
+ @Test void languagePickerKeepsRichTextAndContentReadOnlyLocks()throws Exception {
+  for(String syntax:List.of("custom-colors","python")) {
+   var service=mock(NodePropertiesService.class);when(service.writable()).thenReturn(true);
+   var node=new Node();node.setNodeId(2);node.setName("Locked");node.setSyntax(syntax);node.setIsReadOnly16bit(1);when(service.realNode(2)).thenReturn(node);
+   var model=new ExtendedModelMap();new NodePropertiesController(service).edit(2,model);
+   var html=org.jsoup.Jsoup.parse(render("node/nodeProperties.html",model,Locale.ENGLISH));
+   assertThat(html.select("#codeSyntax[disabled]")).hasSize(1);
+   assertThat(html.select("#propertyMarkdown[disabled]")).hasSize(1);
+   assertThat(html.select(".property-syntax-choice:not([disabled])")).isEmpty();
+  }
+ }
  private static String render(String file,Map<String,Object> model,Locale locale)throws Exception {
   var engine=new SpringTemplateEngine();var fragments=new ClassLoaderTemplateResolver();fragments.setPrefix("templates/");fragments.setSuffix(".html");fragments.setResolvablePatterns(Set.of("common/*"));fragments.setOrder(1);fragments.setCheckExistence(true);engine.addTemplateResolver(fragments);
   var strings=new StringTemplateResolver();strings.setOrder(2);strings.setTemplateMode("HTML");engine.addTemplateResolver(strings);

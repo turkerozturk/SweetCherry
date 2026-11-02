@@ -35,3 +35,13 @@ Geri al/yinele düğmeleri, Ctrl+Z, Ctrl+Y ve Ctrl+Shift+Z aynı geçmişi kulla
 5. Zengin metinde biçim, renk, dört liste karakteri, resim/dosya/tablo ekleme ve nesne silme işlemlerini deneyin; geri al/yinele kontrol edin.
 6. Metin seçip mevcut Dış bağlantı diyaloğunu kullanın. Ayrıca URL seçip yeni düğmeyi deneyin; biçimler ve seçim korunsun, geri alınabilsin. `javascript:` veya düz cümle bağlantıya dönüşmesin.
 7. Görsel yazım alanını ve metin modundaki alanı fareyle dikey boyutlandırın.
+
+
+## Editör yerleşimi ve kod dili seçimi
+
+- Masaüstünde zengin metin yazma alanı kalan ekran yüksekliğini ve içerik bölümünün genişliğini doldurur. “Text” başlığı görsel yer kaplamaz; erişilebilir etiket korunur. Yazma bölümünün dışında ikinci bir dikey kaydırma yoktur. Uzun metinde yazarken imleç görünür tutulur; sol araçlar bağımsız kaydırılabilir.
+- Düz metin ve Markdown düzenleyicide, en az 900 px genişlik ve 500 px yükseklikte, üst menü, kurtarma paneli ve altbilgiden kalan alan yazmaya ayrılır. Alanı aşağı taşırmak yerine metin kendi içinde kayar. Küçük ekranlarda mevcut sayfa kaydırma ve yeniden boyutlandırma davranışı korunur.
+- Markdown kaynak alanı ve önizlemesi üstten aynı hizadadır. Önizleme seçenekleri üst araç çubuğundadır.
+- Özelliklerde **Kod Dili** araması, ikonlu alfabetik liste ve **Markdown** kısayolu bulunur. Bunlar içerik tipinin mevcut kilitlerini kaldırmaz; seçim Kaydet ile kalıcı olur. JavaScript yoksa standart dil listesi kullanılabilir.
+
+Manuel kontrol: uzun içerik yazın; Enter, yapıştırma, geri alma/yineleme ve seçili metin biçimlendirmesini deneyin. Kurtarma panelini açıp kapatın ve pencereyi yeniden boyutlandırın. Markdown önizlemesini gizleyip açın. Kod dili arayın, Markdown seçin; salt okunur ve zengin metin düğümlerinin kilitli kaldığını doğrulayın. Mobilde araç çekmecesini ve metin seçimini kontrol edin.

@@ -20,7 +20,29 @@
     const visual = () => !!(mode && mode.checked && window.RichTextVisualModel);
     function focusEditor() { if (visual()) preview.focus(); else input.focus(); }
     function restoreSelection() {
-        if (visual()) window.RichTextVisualModel.restore(preview, selection[0], selection[1]);
+        if (visual()) {
+            window.RichTextVisualModel.restore(preview, selection[0], selection[1]);
+            // The editor prevents native beforeinput; after rebuilding its DOM, scroll only this surface.
+            const current=window.getSelection?.();
+            if(current?.rangeCount && preview.contains(current.focusNode)) {
+                const range=current.getRangeAt(0).cloneRange();range.collapse(false);
+                let rect=range.getClientRects()[0];
+                if(!rect && current.focusNode.nodeType===Node.TEXT_NODE && current.focusOffset>0){
+                    range.setStart(current.focusNode,current.focusOffset-1);rect=range.getClientRects()[0];
+                }
+                // A caret on the empty paragraph after Enter may have no Range rectangle.
+                if(!rect || !rect.height){
+                    let element=current.focusNode.nodeType===Node.TEXT_NODE?current.focusNode.parentElement:current.focusNode;
+                    if(element===preview)element=preview.childNodes[current.focusOffset] || preview.childNodes[current.focusOffset-1];
+                    if(element?.nodeName==='BR')element=element.parentElement;
+                    rect=element?.getBoundingClientRect?.();
+                }
+                if(rect){const bounds=preview.getBoundingClientRect(),pad=6;
+                    if(rect.bottom>bounds.bottom-pad)preview.scrollTop+=rect.bottom-bounds.bottom+pad;
+                    else if(rect.top<bounds.top+pad)preview.scrollTop-=bounds.top+pad-rect.top;
+                }
+            }
+        }
         else input.setSelectionRange(sub(previous,0,selection[0]).length,sub(previous,0,selection[1]).length);
     }
     /** Tracks textarea UTF-16 selection as model code-point positions before toolbar focus changes. */

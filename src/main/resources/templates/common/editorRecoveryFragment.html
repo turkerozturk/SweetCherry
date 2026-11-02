@@ -4,11 +4,11 @@
  <p th:text="#{editor.recovery.help}"></p>
  <label><input id="recoveryEnabled" type="checkbox" checked> <span th:text="#{editor.recovery.enabled}"></span></label>
  <label><span th:text="#{editor.recovery.interval}"></span> <input id="recoveryInterval" type="number" value="5" min="1" max="300" style="width:5em"></label>
- <div class="recovery-controls"><select id="recoveryDrafts" th:aria-label="#{editor.recovery.choose}"></select>
- <button type="button" id="recoveryRestore" disabled th:text="#{editor.recovery.restore}"></button>
- <button type="button" id="recoveryDownload" disabled th:text="#{editor.recovery.download}"></button>
- <button type="button" id="recoveryDiscard" disabled th:text="#{editor.recovery.discard}"></button>
- <button type="button" id="recoveryRescue" th:text="#{editor.recovery.downloadCurrent}"></button></div>
+ <div class="recovery-controls"><select class="form-select form-select-sm" id="recoveryDrafts" th:aria-label="#{editor.recovery.choose}"></select>
+ <button class="btn btn-sm btn-outline-secondary" type="button" id="recoveryRestore" disabled th:text="#{editor.recovery.restore}"></button>
+ <button class="btn btn-sm btn-outline-secondary" type="button" id="recoveryDownload" disabled th:text="#{editor.recovery.download}"></button>
+ <button class="btn btn-sm btn-outline-secondary" type="button" id="recoveryDiscard" disabled th:text="#{editor.recovery.discard}"></button>
+ <button class="btn btn-sm btn-outline-secondary" type="button" id="recoveryRescue" th:text="#{editor.recovery.downloadCurrent}"></button></div>
  </details>
  <span id="recoveryStatus" role="status" aria-live="polite" th:text="#{editor.recovery.starting}"></span>
  <a id="recoveryLogin" th:href="@{/login}" target="_blank" rel="noopener" hidden th:text="#{editor.recovery.login}"></a>

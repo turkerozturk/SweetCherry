@@ -36,6 +36,13 @@
 <div class="form-check"><input id="typePlainText" class="form-check-input" type="radio" name="nodeType" value="PLAIN_TEXT" th:checked="${nodeType.name() == 'PLAIN_TEXT'}" th:disabled="${syntaxLocked}"><label class="form-check-label" for="typePlainText" th:text="#{node.type.plainText}"></label></div>
 <div class="form-check"><input id="typeCode" class="form-check-input" type="radio" name="nodeType" value="CODE" th:checked="${nodeType.name() == 'CODE'}" th:disabled="${syntaxLocked}"><label class="form-check-label" for="typeCode" th:text="#{node.properties.code}"></label></div>
 <label for="codeSyntax" class="form-label mt-1" th:text="#{node.properties.codeLanguage}"></label><select id="codeSyntax" name="codeSyntax" class="form-select form-select-sm" required th:attr="data-locked=${syntaxLocked}" th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}"><option value="" th:selected="${nodeType.name() != 'CODE'}" th:text="#{node.properties.chooseLanguage}"></option><option th:each="item : ${syntaxOptions}" th:value="${item}" th:selected="${node.syntax == item}" th:text="${item}"></option></select>
+<div id="propertySyntaxPicker" hidden>
+<div class="d-flex gap-1 mt-1"><input id="propertySyntaxSearch" type="search" class="form-control form-control-sm" th:placeholder="#{node.properties.languageSearch}" th:aria-label="#{node.properties.languageSearch}" autocomplete="off">
+<button type="button" id="propertyMarkdown" class="btn btn-sm btn-outline-secondary" th:disabled="${syntaxLocked}" th:title="#{node.properties.useMarkdown}"><img th:src="@{/img/ctbicons/ct_markdown.png}" width="20" height="20" alt=""> Markdown</button></div>
+<details id="propertySyntaxDetails" class="mt-1"><summary class="form-control form-control-sm"><span id="propertySyntaxSelected" th:text="${nodeType.name() == 'CODE' ? node.syntax : #messages.msg('node.properties.chooseLanguage')}"></span></summary>
+<div class="property-syntax-list border rounded p-1" role="group" th:aria-label="#{node.properties.codeLanguage}">
+<button type="button" th:each="item : ${syntaxOptions}" class="property-syntax-choice" th:attr="data-syntax=${item}" th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}"><img th:src="@{/img/ctbicons/{name}.png(name=${syntaxIcons.get(item)})}" width="20" height="20" alt="" loading="lazy"><span th:text="${item}"></span></button>
+</div></details></div>
 <small th:if="${syntaxLocked}" class="form-text" th:text="#{node.properties.syntaxLocked}"></small>
 </fieldset></div></form>
 <dialog id="nodeTagsDialog" class="node-tags-dialog" aria-labelledby="nodeTagsDialogTitle" th:attr="data-endpoint=@{/nodes/tags/catalog},data-loading=#{tags.loading},data-error=#{tags.error},data-empty=#{tags.noChoices},data-changed=#{tags.changed},data-too-long=#{tags.tooLong}">
@@ -46,5 +53,5 @@
 </dialog>
 </section>
 <section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/icon-picker.js}"></script><script defer th:src="@{/js/node/tags.js}"></script>
-<script>(()=>{const radio=document.getElementById('typeCode'),syntax=document.getElementById('codeSyntax');if(!radio||!syntax)return;function sync(){syntax.disabled=syntax.dataset.locked==='true'||!radio.checked;}document.querySelectorAll('input[name="nodeType"]').forEach(item=>item.addEventListener('change',sync));sync();})();</script>
+<script defer th:src="@{/js/node/propertySyntaxPicker.js}"></script>
 </section></body></html>

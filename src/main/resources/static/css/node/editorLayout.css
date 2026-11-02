@@ -1,0 +1,17 @@
+/* Scope viewport fitting to the plain/Markdown edit page, never the reader or other splitters. */
+.plain-editor-page{min-width:0}.plain-editor-page #editorRecovery{padding:.2rem .4rem;margin:.2rem 0;font-size:.8rem}
+.plain-editor-page .markdown-toolbar{gap:.25rem;margin:.2rem 0}.plain-editor-page .markdown-preview-heading{display:inline-flex;font-size:.8rem;gap:.4rem;flex-wrap:wrap}.plain-editor-page #markdownPreviewStatus:empty{display:none}
+.plain-editor-page .md-editor-shell{align-items:stretch}.plain-editor-page #markdownPreviewPane{min-width:0;min-height:0}.plain-editor-page .markdown-preview{margin:0;min-height:24rem}.plain-editor-page #markdownPreview>:first-child{margin-top:0}
+@media(min-width:900px) and (min-height:500px){
+ body.plain-editor-viewport{overflow:hidden}
+ .plain-editor-page{height:var(--plain-editor-height);display:flex;flex-direction:column;overflow:hidden;padding-bottom:0!important}
+ .plain-editor-page>*,#plainEditForm>*{flex-shrink:0}
+ #plainEditForm{display:flex;flex-direction:column;flex:1 1 0;min-height:0;margin:0}
+ #markdownShell{flex:1 1 0;min-height:0;display:flex;gap:.5rem;overflow:hidden}
+ #markdownShell.md-preview-open{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .plain-writing-pane{display:flex;flex-direction:column;min-height:0;min-width:0;flex:1}
+ .plain-editor-page #nodeText{flex:1;height:0;min-height:0;resize:none;margin:0;overflow:auto}
+ .plain-editor-page #markdownPreviewPane{display:flex;flex-direction:column;overflow:hidden}
+ .plain-editor-page #markdownPreview{flex:1;height:0;min-height:0;max-height:none;overflow:auto}
+ .plain-editor-page #editorRecovery{max-height:22dvh;overflow:auto}
+}
