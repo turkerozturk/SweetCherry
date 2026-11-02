@@ -34,6 +34,8 @@ class TenantWizardSecurityTest {
     }
     @Configuration @EnableWebSecurity @EnableWebMvc @EnableMethodSecurity
     static class Config {
+        @Bean com.turkerozturk.home.HomeSettings homeSettings(){return new com.turkerozturk.home.HomeSettings();}
+        @Bean com.turkerozturk.home.HomeActivityService homeActivity(){return mock(com.turkerozturk.home.HomeActivityService.class);}
         @Bean TenantService tenants(){return mock(TenantService.class);}
         @Bean javax.sql.DataSource datasource(){return mock(javax.sql.DataSource.class);}
         @Bean CustomPropertiesHolder properties(){return new CustomPropertiesHolder();}

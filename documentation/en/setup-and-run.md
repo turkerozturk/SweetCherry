@@ -121,3 +121,6 @@ Raw content search operates on stored `node.txt`, including rich-text XML. Searc
 In visual rich-text editing mode, clicking `☐`, `☑` or `☒` at the start of a line (optionally preceded only by spaces or tabs) cycles through those three states. Boxes preceded by other text or objects remain unchanged. Save writes the change to the database; Undo/Redo are supported. In text/preview mode, boxes remain ordinary text.
 
 The **33~** button in both rich-text and plain-text editors inserts 33 tildes and a line break at the cursor, replacing selected text if any. Ctrl+R retains its browser refresh function.
+
+
+[Database opening and home activity](home-activity.md) — `myapp.home`

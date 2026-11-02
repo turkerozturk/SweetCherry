@@ -11,12 +11,12 @@
     const scrollTopButton = document.getElementById('scrollToTopBtn');
     /** Follow the reading pane's scroll position, rather than the non-scrolling window. */
     function updateScrollTopButton() {
-        const reading = content.querySelector('.workspace-rendered');
+        const reading = content.querySelector('.workspace-rendered, .workspace-root-content');
         scrollTopButton.hidden = !reading || reading.scrollTop <= 300;
     }
     content.addEventListener('scroll', updateScrollTopButton, true);
     scrollTopButton.addEventListener('click', () => {
-        const reading = content.querySelector('.workspace-rendered');
+        const reading = content.querySelector('.workspace-rendered, .workspace-root-content');
         reading?.scrollTo({top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
     });
     /** Open the original image in a separate tab, preserving the selected node and tree. */

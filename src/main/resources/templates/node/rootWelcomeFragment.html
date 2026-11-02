@@ -7,11 +7,11 @@
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <button class="btn btn-sm btn-outline-primary" type="submit"><i class="fas fa-plus"></i> <span th:text="#{tree.addRoot}">Add node</span></button>
 </form>
-<ul class="list-unstyled mt-3">
-<li><a class="text-decoration-none" th:href="@{/nodes/timeline/modified(_tenantView=${tenantViewToken})}" th:text="#{timeline.recentModified}">Recently Modified</a></li>
-<li><a class="text-decoration-none" th:href="@{/nodes/timeline/created(_tenantView=${tenantViewToken})}" th:text="#{timeline.recentCreated}">Recently Added</a></li>
-<li><a class="text-decoration-none" th:href="@{/bookmarks(_tenantView=${tenantViewToken})}" th:text="#{bookmarks.heading}">Bookmarks</a></li>
-</ul>
+<div class="d-flex flex-wrap gap-2 mt-3">
+<a class="btn btn-sm btn-outline-primary text-decoration-none" th:href="@{/nodes/timeline/modified(_tenantView=${tenantViewToken})}" th:text="#{timeline.recentModified}">Recently Modified</a>
+<a class="btn btn-sm btn-outline-primary text-decoration-none" th:href="@{/nodes/timeline/created(_tenantView=${tenantViewToken})}" th:text="#{timeline.recentCreated}">Recently Added</a>
+<a class="btn btn-sm btn-outline-primary text-decoration-none" th:href="@{/bookmarks(_tenantView=${tenantViewToken})}" th:text="#{bookmarks.heading}">Bookmarks</a>
+</div>
 <aside class="border rounded bg-body-tertiary p-3 mt-3 small" aria-labelledby="mobileNavigationHelp">
 <h2 id="mobileNavigationHelp" class="h6" th:text="#{home.mobileHelp}">In mobile view</h2>
 <ul class="mb-0">
@@ -21,4 +21,9 @@
 <li th:text="#{home.mobileArrows}"></li>
 </ul>
 </aside>
+<p th:if="${homeActivityUnavailable == true}" class="text-muted mt-3" th:text="#{home.activity.unavailable}"></p>
+<th:block th:if="${homeActivityUnavailable != true}">
+<section th:if="${homeModifiedEnabled == true}" th:insert="~{node/homeActivityFragment :: activity(#{home.activity.modified}, ${homeModified})}"></section>
+<section th:if="${homeCreatedEnabled == true}" th:insert="~{node/homeActivityFragment :: activity(#{home.activity.created}, ${homeCreated})}"></section>
+</th:block>
 </div></body></html>

@@ -161,6 +161,10 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  home:
+    open-latest-modified: false # After database selection only; false keeps the virtual root.
+    modified-minimum: 5 # All today's occurrences, filled with older ones to this minimum; 0 hides the list.
+    created-minimum: 5 # Uses myapp.calendar.time-zone (system by default).
   calendar:
     first-day-of-week: MONDAY # 1=Monday ... 7=Sunday, or an English day name.
     time-zone: system # JVM/system time zone; or e.g. Europe/Istanbul.

@@ -3,7 +3,7 @@
 <body>
 <section th:fragment="treeContent" class="workspace-node" th:attr="data-node-id=${requestedNodeId},data-node-title=${node != null ? node.name : currentTenantName}">
     <th:block th:if="${isRootNode == true}">
-        <th:block th:replace="~{node/rootWelcomeFragment :: welcome}"></th:block>
+        <div class="workspace-root-content" tabindex="0"><th:block th:replace="~{node/rootWelcomeFragment :: welcome}"></th:block></div>
     </th:block>
     <th:block th:if="${node != null}">
         <header class="workspace-node-header">

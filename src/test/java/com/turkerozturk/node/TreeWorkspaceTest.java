@@ -43,6 +43,7 @@ class TreeWorkspaceTest {
         NodeDeletionService deletion = mock(NodeDeletionService.class);
         when(deletion.isCurrentTenantWritable()).thenReturn(true);
         ReflectionTestUtils.setField(controller, "nodeDeletionService", deletion);
+        ReflectionTestUtils.setField(controller, "homeActivity", mock(com.turkerozturk.home.HomeActivityService.class));
         ExtendedModelMap model = new ExtendedModelMap();
         assertThat(controller.treeContent(0, model, new MockHttpServletRequest()))
                 .isEqualTo("node/treeContentFragment :: treeContent");

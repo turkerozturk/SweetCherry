@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<div th:fragment="activity(heading, entries)" class="home-activity mt-4">
+<h2 class="h5" th:text="${heading}"></h2>
+<p class="small text-muted" th:text="#{home.activity.help}"></p>
+<p th:if="${#lists.isEmpty(entries)}" class="text-muted fst-italic" th:text="#{home.activity.empty}"></p>
+<ul class="list-unstyled">
+<li th:each="entry : ${entries}" class="border-bottom py-2">
+<div class="d-flex flex-wrap align-items-center gap-1" style="overflow-wrap:anywhere">
+<img th:if="${entry.icon != 'zero'}" th:src="@{/img/ctbicons/{icon}.png(icon=${entry.icon})}" width="20" height="20" alt="" loading="lazy">
+<a class="text-decoration-none" th:href="@{/tree(nodeId=0,_tenantView=${tenantViewToken})}" th:text="${currentTenantName}"></a>
+<th:block th:each="crumb, status : ${entry.breadcrumbs}">
+<span aria-hidden="true"> / </span>
+<a class="text-decoration-none" th:href="@{/nodes/{id}(id=${crumb.id},_tenantView=${tenantViewToken})}" th:text="${crumb.name}" th:style="${status.last ? 'color:' + entry.color + ';font-weight:' + (entry.bold ? 'bold' : 'normal') : ''}"></a>
+</th:block>
+<span class="small text-muted" th:text="'[' + ${entry.id} + ']'"></span>
+</div>
+<div class="small text-muted"><time th:text="${entry.date}"></time> <span th:if="${!entry.today}" class="badge bg-secondary" th:text="#{home.activity.older}"></span></div>
+</li>
+</ul>
+</div></body></html>

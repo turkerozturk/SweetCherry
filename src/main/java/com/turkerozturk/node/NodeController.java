@@ -375,6 +375,7 @@ public class NodeController {
 
         model.addAttribute("viewMode", viewMode);
 
+        homeActivity.populate(model);
         return "node/mobileReader";
 
     }
@@ -419,12 +420,16 @@ public class NodeController {
     @Autowired
     private com.turkerozturk.richtext.experimental.RichTextRenderingService richTextRenderingService;
 
+    @Autowired
+    private com.turkerozturk.home.HomeActivityService homeActivity;
+
     @GetMapping("/tree/content/{nodeId}")
     @RequiresTenant
     public String treeContent(@PathVariable long nodeId, Model model, HttpServletRequest request) {
         if (nodeId == 0) {
             model.addAttribute("isRootNode", true);
             model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
+            homeActivity.populate(model);
         } else {
             request.setAttribute("newRichTextView", Boolean.TRUE);
             prepareNodePage(nodeId, model, request, "tree");

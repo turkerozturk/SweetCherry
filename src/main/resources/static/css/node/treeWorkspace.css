@@ -79,3 +79,6 @@
         margin:.35rem;
     }
 }
+
+/* Virtual home has its own scrolling pane, independent of node content/backlinks. */
+.workspace-root-content { flex: 1; min-height: 0; overflow: auto; padding: 1rem; overflow-wrap: anywhere; }

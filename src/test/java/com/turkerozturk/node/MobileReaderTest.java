@@ -39,6 +39,7 @@ class MobileReaderTest {
         when(children.getNaviNodesByFatherId(0)).thenReturn(List.of());
         ReflectionTestUtils.setField(controller, "childrenService", children);
         ReflectionTestUtils.setField(controller, "nodeDeletionService", mock(NodeDeletionService.class));
+        ReflectionTestUtils.setField(controller, "homeActivity", mock(com.turkerozturk.home.HomeActivityService.class));
         return controller;
     }
 }

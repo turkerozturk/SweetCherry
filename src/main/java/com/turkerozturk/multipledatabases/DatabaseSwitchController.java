@@ -48,6 +48,11 @@ public class DatabaseSwitchController {
     @Autowired
     private TenantService tenantService;
 
+    @Autowired
+    private com.turkerozturk.home.HomeSettings homeSettings = new com.turkerozturk.home.HomeSettings();
+    @Autowired
+    private com.turkerozturk.home.HomeActivityService homeActivity;
+
     /**
      * bilgi: ONEMLI metod. Secilen tenant ismini oturum degiskenine atayarak veritabaninin degismesini sagliyor.
      *
@@ -102,6 +107,17 @@ public class DatabaseSwitchController {
         // tenantService.printDataSourceDetails();
         //TenantContext.setCurrentTenant(tenant);
         //System.out.println("TENANT DEGISTI: " + tenant);
+        if (homeSettings.isOpenLatestModified()) {
+            try {
+                var latest = homeActivity.latest(source);
+                if (latest.isPresent()) {
+                    return "redirect:/nodes/" + latest.getAsLong() + "?_tenantView="
+                            + session.getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
+                }
+            } catch (java.sql.SQLException | RuntimeException failure) {
+                logger.warn("Latest modified node could not be selected; opening database home ({}).", failure.getClass().getSimpleName());
+            }
+        }
         return "redirect:/";  // Ana sayfaya yonlendir
     }
 

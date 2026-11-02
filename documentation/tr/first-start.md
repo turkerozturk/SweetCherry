@@ -86,3 +86,6 @@ When the credentials file is first generated, its initial admin password is show
 Before Spring reads settings, missing bundled application/profile YAML files are copied into the working directory. Launch scripts/EXE select the JAR's directory; for direct Java launches, change directory there first. Existing root/config `.yml` or `.yaml` files are preserved; profiles are not activated merely by extracting their files. A read-only folder produces a warning, and settings editing requires a writable location. Existing external settings keep their values across upgrades.
 
 New defaults use the desktop tree and the Greenwich example astronomy location (`51.4779`, `-0.0015`, `Europe/London`); saved reader preferences and existing coordinates are retained. The main port defaults to unprivileged `8443`, with additional HTTP on `8080`; neither implies HTTPS without SSL configuration. An old external YAML using port 443 must be changed or overridden explicitly on Linux. `run.sh` respects YAML port values. Remote access remains an explicit configuration choice.
+
+
+[Veritabanı açılışı ve ana sayfa listeleri](home-activity.md) — `myapp.home`
