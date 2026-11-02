@@ -23,3 +23,5 @@ Adım adım işlem ve asset listesi: [yayın hazırlığı](release-checklist.md
 Nightly veya development build kanalı zorunlu değildir. Şu anda yalnız kararlı release indirme kanalı var. İleride development paketleri sunulursa tarih/commit ve deneme sürümü olduğu açıkça belirtilir; stable latest bağlantısı bunlarla karıştırılmaz.
 
 GitHub Issues bug/enhancement etiketleriyle yeterlidir. İstenirse somut bir yayın için Milestone oluşturulabilir; takvim ve bütün gelecek özellikleri peşinen taahhüt etmek gerekmez.
+
+1.6.0; 1.5.0 sonrasındaki CTB yedekleme, zamanlama/saklama, yedek yönetimi, ana sayfa etkinliği ve editör konforu iyileştirmelerini kapsar. Uyumlu yeni özellikler nedeniyle minor sürüm artırılmıştır. Sonraki düzeltme 1.6.1, yeni özellik yayını 1.7.0 olabilir.

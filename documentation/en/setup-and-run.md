@@ -1,15 +1,15 @@
-# SweetCherry 1.5.0 — installation and first use
+# SweetCherry 1.6.0 — installation and first use
 
 SweetCherry is an open-source web companion for CherryTree CTB note databases. It provides browser views, mind maps, editing, and exports. It does not replace CherryTree. The supported starting point is an unencrypted SQLite `.ctb` file; `.ctd`, `.ctx`, and `.ctz` files are outside this guide.
 
 ## Windows 10/11, 64-bit
 
-Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.5.0). Choose one product asset:
+Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.6.0). Choose one product asset:
 
 | Asset | Use |
 | --- | --- |
-| `SweetCherry-1.5.0-windows-x64-setup.exe` | Folder selection wizard and optional shortcuts |
-| `SweetCherry-1.5.0-windows-x64.zip` | Extract and run without an installation wizard |
+| `SweetCherry-1.6.0-windows-x64-setup.exe` | Folder selection wizard and optional shortcuts |
+| `SweetCherry-1.6.0-windows-x64.zip` | Extract and run without an installation wizard |
 
 Both include a Windows x64 Java 17 runtime. You do not need to install Java. The automatically generated **Source code** archives contain source, not the ready-to-run application. Do not run the installer from inside a ZIP.
 
@@ -64,7 +64,7 @@ Use a unique display name and an existing CTB file. Forward slashes make Windows
 
 Start with `custom.isWritable=false`. Setting it to `true` enables supported write operations for authorized users. Content read-only flags are separate from tenant write permission.
 
-**SweetCherry does not make automatic backups.** Back up important databases yourself and avoid simultaneous writes from SweetCherry and CherryTree. CTB files may stay outside the application folder. Copying the closed application folder does not back up those external databases.
+**Manual and optional scheduled CTB backups are available under System → CTB backups (ADMIN).** Scheduling is disabled until configured; see [backup setup and recovery](ctb-backups.md). Keep copies on another device and avoid simultaneous writes from SweetCherry and CherryTree. CTB files may stay outside the application folder. Copying the closed application folder does not back up those external databases.
 
 ## SQLite, MariaDB and PostgreSQL connections
 
@@ -90,7 +90,7 @@ After stopping, you may copy or move the application folder. Recreate shortcuts 
 
 ## Other systems and source builds
 
-The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.5.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.5.0.zip), extract it, and run:
+The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.6.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.6.0.zip), extract it, and run:
 
 - Windows: `first-run.bat`
 - Linux/Raspberry Pi: `sh ./first-run.sh`

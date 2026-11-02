@@ -1,9 +1,9 @@
-# SweetCherry 1.5.0 — hazır Windows paketini kullanma
+# SweetCherry 1.6.0 — hazır Windows paketini kullanma
 
-[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.5.0) Windows 10/11 **64 bit** için bir ürün dosyası indirin:
+[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.6.0) Windows 10/11 **64 bit** için bir ürün dosyası indirin:
 
-- `SweetCherry-1.5.0-windows-x64-setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
-- `SweetCherry-1.5.0-windows-x64.zip`: tamamını çıkarıp `SweetCherry.exe` çalıştırabileceğiniz portable paket.
+- `SweetCherry-1.6.0-windows-x64-setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
+- `SweetCherry-1.6.0-windows-x64.zip`: tamamını çıkarıp `SweetCherry.exe` çalıştırabileceğiniz portable paket.
 
 İkisinde de Java 17 vardır; ayrıca Java kurmanız gerekmez. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
 
@@ -21,7 +21,7 @@ Yönetici olarak veri kaynağı menüsündeki tenant sihirbazını kullanabilirs
 
 Manuel yöntem de korunur: `allTenants/demo.txt` tanımını ayrı bir `.txt` dosyasına kopyalayın. `name` alanını ve `datasource.url` yolunu mevcut CTB’nize göre değiştirin. Başlangıçta `custom.isWritable=false` kullanın. Menüden veri kaynaklarını yeniden yükleyip yeni tanımı seçin. CTB uygulama klasörü dışında kalabilir. Yol, SweetCherry’nin çalıştığı makinede erişilebilir olmalıdır.
 
-**SweetCherry otomatik yedek almaz.** Önemli CTB’leri kendiniz yedekleyin. CherryTree ve SweetCherry’den aynı dosyaya eşzamanlı yazmayın. Uygulamayı kapatıp tüm klasörünü kopyalamak taşımayı kolaylaştırır; klasör dışındaki CTB’ler bu kopyaya dahil değildir.
+**Sistem → CTB yedekleri (ADMIN)** menüsünde elle ve isteğe bağlı zamanlanmış yedekleme bulunur. Zamanlama ayarlanana kadar kapalıdır; [yedekleme ve kurtarma kılavuzuna](ctb-backups.md) bakın. Önemli yedeklerinizi başka bir cihazda da saklayın. CherryTree ve SweetCherry’den aynı dosyaya eşzamanlı yazmayın. Uygulamayı kapatıp tüm klasörünü kopyalamak taşımayı kolaylaştırır; klasör dışındaki CTB’ler bu kopyaya dahil değildir.
 
 Ayrıntılar: [tenant ayarları ve kaynak derleme](setup-and-run.md), [Windows paket yapısı](windows-bundled-distribution.md), [uzaktan erişim](network-access.md), [English installation guide](../en/setup-and-run.md).
 

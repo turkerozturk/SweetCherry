@@ -4,6 +4,15 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.6.0]
+
+- Add consistent full file-based CTB snapshots using the SQLite Online Backup API, integrity checks, SHA-256, record counts, downloads and recovery into a separate read-only working copy; leave source databases unchanged.
+- Add opt-in scheduled backups for explicitly selected connections, physical-source alias grouping, sequential jobs and retry backoff. Apply optional retention only after a successful automatic backup; protect manual/legacy backups and working copies.
+- Add reviewed single/bulk backup deletion with short-lived, single-use session confirmation and checksum/usage protection; report deleted/skipped files explicitly.
+- Add Created/Modified activity lists with styled, clickable occurrence breadcrumbs and configurable minimum counts; open the latest modified node after database selection by default in bundled YAML, with an opt-out.
+- Fill desktop editor panes with the available viewport, remove nested writing-area scrolling, keep the rich-text caret visible, compact recovery controls and align Markdown source/preview. Add searchable code-language icons and a Markdown shortcut in Node Properties, retaining syntax locks.
+- Resolve PDF translations through Spring messages and fall back to a generic code icon when a language-specific resource is missing.
+
 ## [1.5.0]
 
 - Redesign advanced POST search with title/raw-content all-word, any-word and phrase matching; exact-tag ANY/ALL filters, searchable tag/icon choices, sortable SQL pagination, occurrence breadcrumbs and compact date columns. Retain raw node.txt filtering and current-page PDF export.

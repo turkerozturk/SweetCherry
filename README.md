@@ -15,13 +15,14 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 - [Kurulum ve kullanım — Türkçe](documentation/tr/installation.md)
 - [Build from source — Türkçe](documentation/tr/setup-and-run.md)
 
-**SweetCherry does not create automatic backups.** Back up important CTB files yourself. Do not write to the same file simultaneously from SweetCherry and CherryTree. Read-only tenant configuration is available.
+**CTB backups are available manually and on an optional schedule.** Automatic backup is off until configured; keep important backups on another device. Do not write to the same file simultaneously from SweetCherry and CherryTree. Read-only tenant configuration is available.
 
 ## Features and documentation
 
 - Markdown rendering and editing with preview, internal-link editing and reports, searchable tags, and weekly/monthly node calendars.
-- Browser-local recovery drafts for unsaved editor content.
-- [Consistent full CTB backups](documentation/en/ctb-backups.md), with verification, downloads and recovery into a separate working copy.
+- Browser-local recovery drafts for unsaved editor content, viewport-filling desktop editors, aligned Markdown preview and searchable language selection.
+- [Home activity](documentation/en/home-activity.md): recent Created/Modified breadcrumbs and optional opening of the latest modified node (enabled in bundled defaults).
+- [Consistent full CTB backups](documentation/en/ctb-backups.md), with optional scheduling/retention, reviewed single/bulk deletion, verification, downloads and recovery into a separate working copy.
 - [Advanced raw-content search](documentation/en/advanced-search.md) with multiword/tag matching, sortable results and breadcrumbs; [saved filters and on-demand backlinks](documentation/en/saved-filters-backlinks.md).
 - Rich-text editing, images and attachments, external links, tables, embedded codebox editing, and formatted web-page paste.
 - [Quick switch by title and quick plain-text/Markdown capture](documentation/tr/quick-notes.md) with searchable, remembered parent destinations.
@@ -35,7 +36,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 ## Release information
 
-[Changelog](CHANGELOG.md) · [1.5.0 release notes](documentation/releases/v1.5.0.md) · [1.4.0 release notes](documentation/releases/v1.4.0.md) · [1.3.0 release notes](documentation/releases/v1.3.0.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
+[Changelog](CHANGELOG.md) · [1.6.0 release notes](documentation/releases/v1.6.0.md) · [1.5.0 release notes](documentation/releases/v1.5.0.md) · [1.4.0 release notes](documentation/releases/v1.4.0.md) · [1.3.0 release notes](documentation/releases/v1.3.0.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
 
 Development builds are not currently published as a separate download channel. Use the stable release for ordinary use; source builds from `main` may include unreleased changes.
 
