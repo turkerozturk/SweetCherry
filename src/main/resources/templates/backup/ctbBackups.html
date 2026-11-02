@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{ctbBackup.title}">CTB backups</title><th:block layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/backup/ctbBackups.css}"></th:block></head>
+<body><section layout:fragment="content" class="container-fluid py-3">
+<h1 th:text="#{ctbBackup.title}"></h1>
+<p th:text="#{ctbBackup.intro}"></p>
+<p class="small text-body-secondary"><span th:text="#{ctbBackup.directory}"></span> <code th:text="${backupDirectory}" style="overflow-wrap:anywhere"></code></p>
+<p th:if="${backupError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg(backupError)}"></p>
+<p th:if="${backupInvalid > 0}" class="alert alert-warning" th:text="#{ctbBackup.invalid(${backupInvalid})}"></p>
+<p th:if="${!backupEnabled}" class="alert alert-info" th:text="#{ctbBackup.error.disabled}"></p>
+<form th:if="${backupEnabled and backupSelected != null}" method="post" th:action="@{/system/backups/start}" class="mb-3" th:attr="data-confirm-message=#{ctbBackup.confirm(${backupSelected})}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<p><span th:text="#{ctbBackup.selected}"></span> <strong th:text="${backupSelected}"></strong></p>
+<button type="submit" class="btn btn-primary" th:disabled="${backupCurrent != null and backupCurrent.state == 'RUNNING'}"><i class="fa-solid fa-database" aria-hidden="true"></i> <span th:text="#{ctbBackup.start}"></span></button>
+</form>
+<p th:if="${backupSelected == null}" class="alert alert-info" th:text="#{ctbBackup.selectFirst}"></p>
+<div th:if="${backupCurrent != null}" class="border rounded p-3 mb-3" id="ctb-backup-job"
+     th:attr="data-running=${backupCurrent.state == 'RUNNING'},data-status-url=@{/system/backups/status/{id}(id=${backupCurrent.id})},data-paused=#{ctbBackup.pollPaused},data-copying=#{ctbBackup.phase.COPYING},data-checking=#{ctbBackup.phase.CHECKING},data-hashing=#{ctbBackup.phase.HASHING}">
+<h2 class="h5" th:text="#{ctbBackup.job}"></h2>
+<p><strong class="me-2" th:text="${backupCurrent.sourceName}"></strong> <span th:text="${#messages.msg('ctbBackup.state.' + backupCurrent.state)}"></span></p>
+<p id="ctb-backup-phase" aria-live="polite" th:text="${#messages.msg('ctbBackup.phase.' + backupCurrent.phase)}"></p>
+<progress th:if="${backupCurrent.state == 'RUNNING'}" id="ctb-backup-progress" max="100" style="width:100%;max-width:40rem" th:attr="aria-label=#{ctbBackup.progress}"></progress>
+<p th:if="${backupCurrent.error != null}" class="text-danger" th:text="${#messages.msg(backupCurrent.error)}"></p>
+<a class="btn btn-sm btn-outline-secondary" th:href="@{/system/backups}" th:text="#{ctbBackup.refresh}"></a>
+</div>
+<p th:if="${#lists.isEmpty(backups)}" class="text-body-secondary fst-italic" th:text="#{ctbBackup.empty}"></p>
+<div class="table-responsive" th:unless="${#lists.isEmpty(backups)}"><table class="backup-list table table-striped align-middle">
+<thead><tr><th th:text="#{ctbBackup.created}"></th><th th:text="#{ctbBackup.source}"></th><th th:text="#{ctbBackup.size}"></th><th th:text="#{ctbBackup.actions}"></th></tr></thead>
+<tbody><tr th:each="backup : ${backups}">
+<td class="text-nowrap" th:attr="data-label=#{ctbBackup.created}" th:text="${backup.date()}"></td><td th:attr="data-label=#{ctbBackup.source}" th:text="${backup.sourceName}"></td>
+<td class="text-nowrap" th:attr="data-label=#{ctbBackup.size}" th:text="${#numbers.formatDecimal(backup.bytes / 1048576.0, 1, 2)} + ' MiB'"></td>
+<td th:attr="data-label=#{ctbBackup.actions}"><div class="d-flex flex-wrap gap-2">
+<a class="btn btn-sm btn-success" th:href="@{/system/backups/{id}/download(id=${backup.id})}"><i class="fa-solid fa-download" aria-hidden="true"></i> <span th:text="#{ctbBackup.download}"></span></a>
+<form method="post" th:action="@{/system/backups/{id}/open(id=${backup.id})}" th:attr="data-confirm-message=#{ctbBackup.openConfirm}"><button type="submit" class="btn btn-sm btn-outline-primary" th:text="#{ctbBackup.open}"></button></form>
+</div><details class="mt-2"><summary th:text="#{ctbBackup.details}"></summary>
+<p class="small mb-1"><code th:text="${backup.fileName}" style="overflow-wrap:anywhere"></code></p>
+<p class="small mb-1">SHA-256: <code th:text="${backup.sha256}" style="overflow-wrap:anywhere"></code></p>
+<ul class="small mb-0"><li th:each="count : ${backup.counts.entrySet()}"><code th:text="${count.key}"></code>: <span th:text="${count.value}"></span></li></ul>
+</details></td></tr></tbody></table></div>
+<p class="alert alert-info mt-3" th:text="#{ctbBackup.restoreHelp}"></p>
+<p class="small text-body-secondary" th:text="#{ctbBackup.limits}"></p>
+<script th:src="@{/js/backup/ctbBackups.js}" defer></script>
+</section></body></html>

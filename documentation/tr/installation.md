@@ -48,3 +48,6 @@ Eski CTB'nin desteklenen şema güncellemesi dosyayı değiştirir; izin vermede
 Zengin metnin görsel düzenleme modunda, satır başında yalnız boşluk veya tab sonrasında bulunan `☐`, `☑`, `☒` işaretlerine tıklamak bu üç durumu sırayla değiştirir. Önünde başka metin veya nesne olan kutular değişmez. Değişiklik Kaydet ile veritabanına yazılır; Geri Al/Yinele desteklenir. Metin/önizleme modunda kutular normal metindir.
 
 Zengin metin ve düz metin editörlerindeki **33~** düğmesi imlece 33 tilde ve satır sonu ekler; seçili metin varsa onun yerine ekler. Ctrl+R tarayıcının sayfayı yenileme kısayolu olarak korunur.
+
+
+[Tutarlı CTB yedekleme](ctb-backups.md)

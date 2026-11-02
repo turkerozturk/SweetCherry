@@ -5,6 +5,7 @@
 <section layout:fragment="content" class="container py-3" style="max-width: 900px">
     <h1 th:text="#{wizard.title}"></h1><p th:text="#{wizard.location}"></p>
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
+    <p class="alert alert-info" th:if="${backupWorkingCopy == true}" th:text="#{ctbBackup.workingCopy}"></p>
     <p class="alert alert-warning" th:if="${wizardError}" th:text="${#messages.msg(wizardError)}"></p>
     <form method="post" th:action="@{/tenants/wizard}" th:object="${wizard}" id="tenantWizardForm">
         <input type="hidden" th:field="*{tenant}"><input type="hidden" th:field="*{revision}">

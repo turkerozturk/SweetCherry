@@ -1,0 +1,9 @@
+.backup-list td { overflow-wrap: anywhere; }
+@media (max-width: 767.98px) {
+    .backup-list, .backup-list tbody { display: block; width: 100%; }
+    .backup-list thead { display: none; }
+    .backup-list tr { display: block; border: 1px solid var(--bs-border-color, #ccc); border-radius: .4rem; margin-bottom: 1rem; padding: .5rem; }
+    .backup-list td { display: block; border: 0; padding: .35rem; white-space: normal !important; }
+    .backup-list td::before { content: attr(data-label); display: block; font-size: .85rem; font-weight: 600; color: var(--bs-secondary-color, #555); margin-bottom: .15rem; }
+    .backup-list .btn { white-space: normal; text-align: start; }
+}

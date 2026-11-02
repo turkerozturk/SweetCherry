@@ -63,3 +63,6 @@ login-credentials.properties
 /application.yml
 /application-experiments.yml
 /application-operations.yml
+
+# Private CTB backup catalog and restored working copies
+/backups/

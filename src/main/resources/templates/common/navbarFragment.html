@@ -316,6 +316,7 @@
                         <ul class="dropdown-menu">
                             <li sec:authorize="isAuthenticated()">
                                 <th:block sec:authorize="hasRole('ADMIN')">
+                                    <a class="dropdown-item" th:href="@{/system/backups}"><i class="fa-solid fa-database" aria-hidden="true"></i> <span th:text="#{ctbBackup.title}">CTB backups</span></a>
                                     <a class="dropdown-item" th:href="@{/system/settings}"><i class="fa-solid fa-sliders" aria-hidden="true"></i> <span th:text="#{appsettings.title}">Application settings</span></a>
                                     <form method="POST" th:action="@{/restartContext}" th:attr="data-shutdown-confirm=#{appsettings.restartConfirm}">
                                         <button class="dropdown-item" type="submit"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> <span th:text="#{appsettings.restart}">Restart SweetCherry</span></button>

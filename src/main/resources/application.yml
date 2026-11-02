@@ -161,6 +161,9 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  ctb-backup:
+    enabled: true
+    directory: backups/ctb # Full SQLite snapshots; relative to the application working directory.
   home:
     open-latest-modified: false # After database selection only; false keeps the virtual root.
     modified-minimum: 5 # All today's occurrences, filled with older ones to this minimum; 0 hides the list.

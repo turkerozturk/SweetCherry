@@ -124,3 +124,6 @@ The **33~** button in both rich-text and plain-text editors inserts 33 tildes an
 
 
 [Database opening and home activity](home-activity.md) — `myapp.home`
+
+
+[Consistent CTB backups](ctb-backups.md)

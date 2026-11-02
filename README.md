@@ -21,6 +21,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 - Markdown rendering and editing with preview, internal-link editing and reports, searchable tags, and weekly/monthly node calendars.
 - Browser-local recovery drafts for unsaved editor content.
+- [Consistent full CTB backups](documentation/en/ctb-backups.md), with verification, downloads and recovery into a separate working copy.
 - [Advanced raw-content search](documentation/en/advanced-search.md) with multiword/tag matching, sortable results and breadcrumbs; [saved filters and on-demand backlinks](documentation/en/saved-filters-backlinks.md).
 - Rich-text editing, images and attachments, external links, tables, embedded codebox editing, and formatted web-page paste.
 - [Quick switch by title and quick plain-text/Markdown capture](documentation/tr/quick-notes.md) with searchable, remembered parent destinations.
