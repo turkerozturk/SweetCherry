@@ -7,6 +7,13 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 class PdfExportOptionsTest {
+    private org.springframework.context.MessageSource messages() {
+        var messages = new org.springframework.context.support.StaticMessageSource();
+        messages.addMessage("pdf.options.contents", java.util.Locale.ENGLISH, "Table of contents");
+        messages.addMessage("pdf.options.contents", java.util.Locale.forLanguageTag("tr"), "İçindekiler");
+        return messages;
+    }
+
     private PdfExportOptions options(String paper, String orientation, boolean metadata) {
         return new PdfExportOptions(paper, orientation, false, false, true, true, true, metadata, true, true);
     }
@@ -50,7 +57,7 @@ class PdfExportOptionsTest {
     @Test void validatesOptionsAndRemembersOnlySuccessfulExportsInSession() {
         assertThatThrownBy(() -> options("unknown", "portrait", true)).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
         var service = mock(NodePdfExportService.class); var sources = mock(PdfSourceMetadata.class);
-        var controller = new NodePdfOptionsController(service, sources);
+        var controller = new NodePdfOptionsController(service, sources, messages());
         var session = new org.springframework.mock.web.MockHttpSession();
         when(service.export(eq(53L), any(), any())).thenReturn(new NodePdfExportService.Export("Node", new byte[]{1}));
         controller.download(53, session, "Letter", "landscape", false, false, true, true, true, false, true, true);
@@ -103,7 +110,7 @@ class PdfExportOptionsTest {
     @org.junit.jupiter.api.Test void subtreeUsesSamePreferencesAndRemembersContentsAfterSuccess() {
         var service = org.mockito.Mockito.mock(NodePdfExportService.class);
         var sources = org.mockito.Mockito.mock(PdfSourceMetadata.class);
-        var controller = new NodePdfOptionsController(service, sources);
+        var controller = new NodePdfOptionsController(service, sources, messages());
         var session = new org.springframework.mock.web.MockHttpSession();
         org.mockito.Mockito.when(service.exportSubtree(org.mockito.ArgumentMatchers.eq(53L),
                 org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.isNull(),
@@ -115,12 +122,16 @@ class PdfExportOptionsTest {
         controller.subtreePage(25, session, model);
         org.assertj.core.api.Assertions.assertThat(model).containsEntry("includeDescendants", true).containsEntry("contents", true);
         org.assertj.core.api.Assertions.assertThat(model.get("options")).isEqualTo(PdfExportOptions.defaults());
+        verify(service).exportSubtree(eq(53L), any(), isNull(), eq(true), eq("Table of contents"));
+        controller.subtreeDownload(53, session, "A4", "portrait", true, true, true,
+                false, false, false, false, false, true, java.util.Locale.forLanguageTag("tr"));
+        verify(service).exportSubtree(eq(53L), any(), isNull(), eq(true), eq("İçindekiler"));
     }
 
     @Test void objectSelectionIsRememberedOnlyAfterSuccessfulExport() {
         var service = mock(NodePdfExportService.class);
         var sources = mock(PdfSourceMetadata.class);
-        var controller = new NodePdfOptionsController(service, sources);
+        var controller = new NodePdfOptionsController(service, sources, messages());
         var session = new org.springframework.mock.web.MockHttpSession();
         assertThat(NodePdfOptionsController.rememberedObjects(session))
                 .isEqualTo(com.turkerozturk.richtext.experimental.PdfObjectSelection.all());
@@ -134,5 +145,22 @@ class PdfExportOptionsTest {
         assertThatThrownBy(() -> controller.downloadObjects(53, session, "A4", "portrait", true, true, true,
                 false, false, false, false, false, true, true, true, true)).isInstanceOf(IllegalStateException.class);
         assertThat(NodePdfOptionsController.rememberedObjects(session)).isEqualTo(expected);
+    }
+    @Test void postSubtreeUsesInjectedMessagesForTheRequestedLocale() {
+        var service = mock(NodePdfExportService.class);
+        var messages = mock(org.springframework.context.MessageSource.class);
+        var locale = java.util.Locale.forLanguageTag("tr");
+        when(messages.getMessage(eq("pdf.options.contents"), isNull(), eq(locale)))
+                .thenReturn("Configured contents heading");
+        when(service.exportSubtree(eq(53L), any(), isNull(), eq(true),
+                eq("Configured contents heading"), any(com.turkerozturk.richtext.experimental.PdfObjectSelection.class)))
+                .thenReturn(new NodePdfExportService.Export("Root", new byte[]{1}));
+        var controller = new NodePdfOptionsController(service, mock(PdfSourceMetadata.class), messages);
+        controller.subtreeDownloadObjects(53, new org.springframework.mock.web.MockHttpSession(),
+                "A4", "portrait", true, true, true, false, false, false, false, false,
+                true, true, true, true, true, locale);
+        verify(messages).getMessage(eq("pdf.options.contents"), isNull(), eq(locale));
+        verify(service).exportSubtree(eq(53L), any(), isNull(), eq(true),
+                eq("Configured contents heading"), any(com.turkerozturk.richtext.experimental.PdfObjectSelection.class));
     }
 }

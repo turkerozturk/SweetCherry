@@ -9,13 +9,21 @@ public final class RichTextCodeboxes {
     private RichTextCodeboxes() { }
     public record Value(String text, String syntax) { }
     public record Language(String syntax, String icon) { }
-    static List<Language> languages() {
+    private static final List<Language> LANGUAGES = buildLanguages();
+    static List<Language> languages() { return LANGUAGES; }
+    private static List<Language> buildLanguages() {
         var names = new TreeSet<String>(CodeHighLighter.supportedSyntaxes());
         for (var icon : CodeIcon.values()) if (!icon.getSyntax().equals("other")) names.add(icon.getSyntax());
         names.remove("plain-text");
         var result = new ArrayList<Language>(); result.add(new Language("plain-text", "ct_code"));
-        for (String name : names) result.add(new Language(name, CodeIcon.getCodeIconBySyntax(name).getNodeIcon().getIconName()));
+        for (String name : names) result.add(new Language(name, iconFor(name, icon -> new org.springframework.core.io.ClassPathResource(
+                "static/img/ctbicons/" + icon + ".png", RichTextCodeboxes.class.getClassLoader()).exists())));
         return List.copyOf(result);
+    }
+    /** Optional language artwork may be absent in an older/custom distribution. */
+    static String iconFor(String syntax, java.util.function.Predicate<String> bundled) {
+        String icon = CodeIcon.getCodeIconBySyntax(syntax).getNodeIcon().getIconName();
+        return bundled.test(icon) ? icon : "ct_code";
     }
     static Map<String, Value> decode(String json) {
         try {

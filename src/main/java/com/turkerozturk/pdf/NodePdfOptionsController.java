@@ -13,8 +13,13 @@ public class NodePdfOptionsController {
     static final String PREFERENCES = "NODE_PDF_OPTIONS";
     private final NodePdfExportService service;
     private final PdfSourceMetadata sources;
-    public NodePdfOptionsController(NodePdfExportService service, PdfSourceMetadata sources) {
-        this.service = service; this.sources = sources;
+    private final org.springframework.context.MessageSource messages;
+    public NodePdfOptionsController(NodePdfExportService service, PdfSourceMetadata sources,
+                                    org.springframework.context.MessageSource messages) {
+        this.service = service; this.sources = sources; this.messages = messages;
+    }
+    private String contentsTitle(java.util.Locale locale) {
+        return messages.getMessage("pdf.options.contents", null, locale);
     }
     @GetMapping("/nodes/pdf/{nodeId}")
     public String page(@PathVariable long nodeId, HttpSession session, Model model) {
@@ -54,7 +59,7 @@ public class NodePdfOptionsController {
             @RequestParam(defaultValue="false") boolean contents, java.util.Locale locale) {
         var options = new PdfExportOptions(paper, orientation, colors, nodeTitle, outline,
                 filenameHeader, pageNumbers, metadata, sourceName, sourceAddress);
-        String contentsTitle = java.util.ResourceBundle.getBundle("messages", locale).getString("pdf.options.contents");
+        String contentsTitle = contentsTitle(locale);
         var exported = service.exportSubtree(nodeId, options, sources.current(options), contents, contentsTitle);
         session.setAttribute(PREFERENCES, options);
         session.setAttribute("NODE_PDF_CONTENTS", contents);
@@ -93,7 +98,7 @@ public class NodePdfOptionsController {
         var options = new PdfExportOptions(paper, orientation, colors, nodeTitle, outline,
                 filenameHeader, pageNumbers, metadata, sourceName, sourceAddress);
         var exported = service.exportSubtree(nodeId, options, sources.current(options), contents,
-                java.util.ResourceBundle.getBundle("messages", locale).getString("pdf.options.contents"), objects);
+                contentsTitle(locale), objects);
         remember(session, options, objects);
         session.setAttribute("NODE_PDF_CONTENTS", contents);
         return PdfFromHtmlController.downloadResponse(exported, nodeId);
