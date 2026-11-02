@@ -14,7 +14,10 @@ import static java.nio.file.StandardOpenOption.*;
 /** Only generated identifiers are accepted; incomplete snapshots have no published manifest. */
 @Component
 public class CtbBackupStore {
-    public record Backup(String id,String fileName,String sourceName,String created,long bytes,String sha256,Map<String,Long> counts) {
+    public record Backup(String id,String fileName,String sourceName,String created,long bytes,String sha256,Map<String,Long> counts,String sourceKey,boolean automatic) {
+        public Backup(String id,String fileName,String sourceName,String created,long bytes,String sha256,Map<String,Long> counts) {
+            this(id,fileName,sourceName,created,bytes,sha256,counts,null,false);
+        }
         public String date() { return java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                 .withZone(java.time.ZoneId.systemDefault()).format(java.time.Instant.parse(created)); }
     }
@@ -54,7 +57,7 @@ public class CtbBackupStore {
         Backup backup;
         try(var in=Files.newInputStream(meta,READ,NOFOLLOW_LINKS)) { backup=json.readValue(in,Backup.class); }
         if (!id.equals(backup.id()) || !file.getFileName().toString().equals(backup.fileName()) || backup.bytes()!=Files.size(file)
-                || backup.sha256()==null || !backup.sha256().matches("[a-f0-9]{64}") || backup.sourceName()==null || backup.created()==null || backup.counts()==null)
+                || backup.sha256()==null || !backup.sha256().matches("[a-f0-9]{64}") || backup.sourceName()==null || backup.created()==null || backup.counts()==null || backup.sourceKey()!=null && !backup.sourceKey().matches("[a-f0-9]{64}") || backup.automatic() && backup.sourceKey()==null)
             throw new CtbBackupProblem("integrity");
         try { java.time.Instant.parse(backup.created()); } catch(java.time.DateTimeException invalid) { throw new CtbBackupProblem("integrity"); }
         return backup;
@@ -67,7 +70,7 @@ public class CtbBackupStore {
                 String name=path.getFileName().toString();backups.add(get(name.substring(7,name.length()-5)));
             } catch(IOException|RuntimeException rejected) { invalid++; }
         }
-        backups.sort(Comparator.comparing(Backup::created).reversed().thenComparing(Backup::id));
+        backups.sort(Comparator.comparing((Backup backup)->java.time.Instant.parse(backup.created())).reversed().thenComparing(Backup::id));
         return new Catalog(List.copyOf(backups),invalid);
     }
     static String sha256(Path file) throws IOException {
@@ -98,6 +101,18 @@ public class CtbBackupStore {
             if(Files.isSymbolicLink(folder) || !Files.isDirectory(folder,NOFOLLOW_LINKS))throw new CtbBackupProblem("storage");
             Path target=folder.resolve("restored-"+UUID.randomUUID()+".ctb");move(copy,target);return target;
         } finally { Files.deleteIfExists(copy); }
+    }
+    synchronized boolean deleteAutomatic(String id,String sourceKey,List<Path> protectedFiles) throws IOException {
+        Backup backup=checked(id); // Never remove an edited or damaged file as if it were our unchanged snapshot.
+        if(!backup.automatic() || !sourceKey.equals(backup.sourceKey()))return false;
+        Path file=file(id);
+        for(String suffix:List.of("-wal","-shm","-journal"))if(Files.exists(Path.of(file.toString()+suffix),NOFOLLOW_LINKS))return false;
+        for(Path protectedFile:protectedFiles)if(Files.isSameFile(file,protectedFile))return false;
+        Path retired=root().resolve("retired-"+id+".json");
+        move(metadata(id),retired);
+        try { Files.delete(file); }
+        catch(IOException|RuntimeException failure){move(retired,metadata(id));throw failure;}
+        Files.deleteIfExists(retired);return true;
     }
     static void force(Path file) throws IOException { try(var channel=FileChannel.open(file,WRITE,NOFOLLOW_LINKS)){channel.force(true);} }
 }

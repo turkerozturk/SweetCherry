@@ -15,19 +15,38 @@
 </form>
 <p th:if="${backupSelected == null}" class="alert alert-info" th:text="#{ctbBackup.selectFirst}"></p>
 <div th:if="${backupCurrent != null}" class="border rounded p-3 mb-3" id="ctb-backup-job"
-     th:attr="data-running=${backupCurrent.state == 'RUNNING'},data-status-url=@{/system/backups/status/{id}(id=${backupCurrent.id})},data-paused=#{ctbBackup.pollPaused},data-copying=#{ctbBackup.phase.COPYING},data-checking=#{ctbBackup.phase.CHECKING},data-hashing=#{ctbBackup.phase.HASHING}">
+     th:attr="data-running=${backupCurrent.state == 'RUNNING'},data-status-url=@{/system/backups/status/{id}(id=${backupCurrent.id})},data-paused=#{ctbBackup.pollPaused},data-copying=#{ctbBackup.phase.COPYING},data-checking=#{ctbBackup.phase.CHECKING},data-hashing=#{ctbBackup.phase.HASHING},data-cleaning=#{ctbBackup.phase.CLEANING}">
 <h2 class="h5" th:text="#{ctbBackup.job}"></h2>
 <p><strong class="me-2" th:text="${backupCurrent.sourceName}"></strong> <span th:text="${#messages.msg('ctbBackup.state.' + backupCurrent.state)}"></span></p>
+<p th:if="${backupCurrent.automatic}" class="small"><span class="badge bg-secondary" th:text="#{ctbBackup.auto.label}"></span>
+<span th:if="${backupCurrent.state == 'SUCCEEDED'}" th:text="#{ctbBackup.auto.cleanup(${backupCurrent.removed},${backupCurrent.skipped})}"></span></p>
 <p id="ctb-backup-phase" aria-live="polite" th:text="${#messages.msg('ctbBackup.phase.' + backupCurrent.phase)}"></p>
 <progress th:if="${backupCurrent.state == 'RUNNING'}" id="ctb-backup-progress" max="100" style="width:100%;max-width:40rem" th:attr="aria-label=#{ctbBackup.progress}"></progress>
 <p th:if="${backupCurrent.error != null}" class="text-danger" th:text="${#messages.msg(backupCurrent.error)}"></p>
 <a class="btn btn-sm btn-outline-secondary" th:href="@{/system/backups}" th:text="#{ctbBackup.refresh}"></a>
 </div>
+<section th:if="${backupAutomatic != null}" class="border rounded p-3 mb-3" id="ctb-backup-automatic">
+<h2 class="h5" th:text="#{ctbBackup.auto.title}"></h2>
+<a class="btn btn-sm btn-outline-secondary mb-2" th:href="@{/system/backups}" th:text="#{ctbBackup.refresh}"></a>
+<p th:text="${backupAutomatic.enabled} ? #{ctbBackup.auto.enabled(${backupAutomatic.interval})} : #{ctbBackup.auto.disabled}"></p>
+<p class="small" th:text="${backupAutomatic.keepLast == 0} ? #{ctbBackup.auto.unlimited} : #{ctbBackup.auto.keep(${backupAutomatic.keepLast})}"></p>
+<p class="small text-body-secondary" th:text="#{ctbBackup.auto.help}"></p>
+<p class="small"><span th:text="#{ctbBackup.auto.checked}"></span> <span th:text="${backupAutomatic.checked}"></span></p>
+<p th:if="${backupAutomatic.error != null}" class="alert alert-warning" th:text="${#messages.msg(backupAutomatic.error)}"></p>
+<p th:if="${backupAutomatic.enabled and #lists.isEmpty(backupAutomatic.rows)}" class="alert alert-warning" th:text="#{ctbBackup.auto.empty}"></p>
+<div th:if="${!#lists.isEmpty(backupAutomatic.rows)}" class="table-responsive"><table class="backup-list table table-sm">
+<thead><tr><th th:text="#{ctbBackup.source}"></th><th th:text="#{ctbBackup.auto.status}"></th><th th:text="#{ctbBackup.auto.last}"></th><th th:text="#{ctbBackup.auto.next}"></th></tr></thead>
+<tbody><tr th:each="entry : ${backupAutomatic.rows}">
+<td th:attr="data-label=#{ctbBackup.source}" th:text="${#strings.listJoin(entry.names, ', ')}"></td>
+<td th:attr="data-label=#{ctbBackup.auto.status}"><span th:text="${#messages.msg('ctbBackup.auto.state.' + entry.state)}"></span><span th:if="${entry.error != null}" class="text-danger d-block" th:text="${#messages.msg(entry.error)}"></span></td>
+<td th:attr="data-label=#{ctbBackup.auto.last}" th:text="${entry.last}"></td><td th:attr="data-label=#{ctbBackup.auto.next}" th:text="${entry.next}"></td>
+</tr></tbody></table></div>
+</section>
 <p th:if="${#lists.isEmpty(backups)}" class="text-body-secondary fst-italic" th:text="#{ctbBackup.empty}"></p>
 <div class="table-responsive" th:unless="${#lists.isEmpty(backups)}"><table class="backup-list table table-striped align-middle">
 <thead><tr><th th:text="#{ctbBackup.created}"></th><th th:text="#{ctbBackup.source}"></th><th th:text="#{ctbBackup.size}"></th><th th:text="#{ctbBackup.actions}"></th></tr></thead>
 <tbody><tr th:each="backup : ${backups}">
-<td class="text-nowrap" th:attr="data-label=#{ctbBackup.created}" th:text="${backup.date()}"></td><td th:attr="data-label=#{ctbBackup.source}" th:text="${backup.sourceName}"></td>
+<td class="text-nowrap" th:attr="data-label=#{ctbBackup.created}" th:text="${backup.date()}"></td><td th:attr="data-label=#{ctbBackup.source}"><span th:text="${backup.sourceName}"></span> <span class="badge bg-secondary" th:if="${backup.automatic}" th:text="#{ctbBackup.auto.label}"></span></td>
 <td class="text-nowrap" th:attr="data-label=#{ctbBackup.size}" th:text="${#numbers.formatDecimal(backup.bytes / 1048576.0, 1, 2)} + ' MiB'"></td>
 <td th:attr="data-label=#{ctbBackup.actions}"><div class="d-flex flex-wrap gap-2">
 <a class="btn btn-sm btn-success" th:href="@{/system/backups/{id}/download(id=${backup.id})}"><i class="fa-solid fa-download" aria-hidden="true"></i> <span th:text="#{ctbBackup.download}"></span></a>

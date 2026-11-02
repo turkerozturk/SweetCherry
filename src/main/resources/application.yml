@@ -164,6 +164,12 @@ myapp:
   ctb-backup:
     enabled: true
     directory: backups/ctb # Full SQLite snapshots; relative to the application working directory.
+    automatic:
+      enabled: false # Opt in, then explicitly list registered tenant names below.
+      interval-minutes: 1440
+      retry-minutes: 5
+      keep-last: 0 # 0 = unlimited; only automatic backups of the same physical source are pruned.
+      tenants: []
   home:
     open-latest-modified: false # After database selection only; false keeps the virtual root.
     modified-minimum: 5 # All today's occurrences, filled with older ones to this minimum; 0 hides the list.

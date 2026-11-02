@@ -37,7 +37,7 @@ myapp:
 
 Değişiklikten sonra yeniden başlatın. Bu anahtarlar yoksa da aynı varsayılanlar geçerlidir. Klasör **uygulamanın çalışma klasörüne** göre çözülür; mutlak yol da yazılabilir. `enabled: false` yeni yedek oluşturmayı kapatır; mevcut yedeklerin indirilmesi ve çalışma kopyasıyla kurtarma açık kalır. Klasör yalnız gerektiğinde oluşturulur. SweetCherry’yi çalıştıran hesabın izinleri ve yeterli boş alanı olmalıdır. Çalışma kopyası için yedek boyutu kadar ilave alan gerekir. Desteklenen sistemlerde yeni dosya/klasörler özel POSIX izinleriyle oluşturulur; mevcut klasörleri ve Windows/ağ paylaşımı ACL izinlerini ayrıca koruyun. Git deposu içindeki özel yedek klasörünü de Git’ten hariç tutun; varsayılan `/backups/` zaten hariçtir.
 
-İlk adımda otomatik zamanlama, saklama sayısına göre silme, yedek silme düğmesi veya düğüm sürüm geçmişi yoktur. Uygulama YAML dosyaları, giriş bilgileri, tenant config dosyaları ve notlardan dışarıya linklenmiş dosyalar bu CTB yedeğine dahil değildir. Yedekler notları ve ekleri içerdiğinden klasörü özel tutun. Asıl dosyayla aynı diskteki yedek, o diskin bozulmasına karşı koruma sağlamaz; indirilen kopyaları farklı cihaz/diskte de saklayın.
+Otomatik zamanlama ve saklama kuralı isteğe bağlıdır (aşağıya bakın). Elle yedek silme düğmesi ve düğüm sürüm geçmişi yoktur. Uygulama YAML dosyaları, giriş bilgileri, tenant config dosyaları ve notlardan dışarıya linklenmiş dosyalar bu CTB yedeğine dahil değildir. Yedekler notları ve ekleri içerdiğinden klasörü özel tutun. Asıl dosyayla aynı diskteki yedek, o diskin bozulmasına karşı koruma sağlamaz; indirilen kopyaları farklı cihaz/diskte de saklayın.
 
 ## Manuel kontrol
 
@@ -48,3 +48,40 @@ Değişiklikten sonra yeniden başlatın. Bu anahtarlar yoksa da aynı varsayıl
 * Geçersiz ID, sonradan değiştirilmiş yedek, kapalı oluşturma ayarı, az disk alanı/yazılamayan klasör, yarım iş ve ADMIN olmayan hesap senaryolarını deneyin. Geçersiz/eksik dosya geçerli kurtarma kaynağı olarak sunulmamalı.
 
 Kaynaklar: [SQLite Online Backup API](https://www.sqlite.org/backup.html), [SQLite backup eşzamanlılığı](https://www.sqlite.org/c3ref/backup_finish.html), [açık dosyayı kopyalamanın riskleri](https://www.sqlite.org/howtocorrupt.html#_backup_or_restore_while_a_transaction_is_active).
+
+
+## İsteğe bağlı otomatik yedekleme ve saklama
+
+Otomatik yedekleme **varsayılan olarak kapalıdır**. Mevcut `myapp.ctb-backup` bölümüne ekleyin:
+
+```yaml
+myapp:
+  ctb-backup:
+    enabled: true
+    directory: backups/ctb
+    automatic:
+      enabled: true
+      interval-minutes: 1440
+      retry-minutes: 5
+      keep-last: 7
+      tenants:
+        - "Notlarım"
+        - "Diğer CTB"
+```
+
+Dosya yolu değil, kayıtlı tenant bağlantılarının tam görünen adlarını kullanın. Varsayılan liste boştur; yalnız ayarı açmak tüm veritabanlarını otomatik yedeklemeye almaz. `keep-last` varsayılanı **0 (sınırsız)**dır; örnek, fiziksel kaynak başına yedi otomatik yedek saklamayı açıkça seçer. Aralık/tekrar sayıları pozitif, saklama sayısı sıfır veya pozitif olmalıdır. YAML değişikliğinden sonra yeniden başlatın. Deneysel `myapp.scheduling.enabled` ayarını açmak gerekmez.
+
+İlk kontrol SweetCherry hazır olduktan bir dakika sonra, devamında dakikada birdir. Tarayıcıda oturum açılması veya veritabanının seçili olması gerekmez. Kaynaklar sırayla, kontrol başına en fazla bir yeni iş başlayacak şekilde işlenir. Elle başlatılmış/devam eden yedeğin bitmesi beklenir. Uygulama kapalıyken kaçırılan yedekler kuyrukta birikmez; yeniden açılınca zamanı geçmiş kaynak yedeklenir. Başarısız kaynak `retry-minutes` kadar bekler; bu sırada diğer zamanı gelmiş kaynaklar ilerleyebilir.
+
+Aynı CTB’ye bağlı alias’lar, SQLite URI yolları ve sembolik linkler birleştirilir. Kaynak kimliği gerçek dosya konumundan üretilir; katalogda yalnız hash’i tutulur. Tenant adının değişmesi geçmişi bölmez. CTB dosyasını taşımak/adını değiştirmek güvenli tarafta kalmak için yeni kaynak sayılır. Ayrı, salt okunur SQLite bağlantısı kullanılır: kapalı tenant havuzu açılmaz, eksik dosya oluşturulmaz, oturum değiştirilmez, şema güncellenmez. Bulunamayan adlar, desteklenmeyen sunucu veritabanları ve erişilemeyen yollar yedekler sayfasında gösterilir. Plan durumunu güncel görmek için Yenile’ye basın.
+
+Aralık, o kaynağın son başarılı kimlikli yedeğinden başlar; yeni elle alınmış yedek de buna dahildir. Tamamlanma zamanı katalogda saklandığından yeniden başlatmada hatırlanır. Kaynak kimliği olmayan eski katalog kayıtları okunur ve korunur; fiziksel kaynakları güvenle çıkarılamadığı için ilk otomatik işi ertelemezler.
+
+Saklama kuralı **yalnız yeni otomatik snapshot tamamlanıp doğrulandıktan sonra**, aynı kaynağın otomatik yedeklerine uygulanır. Yeni yedek, elle alınmış yedekler, eski katalog kayıtları, başka kaynakların yedekleri ve `working-copies/` her zaman korunur. Tenant olarak tanıtılmış, SQLite WAL/SHM/journal yan dosyası bulunan veya checksum’u değişmiş dosyalar atlanır. Düzenlemek için daima ayrı çalışma kopyası açın; dış programlar SweetCherry’nin koordinasyonuna katılmaz. Temizlik hatası uyarı sayılır; yeni tamamlanmış yedeği başarısız yapmaz. `keep-last: 0` ise otomatik silme yapılmaz. Saklama kuralını açmak/sayısını değiştirmek, başlangıçta hemen silme başlatmaz; sonraki başarılı otomatik yedek beklenir. Yarım temizlemeden kalan emekliye ayrılmış katalog dosyaları listede gösterilmez. Yedek klasörünü dışarıdan değişikliğe karşı koruyun; checksum dijital imza değildir.
+
+### Ek manuel kontroller
+
+* Aynı CTB’ye bakan iki bağlantı adını ve farklı CTB’ye bakan bir bağlantıyı seçin. Alias’ların tek otomatik kaynak olarak görünmesini, işlerin sırayla çalışmasını ve tarayıcının açık kalmasının gerekmemesini doğrulayın.
+* Aralık dolmadan SweetCherry’yi yeniden başlatın: son başarılı kimlikli yedek sonraki işi ertelemeli. Eksik kaynak deneyin; tekrar beklemesi sırasında diğer zamanı gelen kaynak ilerlemeli.
+* `keep-last: 2` ile üç başarılı otomatik yedek alın. Yalnız o kaynağın son iki otomatik yedeği kalmalı. Elle alınmış yedek ve çalışma kopyası korunmalı. Sıfırda hepsi kalmalı.
+* Yeni işi başarısız duruma getirin: eski yedek silinmemeli. Eski otomatik dosyayı değiştirin veya tenant olarak tanıtın: temizlik atlayıp uyarmalı. Türkçe/İngilizce plan durumunu ve dar mobil görünümü de kontrol edin.

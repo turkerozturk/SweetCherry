@@ -25,6 +25,8 @@ class CtbBackupTemplateTest {
             context.setVariable("backupEnabled",true);context.setVariable("backupSelected",running?"<Source>":null);
             context.setVariable("backupDirectory","backups/ctb");context.setVariable("backupInvalid",0);context.setVariable("backups",List.of(backup));
             context.setVariable("tenantViewToken","token");
+            context.setVariable("backupAutomatic",new CtbBackupScheduler.View(running,1440,running?2:0,"—",null,
+                    running?List.of(new CtbBackupScheduler.Row(List.of("<Source>","Alias"),"DUE","—","—",null)):List.of()));
             if(running)context.setVariable("backupCurrent",new CtbBackupService.Status(id,"<Source>","2026-11-02T12:00:00Z","RUNNING","COPYING",5,10,null));
             String html=engine.process(Files.readString(Path.of("src/main/resources/templates/backup/ctbBackups.html")),context);
             var doc=org.jsoup.Jsoup.parse(html);assertThat(html).doesNotContain("??ctbBackup", "<Source>");
@@ -32,7 +34,8 @@ class CtbBackupTemplateTest {
             assertThat(doc.selectFirst("form[action$=/open]").attr("method")).isEqualTo("post");
             assertThat(doc.select("form[action$=/start]")).hasSize(running?1:0);
             if(running)assertThat(doc.selectFirst("input[name=_tenantView]").attr("value")).isEqualTo("token");
-            assertThat(doc.select(".backup-list td[data-label]")).hasSize(4);
+            assertThat(doc.select(".backup-list td[data-label]")).hasSize(running?8:4);
+            assertThat(doc.selectFirst("#ctb-backup-automatic")).isNotNull();
             assertThat(doc.selectFirst("h1").text()).isEqualTo(lang.equals("tr")?"CTB yedekleri":"CTB backups");
         }
     }

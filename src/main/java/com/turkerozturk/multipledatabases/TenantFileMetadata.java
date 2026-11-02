@@ -4,9 +4,9 @@ import java.nio.file.*;
 import java.util.*;
 
 /** Filesystem metadata only: never opens a pool or creates a missing SQLite file. */
-final class TenantFileMetadata {
+public final class TenantFileMetadata {
     private TenantFileMetadata() { }
-    static Path ctbPath(String url) {
+    public static Path ctbPath(String url) {
         if(url==null || !url.startsWith("jdbc:sqlite:"))return null;
         String path=url.substring("jdbc:sqlite:".length());
         if(path.contains("mode=memory") || path.equals(":memory:"))return null;

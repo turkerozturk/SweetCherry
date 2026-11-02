@@ -25,13 +25,19 @@ public class CtbBackupController {
     private final CtbBackupStore store;
     private final CtbBackupEngine engine;
     private final TenantService tenants;
+    private final CtbBackupScheduler automatic;
     public CtbBackupController(CtbBackupSettings settings,CtbBackupService service,CtbBackupStore store,CtbBackupEngine engine,TenantService tenants) {
-        this.settings=settings;this.service=service;this.store=store;this.engine=engine;this.tenants=tenants;
+        this(settings,service,store,engine,tenants,null);
+    }
+    @org.springframework.beans.factory.annotation.Autowired
+    public CtbBackupController(CtbBackupSettings settings,CtbBackupService service,CtbBackupStore store,CtbBackupEngine engine,TenantService tenants,CtbBackupScheduler automatic) {
+        this.settings=settings;this.service=service;this.store=store;this.engine=engine;this.tenants=tenants;this.automatic=automatic;
     }
     @GetMapping public String page(Model model,HttpServletResponse response) {
         response.setHeader("Cache-Control","no-store");
         model.addAttribute("backupEnabled",settings.isEnabled());model.addAttribute("backupCurrent",service.current());
         model.addAttribute("backupDirectory",store.directory());
+        if(automatic!=null)model.addAttribute("backupAutomatic",automatic.view());
         model.addAttribute("backups",List.of());model.addAttribute("backupInvalid",0);
         try {var catalog=store.catalog();model.addAttribute("backups",catalog.backups());model.addAttribute("backupInvalid",catalog.invalid());}
         catch(IOException|RuntimeException failure){model.addAttribute("backupError","ctbBackup.error.storage");}
