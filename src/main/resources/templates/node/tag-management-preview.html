@@ -1,0 +1,8 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{tags.manage.reviewTitle}"></title></head><body><section layout:fragment="content" class="container py-3">
+<h1 class="fs-4" th:text="#{tags.manage.reviewTitle}"></h1>
+<p class="alert alert-warning" th:text="${#messages.msg(tagChange.operation.action.name() == 'RENAME' ? 'tags.manage.renameReview' : 'tags.manage.removeReview',tagChange.operation.from,tagChange.operation.to,tagChange.count)}"></p>
+<p th:text="#{tags.manage.confirmHelp}"></p><p class="small text-muted" th:text="#{tags.manage.shown(${tagChange.rows.size()},${tagChange.count})}"></p>
+<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>ID</th><th th:text="#{tags.node}"></th><th th:text="#{tags.manage.before}"></th><th th:text="#{tags.manage.after}"></th></tr></thead><tbody><tr th:each="row : ${tagChange.rows}"><td th:text="${row.id}"></td><td th:text="${row.name}"></td><td class="text-break" th:text="${row.before}"></td><td class="text-break" th:text="${row.after}"></td></tr></tbody></table></div>
+<form method="post" th:action="@{/nodes/tags/manage/confirm}"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="token" th:value="${confirmationToken}"><button type="submit" class="btn btn-sm btn-danger" th:text="#{tags.manage.confirm}"></button> <a class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/tags/manage(_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></form>
+</section></body></html>

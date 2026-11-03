@@ -1,7 +1,9 @@
 <!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
 <head><title th:text="#{tags.viewTitle}"></title><section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/tags.css}"></section></head>
 <body><section layout:fragment="content" class="container-fluid tags-page p-3">
-<h1 th:text="#{tags.viewTitle}"></h1><p th:text="#{tags.viewHelp}"></p>
+<h1 th:text="#{tags.viewTitle}"></h1>
+<p th:if="${canEditTags}"><a class="btn btn-sm btn-outline-primary" th:href="@{/nodes/tags/manage(_tenantView=${tenantViewToken})}" th:text="#{tags.manage.open}"></a></p>
+<p th:if="${tagManagementResult != null}" class="alert alert-success" role="status" th:text="${#messages.msg(tagManagementResult.operation.action.name() == 'RENAME' ? 'tags.manage.renamed' : 'tags.manage.removed',tagManagementResult.operation.from,tagManagementResult.operation.to,tagManagementResult.count)}"></p><p th:text="#{tags.viewHelp}"></p>
 <p th:text="#{tags.statistics(${tagView.catalogue.size()},${tagView.taggedContents},${tagView.taggedPlaces})}"></p>
 <form th:action="@{/nodes/tags}" method="get" class="mb-3"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <details open><summary th:text="#{tags.choose}"></summary>

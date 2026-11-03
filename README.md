@@ -20,6 +20,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 ## Features and documentation
 
 - Markdown rendering and editing with preview, internal-link editing and reports, searchable tags, and weekly/monthly node calendars.
+- [Database-wide tag rename/removal](documentation/en/tag-management.md), with reviewed changes and commit-only audit logs.
 - Browser-local recovery drafts for unsaved editor content, viewport-filling desktop editors, aligned Markdown preview and searchable language selection.
 - [Home activity](documentation/en/home-activity.md): recent Created/Modified breadcrumbs and optional opening of the latest modified node (enabled in bundled defaults).
 - [Consistent full CTB backups](documentation/en/ctb-backups.md), with optional scheduling/retention, reviewed single/bulk deletion, verification, downloads and recovery into a separate working copy.

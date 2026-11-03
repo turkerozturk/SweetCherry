@@ -1,0 +1,14 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{tags.manage.title}"></title><section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/tags.css}"></section></head>
+<body><section layout:fragment="content" class="container py-3">
+<h1 class="fs-4" th:text="#{tags.manage.title}"></h1><p th:text="#{tags.manage.help}"></p>
+<p th:if="${tagManagementError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg(tagManagementError)}"></p>
+<p th:if="${tagChoices.isEmpty()}" class="alert alert-info" th:text="#{tags.noChoices}"></p>
+<form th:if="${!tagChoices.isEmpty()}" method="post" th:action="@{/nodes/tags/manage/preview}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div data-tag-browser><label for="managedTagFilter" class="form-label" th:text="#{tags.filter}"></label><input id="managedTagFilter" class="form-control form-control-sm" type="search" data-tag-filter autocomplete="off">
+<div data-tag-list class="tag-choice-list"><label class="tag-choice" th:each="tag : ${tagChoices}"><input type="radio" name="from" th:value="${tag}" required><span th:text="${tag}"></span></label></div><div class="tag-summary" data-tag-summary aria-live="polite"></div></div>
+<label for="tagAction" class="form-label" th:text="#{tags.manage.action}"></label><select id="tagAction" name="action" class="form-select form-select-sm"><option value="RENAME" th:text="#{tags.manage.rename}"></option><option value="REMOVE" th:text="#{tags.manage.remove}"></option></select>
+<div class="mt-2" id="tagRenameFields"><label for="managedTagName" class="form-label" th:text="#{tags.manage.newName}"></label><input id="managedTagName" name="to" type="text" class="form-control form-control-sm" maxlength="20000" autocomplete="off"><small class="form-text" th:text="#{tags.manage.nameHelp}"></small></div>
+<div class="d-flex flex-wrap gap-2 mt-3"><button type="submit" class="btn btn-sm btn-primary" th:text="#{tags.manage.preview}"></button><a class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/tags(_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
+</form></section><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/node/tags.js}"></script><script defer th:src="@{/js/node/tagManagement.js}"></script></section></body></html>

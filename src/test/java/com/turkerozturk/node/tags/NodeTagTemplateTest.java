@@ -64,6 +64,24 @@ class NodeTagTemplateTest {
    assertThat(html.select(".property-syntax-choice:not([disabled])")).isEmpty();
   }
  }
+ @Test void tagManagementFormsEscapeValuesAndSubmitOnlyConfirmationTokenAfterReview()throws Exception {
+  for(Locale locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))){
+   var model=new ExtendedModelMap();model.addAttribute("tagChoices",List.of("<tag>","one,two","C++"));
+   String form=render("node/tag-management.html",model,locale);var parsed=org.jsoup.Jsoup.parse(form);
+   assertThat(parsed.select("input[name=from]").eachAttr("value")).containsExactly("<tag>","one,two","C++");
+   assertThat(parsed.select("form").attr("method")).isEqualTo("post");assertThat(parsed.select("form").attr("action")).isEqualTo("/nodes/tags/manage/preview");assertThat(form).doesNotContain("??tags.manage.","<tag>");
+   var op=new TagManagementService.Operation(TagManagementService.Action.RENAME,"<tag>","new");
+   model.addAttribute("tagChange",new TagManagementService.Preview(op,1,"digest",List.of(new TagManagementService.Row(2,"<unsafe>","<tag>","new"))));model.addAttribute("confirmationToken","nonce");
+   String review=render("node/tag-management-preview.html",model,locale);var confirm=org.jsoup.Jsoup.parse(review).select("form");
+   assertThat(confirm.attr("action")).isEqualTo("/nodes/tags/manage/confirm");assertThat(confirm.select("input[name=token]").val()).isEqualTo("nonce");
+   assertThat(confirm.select("input[name=from],input[name=to],input[name=action]")).isEmpty();assertThat(review).contains("&lt;unsafe&gt;").doesNotContain("??tags.manage.","<unsafe>");
+   var remove=new TagManagementService.Operation(TagManagementService.Action.REMOVE,"<tag>",null);
+   model.addAttribute("tagChange",new TagManagementService.Preview(remove,1,"digest",List.of(new TagManagementService.Row(2,"Name","<tag>",""))));
+   assertThat(render("node/tag-management-preview.html",model,locale)).doesNotContain("??tags.manage.");
+   model.addAttribute("tagManagementResult",new TagManagementService.Result(remove,1));model.addAttribute("tagView",new NodeTagService.View(List.of(),List.of(),0,0,0,new NodeTagService.Options(List.of(),"any",50,1)));model.addAttribute("canEditTags",true);
+   assertThat(org.jsoup.Jsoup.parse(render("node/tags.html",model,locale)).select("[role=status]").text()).contains("<tag>").doesNotContain("??");
+  }
+ }
  private static String render(String file,Map<String,Object> model,Locale locale)throws Exception {
   var engine=new SpringTemplateEngine();var fragments=new ClassLoaderTemplateResolver();fragments.setPrefix("templates/");fragments.setSuffix(".html");fragments.setResolvablePatterns(Set.of("common/*"));fragments.setOrder(1);fragments.setCheckExistence(true);engine.addTemplateResolver(fragments);
   var strings=new StringTemplateResolver();strings.setOrder(2);strings.setTemplateMode("HTML");engine.addTemplateResolver(strings);

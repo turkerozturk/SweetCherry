@@ -42,6 +42,28 @@ class NodeTagSecurityTest {
             verifyNoInteractions(service);
         }
     }
+    @Test void managementRequiresAdminWritableCsrfAndCurrentSourceBeforePreview()throws Exception {
+        try(var context=new AnnotationConfigWebApplicationContext()){
+            context.setServletContext(new MockServletContext());context.register(Config.class);context.refresh();
+            var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+            var session=new MockHttpSession();session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");TenantContext.setCurrentTenant("Writable");
+            TagManagementService service=org.springframework.test.util.AopTestUtils.getUltimateTargetObject(context.getBean(TagManagementService.class));var properties=context.getBean(com.turkerozturk.node.properties.NodePropertiesService.class);
+            var op=new TagManagementService.Operation(TagManagementService.Action.REMOVE,"old",null);
+            when(service.preview(op)).thenReturn(new TagManagementService.Preview(op,1,"revision",java.util.List.of(new TagManagementService.Row(2,"Name","old",""))));
+            mvc.perform(post("/nodes/tags/manage/preview").session(session).param("action","REMOVE").param("from","old").param("_tenantView","current").with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+            verifyNoInteractions(service);
+            when(properties.writable()).thenReturn(false);
+            doAnswer(call->{if(!properties.writable())throw new org.springframework.security.access.AccessDeniedException("Read only");return null;}).when(service).requireWritable();
+            mvc.perform(post("/nodes/tags/manage/preview").session(session).param("action","REMOVE").param("from","old").param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isForbidden());
+            verify(service,never()).preview(any());clearInvocations(service);when(properties.writable()).thenReturn(true);
+            for(String token:java.util.List.of("old",""))mvc.perform(post("/nodes/tags/manage/preview").session(session).param("action","REMOVE").param("from","old").param("_tenantView",token).with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
+            mvc.perform(post("/nodes/tags/manage/preview").session(session).param("action","REMOVE").param("from","old").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
+            verifyNoInteractions(service);
+            mvc.perform(post("/nodes/tags/manage/preview").session(session).param("action","REMOVE").param("from","old").param("_tenantView","current").with(user("admin").roles("ADMIN"))).andExpect(redirectedUrl("/login?expired"));verifyNoInteractions(service);
+            TenantContext.clear();mvc.perform(post("/nodes/tags/manage/preview").session(session).param("action","REMOVE").param("from","old").param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(redirectedUrl("/"));verifyNoInteractions(service);
+            TenantContext.setCurrentTenant("Writable");mvc.perform(post("/nodes/tags/manage/preview").session(session).param("action","REMOVE").param("from","old").param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isOk()).andExpect(view().name("node/tag-management-preview"));verify(service).preview(op);
+        }
+    }
     @Configuration @EnableWebSecurity @EnableWebMvc @EnableMethodSecurity
     static class Config implements WebMvcConfigurer {
         @Bean org.springframework.web.servlet.ViewResolver viewResolver(){return (name,locale)->new org.springframework.web.servlet.view.InternalResourceView("/test-view");}
@@ -49,6 +71,8 @@ class NodeTagSecurityTest {
         @Bean InMemoryUserDetailsManager users(){return new InMemoryUserDetailsManager();}
         @Bean NodeTagService service(){return mock(NodeTagService.class);}
         @Bean com.turkerozturk.node.properties.NodePropertiesService properties(){return mock(com.turkerozturk.node.properties.NodePropertiesService.class);}
+        @Bean TagManagementService tagManagementService(){return mock(TagManagementService.class);}
+        @Bean TagManagementController tagManagementController(TagManagementService service,NodeTagService tags){return new TagManagementController(service,tags);}
         @Bean NodeTagController controller(NodeTagService service,com.turkerozturk.node.properties.NodePropertiesService properties){return new NodeTagController(service,properties);}
         @Override public void addInterceptors(InterceptorRegistry registry){registry.addInterceptor(new TenantRequiredInterceptor());}
         @Bean SecurityFilterChain chain(HttpSecurity http)throws Exception {
