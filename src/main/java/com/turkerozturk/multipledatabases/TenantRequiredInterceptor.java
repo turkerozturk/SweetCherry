@@ -39,6 +39,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                 || request.getRequestURI().startsWith(request.getContextPath() + "/exportedFiles/import/")
                 || request.getRequestURI().equals(request.getContextPath() + "/system/backups/start")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/cherrytemplatetasks/create")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/cherrytemplatenode/")
                 || request.getRequestURI().equals(request.getContextPath() + "/mindmap-export"));
         String pageToken = request.getParameter("_tenantView");
         boolean markedNavigation = pageToken != null;

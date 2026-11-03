@@ -66,4 +66,11 @@ class TemplateReportTest {
         }
     }
 
+    @Test void singleRecordChecksMembershipWithoutScanningOtherRecords() {
+        var nodes=mock(NodeService.class);var children=mock(ChildrenRepository.class);var source=node(1,"report","a");var record=node(2,"Record","");
+        when(nodes.findDisplayNode(1)).thenReturn(source);when(nodes.findDisplayNode(11)).thenReturn(record);var service=new TemplateService();ReflectionTestUtils.setField(service,"nodeService",nodes);ReflectionTestUtils.setField(service,"children",children);
+        assertThat(service.getRecord(1,11,"token").getNodeId()).isEqualTo(11);verify(children).findByFatherIdOrderBySequenceAsc(11);verify(nodes,never()).getNodesByTags(anyString());
+        record.setTags("report extra");assertThatThrownBy(()->service.getRecord(1,11,"token")).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+    }
+
 }

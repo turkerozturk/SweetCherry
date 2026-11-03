@@ -46,8 +46,25 @@ public class TemplateService {
         // Preserve legacy exact whole-field tag membership. Do not expand into tag token matching.
         for(Node record:nodeService.getNodesByTags(template.getName())) {
             if(!Objects.equals(record.getTags(),template.getName()))continue;
+            projects.add(project(template,record,record.getNodeId(),tenantView));
+        }
+        projects.sort(Comparator.comparing(ProjectNode::getName,Comparator.nullsFirst(Comparator.naturalOrder())).thenComparingLong(ProjectNode::getNodeId));
+        template.setProjectNodes(projects);return template;
+    }
+
+    /** Resolve only the requested occurrence; do not render every record for one custom view. */
+    @org.springframework.transaction.annotation.Transactional(readOnly=true)
+    public ProjectNode getRecord(long templateId,long occurrenceId,String tenantView) {
+        if(templateId<=0 || occurrenceId<=0)throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST);
+        Node source=nodeService.findDisplayNode(templateId),record=nodeService.findDisplayNode(occurrenceId);
+        if(source==null || record==null || !Objects.equals(source.getName(),record.getTags()))
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND);
+        return project(new TemplateNode(source),record,occurrenceId,tenantView);
+    }
+
+    private ProjectNode project(TemplateNode template,Node record,long occurrenceId,String tenantView) {
             var matches=new LinkedHashMap<String,List<DataNode>>();
-            for(var occurrence:children.findByFatherIdOrderBySequenceAsc(record.getNodeId())) {
+            for(var occurrence:children.findByFatherIdOrderBySequenceAsc(occurrenceId)) {
                 Node node=nodeService.findDisplayNode(occurrence.getNodeId());
                 if(node==null || !template.getDataLabels().containsKey(node.getName()))continue;
                 var data=new DataNode(node,template.getDataLabels().get(node.getName()));
@@ -64,12 +81,9 @@ public class TemplateService {
                 if(found.size()==1)values.put(key,found.get(0));
                 else if(found.size()>1)duplicates.put(key,List.copyOf(found));
             }
-            var project=new ProjectNode(record,nodeService.doBreadcrumbsToString(nodeService.addBreadcrumbs(record.getNodeId())));
+            var project=new ProjectNode(record,nodeService.doBreadcrumbsToString(nodeService.addBreadcrumbs(occurrenceId)));
             project.setDataLabels(template.getDataLabels());project.setDataNodes(values);project.setDuplicateDataNodes(duplicates);
-            project.setMissingDataLabels(findMissingLabels(template.getDataLabels().keySet(),matches));projects.add(project);
-        }
-        projects.sort(Comparator.comparing(ProjectNode::getName,Comparator.nullsFirst(Comparator.naturalOrder())).thenComparingLong(ProjectNode::getNodeId));
-        template.setProjectNodes(projects);return template;
+            project.setMissingDataLabels(findMissingLabels(template.getDataLabels().keySet(),matches));project.setNodeId(occurrenceId);return project;
     }
 
     public static Set<String> findMissingLabels(Set<String> labels,Map<String,?> values) {

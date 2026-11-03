@@ -162,6 +162,11 @@ logging:
 # My custom variables
 myapp:
   custom-lists:
+    views:
+      date-time-format: "yyyy-MM-dd HH:mm:ss"
+      time-zone: "" # Empty uses the JVM/operating system zone; e.g. Europe/Istanbul or UTC.
+      max-design-characters: 131072
+      max-rendered-characters: 16777216
     main-node-name: cherrytemplatetasks
     template-prefix: cherrytemplate # A separating hyphen is added unless already present.
   text-tree-export:

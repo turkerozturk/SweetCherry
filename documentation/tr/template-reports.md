@@ -39,3 +39,5 @@ Tarayıcının yerel bugünkü tarihiyle tam eşleşen `yyyy-mm-dd` adlı kayıt
 6. TR/EN, PDF elle doldurma yeri/başlık/sayfa toplamı ve XLSX sabit başlıkları kontrol edin. USER/salt okunur erişimi, bağlantı kapatmayı ve başka sekmede bağlantı değiştikten sonra eski belirteçli linklerin sorgu yapmamasını deneyin.
 
 PDF’de normal resimler değer sütununa sığdırılıp ayrı satırlarda gösterilir; çizicinin metinle çakışması önlenir. Satır içi LaTeX ve ataş ikonları mevcut akışını korur.
+
+[Özelleştirilebilir tek kayıt HTML tasarımları](record-layouts.md)

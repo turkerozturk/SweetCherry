@@ -6,6 +6,7 @@
 <a class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.template}"></a>
 <a class="btn btn-sm btn-outline-danger" th:href="@{/cherrytemplatenode/pdf/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.pdf}"></a>
 <a class="btn btn-sm btn-outline-success" th:href="@{/cherrytemplatenode/xlsx/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.xlsx}"></a>
+<a class="btn btn-sm btn-outline-primary" th:href="@{/cherrytemplatenode/{id}/views(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{recordviews.title}"></a>
 <button type="button" class="btn btn-sm btn-outline-secondary" data-report-copy th:attr="data-copy-text=${cherryTemplateNode.name},data-done=#{report.copied}" th:text="#{report.copy}"></button>
 </nav>
 <details class="mb-2"><summary th:text="#{report.about}"></summary><p th:text="#{report.membership}"></p><dl class="row"><dt class="col-sm-3" th:text="#{report.template}"></dt><dd class="col-sm-9" th:text="|${cherryTemplateNode.name} [${cherryTemplateNode.nodeId}]|"></dd></dl><ol><li th:each="label : ${cherryTemplateNode.dataLabels}" th:text="|${label.key} → ${label.value}|"></li></ol><div th:replace="~{help/cherrytemplatenode :: helpContentfragment}"></div></details>
@@ -16,7 +17,7 @@
 <details data-report-alarms hidden><summary th:text="#{report.alarms}"></summary><ul></ul></details>
 <div class="table-responsive"><table class="table table-sm report-records"><thead><tr><th>#</th><th th:text="#{report.node}"></th><th th:if="${!reportGrid}" th:text="#{report.values}"></th><th th:if="${reportGrid}" th:each="label : ${cherryTemplateNode.dataLabels}" th:text="${label.value}" th:title="${label.key}"></th></tr></thead><tbody>
 <tr th:each="project, stat : ${cherryTemplateNode.projectNodes}" data-report-record th:attr="data-incomplete=${project.incomplete},data-record-name=${project.name}">
-<td th:text="${stat.count}"></td><td class="report-name"><a th:href="@{/nodes/{id}(id=${project.nodeId},_tenantView=${tenantViewToken})}" th:text="${project.name}" th:title="${project.breadcrumbsAsString}"></a><br><small th:text="|[${project.nodeId}]|"></small><div class="small text-muted" th:text="${project.breadcrumbsAsString}"></div></td>
+<td th:text="${stat.count}"></td><td class="report-name"><a th:href="@{/nodes/{id}(id=${project.nodeId},_tenantView=${tenantViewToken})}" th:text="${project.name}" th:title="${project.breadcrumbsAsString}"></a><br><small th:text="|[${project.nodeId}]|"></small> <a class="small" th:href="@{/cherrytemplatenode/{id}/views(id=${cherryTemplateNode.nodeId},recordId=${project.nodeId},_tenantView=${tenantViewToken})}" th:text="#{recordviews.open}"></a><div class="small text-muted" th:text="${project.breadcrumbsAsString}"></div></td>
 <td th:if="${!reportGrid}" class="report-values"><table class="table table-sm mb-0"><tbody><tr th:each="field : ${project.fields}"><th th:text="${field.label}" th:title="${field.key}"></th><td><div th:replace="~{customlists/report :: value(${field})}"></div></td></tr></tbody></table></td>
 <td th:if="${reportGrid}" th:each="field : ${project.fields}"><div th:replace="~{customlists/report :: value(${field})}"></div></td>
 </tr></tbody></table></div>

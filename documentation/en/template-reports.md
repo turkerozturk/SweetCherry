@@ -48,3 +48,5 @@ For an exact `yyyy-mm-dd` record title matching the browser's local date, the fi
 6. Check EN/TR labels, PDF write-in space/header/page totals, XLSX labels/frozen panes and report access as USER/read-only. Close the source or switch it in another tab: stale marked links must not query the new source.
 
 Normal PDF images are bounded to the value column and placed on separate lines to avoid renderer overlap. Inline LaTeX and attachment icons retain their existing flow.
+
+[Custom single-record HTML layouts](record-layouts.md)

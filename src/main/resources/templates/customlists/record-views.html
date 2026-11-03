@@ -1,0 +1,24 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}"><head><title th:text="#{recordviews.title}"></title></head><body><section layout:fragment="content" class="container py-3">
+<h1 class="fs-4" th:text="#{recordviews.title}"></h1><p th:text="|${layouts.name} [${layouts.templateId}]|"></p>
+<a class="btn btn-sm btn-outline-primary mb-2" th:href="@{/cherrytemplatenode/{id}(id=${layouts.templateId},_tenantView=${tenantViewToken})}" th:text="#{report.list}"></a>
+<p class="alert alert-success" th:if="${layoutCreated != null}" th:text="#{recordviews.created(${layoutCreated})}"></p>
+<p th:text="#{recordviews.intro}"></p><pre class="border rounded p-2">{{record.name}} · {{record.id}} · {{record.breadcrumbs}}
+{{template.name}} · {{template.id}} · {{view.name}} · {{now}}
+{{field.application}}</pre><p class="small text-muted" th:text="#{recordviews.rules}"></p>
+<p class="alert alert-info" th:if="${layouts.status == 'missing'}" th:text="#{recordviews.noFolder}"></p>
+<p class="alert alert-warning" th:if="${layouts.status == 'multiple'}" th:text="#{recordviews.multipleFolders}"></p>
+<p th:each="folder : ${layouts.folders}"><a th:href="@{/nodes/{id}(id=${folder.id},_tenantView=${tenantViewToken})}" th:text="|_views [${folder.id}]|"></a></p>
+<form th:if="${layoutAdmin and layouts.writable and layouts.status != 'multiple' and !#lists.contains(layouts.views.![name], 'Example layout')}" method="post" th:action="@{/cherrytemplatenode/{id}/views/example(id=${layouts.templateId})}" th:attr="data-confirm-message=#{recordviews.confirm}"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="btn btn-sm btn-primary mb-3" th:text="#{recordviews.create}"></button></form>
+<p class="alert alert-info" th:if="${layouts.status == 'ready' and layouts.views.isEmpty()}" th:text="#{recordviews.noViews}"></p>
+<div class="mb-3" th:if="${!layouts.records.isEmpty()}"><label for="layoutRecord" th:text="#{recordviews.record}"></label><select id="layoutRecord" class="form-select form-select-sm"><option th:each="record : ${layouts.records}" th:value="${record.id}" th:selected="${selectedRecord != null and selectedRecord == record.id}" th:text="|${record.name} [${record.id}]|"></option></select></div>
+<p class="alert alert-info" th:if="${layouts.records.isEmpty()}" th:text="#{report.noRecords}"></p>
+<div class="table-responsive"><table class="table table-sm"><thead><tr><th th:text="#{recordviews.design}"></th><th th:text="#{customsetup.actions}"></th></tr></thead><tbody><tr th:each="view : ${layouts.views}"><td><a th:href="@{/nodes/{id}(id=${view.id},_tenantView=${tenantViewToken})}" th:text="|${view.name} [${view.id}]|"></a><span class="badge text-bg-warning" th:unless="${view.plain}" th:text="#{recordviews.requiresPlain}"></span></td><td>
+<form th:if="${view.plain and !layouts.records.isEmpty()}" method="get" th:action="@{/cherrytemplatenode/{id}/view/{view}(id=${layouts.templateId},view=${view.id})}" data-record-view-form><input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="recordId" th:value="${selectedRecord != null ? selectedRecord : layouts.records[0].id}"><button class="btn btn-sm btn-outline-primary" th:text="#{recordviews.open}"></button></form>
+<a th:if="${layoutAdmin and layouts.writable and view.plain}" class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/content/{id}(id=${view.contentId},_tenantView=${tenantViewToken})}" th:text="#{recordviews.edit}"></a>
+</td></tr></tbody></table></div>
+<details><summary th:text="#{recordviews.help}"></summary><p th:text="#{recordviews.helpText}"></p><pre>&lt;article style="max-width:900px;margin:auto"&gt;
+  &lt;h1&gt;{{record.name}}&lt;/h1&gt;
+  &lt;p&gt;{{now}}&lt;/p&gt;
+  &lt;section&gt;{{field.application}}&lt;/section&gt;
+&lt;/article&gt;</pre><p th:text="#{recordviews.timeHelp}"></p></details>
+</section><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/customlists/recordViews.js}"></script></section></body></html>
