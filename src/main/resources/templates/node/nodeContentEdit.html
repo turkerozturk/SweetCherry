@@ -21,6 +21,11 @@
         <button type="button" id="plainUndo" class="btn btn-sm btn-outline-secondary" th:title="#{richtext.edit.undo}" th:aria-label="#{richtext.edit.undo}"><i class="fas fa-undo" aria-hidden="true"></i></button>
         <button type="button" id="plainRedo" class="btn btn-sm btn-outline-secondary" th:title="#{richtext.edit.redo}" th:aria-label="#{richtext.edit.redo}"><i class="fas fa-redo" aria-hidden="true"></i></button>
         <button type="button" id="plainSeparator" class="btn btn-sm btn-outline-secondary" th:title="#{editor.separator.help}">33~</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-plain-insert="☐ " th:title="#{editor.insertUnchecked}">☐</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-plain-insert="☑ " th:title="#{editor.insertChecked}">☑</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-plain-insert="☒ " th:title="#{editor.insertCrossed}">☒</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-plain-insert="• " th:title="#{editor.insertBullet}">•</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-plain-insert="&#9;" th:title="#{editor.insertTab}">TAB</button>
         </div>
 <div th:if="${node.syntax == 'markdown'}" id="markdownTools" class="markdown-toolbar" th:attr="data-preview-url=@{/nodes/markdown/{id}/preview(id=${node.nodeId})},data-loading=#{markdown.loading},data-failed=#{markdown.failed}">
 <button type="button" class="btn btn-sm btn-outline-secondary" data-md-before="**" data-md-after="**" th:title="#{richtext.edit.bold}"><b>B</b></button>

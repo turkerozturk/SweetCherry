@@ -1,50 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-
-<div th:fragment="helpContentfragment" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
-
-
-    <h1>Cherry Template Tasks</h1>
-    <a th:href="@{'/help/index'}"/>Help</a>
-
-
-    <hr/>
-    <h1>BİLGİ</h1>
-    <p>
-        <br/> Bu nodeyi diğerlerinden ayıran özellik, node.name değerinin "cherrytemplatetasks" olmasıdır.
-        <br/> node.txt değerinin her satırı bir template ismidir.
-        <br/> node.name değeri cherrytemplate-&lt;templateismi&gt; olan düğümler üzerinde işlem yapılacağı anlamına
-        gelir.
-        <br/>
-        <br/>
-        <br/><img src="/img/db-godnode.jpg" alt="GodNode'nin veritabanındaki görünümü">
-        <br/>
-        <br/><img src="/img/ct-godnode.jpg" alt="GodNode'nin yazılımdaki görünümü">
-        <br/>Template Node Id ye tıklandığında ismi cherrytemplate-&lt;templateismi&gt; olan düğümün tüm içeriğini Node
-        yapısında gösteren sayfa açılır.
-        <br/>
-        <br/>
-        <br/>Which Node Has It e tıklandığında node.tags =
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-
-    </p>
-
-
-    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-
-
-</div>
-
-</body>
-</html>
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}"><head><title th:text="#{customsetup.helpMainTitle}"></title></head><body><section layout:fragment="content" class="container py-3">
+<div th:fragment="helpContentfragment"><h1 class="fs-4" th:text="#{customsetup.helpMainTitle}"></h1><p th:text="#{customsetup.helpMainIntro}"></p>
+<div class="card p-3 my-2"><h2 class="fs-5" th:text="#{customsetup.step1}"></h2><p th:text="#{customsetup.helpMain1}"></p><div class="border rounded p-3"><img th:src="@{/img/ctbicons/ct_code.png}" width="24" height="24" alt=""> <strong th:text="${customListNames == null ? 'cherrytemplatetasks' : customListNames.main}"></strong> <span class="badge text-bg-secondary" th:text="#{node.type.plainText}"></span></div></div>
+<div class="card p-3 my-2"><h2 class="fs-5" th:text="#{customsetup.step2}"></h2><p th:text="#{customsetup.linesHelp}"></p><pre class="border rounded p-2">projects&#9;<span th:text="#{customsetup.exampleProjects}"></span>
+devices&#9;<span th:text="#{customsetup.exampleDevices}"></span>
+#software&#9;<span th:text="#{customsetup.exampleSoftware}"></span></pre></div>
+<div class="card p-3 my-2"><h2 class="fs-5" th:text="#{customsetup.step3}"></h2><p th:text="#{customsetup.helpMain3}"></p><div class="border rounded p-3"><img th:src="@{/img/ctbicons/ct_code.png}" width="24" height="24" alt=""> <strong th:text="${customListNames == null ? 'cherrytemplate-projects' : customListNames.template('projects')}"></strong></div></div>
+<p th:text="#{customsetup.settingsHelp}"></p><a class="btn btn-sm btn-primary" th:href="@{/cherrytemplatetasks}" th:text="#{customsetup.title}"></a> <a th:href="@{/help/cherrytemplatenode}" th:text="#{customlists.helpNode}"></a>
+</div></section></body></html>

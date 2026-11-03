@@ -45,7 +45,7 @@ class NodePropertiesServiceTest {
         NodePropertiesService service = new NodePropertiesService(nodes, children, settings);
         ReflectionTestUtils.setField(service, "entityManager", entityManager);
 
-        service.update(12L, "Yeni isim", true, TitleColor.RED, NodeIcon.OTHER, false);
+        service.update(12L, "\u200B\u00a0 Yeni isim \uFEFF", true, TitleColor.RED, NodeIcon.OTHER, false);
 
         verify(query).setParameter("rich", (0xE01B24L << 3) | 7L);
         verify(query).setParameter("icon", 0L);

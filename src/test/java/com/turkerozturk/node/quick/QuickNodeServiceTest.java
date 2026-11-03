@@ -82,7 +82,7 @@ class QuickNodeServiceTest {
     var properties=mock(NodePropertiesService.class);when(properties.writable()).thenReturn(true);
     var child=new ChildNodeService(properties,new CustomPropertiesHolder());ReflectionTestUtils.setField(child,"entityManager",em);
     var service=new QuickNodeService(proxy(child,tx),properties);ReflectionTestUtils.setField(service,"entityManager",em);service=proxy(service,tx);
-    long id=service.create(11,"  New note  ","# Heading\n\nraw **text**\n","markdown");
+    long id=service.create(11,"\u00a0\u200B New note \uFEFF","# Heading\n\nraw **text**\n","markdown");
     try(var row=s.executeQuery("SELECT c.father_id,c.master_id,n.name,n.txt,n.syntax,n.ts_creation,n.ts_lastsave FROM children c JOIN node n ON n.node_id=c.node_id WHERE c.node_id="+id)) {
      assertThat(row.next()).isTrue();assertThat(row.getLong(1)).isEqualTo(11);assertThat(row.getLong(2)).isZero();
      assertThat(row.getString(3)).isEqualTo("New note");assertThat(row.getString(4)).isEqualTo("# Heading\n\nraw **text**\n");

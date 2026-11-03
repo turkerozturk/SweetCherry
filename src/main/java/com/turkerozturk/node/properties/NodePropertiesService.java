@@ -82,6 +82,7 @@ public class NodePropertiesService {
         if (!writable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
+        name = com.turkerozturk.node.NodeNames.clean(name);
         if (name == null || name.isBlank() || name.length() > 255 || icon == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid node properties");
         }

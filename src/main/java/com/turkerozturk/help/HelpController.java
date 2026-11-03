@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @PreAuthorize("hasRole('ADMIN')")
 @Controller
 public class HelpController {
+    @org.springframework.beans.factory.annotation.Autowired private com.turkerozturk.customlists.CustomListsSettings customListsSettings;
 
     @GetMapping("/help/advanced-search")
     public String getAdvancedSearch() {
@@ -82,10 +83,8 @@ public class HelpController {
         return "/help/dashboard";
     }
 
-    @GetMapping("/help/cherrytemplatenode")
-    public String help() {
-        return "/help/cherrytemplatenode";
-    }
+    @GetMapping("/help/cherrytemplatenode") @PreAuthorize("isAuthenticated()")
+    public String helpTemplateNode(org.springframework.ui.Model model) {model.addAttribute("customListNames",customListsSettings.effective());return "help/cherrytemplatenode";}
 
     /** Keeps old PDF help links usable after removing the unverified help page. */
     @GetMapping("/help/cherrytemplatenode--pdf")
@@ -94,8 +93,10 @@ public class HelpController {
     }
 
     @GetMapping("/help/cherrytemplatetasks")
-    public String helpTasks() {
-        return "/help/cherrytemplatetasks";
+    @PreAuthorize("isAuthenticated()")
+    public String helpTasks(org.springframework.ui.Model model) {
+        model.addAttribute("customListNames",customListsSettings.effective());
+        return "help/cherrytemplatetasks";
     }
 
 

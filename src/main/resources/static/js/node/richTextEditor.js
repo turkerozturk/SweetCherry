@@ -220,6 +220,7 @@
 
     // Prevent toolbar focus from discarding a visual selection (including keyboard activation).
     document.querySelectorAll('.toolbar button').forEach(button=>button.addEventListener('pointerdown',event=>{captureSelection();event.preventDefault();}));
+    document.querySelectorAll('[data-insert-tab]').forEach(button=>{button.addEventListener('pointerdown',event=>event.preventDefault());button.addEventListener('click',()=>{if(!composing){rememberSelection();visualChange('\t');}});});
     document.querySelectorAll('[data-insert-symbol]').forEach(button=>button.addEventListener('click',()=>{
         if(composing)return;
         rememberSelection();visualChange(button.dataset.insertSymbol+' ');

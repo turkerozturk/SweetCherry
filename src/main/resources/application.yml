@@ -161,6 +161,9 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  custom-lists:
+    main-node-name: cherrytemplatetasks
+    template-prefix: cherrytemplate # A separating hyphen is added unless already present.
   text-tree-export:
     max-nodes: 10000
     max-depth: 64

@@ -151,6 +151,13 @@ public class NodeDuplicationService {
         long newRoot=mapping.get(id);
         for(var row:branch) if(row.master==0) {
             copyRows(connection,"node",row.id,mapping.get(row.id),timestamp,true);
+            try(var query=connection.prepareStatement("SELECT name FROM node WHERE node_id=?")){
+                query.setLong(1,mapping.get(row.id));try(var names=query.executeQuery()){
+                    if(names.next()){String original=names.getString(1),clean=com.turkerozturk.node.NodeNames.clean(original);
+                        if(!java.util.Objects.equals(original,clean))try(var update=connection.prepareStatement("UPDATE node SET name=? WHERE node_id=?")){update.setString(1,clean);update.setLong(2,mapping.get(row.id));update.executeUpdate();}
+                    }
+                }
+            }
             for(String table:List.of("image","grid","codebox")) copyRows(connection,table,row.id,mapping.get(row.id),timestamp,false);
         }
         var siblings=new ArrayList<>(snapshot.rows.stream().filter(row->row.parent==root.parent)

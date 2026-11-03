@@ -90,13 +90,14 @@ public class QuickNodeService {
     @Transactional
     public long create(long parent, String title, String text, String syntax) {
         if (!properties.writable()) throw new AccessDeniedException("The selected CTB is read-only.");
+        title = com.turkerozturk.node.NodeNames.clean(title);
         if (parent < 0 || title == null || title.isBlank() || title.length()>255 || title.indexOf('\0')>=0
                 || text == null || text.length()>MAX_TEXT || text.indexOf('\0')>=0
                 || !("plain-text".equals(syntax) || "markdown".equals(syntax)))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         long id = parent == 0 ? creation.createTopLevel() : creation.create(parent);
         int updated = entityManager.createNativeQuery("UPDATE node SET name=:name,txt=:text,syntax=:syntax WHERE node_id=:id")
-                .setParameter("name", title.strip()).setParameter("text", text).setParameter("syntax", syntax)
+                .setParameter("name", title).setParameter("text", text).setParameter("syntax", syntax)
                 .setParameter("id", id).executeUpdate();
         if (updated != 1) throw new IllegalStateException("New note was not found");
         return id;

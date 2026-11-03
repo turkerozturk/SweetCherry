@@ -1,8 +1,8 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 function editor(recoveryEnabled=false) {
  const handlers={},els={};let dirty,recovery;
- for(const id of ['nodeText','plainEditForm','plainUndo','plainRedo','plainSeparator'])els[id]={value:id==='nodeText'?'A😀B':'',selectionStart:0,selectionEnd:0,addEventListener:(type,fn)=>handlers[id+':'+type]=fn,focus(){},setSelectionRange(a,b){this.selectionStart=a;this.selectionEnd=b;},setRangeText(value,a,b){this.value=this.value.slice(0,a)+value+this.value.slice(b);this.selectionStart=this.selectionEnd=a+value.length;}};
- vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/node/plainTextEditor.js'),'utf8'),{document:{getElementById:id=>els[id]},window:{EditorRecovery:recoveryEnabled?{install:(form,adapter)=>recovery=adapter}:undefined,EditorLeaveGuard:{install:(form,check)=>dirty=check}}});
+ for(const id of ['nodeText','plainEditForm','plainUndo','plainRedo','plainSeparator','plainTab','plainBullet'])els[id]={value:id==='nodeText'?'A😀B':'',selectionStart:0,selectionEnd:0,addEventListener:(type,fn)=>handlers[id+':'+type]=fn,focus(){},setSelectionRange(a,b){this.selectionStart=a;this.selectionEnd=b;},setRangeText(value,a,b){this.value=this.value.slice(0,a)+value+this.value.slice(b);this.selectionStart=this.selectionEnd=a+value.length;}};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/node/plainTextEditor.js'),'utf8'),{document:{getElementById:id=>els[id],querySelectorAll:()=>[Object.assign(els.plainTab,{dataset:{plainInsert:'\t'}}),Object.assign(els.plainBullet,{dataset:{plainInsert:'• '}})]},window:{EditorRecovery:recoveryEnabled?{install:(form,adapter)=>recovery=adapter}:undefined,EditorLeaveGuard:{install:(form,check)=>dirty=check}}});
  const fire=(id,type,event={})=>handlers[id+':'+type](event);
  return {els,fire,recovery:()=>recovery,dirty:()=>dirty(),type(value){fire('nodeText','beforeinput',{inputType:'insertText'});els.nodeText.value=value;els.nodeText.selectionStart=els.nodeText.selectionEnd=value.length;fire('nodeText','input');}};
 }
@@ -27,3 +27,5 @@ test('plain recovery restores text, cursor and undo/redo without submitting or r
  fresh.fire('plainUndo','click');assert.equal(fresh.els.nodeText.value,'First draft');
  fresh.fire('plainRedo','click');assert.equal(fresh.els.nodeText.value,'Second draft');assert.equal(fresh.dirty(),true);
 });
+
+test('TAB and list buttons insert literal text and share undo/redo',()=>{const e=editor();e.els.nodeText.selectionStart=1;e.els.nodeText.selectionEnd=3;e.fire('plainTab','click');assert.equal(e.els.nodeText.value,'A\tB');e.fire('plainUndo','click');assert.equal(e.els.nodeText.value,'A😀B');e.fire('plainRedo','click');assert.equal(e.els.nodeText.value,'A\tB');e.fire('plainBullet','click');assert.equal(e.els.nodeText.value,'A\t• B');});

@@ -37,6 +37,7 @@
     window.PlainTextEditorBridge={replace(start,end,text){
         if(composing)return false;capture();input.focus();input.setRangeText(text,start,end,'end');commit();return true;
     }};
+    document.querySelectorAll('[data-plain-insert]').forEach(button=>{button.addEventListener('pointerdown',event=>event.preventDefault());button.addEventListener('click',()=>{if(composing)return;capture();input.focus();input.setRangeText(button.dataset.plainInsert,input.selectionStart,input.selectionEnd,'end');commit();});});
     buttons();
     window.EditorRecovery?.install(form,{
         base:initial,

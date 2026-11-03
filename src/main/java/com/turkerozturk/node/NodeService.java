@@ -86,16 +86,18 @@ public class NodeService {
         return nodeRepository.findByTags(tags);
     }
 
+    @Autowired(required=false) private com.turkerozturk.customlists.CustomListsSettings customListsSettings;
+
     public List<Node> getNodesWithNameCherryTemplateTasks() {
         // return nodeRepository.findByName("cherrytemplatetasks");
-        return nodeRepository.findByNameOrderByNodeIdAsc("cherrytemplatetasks");
+        return nodeRepository.findByNameOrderByNodeIdAsc(customListsSettings==null?"cherrytemplatetasks":customListsSettings.effective().main());
 
     }
 
     public List<Node> getNodesWithNameTemplateNames(String[] templateNodeNames) {
         List<Node> templateNodes = new ArrayList<>();
         for(int i = 0; i < templateNodeNames.length; i++) {
-            List<Node> temporaryNodes = nodeRepository.findByName("cherrytemplate-" + templateNodeNames[i]);
+            List<Node> temporaryNodes = nodeRepository.findByName(customListsSettings==null?"cherrytemplate-"+templateNodeNames[i]:customListsSettings.effective().template(templateNodeNames[i]));
             if(temporaryNodes.size() == 1) {
                 Node templateNode = temporaryNodes.get(0);
                 templateNodes.add(templateNode);

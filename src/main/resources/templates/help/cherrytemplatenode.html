@@ -1,44 +1,7 @@
-<div th:fragment="helpContentfragment" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
-
-    <h1>Cherry Template Node</h1>
-    <a th:href="@{'/help/index'}"/>Help</a>
-
-    <p>
-    <img th:src="@{/img/icons/CT_LIFEBUOY.svg}" class="childiconcss"/>
-    Eğer düğüm isimleri yıl ay gün biçiminde ise ve dailyalarm isminde düğümler varsa sayfa
-    yüklendiğinde bir popup pencerede içerikleri görüntülenir. <br/>
-    Bugünün tarihi ile eşleşirse ve sayfa ekrana sığmıyorsa sayfa yüklendiğinde bugünün tarihi isimli
-    düğümü ortalar.<br/>
-    FOCUS ve TODO gibi metinler içeren düğümleri vurgulu gösterir.<br/>
-    İçi boş olan düğümleri vurgulu gösterir.<br/>
-    Düğümler şablonda tanımlı fakat gerçekte yoksalar gösterilmezler.
-    </p>
-
-    <p>
-        <br/> TemplateNode'yi diğerlerinden ayıran özellik, node.name değerinin "cherrytemplate-" ile başlayıp, GodNode
-        nin node.txt satırlarından birindeki kelime ile devam etmesidir.
-        <br/> Bu node nin node.name değeri, sıfır veya birçok ProjectNode'sinde node.tags değeri olarak bulunur.
-        <br/> node.txt değerinin her satırı bir data değişkeni ismidir.
-        <br/> node.name değeri cherrytemplate-&lt;templateismi&gt; olan düğümler üzerinde işlem yapılacağı anlamına
-        gelir.
-        <br/>
-        <br/>
-        <br/><img src="/img/db-templatenode.jpg" alt="TemplateNode'nin veritabanındaki görünümü">
-        <br/>
-        <br/><img src="/img/ct-templatenode.jpg" alt="TemplateNode'nin yazılımdaki görünümü"> <br/>
-        <br/>
-        <br/>Template Node Id ye tıklandığında ismi cherrytemplate-&lt;templateismi&gt; olan düğümün tüm içeriğini Node
-        yapısında gösteren sayfa açılır.
-        <br/>
-        <br/>
-        <br/>Which Node Has It e tıklandığında node.tags =
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-
-    </p>
-
-
-</div>
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}"><head><title th:text="#{customsetup.helpTemplateTitle}"></title></head><body><section layout:fragment="content" class="container py-3">
+<div th:fragment="helpContentfragment"><h1 class="fs-4" th:text="#{customsetup.helpTemplateTitle}"></h1><p th:text="#{customsetup.helpTemplateIntro}"></p>
+<div class="card p-3 my-2"><strong><img th:src="@{/img/ctbicons/ct_code.png}" width="24" height="24" alt=""> <span th:text="${customListNames == null ? 'cherrytemplate-projects' : customListNames.template('projects')}"></span></strong><pre class="border rounded p-2 mt-2">name&#9;<span th:text="#{customsetup.exampleName}"></span>
+status&#9;<span th:text="#{customsetup.exampleStatus}"></span></pre><p th:text="#{customsetup.helpTemplate1}"></p></div>
+<div class="card p-3 my-2"><img th:src="@{/img/ctbicons/ct_code.png}" width="24" height="24" alt=""><p th:text="#{customsetup.helpTemplate2}"></p><code th:text="${customListNames == null ? 'cherrytemplate-projects' : customListNames.template('projects')}"></code></div>
+<p th:text="#{customsetup.helpTemplate3}"></p><p th:text="#{customsetup.helpTemplateScope}"></p><a class="btn btn-sm btn-primary" th:href="@{/cherrytemplatetasks}" th:text="#{customsetup.title}"></a> <a th:href="@{/help/cherrytemplatetasks}" th:text="#{customlists.helpTasks}"></a>
+</div></section></body></html>

@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add localized custom-list setup/help with global and per-connection names, explicit definition status and confirmed missing-node creation; add editor TAB/symbol buttons and trim boundary whitespace/invisible characters from authored node names.
+
 - Add reviewed, atomic database-wide tag rename/removal for ADMIN writable connections, exact token matching, merge de-duplication, Modified tracking and commit-only per-node audit logs.
 
 - Export a selected occurrence/subtree as a UTF-8 text ZIP with nested directories, safe collision handling, bounded temporary-file output and shared-occurrence hierarchy. Preserve code/Markdown source; flatten rich text without binary attachments. Consolidate PDF/CTB/Freeplane/text ZIP under Export in both readers.

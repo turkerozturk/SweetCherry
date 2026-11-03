@@ -1,63 +1,21 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
-      layout:decorate="~{_layout}">
-<head>
-    <title>Check Nodes With Name CherryTemplateTasks</title>
-
-    <style>
-        .templateiconcss {
-            max-width: 47px;
-            max-height: 47px;
-            width: 47px;
-            height: 47px;
-        }
-
-                .childiconcss {
-            max-width: 27px;
-            max-height: 27px;
-            width: 27px;
-            height: 27px;
-        }
-    </style>
-</head>
-<body>
-<section layout:fragment="content">
-
-    <h1 th:text="${customListsNodeStatus}" class="text-center text-danger d-none"></h1>
-
-    <th:block th:switch="${customListsNodeStatus}"
-              th:with="Topic=${T(com.turkerozturk.node.CustomListsNodeStatus)}">
-        <th:block th:case="${Topic.MAIN_NODE_IS_ABSENT}">
-            <!--/*-->
-            ana düğüm yok demek. no lists değil! TODO
-            <!--*/-->
-
-            <div th:replace="~{customlists/mainNodeIsAbsentFragment :: mainNodeIsAbsentFragment}"></div>
-        </th:block>
-
-        <th:block th:case="${Topic.EXIST_BUT_ITS_CONTENT_IS_RICH_TEXT}">
-            <div th:replace="~{customlists/mainNodeIsRichTextFragment :: mainNodeIsRichTextFragment}"></div>
-        </th:block>
-
-        <th:block th:case="${Topic.EXIST}">
-             <div th:replace="~{customlists/listsFragment :: listsFragment}"></div>
-        </th:block>
-
-        <th:block th:case="${Topic.EXIST_BUT_EMPTY}">
-             <div th:replace="~{customlists/emptylistsFragment :: emptylistsFragment}"></div>
-        </th:block>
-
-        <th:block th:case="${Topic.EXIST_MULTIPLE}">
-            <div th:replace="~{customlists/multipleListsFragment :: multipleListsFragment}"></div>
-        </th:block>
-
-        <th:block th:case="${Topic.EXIST_BUT_HAS_NO_VALID_LIST_NAMES}">
-            <div th:replace="~{customlists/noValidListsFragment :: noValidListsFragment}"></div>
-        </th:block>
-
-    </th:block>
-
-</section>
-
-</body>
-</html>
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{customsetup.title}"></title></head><body><section layout:fragment="content" class="container py-3">
+<h1 class="fs-4" th:text="#{customsetup.title}"></h1><p th:text="#{customsetup.intro}"></p>
+<p><a th:href="@{/help/cherrytemplatetasks}" th:text="#{customlists.helpTasks}"></a> · <a th:href="@{/help/cherrytemplatenode}" th:text="#{customlists.helpNode}"></a></p>
+<p th:if="${customListsCreated != null}" class="alert alert-success" th:text="#{customsetup.created(${customListsCreated})}"></p>
+<dl class="row"><dt class="col-sm-4" th:text="#{customsetup.mainName}"></dt><dd class="col-sm-8" th:text="${setup.names.main}"></dd><dt class="col-sm-4" th:text="#{customsetup.prefix}"></dt><dd class="col-sm-8" th:text="${setup.names.prefix}"></dd></dl>
+<p class="alert" th:classappend="${setup.status == 'ready'} ? 'alert-success' : 'alert-warning'" th:text="${#messages.msg('customsetup.state.'+setup.status)}"></p>
+<div th:each="entry : ${setup.mains}" class="mb-2"><a th:href="@{/nodes/{id}(id=${entry.id},_tenantView=${tenantViewToken})}" th:text="|${entry.name} [${entry.id}]|"></a> <a class="btn btn-sm btn-outline-secondary" th:if="${customListsAdmin and setup.writable}" th:href="@{/nodes/properties/{id}(id=${entry.id},_tenantView=${tenantViewToken})}" th:text="#{tree.properties}"></a> <a class="btn btn-sm btn-outline-primary" th:if="${entry.plain() and customListsAdmin and setup.writable}" th:href="@{/nodes/content/{id}(id=${entry.id},_tenantView=${tenantViewToken})}" th:text="#{tree.edit}"></a></div>
+<form th:if="${setup.status == 'absent' and customListsAdmin and setup.writable}" method="post" th:action="@{/cherrytemplatetasks/create}" th:attr="data-confirm-message=#{customsetup.confirmMain(${setup.names.main})}"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="main" value="true"><button class="btn btn-sm btn-primary" th:text="#{customsetup.createMain}"></button></form>
+<section th:if="${setup.status == 'ready'}"><h2 class="fs-5 mt-3" th:text="#{customsetup.linesTitle}"></h2><p th:text="#{customsetup.linesHelp}"></p>
+<pre class="border rounded p-2">projects&#9;<span th:text="#{customsetup.exampleProjects}"></span>
+devices&#9;<span th:text="#{customsetup.exampleDevices}"></span>
+#software&#9;<span th:text="#{customsetup.exampleSoftware}"></span></pre>
+<p th:if="${setup.lines.isEmpty()}" class="alert alert-info" th:text="#{customsetup.empty}"></p>
+<div class="table-responsive" th:if="${!setup.lines.isEmpty()}"><table class="table table-sm table-bordered"><thead><tr><th>#</th><th th:text="#{customsetup.key}"></th><th th:text="#{customsetup.description}"></th><th th:text="#{customsetup.expected}"></th><th th:text="#{customsetup.status}"></th><th th:text="#{customsetup.actions}"></th></tr></thead><tbody>
+<tr th:each="line : ${setup.lines}"><td th:text="${line.number}"></td><td class="text-break" th:text="${line.key}"></td><td class="text-break" th:text="${line.description}"></td><td class="text-break" th:text="${line.name}"></td><td th:text="${#messages.msg('customsetup.line.'+line.status)}"></td><td>
+<div th:each="entry : ${line.matches}"><a th:href="@{/nodes/{id}(id=${entry.id},_tenantView=${tenantViewToken})}" th:text="|[${entry.id}]|"></a> <a th:if="${line.status == 'ready'}" th:href="@{/cherrytemplatenode/{id}(id=${entry.id},_tenantView=${tenantViewToken})}" th:text="#{customsetup.openList}"></a> <a th:if="${customListsAdmin and setup.writable}" th:href="@{/nodes/content/{id}(id=${entry.id},_tenantView=${tenantViewToken})}" th:text="#{tree.edit}"></a></div>
+<form th:if="${line.status == 'missing' and customListsAdmin and setup.writable}" method="post" th:action="@{/cherrytemplatetasks/create}" th:attr="data-confirm-message=#{customsetup.confirmTemplate(${line.name})}"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="key" th:value="${line.key}"><button class="btn btn-sm btn-outline-primary" th:text="#{customsetup.createTemplate}"></button></form>
+</td></tr></tbody></table></div></section>
+<p class="small text-muted mt-3" th:text="#{customsetup.settingsHelp}"></p>
+</section></body></html>

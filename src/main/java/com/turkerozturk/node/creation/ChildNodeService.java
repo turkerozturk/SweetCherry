@@ -72,6 +72,8 @@ public class ChildNodeService {
         }
         Map<String, String> defaults = settings.getCustomProperties(TenantContext.getCurrentTenant());
         String name = defaults == null ? "New node" : defaults.getOrDefault("custom.newNodeName", "New node");
+        name = com.turkerozturk.node.NodeNames.clean(name);
+        if(name == null)name="New node";
         String tags = defaults == null ? "" : defaults.getOrDefault("custom.newNodeTags", "");
         long timestamp = Instant.now().getEpochSecond();
 
