@@ -25,6 +25,9 @@ import com.turkerozturk.helpers.DateTimeHelper;
 public class DataNode {
 
     private long nodeId;
+    private long contentId;
+    private String plainText;
+    private boolean empty;
     private String label;
     private String humanFriendlyLabel;
     private String data;
@@ -34,12 +37,28 @@ public class DataNode {
 
     public DataNode(Node node, String humanFriendlyLabel) {
         this.nodeId = node.getNodeId();
+        this.contentId = node.getNodeId();
+        this.plainText = java.util.Objects.toString(node.getTxt(), "");
+        this.empty = plainText.isBlank();
         this.label = node.getName();
         this.syntax = node.getSyntax();
         this.data = com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax()) ? com.turkerozturk.markdown.NodeMarkup.render(node.getSyntax(),node.getTxt()) : node.getTxtAsHtml();
         this.creationDateTime = DateTimeHelper.convertTimestampToHumanReadable(node.getCreationTimestamp());
         this.modificationDateTime = DateTimeHelper.convertTimestampToHumanReadable(node.getLastSaveTimestamp());
         this.humanFriendlyLabel = humanFriendlyLabel;
+    }
+
+    /** Disable Jsoup pretty printing so stored line breaks reach both HTML and PDF renderers. */
+    public static String plainHtml(String text){
+        var doc=org.jsoup.Jsoup.parseBodyFragment("");doc.outputSettings().prettyPrint(false);
+        return doc.body().appendElement("div").addClass("template-plain").text(text).outerHtml();
+    }
+
+    public long getContentId(){return contentId;}
+    public String getPlainText(){return plainText;}
+    public boolean isEmpty(){return empty;}
+    public void prepare(long occurrenceId,String html,String text){
+        nodeId=occurrenceId;data=html;plainText=text;empty=text==null||NodeNames.clean(text).isEmpty();
     }
 
     public long getNodeId() {

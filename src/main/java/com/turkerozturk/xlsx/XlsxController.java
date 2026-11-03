@@ -62,124 +62,15 @@ public class XlsxController {
     @Autowired
     private MessageSource messageSource;
 
-    public static final int DATA_START_COLUMN = 1 + 1;
+    public static final int DATA_START_COLUMN = 2;
 
+    @com.turkerozturk.multipledatabases.RequiresTenant
     @GetMapping("/cherrytemplatenode/xlsx/{templateNodeId}")
     public ResponseEntity<byte[]> downloadXlsx(@PathVariable long templateNodeId, Locale locale) throws IOException {
-        TemplateNode templateNode = templateService.getTemplateNode(templateNodeId);
-
-        // Create a new Workbook and Sheet
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Template Data");
-
-        int rowCounter = 0;
-        int columnHeaderCounter = DATA_START_COLUMN;
-        Row headerRow = sheet.createRow(rowCounter);
-
-        Cell nodeIdCellLabel = headerRow.createCell(0);
-        String translationOfNodeIdLabel = messageSource.getMessage("node.nodeId", null, locale);
-        nodeIdCellLabel.setCellValue(translationOfNodeIdLabel);
-
-        Cell nodeNameCellLabel = headerRow.createCell(1);
-        String translationOfNodeNameLabel = messageSource.getMessage("node.name", null, locale);
-        nodeNameCellLabel.setCellValue(translationOfNodeNameLabel);
-
-        for (String key : templateNode.getDataLabels().keySet()) {
-
-            Cell headerCell = headerRow.createCell(columnHeaderCounter);
-            headerCell.setCellValue(key);
-            columnHeaderCounter++;
-        }
-
-
-        List<ProjectNode> projectNodes = templateNode.getProjectNodes();
-        for (ProjectNode projectNode : projectNodes) {
-            rowCounter++;
-            Row dataRow = sheet.createRow(rowCounter);
-
-            Map<String, DataNode> dataNodesMap = projectNode.getDataNodes();
-
-            Cell porjectNodeIdCell = dataRow.createCell(0); // see DATA_START_COLUMN
-            porjectNodeIdCell.setCellValue(projectNode.getNodeId());
-
-            Cell porjectNodeNameCell = dataRow.createCell(1); // see DATA_START_COLUMN
-            porjectNodeNameCell.setCellValue(projectNode.getName());
-
-
-
-            int columnDataCounter = DATA_START_COLUMN;
-            for (String key : templateNode.getDataLabels().keySet()) {
-
-                Cell dataCell = dataRow.createCell(columnDataCounter);
-
-                DataNode dataNode = dataNodesMap.get(key);
-                String value;
-                if (dataNode != null) {
-                    if (!dataNode.getSyntax().equals("custom-colors")) {
-                        value = dataNode.getData();
-                    } else {
-                        try {
-                            String xmlContent = dataNode.getData();
-                            ByteArrayInputStream input = new ByteArrayInputStream(xmlContent.getBytes("UTF-8"));
-                            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                            Document doc = null;
-                            doc = dBuilder.parse(input);
-                            doc.getDocumentElement().normalize();
-                            value = getTextContent(doc.getDocumentElement());
-
-                        } catch (SAXException e) {
-                            throw new RuntimeException(e);
-                        } catch (ParserConfigurationException e) {
-                            throw new RuntimeException(e);
-                        }
-
-
-
-
-                    }
-                } else {
-                    value = null;
-                }
-
-                dataCell.setCellValue(value);
-                columnDataCounter++;
-            }
-
-        }
-
-
-        // Write the workbook to a ByteArrayOutputStream
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        workbook.write(bos);
-        byte[] xlsxBytes = bos.toByteArray();
-        workbook.close();
-
-        // Prepare headers for the response
-        String targetXlsxFileName = templateNode.getName() + ".xlsx";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", targetXlsxFileName);
-        headers.setContentLength(xlsxBytes.length);
-
-        // Return the ResponseEntity with the XLSX data
-        return new ResponseEntity<>(xlsxBytes, headers, HttpStatus.OK);
+        var template=templateService.getTemplateNode(templateNodeId);
+        byte[] bytes=new TemplateXlsxDocument().render(template,messageSource,locale);
+        var headers=new HttpHeaders();headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDisposition(org.springframework.http.ContentDisposition.attachment().filename(template.getName()+".xlsx",java.nio.charset.StandardCharsets.UTF_8).build());
+        headers.setContentLength(bytes.length);headers.setCacheControl("no-store");return new ResponseEntity<>(bytes,headers,HttpStatus.OK);
     }
-
-    public static String getTextContent(Node node) {
-        StringBuilder sb = new StringBuilder();
-        NodeList childNodes = node.getChildNodes();
-
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node child = childNodes.item(i);
-            if (child.getNodeType() == Node.TEXT_NODE) {
-                sb.append(child.getNodeValue().trim());
-            } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                sb.append(getTextContent(child));
-            }
-        }
-        return sb.toString().trim();
-    }
-
-
 }

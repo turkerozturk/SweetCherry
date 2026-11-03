@@ -82,135 +82,19 @@ public class DashBoardController {
     /*
     bilgi burasi sablondaki tum nodelerden tablo olusturan can alici yer.
      */
+    @RequiresTenant
     @GetMapping("/cherrytemplatenode/{templateNodeId}")
-    public String checkTemplateNodesByNodeIds(@PathVariable long templateNodeId, Model model) {
-
-        TemplateNode templateNode = templateService.getTemplateNode(templateNodeId);
-
-        model.addAttribute("cherryTemplateNode", templateNode);
-
-        if(!templateNode.getProjectNodes().isEmpty()) {
-            model.addAttribute("hasProjectNodes", true);
-
-        }
-
-
-
-        // see thymeleaf newline character topic:
-        model.addAttribute("newlinechar", '\n');
-
-        return "cherrytemplatenode";
+    public String checkTemplateNodesByNodeIds(@PathVariable long templateNodeId, Model model, jakarta.servlet.http.HttpSession session) {
+        model.addAttribute("cherryTemplateNode",templateService.getTemplateNode(templateNodeId,(String)session.getAttribute(com.turkerozturk.multipledatabases.TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN)));
+        model.addAttribute("reportGrid",false);return "cherrytemplatenode";
     }
 
+    @RequiresTenant
     @GetMapping("/cherrytemplate-type-1/{templateNodeId}")
-    public String cherrytemplateTtype1(@PathVariable long templateNodeId, Model model) {
-
-        TemplateNode templateNode = templateService.getTemplateNode(templateNodeId);
-
-        model.addAttribute("cherryTemplateNode", templateNode);
-
-        if(!templateNode.getProjectNodes().isEmpty()) {
-            model.addAttribute("hasProjectNodes", true);
-
-        }
-
-
-
-        // see thymeleaf newline character topic:
-        model.addAttribute("newlinechar", '\n');
-
-
-
-
-        // bilgi start
-
-
-        // bilgi: gonderilecek tum veri. Icteki liste bir satira ait hucreler, distaki liste satirlar, ilk satir sutun basliklarini icerir.
-        List<List<String>> dataRowsAsStringArray = new ArrayList<>();
-
-
-
-
-
-        // bilgi: ilk satir yani sutun basliklarini iceren hucrelerin eldesi ve satirin ana tabloya eklenmesi.
-        List<String> rowOfDataLabels = new ArrayList<>();
-
-        // bilgi: etiket ismi messages.properties dosyasinda var.
-        rowOfDataLabels.add("node.nodeId");
-
-        // bilgi: etiket ismi messages.properties dosyasinda var.
-        rowOfDataLabels.add("node.name");
-
-
-        for (String key : templateNode.getDataLabels().keySet()) {
-            rowOfDataLabels.add(key);
-        }
-        dataRowsAsStringArray.add(rowOfDataLabels);
-
-        // bilgi: ikinci ve sonraki satirlarin eldesi.
-        List<ProjectNode> projectNodes = templateNode.getProjectNodes();
-        for (ProjectNode projectNode : projectNodes) {
-
-            // bilgi: projectNode nin veri hucrelerini string listesine donusturecegiz.
-            Map<String, DataNode> dataNodesMap = projectNode.getDataNodes();
-
-
-            List<String> dataCellsInOneRow = new ArrayList<>();
-
-            // bilgi: node id sutunu olsun.
-            dataCellsInOneRow.add(String.valueOf(projectNode.getNodeId()));
-
-            // bilgi: node name sutunu olsun.
-            dataCellsInOneRow.add(projectNode.getName());
-
-
-            for (String key : templateNode.getDataLabels().keySet()) {
-
-
-
-                DataNode dataNode = dataNodesMap.get(key);
-                String value;
-                if (dataNode != null) {
-                    if (!dataNode.getSyntax().equals("custom-colors")) {
-                        value = dataNode.getData();
-                    } else {
-                        try {
-                            String xmlContent = dataNode.getData();
-                            ByteArrayInputStream input = new ByteArrayInputStream(xmlContent.getBytes("UTF-8"));
-                            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                            Document doc = null;
-                            doc = dBuilder.parse(input);
-                            doc.getDocumentElement().normalize();
-                            value = XlsxController.getTextContent(doc.getDocumentElement());
-
-                        } catch (SAXException | IOException e) {
-                            throw new RuntimeException(e);
-                        } catch (ParserConfigurationException e) {
-                            throw new RuntimeException(e);
-                        }
-
-
-                    }
-                } else {
-                    value = null;
-                }
-                dataCellsInOneRow.add(value);
-
-            }
-
-            dataRowsAsStringArray.add(dataCellsInOneRow);
-        }
-
-
-        model.addAttribute("dataRowsAsStringArray", dataRowsAsStringArray);
-
-
-        // bilgi stop
-
-        return "cherrytemplate-type-1";
+    public String cherrytemplateTtype1(@PathVariable long templateNodeId, Model model, jakarta.servlet.http.HttpSession session) {
+        model.addAttribute("cherryTemplateNode",templateService.getTemplateNode(templateNodeId,(String)session.getAttribute(com.turkerozturk.multipledatabases.TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN)));
+        model.addAttribute("reportGrid",true);return "cherrytemplate-type-1";
     }
-
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard")

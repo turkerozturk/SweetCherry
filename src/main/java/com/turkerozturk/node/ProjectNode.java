@@ -54,6 +54,12 @@ public class ProjectNode {
         this.breadcrumbsAsString = breadcrumbsAsString;
     }
 
+    private Map<String, java.util.List<DataNode>> duplicateDataNodes = new LinkedHashMap<>();
+    public Map<String, java.util.List<DataNode>> getDuplicateDataNodes(){return duplicateDataNodes;}
+    public void setDuplicateDataNodes(Map<String, java.util.List<DataNode>> value){duplicateDataNodes=value;}
+    public java.util.List<TemplateField> getFields(){return dataLabels.entrySet().stream().map(e->TemplateField.of(this,e.getKey(),e.getValue())).toList();}
+    public boolean isIncomplete(){return getFields().stream().anyMatch(f->!f.status().equals("value"));}
+
     public long getNodeId() {
         return nodeId;
     }

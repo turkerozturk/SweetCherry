@@ -29,70 +29,50 @@ import java.util.*;
 @Service
 public class TemplateService {
 
-    @Autowired
-    private NodeService nodeService;
+    @Autowired private NodeService nodeService;
+    @Autowired private com.turkerozturk.children.ChildrenRepository children;
+    @Autowired private com.turkerozturk.richtext.experimental.RichTextRenderingService richText;
+    @Autowired private com.turkerozturk.exportmindmap.MindMapTextContent textContent;
 
-    @Autowired
-    private ChildrenService childrenService;
+    @org.springframework.transaction.annotation.Transactional(readOnly=true)
+    public TemplateNode getTemplateNode(long id) {return getTemplateNode(id, "");}
 
-    public TemplateNode getTemplateNode(long templateNodeId) {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        TemplateNode templateNode = new TemplateNode(nodeService.getById(templateNodeId));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        List<Node> rawProjectNodes = nodeService.getNodesByTags(templateNode.getName());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        List<ProjectNode> projectNodes = new ArrayList<>();
-        for(Node rawProjectNode : rawProjectNodes) {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            LinkedHashMap<Long, String> breadcrumbs = nodeService.addBreadcrumbs(rawProjectNode.getNodeId());
-            rawProjectNode.setBreadcrumbs(breadcrumbs);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            List<Node> childrenNodes = childrenService.getNodesByFatherId(rawProjectNode.getNodeId());
-            Map<String, DataNode> dataNodesMap = new HashMap<>();
-            for(Node childrenNode : childrenNodes) {
-                for(String dataLabel : templateNode.getDataLabels().keySet()) {
-                    if(childrenNode.getName().equals(dataLabel)) {
-                        String humanFriendlyLabel = templateNode.getDataLabels().get(dataLabel);
-                        DataNode dataNode = new DataNode(childrenNode, humanFriendlyLabel);
-                        dataNodesMap.put(dataLabel, dataNode);
-                    }
-                }
+    @org.springframework.transaction.annotation.Transactional(readOnly=true)
+    public TemplateNode getTemplateNode(long id,String tenantView) {
+        Node source=nodeService.findDisplayNode(id);
+        if(source==null)throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND);
+        var template=new TemplateNode(source);template.setNodeId(id);
+        var projects=new ArrayList<ProjectNode>();
+        // Preserve legacy exact whole-field tag membership. Do not expand into tag token matching.
+        for(Node record:nodeService.getNodesByTags(template.getName())) {
+            if(!Objects.equals(record.getTags(),template.getName()))continue;
+            var matches=new LinkedHashMap<String,List<DataNode>>();
+            for(var occurrence:children.findByFatherIdOrderBySequenceAsc(record.getNodeId())) {
+                Node node=nodeService.findDisplayNode(occurrence.getNodeId());
+                if(node==null || !template.getDataLabels().containsKey(node.getName()))continue;
+                var data=new DataNode(node,template.getDataLabels().get(node.getName()));
+                String raw=Objects.toString(node.getTxt(), "");
+                String plain=textContent.text(node.getNodeId(),node.getSyntax(),raw);
+                String html="custom-colors".equals(node.getSyntax()) && !raw.isBlank()?richText.render(node, tenantView):
+                    com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax())?com.turkerozturk.markdown.NodeMarkup.render(node.getSyntax(),raw):DataNode.plainHtml(raw);
+                data.prepare(occurrence.getNodeId(),html,plain);
+                matches.computeIfAbsent(node.getName(),ignored->new ArrayList<>()).add(data);
             }
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            ProjectNode projectNode = new ProjectNode(rawProjectNode, nodeService.doBreadcrumbsToString(breadcrumbs));
-            projectNode.setDataLabels(templateNode.getDataLabels());
-            projectNode.setDataNodes(dataNodesMap);
-            projectNode.setMissingDataLabels(findMissingLabels(templateNode.getDataLabels().keySet(), dataNodesMap));
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            projectNodes.add(projectNode);
+            var values=new LinkedHashMap<String,DataNode>();var duplicates=new LinkedHashMap<String,List<DataNode>>();
+            for(String key:template.getDataLabels().keySet()){
+                var found=matches.getOrDefault(key,List.of());
+                if(found.size()==1)values.put(key,found.get(0));
+                else if(found.size()>1)duplicates.put(key,List.copyOf(found));
+            }
+            var project=new ProjectNode(record,nodeService.doBreadcrumbsToString(nodeService.addBreadcrumbs(record.getNodeId())));
+            project.setDataLabels(template.getDataLabels());project.setDataNodes(values);project.setDuplicateDataNodes(duplicates);
+            project.setMissingDataLabels(findMissingLabels(template.getDataLabels().keySet(),matches));projects.add(project);
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // projectNodes listesini projenin adina gore alfabetik olarak sirala
-        Collections.sort(projectNodes, Comparator.comparing(ProjectNode::getName));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        templateNode.setProjectNodes(projectNodes);
-        return templateNode;
+        projects.sort(Comparator.comparing(ProjectNode::getName,Comparator.nullsFirst(Comparator.naturalOrder())).thenComparingLong(ProjectNode::getNodeId));
+        template.setProjectNodes(projects);return template;
     }
 
-    /**
-     * If the user not used some dataLabes whose defined in template node, this method will collect those dataLabels
-     * to show them to the user for information.
-     * @param dataLabels
-     * @param dataNodesMap
-     * @return
-     */
-    public static Set<String> findMissingLabels(Set<String> dataLabels, Map<String, DataNode> dataNodesMap) {
-        Set<String> missingLabels = new TreeSet<>();
-
-        for (String label : dataLabels) {
-            if (!dataNodesMap.containsKey(label)) {
-                missingLabels.add(label);
-            }
-        }
-
-        return missingLabels;
+    public static Set<String> findMissingLabels(Set<String> labels,Map<String,?> values) {
+        var missing=new LinkedHashSet<>(labels);missing.removeAll(values.keySet());return missing;
     }
-
 }

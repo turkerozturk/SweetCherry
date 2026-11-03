@@ -1,0 +1,29 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body><section th:fragment="report" class="container-fluid py-3 template-report" th:attr="data-template-id=${cherryTemplateNode.nodeId},data-source=${tenantViewToken}">
+<h1 class="fs-4" th:text="${cherryTemplateNode.name}"></h1>
+<nav class="d-flex flex-wrap gap-2 mb-2">
+<a class="btn btn-sm btn-outline-primary" th:href="@{/cherrytemplatenode/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.list}"></a>
+<a class="btn btn-sm btn-outline-primary" th:href="@{/cherrytemplate-type-1/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.grid}"></a>
+<a class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.template}"></a>
+<a class="btn btn-sm btn-outline-danger" th:href="@{/cherrytemplatenode/pdf/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.pdf}"></a>
+<a class="btn btn-sm btn-outline-success" th:href="@{/cherrytemplatenode/xlsx/{id}(id=${cherryTemplateNode.nodeId},_tenantView=${tenantViewToken})}" th:text="#{report.xlsx}"></a>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-report-copy th:attr="data-copy-text=${cherryTemplateNode.name},data-done=#{report.copied}" th:text="#{report.copy}"></button>
+</nav>
+<details class="mb-2"><summary th:text="#{report.about}"></summary><p th:text="#{report.membership}"></p><dl class="row"><dt class="col-sm-3" th:text="#{report.template}"></dt><dd class="col-sm-9" th:text="|${cherryTemplateNode.name} [${cherryTemplateNode.nodeId}]|"></dd></dl><ol><li th:each="label : ${cherryTemplateNode.dataLabels}" th:text="|${label.key} → ${label.value}|"></li></ol><div th:replace="~{help/cherrytemplatenode :: helpContentfragment}"></div></details>
+<div class="alert alert-warning" role="status" th:if="${!cherryTemplateNode.definitionIssues.isEmpty()}"><strong th:text="#{report.definitions}"></strong><ul><li th:each="issue : ${cherryTemplateNode.definitionIssues}" th:text="${issue}"></li></ul></div>
+<div class="d-flex flex-wrap align-items-center gap-3 mb-2"><label><span th:text="#{report.search}"></span><input type="search" class="form-control form-control-sm" data-report-search></label><label><input type="checkbox" data-report-incomplete> <span th:text="#{report.incomplete}"></span></label><button type="button" class="btn btn-sm btn-outline-primary" data-report-today th:text="#{report.today}"></button><span data-report-count role="status" aria-live="polite"></span></div>
+<p class="small text-muted" th:text="#{report.exportScope}"></p>
+<p th:if="${cherryTemplateNode.projectNodes.isEmpty()}" class="alert alert-info" th:text="#{report.noRecords}"></p>
+<details data-report-alarms hidden><summary th:text="#{report.alarms}"></summary><ul></ul></details>
+<div class="table-responsive"><table class="table table-sm report-records"><thead><tr><th>#</th><th th:text="#{report.node}"></th><th th:if="${!reportGrid}" th:text="#{report.values}"></th><th th:if="${reportGrid}" th:each="label : ${cherryTemplateNode.dataLabels}" th:text="${label.value}" th:title="${label.key}"></th></tr></thead><tbody>
+<tr th:each="project, stat : ${cherryTemplateNode.projectNodes}" data-report-record th:attr="data-incomplete=${project.incomplete},data-record-name=${project.name}">
+<td th:text="${stat.count}"></td><td class="report-name"><a th:href="@{/nodes/{id}(id=${project.nodeId},_tenantView=${tenantViewToken})}" th:text="${project.name}" th:title="${project.breadcrumbsAsString}"></a><br><small th:text="|[${project.nodeId}]|"></small><div class="small text-muted" th:text="${project.breadcrumbsAsString}"></div></td>
+<td th:if="${!reportGrid}" class="report-values"><table class="table table-sm mb-0"><tbody><tr th:each="field : ${project.fields}"><th th:text="${field.label}" th:title="${field.key}"></th><td><div th:replace="~{customlists/report :: value(${field})}"></div></td></tr></tbody></table></td>
+<td th:if="${reportGrid}" th:each="field : ${project.fields}"><div th:replace="~{customlists/report :: value(${field})}"></div></td>
+</tr></tbody></table></div>
+<p data-report-no-match hidden class="alert alert-info" th:text="#{report.noMatch}"></p>
+</section>
+<div th:fragment="value(field)" class="report-field" th:attr="data-field-key=${field.key}">
+<div th:if="${field.status == 'value'}" class="field-content" th:utext="${field.data.data}"></div>
+<div th:unless="${field.status == 'value'}" class="report-state" th:attr="data-state=${field.status}"><strong th:text="${#messages.msg('report.state.'+field.status)}"></strong><ul th:if="${field.status == 'ambiguous'}"><li th:each="match : ${field.matches}"><a th:href="@{/nodes/{id}(id=${match.nodeId},_tenantView=${tenantViewToken})}" th:text="|${match.label} [${match.nodeId}]|"></a></li></ul></div>
+<a th:if="${field.data != null}" class="small" th:href="@{/nodes/{id}(id=${field.data.nodeId},_tenantView=${tenantViewToken})}" th:text="|[${field.data.nodeId}]|"></a>
+</div></body></html>

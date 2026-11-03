@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Unify ordered custom-list fields across HTML list/table, landscape PDF and XLSX; distinguish missing, empty and ambiguous child fields, diagnose repeated definitions, add record search/incomplete filtering and a Today shortcut, and replace blinking markers with static localized statuses. Preserve exact whole-field tag membership and the CTB schema.
+
 - Add localized custom-list setup/help with global and per-connection names, explicit definition status and confirmed missing-node creation; add editor TAB/symbol buttons and trim boundary whitespace/invisible characters from authored node names.
 
 - Add reviewed, atomic database-wide tag rename/removal for ADMIN writable connections, exact token matching, merge de-duplication, Modified tracking and commit-only per-node audit logs.

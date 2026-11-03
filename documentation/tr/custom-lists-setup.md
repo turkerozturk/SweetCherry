@@ -52,3 +52,6 @@ Plain Text/Markdown araç çubuğunda ☐, ☑, ☒, • ve TAB; görsel Rich Te
 4. Global ayarları ve tenant önceliğini, iki dilde yardım sayfalarını ve rapor içindeki yardımı kontrol edin.
 5. USER/salt okunur görünümünde oluşturma olmasın; başka sekmede bağlantı değiştikten sonra eski form yeni veritabanına yazamasın.
 6. İki editörde TAB/işaret ekleme, undo/redo ve kaydetmeyi deneyin. Ad sınırlarında boşluk, NBSP ve görünmez biçim karakterlerinin temizlenip iç boşlukların korunduğunu görün.
+
+
+[Sıralı rapor alanları ve çıktı kuralları](template-reports.md)

@@ -37,24 +37,31 @@ public class TemplateNode {
         this.dataLabels = setDataLabels(node.getTxt());
     }
 
-    public Map<String, String> setDataLabels(String rawDataLabelsList) {
+    private java.util.List<String> definitionIssues = java.util.List.of();
+    public java.util.List<String> getDefinitionIssues(){return definitionIssues;}
 
-        String[] rawDataLabels = rawDataLabelsList.split("\\r?\\n");
-
-        Map<String, String> dataLabelsMap = new HashMap<>();
-        for (String rawDataLabel : rawDataLabels) {
-            if (!rawDataLabel.startsWith(" ")) {
-
-                String[] variables = rawDataLabel.split("\\t");
-                if (variables.length == 1) {
-                    dataLabelsMap.put(rawDataLabel, rawDataLabel);
-                } else {
-                    dataLabelsMap.put(variables[0], variables[1]);
-                }
-
+    /** Retain definition order; a leading ASCII space remains a legacy comment marker. */
+    public Map<String, String> setDataLabels(String raw) {
+        var labels = new java.util.LinkedHashMap<String,String>();
+        var issues = new java.util.ArrayList<String>();
+        var repeated = new java.util.HashSet<String>();
+        int line = 0;
+        for(String original : java.util.Objects.toString(raw, "").split("\\R", -1)) {
+            line++;
+            String clean = NodeNames.clean(original);
+            if(clean.isEmpty() || clean.startsWith("#") || original.startsWith(" ")) continue;
+            String[] parts = original.split("\\t", 2);
+            String key = NodeNames.clean(parts[0]);
+            if(key.isEmpty()) {issues.add("["+line+"] ∅");continue;}
+            String label = parts.length == 1 ? key : NodeNames.clean(parts[1]);
+            if(label.isEmpty())label=key;
+            if(labels.containsKey(key) || repeated.contains(key)) {
+                labels.remove(key);repeated.add(key);issues.add("["+line+"] "+key);continue;
             }
+            labels.put(key,label);
         }
-        return dataLabelsMap;
+        definitionIssues = java.util.List.copyOf(issues);
+        return labels;
     }
 
     /*

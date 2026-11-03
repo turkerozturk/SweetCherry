@@ -52,3 +52,6 @@ The Plain Text/Markdown toolbar includes ☐, ☑, ☒, • and TAB; the visual 
 4. Test global settings, then tenant overrides; check both localized help pages and the report's embedded help.
 5. Verify read-only/USER access shows information without creation, and an old tab after a connection switch cannot create in the new database.
 6. Insert TAB/symbols in both editors, undo/redo and save. Save a node name with leading/trailing spaces, NBSP or zero-width format characters; verify only the boundaries are removed.
+
+
+[Ordered report fields and output rules](template-reports.md)
