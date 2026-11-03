@@ -23,6 +23,17 @@ public class RecordViewController {
         String token=(String)request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
         model.addAttribute("recordView",service.render(templateId,viewId,recordId,token,locale));model.addAttribute("layoutAdmin",request.isUserInRole("ADMIN"));return "customlists/record-view";
     }
+    @org.springframework.beans.factory.annotation.Autowired private RecordViewPdf pdf;
+    @GetMapping("/cherrytemplatenode/{templateId}/view/{viewId}/pdf")
+    public org.springframework.http.ResponseEntity<byte[]> pdf(@PathVariable long templateId,@PathVariable long viewId,@RequestParam long recordId,HttpServletRequest request,Locale locale){
+        String token=(String)request.getSession().getAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
+        var page=service.render(templateId,viewId,recordId,token,locale);
+        byte[] bytes=pdf.export(page);
+        String filename=com.turkerozturk.pdf.PdfFilename.create(page.record().getName()+" - "+page.view().name(),recordId);
+        return org.springframework.http.ResponseEntity.ok().contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+            .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,org.springframework.http.ContentDisposition.attachment().filename(filename,java.nio.charset.StandardCharsets.UTF_8).build().toString())
+            .header(org.springframework.http.HttpHeaders.CACHE_CONTROL,"no-store").contentLength(bytes.length).body(bytes);
+    }
     @PostMapping("/cherrytemplatenode/{templateId}/views/example")
     @PreAuthorize("hasRole('ADMIN')")
     public String example(@PathVariable long templateId,RedirectAttributes flash){flash.addFlashAttribute("layoutCreated",service.createExample(templateId));return "redirect:/cherrytemplatenode/"+templateId+"/views";}

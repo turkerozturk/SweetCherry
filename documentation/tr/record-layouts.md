@@ -1,6 +1,6 @@
 # Özelleştirilebilir tek kayıt HTML tasarımları
 
-Tasarım, CTB içindeki HTML kaynağına tek bir kaydın değerlerini yerleştirir. Mevcut HTML liste, HTML tablo, PDF ve XLSX görünümleri korunur. Bu adım HTML içindir; bu tasarımların PDF çıktısı sonraki adımdır.
+Tasarım, CTB içindeki HTML kaynağına tek bir kaydın değerlerini yerleştirir. Mevcut HTML liste, HTML tablo, PDF ve XLSX görünümleri korunur. Aynı kayıt tasarımı PDF olarak da indirilebilir.
 
 ## Örnekle başlama
 
@@ -80,3 +80,14 @@ Bu adımda script motoru yoktur; `{{now}}` sunucunun sağladığı adlandırılm
 4. Tarih biçimi/bölgesini değiştirip yeniden başlatın. Yenilemenin notların Created/Modified tarihlerini değiştirmediğini kontrol edin.
 5. Deneme tasarımında script/form/uzak resim girişimleri çalışmasın ve dış kaynak istemesin. Desteklenen bağlantılar ayrı açılsın. Gösterim kaynak HTML'yi değiştirmesin.
 6. USER/salt okunur erişim, yanlış şablon/tasarım/kayıt kombinasyonları, birden fazla `_views` ve bağlantı değişmiş eski sekmeyi deneyin; izinsiz oluşturma/yeni kaynağa yanlış yazma olmasın.
+
+
+## PDF indirme
+
+Bir kayıt tasarımını açıp **PDF indir** seçin. Seçilen kayıt ve tasarım, aynı üyelik, değişken ve eksik alan kurallarıyla aktarılır. `{{now}}` indirme anında yeniden hesaplanır; düğüm tarihleri ve tasarım içeriği değişmez. USER/salt okunur erişim, aynı aktif bağlantı denetimiyle desteklenir.
+
+İlk çıktı **A4 dikey** biçimindedir; altta sayfa / toplam sayfa bulunur. Liberation fontları gömülür; renkler, tablolar, gömülü PNG/JPEG resimler ve tıklanabilir HTTP/HTTPS bağlantıları desteklenir. Ek başlık eklenmez: tasarımda `{{record.name}}` değişkenini istediğiniz yere koyun. Dosya adı kayıt ve tasarım adını içerir. İç düğüm bağlantılarının metni korunur fakat bağımsız PDF'de etkin değildir; sunucu adresi veya tenant belirteci bağlantı olarak eklenmez. SweetCherry/kaynak meta bilgisi kapalıdır.
+
+PDF motoru tam bir tarayıcı değildir. Blok veya tablo düzenleri; basit boyut, boşluk, çerçeve, renk ve metin stilleri tercih edin. Grid/flex, media kuralları, özel fontlar, konumlandırma ve CSS fonksiyonları aktarılmaz. Bu ilk adımda sayfa boyutu ve kenar boşlukları sabittir; HTML `@page` kuralları uygulanmaz. Harici CSS/font/resim veya yerel dosya yüklenmez. Tasarım limitlerine ek olarak mevcut `myapp.pdf.max-html-characters`, `max-image-bytes` ve `max-image-pixels` limitleri geçerlidir; aşımda rapor kesilmez, istek 413 ile durur.
+
+Manuel kontrol: iki ayrı kayıt/tasarımda Türkçe metin, tablo, resim, uzun kayıt ve dış bağlantı içeren PDF indirin; sayfa bölünmelerini ve altbilgideki sayfa toplamlarını inceleyin. Bağlantı değiştirildikten sonra eski sekmenin çıktı alamadığını, kaynak tarihlerinin değişmediğini, bilinmeyen/eksik değişkenlerin uyarı olarak kaldığını doğrulayın. Tarayıcı/PDF benzerliği için grid yerine tablo düzeni kullanın.

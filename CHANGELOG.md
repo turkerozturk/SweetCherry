@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Download custom single-record HTML layouts as offline A4 PDFs with embedded fonts/images, safe print CSS and page totals.
+
 - Add customizable single-record HTML layouts stored as Plain Text nodes under `_views`, bounded text-node placeholders, a configurable server-rendered clock, shared field diagnostics and confirmed example creation. Render sanitized layouts in an isolated frame without changing the CTB schema or existing report routes.
 
 - Unify ordered custom-list fields across HTML list/table, landscape PDF and XLSX; distinguish missing, empty and ambiguous child fields, diagnose repeated definitions, add record search/incomplete filtering and a Today shortcut, and replace blinking markers with static localized statuses. Preserve exact whole-field tag membership and the CTB schema.

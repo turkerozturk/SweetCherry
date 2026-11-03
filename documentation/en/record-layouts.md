@@ -1,6 +1,6 @@
 # Custom single-record HTML layouts
 
-A layout displays one matching record using HTML stored in the CTB itself. The existing list, table, PDF and XLSX views remain available. This step adds HTML layouts; export of these layouts to PDF is a later step.
+A layout displays one matching record using HTML stored in the CTB itself. The existing list, table, PDF and XLSX views remain available. These HTML layouts can also be downloaded as PDF.
 
 ## Start from an example
 
@@ -80,3 +80,14 @@ There is no script engine in this step: `{{now}}` is a named server value. A mal
 4. Change the date pattern/zone, restart and refresh. Confirm note Created/Modified dates are unchanged.
 5. Add script/form/remote-image attempts to a test layout. They must not execute or fetch outside resources; supported links should open separately. The HTML source remains unchanged after display.
 6. Try USER/read-only access, wrong template/layout/record combinations, duplicate `_views` folders and a stale tab after changing connections. Reads must work only for the selected source; unauthorized creation must not occur.
+
+
+## PDF download
+
+Open a record layout and choose **Download PDF**. It downloads the selected record in the selected design, using the same membership, placeholder and missing-field rules. `{{now}}` is rendered again at download time; no node dates or design contents change. USER/read-only access is supported with the same selected-connection guard.
+
+The initial output is **A4 portrait**, with page / total page count in the footer, embedded Liberation fonts, colors, tables, embedded PNG/JPEG images and clickable HTTP/HTTPS links. No extra record title is inserted: place `{{record.name}}` where you want it in the design. The filename includes the record and layout names. Internal node links keep their text but are inactive in a standalone PDF; no server address or tenant token is embedded as a link. SweetCherry/source metadata is disabled.
+
+The PDF engine supports basic CSS, not a full browser. Prefer block or table layouts and simple sizes, spacing, borders, colors and text styles. Grid/flex, media rules, custom fonts, positioning and CSS functions are omitted. PDF page size and margins are fixed for this first step; HTML `@page` rules are ignored. External CSS/fonts/images and local files are never fetched. Existing `myapp.pdf.max-html-characters`, `max-image-bytes` and `max-image-pixels` limits apply in addition to the layout limits; an exceeded limit cancels the request (413), rather than truncating the report.
+
+Manual check: download two records/designs, including Turkish text, a table, an image, a long record and an external link; inspect page breaks and footer totals. Check that a stale database tab cannot export, source dates remain unchanged, and unknown/missing placeholders still appear as notices. For a close browser/PDF match, use a table layout rather than CSS grid.
