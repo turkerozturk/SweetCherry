@@ -82,6 +82,43 @@
             white-space: nowrap;
         }
 
+        /* Reserve the button's width so hover never moves the tree or its labels. */
+        .markmap-add-child {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 22px;
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            border: 1px solid #6c757d;
+            border-radius: 4px;
+            background: #fff;
+            color: #212529;
+            font: 18px/1 sans-serif;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .markmap-node-label:hover .markmap-add-child,
+        .markmap-node-label:focus-within .markmap-add-child {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .markmap-add-child:focus-visible { outline: 2px solid #0d6efd; outline-offset: 2px; }
+        @media (hover: none) {
+            .markmap-add-child { opacity: 1; pointer-events: auto; }
+        }
+        #markmap-child-dialog {
+            width: min(28rem, calc(100vw - 2rem));
+            max-height: calc(100vh - 2rem);
+            border: 1px solid #adb5bd;
+            border-radius: .5rem;
+            padding: 1.25rem;
+        }
+        #markmap-child-dialog::backdrop { background: rgb(0 0 0 / 35%); }
+        #markmap-child-parent { overflow-wrap: anywhere; }
+
         .markmap-node-title.is-bold {
             font-weight: 700;
         }
@@ -180,13 +217,37 @@
     <div class="card shadow-sm mind-map-panel">
         <div class="card-body">
             <svg id="markmap"
-                 role="img"
+                 role="group"
                  th:attr="aria-label=${rootNodeName} + ' düşünce haritası'">
             </svg>
         </div>
     </div>
 </main>
 
+
+<div th:if="${markmapCanAdd}" data-markmap-children
+     th:attr="data-stale=#{quick.stale},data-denied=#{quick.denied},data-invalid=#{quick.invalid},data-uncertain=#{quick.uncertain},data-saving=#{markmap.child.saving},data-reload=#{markmap.child.reload}">
+    <dialog id="markmap-child-dialog" aria-labelledby="markmap-child-heading">
+        <h2 id="markmap-child-heading" class="h5" th:text="#{markmap.child.add}">Add child node</h2>
+        <p id="markmap-child-parent" class="small text-body-secondary"></p>
+        <form data-markmap-child-form method="post" th:action="@{/nodes/quick/create}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+            <input type="hidden" name="parentId">
+            <input type="hidden" name="text" value="">
+            <input type="hidden" name="syntax" value="plain-text">
+            <label for="markmap-child-title" th:text="#{quick.title}">Title</label>
+            <input id="markmap-child-title" name="title" type="text" class="form-control"
+                   maxlength="255" required autocomplete="off" autofocus>
+            <p data-markmap-child-status class="small mt-2" role="status" aria-live="polite"></p>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" data-markmap-child-cancel class="btn btn-outline-secondary" th:text="#{markmap.child.cancel}">Cancel</button>
+                <button type="submit" class="btn btn-primary" th:text="#{markmap.child.ok}">OK</button>
+            </div>
+        </form>
+    </dialog>
+</div>
+<script th:if="${markmapCanAdd}" th:src="@{/js/markmap/quickChild.js}"></script>
 
 <!-- Markmap View, tarayıcı sürümünde global d3 nesnesini kullanır. -->
 <script th:src="@{/js/thirdparty/markmap/d3.min.js}"></script>
@@ -210,6 +271,9 @@
         const viewScaleStorageKey = 'sweetCherry.markmap.viewScale';
         const defaultViewScale = 1;
         const data = JSON.parse(dataJson);
+        const canAddChildren = /*[[${markmapCanAdd}]]*/ false;
+        const addChildLabel = /*[[#{markmap.child.add}]]*/ 'Add child node';
+        const revealParentId = new URLSearchParams(window.location.search).get('childOf');
 
         prepareLabels(data);
 
@@ -317,7 +381,8 @@
                 : defaultViewScale;
         }
 
-        function prepareLabels(node) {
+        function prepareLabels(node, depth = 0) {
+            if (node.payload?.parentId === revealParentId) node.payload.fold = 0;
             const iconName = node.payload?.iconName;
             const isBold = node.payload?.bold === true;
             const color = normalizeColor(node.payload?.color);
@@ -372,6 +437,13 @@
             if(currentNodeId === 0 && hasVisibleNodeIcon) {
                 iconHtml='<img class="markmap-node-icon" src="'+escapeHtmlAttribute(iconBaseUrl+encodeURIComponent(String(iconName))+'.png')+'" alt="">';
             }
+            const parentId = String(node.payload?.parentId || '');
+            const addChildHtml = canAddChildren && /^[1-9][0-9]{0,18}$/.test(parentId)
+                ? '<button type="button" class="markmap-add-child" data-parent-id="'
+                    + parentId + '" data-reveal-level="' + (depth + 1)
+                    + '" aria-label="' + escapeHtmlAttribute(addChildLabel)
+                    + '" title="' + escapeHtmlAttribute(addChildLabel) + '">+</button>'
+                : '';
             node.content =
                 '<span class="markmap-node-label">'
                 + iconHtml
@@ -383,9 +455,9 @@
                 + colorStyle
                 + '>'
                 + safeTitle
-                + '</a></span>';
+                + '</a>' + addChildHtml + '</span>';
 
-            (node.children || []).forEach(prepareLabels);
+            (node.children || []).forEach(child => prepareLabels(child, depth + 1));
         }
 
         function createNodeUrl(nodeId) {

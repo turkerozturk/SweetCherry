@@ -31,7 +31,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 - [Folder-tree text ZIP export](documentation/en/text-tree-export.md) with original leaf extensions and nested directories.
 - Preview and import exported CTBs into a writable database, preserving hierarchy and remapping internal IDs.
 - Tenant configuration wizard, SQLite/MariaDB/MySQL/PostgreSQL connections, and application settings editors.
-- Markmap, Mermaid, Freeplane/FreeMind export with optional content notes, and PDF export with hierarchical navigation. Offline LaTeX rendering in content and PDF.
+- Markmap with [quick child creation](documentation/en/markmap-quick-child.md), Mermaid, Freeplane/FreeMind export with optional content notes, and PDF export with hierarchical navigation. Offline LaTeX rendering in content and PDF.
 - Local use or configurable network access; offline sun and moon calculations.
 
 [CTB export](documentation/tr/ctb-export.md) · [Shared nodes](documentation/tr/shared-node-operations.md) · [Network access](documentation/tr/network-access.md) · [Optional features](documentation/tr/optional-features.md) · [Versioning](documentation/tr/versioning.md)

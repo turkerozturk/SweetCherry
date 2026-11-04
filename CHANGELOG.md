@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add hover/focus/touch child creation to Markmap with a name-only dialog, existing guarded quick-note writes, exact shared-occurrence parent IDs and refresh/reveal after confirmed save.
+
 ## [1.7.0]
 
 - Publish a Java-free all-OS portable ZIP, Windows x64 setup with Java, clearly named third-party licences ZIP and lowercase checksums; keep build metadata inside the application packages.

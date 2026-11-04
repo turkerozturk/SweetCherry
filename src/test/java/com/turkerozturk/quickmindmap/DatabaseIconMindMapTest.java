@@ -19,7 +19,7 @@ class DatabaseIconMindMapTest {
     TenantIcons icons(){var holder=new CustomPropertiesHolder();holder.addCustomProperties("Demo",Map.of(TenantIcons.PROPERTY,"cherry_blue"));TenantContext.setCurrentTenant("Demo");return new TenantIcons(holder);}
     @Test void mermaidAndMarkmapDatabaseRootsRespectIconsSwitch()throws Exception {
         var children=mock(ChildrenRepository.class);var nodes=mock(NodeRepository.class);
-        var mermaid=new QuickMindMapController(children,nodes);var markmap=new MarkmapQuickMindMapController(children,nodes,new ObjectMapper());
+        var mermaid=new QuickMindMapController(children,nodes);var markmap=new MarkmapQuickMindMapController(children,nodes,new ObjectMapper(),mock(com.turkerozturk.node.properties.NodePropertiesService.class));
         var icons=icons();ReflectionTestUtils.setField(mermaid,"tenantIcons",icons);ReflectionTestUtils.setField(markmap,"tenantIcons",icons);
         for(boolean enabled:List.of(true,false)) {
             var model=new ExtendedModelMap();mermaid.showAllRoots(0,enabled,false,false,model);

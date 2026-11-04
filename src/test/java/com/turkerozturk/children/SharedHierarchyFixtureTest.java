@@ -82,7 +82,7 @@ class SharedHierarchyFixtureTest {
     }
     @Test void markmapIncludesNestedSharedChildren() throws Exception {
         var mapper = new ObjectMapper(); var model = new ExtendedModelMap();
-        new MarkmapQuickMindMapController(children,nodes,mapper).showMarkmapQuickMindMap(11,10,false,false,false,model);
+        new MarkmapQuickMindMapController(children,nodes,mapper,mock(com.turkerozturk.node.properties.NodePropertiesService.class)).showMarkmapQuickMindMap(11,10,false,false,false,model);
         var root = mapper.readTree((String)model.get("markmapDataJson"));
         assertThat(root.get("children").size()).isEqualTo(3);
         assertThat(root.get("children").get(2).get("payload").get("nodeId").asLong()).isEqualTo(18);

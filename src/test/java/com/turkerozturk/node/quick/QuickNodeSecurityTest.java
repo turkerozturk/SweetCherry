@@ -49,6 +49,11 @@ class QuickNodeSecurityTest {
     .param("_tenantView","current").param("parentId","11").param("title","T").param("text","body"))
     .andExpect(status().isOk()).andExpect(jsonPath("$.id").value("20"));
    verify(service).create(11,"T","body","plain-text");clearInvocations(service);
+   when(service.create(11,"Child","","plain-text")).thenReturn(21L);
+   mvc.perform(post("/nodes/quick/create").session(session).with(csrf()).with(user("admin").roles("ADMIN"))
+    .param("_tenantView","current").param("parentId","11").param("title","Child"))
+    .andExpect(status().isOk()).andExpect(jsonPath("$.id").value("21"));
+   verify(service).create(11,"Child","","plain-text");clearInvocations(service);
    TenantContext.clear();
    mvc.perform(get("/nodes/quick/search").session(session).with(user("reader").roles("USER"))
     .param("_tenantView","current").param("q","Node")).andExpect(status().isConflict())

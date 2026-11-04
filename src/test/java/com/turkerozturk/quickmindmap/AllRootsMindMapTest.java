@@ -43,7 +43,7 @@ class AllRootsMindMapTest {
         assertThat(singleMermaid.get("rootParentNodeId")).isEqualTo(0L);
 
         MarkmapQuickMindMapController markmap = new MarkmapQuickMindMapController(
-                children, nodes, new ObjectMapper());
+                children, nodes, new ObjectMapper(), mock(com.turkerozturk.node.properties.NodePropertiesService.class));
         ExtendedModelMap markmapModel = new ExtendedModelMap();
         assertThat(markmap.showAllRoots(3, false, false, false, markmapModel))
                 .isEqualTo("markmap-quick-mind-map");

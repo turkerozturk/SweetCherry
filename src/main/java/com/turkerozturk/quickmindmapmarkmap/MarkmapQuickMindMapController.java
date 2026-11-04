@@ -9,12 +9,15 @@ import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.helpers.NodeIcon;
 import com.turkerozturk.node.Node;
 import com.turkerozturk.node.NodeRepository;
+import com.turkerozturk.node.properties.NodePropertiesService;
+import jakarta.servlet.http.HttpServletRequest;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.multipledatabases.TenantContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,15 +38,23 @@ public class MarkmapQuickMindMapController {
     private final ChildrenRepository childrenRepository;
     private final NodeRepository nodeRepository;
     private final ObjectMapper objectMapper;
+    private final NodePropertiesService properties;
 
     public MarkmapQuickMindMapController(
             ChildrenRepository childrenRepository,
             NodeRepository nodeRepository,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            NodePropertiesService properties
     ) {
         this.childrenRepository = childrenRepository;
         this.nodeRepository = nodeRepository;
         this.objectMapper = objectMapper;
+        this.properties = properties;
+    }
+
+    @ModelAttribute("markmapCanAdd")
+    public boolean canAddChildren(HttpServletRequest request) {
+        return request.isUserInRole("ADMIN") && properties.writable();
     }
 
     @GetMapping("/markmap-quick-mind-map/all")
@@ -214,6 +225,8 @@ public class MarkmapQuickMindMapController {
 
             ObjectNode payload = result.putObject("payload");
             payload.put("nodeId", treeNodeId);
+            // Creation must keep the exact occurrence id, including shared-only and 64-bit ids.
+            payload.put("parentId", Long.toString(treeNodeId));
             payload.put("bold", displayNode.isBoldnessBit());
 
             if (colors) {
