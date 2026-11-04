@@ -1,6 +1,6 @@
 # SweetCherry kurulum ve kullanım kılavuzu
 
-> Bu belge kaynak koddan derleme içindir. Hazır Windows paketini kullanmak için [kurulum kılavuzuna](installation.md) bakın. Kararlı kaynak için `v1.0.0` etiketini kullanabilirsiniz; `main` geliştirme dalıdır.
+> Bu belge kaynak koddan derleme içindir. Hazır Windows paketini kullanmak için [kurulum kılavuzuna](installation.md) bakın. Bu sürümün kaynağı için `v1.7.0` etiketini kullanabilirsiniz; `main` geliştirme dalıdır.
 
 ## SweetCherry nedir?
 
@@ -340,3 +340,8 @@ SQLite, MariaDB/MySQL ve PostgreSQL tenant geçişleri için [tenant dialect yö
 Bellek veya yükleme sınırlarıyla karşılaşırsanız:
 [Bellek, HTTP ve dosya sınırları](memory-and-transfer-limits.md).
 Veritabanları için [özel ikon](database-icons.md) tanımlanabilir.
+
+
+## Derleme çıktısını taşıma
+
+Derleme sonrasında oluşan `release/SweetCherry` klasörünün **tamamını** kullanın veya taşıyın. Yalnız JAR dosyasını almak, belgelenen ilk açılış için gereken örnek CTB, tenant tanımları, scriptler ve lisans belgelerini dışarıda bırakır. `release` altındaki uygulama klasörünün yapısını koruyun.

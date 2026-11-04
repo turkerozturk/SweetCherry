@@ -1,6 +1,6 @@
 # SweetCherry — third-party notices
 
-SweetCherry is distributed under GNU GPL v3 or later. See the root `LICENSE` and [application source](https://github.com/turkerozturk/SweetCherry). The application version and exact build commit are recorded in `windows-bundle.json` for each Windows package. License and attribution files are copied into the normal Maven distribution before bundling.
+SweetCherry is distributed under GNU GPL v3 or later. See the root `LICENSE` and [application source](https://github.com/turkerozturk/SweetCherry). The application version and exact build commit are recorded in `build-info.json` inside each application package. License and attribution files are copied into the normal Maven distribution before bundling.
 
 The original dependency and copied-asset license inventory was prepared for 1.0.0 and retained for 1.1.0. Later additions are documented below with their own license files and source references; the original inventory is a historical snapshot. Runtime license files accompany the actual Java runtime bundled by the Windows workflow.
 
@@ -37,7 +37,7 @@ CherryTree icon files were taken from CherryTree sources and converted/resized f
 
 ## Bundled Java runtime and packaging tools
 
-The runtime retains its own `runtime/NOTICE` and complete `runtime/legal/` directory. It identifies Eclipse Adoptium Temurin 17.0.20.1+1, JRE, Windows x64, principally GPL v2 with the Classpath Exception and component-specific notices. Its `runtime/release` records source revision `79597447bd94` in https://github.com/adoptium/jdk17u and build source revision `e6ba7dec3d07654074559310376a3ae89da5f4ac` in https://github.com/adoptium/temurin-build . Use those exact revisions for corresponding-source provenance.
+The Java-free portable ZIP omits the runtime. In the Windows setup package, the runtime retains its own `runtime/NOTICE` and complete `runtime/legal/` directory. It identifies Eclipse Adoptium Temurin 17.0.20.1+1, JRE, Windows x64, principally GPL v2 with the Classpath Exception and component-specific notices. Its `runtime/release` records source revision `79597447bd94` in https://github.com/adoptium/jdk17u and build source revision `e6ba7dec3d07654074559310376a3ae89da5f4ac` in https://github.com/adoptium/temurin-build . Use those exact revisions for corresponding-source provenance.
 
 Launch4j 3.50 creates the Windows launcher; its tool and generated wrapper have distinct licensing terms. The upstream current license reference included here is not asserted to be a byte-identical notice from the 3.50 tag. Consult https://launch4j.sourceforge.net/ and the upstream source. Inno Setup creates the installer; see https://jrsoftware.org/isinfo.php and https://jrsoftware.org/files/is/license.txt . Compiler tooling is not an application dependency.
 

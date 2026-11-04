@@ -1,4 +1,4 @@
-name: Windows x64 bundled distribution
+name: Portable distribution (Windows builder)
 on:
   workflow_dispatch:
 permissions:
@@ -45,24 +45,43 @@ jobs:
           "SC_RUNTIME_ARCHIVE=$archive" >> $env:GITHUB_ENV
           "SC_RUNTIME_SHA256=$($package.checksum)" >> $env:GITHUB_ENV
           "SC_RUNTIME_VERSION=$($metadata[0].release_name)" >> $env:GITHUB_ENV
-      - name: Build EXE and portable ZIP
+      - name: Build Windows setup and all-OS ZIP
         shell: pwsh
         run: |
           ./packaging/windows/build-bundle.ps1 -IsccPath $env:SC_ISCC -RuntimeArchive $env:SC_RUNTIME_ARCHIVE -RuntimeSha256 $env:SC_RUNTIME_SHA256 -RuntimeVersion $env:SC_RUNTIME_VERSION
+      - name: Verify Java-free ZIP and build metadata
+        shell: pwsh
+        run: |
+          $zip = @(Get-ChildItem dist/windows/sweetcherry_*_all_os_portable.zip)
+          if ($zip.Count -ne 1) { throw 'Expected one Java-free ZIP.' }
+          $verify = Join-Path $env:RUNNER_TEMP 'sweetcherry-portable-check'
+          Expand-Archive $zip[0].FullName $verify
+          $portable = Join-Path $verify 'SweetCherry'
+          if (Test-Path "$portable/runtime") { throw 'Portable ZIP contains Java.' }
+          if (!(Test-Path 'release/SweetCherry/runtime/bin/java.exe')) { throw 'Setup runtime was removed.' }
+          $info = Get-Content "$portable/build-info.json" -Raw | ConvertFrom-Json
+          $setupInfo = Get-Content 'release/SweetCherry/build-info.json' -Raw | ConvertFrom-Json
+          if ($info.packageRuntimeIncluded -ne $false -or $setupInfo.packageRuntimeIncluded -ne $true) { throw 'Incorrect runtime metadata.' }
+          Get-ChildItem release/SweetCherry -File -Recurse -Force | ForEach-Object {
+            $relative = [IO.Path]::GetRelativePath((Resolve-Path 'release/SweetCherry').Path, $_.FullName)
+            if ($relative -ne 'build-info.json' -and $relative -notmatch '^runtime[\\/]') {
+              $copy = Join-Path $portable $relative
+              if (!(Test-Path $copy) -or (Get-FileHash $_.FullName).Hash -ne (Get-FileHash $copy).Hash) { throw "Portable file changed/missing: $relative" }
+            }
+          }
       - name: Test installer and launcher without system Java
         shell: pwsh
         run: |
-          $installer = @(Get-ChildItem dist/windows/*-setup.exe)
+          $installer = @(Get-ChildItem dist/windows/sweetcherry_*_all_os_portable_with_java_and_setup.exe)
           if ($installer.Count -ne 1) { throw 'Expected one installer.' }
           ./packaging/windows/smoke-test.ps1 -InstallerPath $installer[0].FullName
       - uses: actions/upload-artifact@v4
         with:
-          name: SweetCherry-windows-x64-java17
+          name: sweetcherry-release-assets
           path: |
-            dist/windows/*-setup.exe
-            dist/windows/*-windows-x64.zip
-            dist/windows/*-notices.zip
-            dist/windows/SHA256SUMS.txt
-            release/SweetCherry/windows-bundle.json
+            dist/windows/sweetcherry_*_all_os_portable_with_java_and_setup.exe
+            dist/windows/sweetcherry_*_all_os_portable.zip
+            dist/windows/sweetcherry-*-third_party_licences.zip
+            dist/windows/sha256sums.txt
           if-no-files-found: error
           retention-days: 14

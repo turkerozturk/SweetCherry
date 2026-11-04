@@ -8,7 +8,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 ## Download and start
 
-[Download the latest stable release](https://github.com/turkerozturk/SweetCherry/releases/latest). The release page contains the Windows x64 installer and portable ZIP with Java 17 included. Windows users do not need to install Java separately. Extract the portable ZIP before running `SweetCherry.exe`.
+[Download the latest stable release](https://github.com/turkerozturk/SweetCherry/releases/latest). The release page contains an all-OS portable ZIP without Java and a Windows x64 setup EXE with Java 17. Extract the ZIP completely and use the appropriate run script with Java 17+ installed. The setup EXE includes Windows Java and needs no separate Java installation. See the installation guides for platform requirements.
 
 - [First-start help / İlk çalıştırma](documentation/tr/first-start.md)
 - [Installation and usage — English](documentation/en/setup-and-run.md)
@@ -38,7 +38,7 @@ Browse your notes in desktop and mobile web views, explore them as mind maps, ed
 
 ## Release information
 
-[Changelog](CHANGELOG.md) · [1.6.0 release notes](documentation/releases/v1.6.0.md) · [1.5.0 release notes](documentation/releases/v1.5.0.md) · [1.4.0 release notes](documentation/releases/v1.4.0.md) · [1.3.0 release notes](documentation/releases/v1.3.0.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
+[Changelog](CHANGELOG.md) · [1.7.0 release notes](documentation/releases/v1.7.0.md) · [1.6.0 release notes](documentation/releases/v1.6.0.md) · [1.5.0 release notes](documentation/releases/v1.5.0.md) · [1.4.0 release notes](documentation/releases/v1.4.0.md) · [1.3.0 release notes](documentation/releases/v1.3.0.md) · [1.2.0 release notes](documentation/releases/v1.2.0.md) · [1.1.0 release notes](documentation/releases/v1.1.0.md) · [Screenshot capture plan](documentation/images/1.1/README.md)
 
 Development builds are not currently published as a separate download channel. Use the stable release for ordinary use; source builds from `main` may include unreleased changes.
 

@@ -9,7 +9,7 @@ The four existing routes remain available:
 | `/cherrytemplatenode/pdf/<id>` | A4 landscape PDF with template header and page totals |
 | `/cherrytemplatenode/xlsx/<id>` | XLSX table |
 
-No CTB schema, stored notes, tags or timestamps are changed by reading/exporting these reports. Custom single-record layouts and placeholders are a later step.
+No CTB schema, stored notes, tags or timestamps are changed by reading/exporting these reports. [Custom single-record layouts and placeholders](record-layouts.md) are also available.
 
 ## Membership and fields
 

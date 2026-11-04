@@ -22,7 +22,7 @@ foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','THIRD-PARTY-N
 if ((Test-Path (Join-Path $bundle 'login-credentials.properties')) -or (Test-Path (Join-Path $bundle 'saved-filters'))) { throw 'Do not package an already-used distribution.' }
 if ((Get-FileHash $RuntimeArchive -Algorithm SHA256).Hash -ne $RuntimeSha256) { throw 'Runtime checksum mismatch.' }
 [xml]$pom = Get-Content (Join-Path $repo 'pom.xml') -Raw
-$version = [string]$pom.project.version
+$version = ([string]$pom.project.version).ToLowerInvariant()
 if ($version -notmatch '^(\d+)\.(\d+)\.(\d+)(?:-[A-Za-z0-9.-]+)?$') { throw "Unsupported project version: $version" }
 $fileVersion = "$($Matches[1]).$($Matches[2]).$($Matches[3]).0"
 New-Item $out -ItemType Directory -Force | Out-Null
@@ -67,13 +67,16 @@ $commit = (& git -C $repo rev-parse HEAD).Trim()
 @{
     applicationVersion=$version; commit=$commit; architecture='windows-x64'; java=$RuntimeVersion;
     runtimeArchiveSha256=$RuntimeSha256.ToLowerInvariant(); launch4j='3.50'; launch4jMavenPlugin='2.7.0';
-    innoSetup=(Get-Item $IsccPath).VersionInfo.FileVersion
-} | ConvertTo-Json | Set-Content "$bundle/windows-bundle.json" -Encoding utf8
+    innoSetup=(Get-Item $IsccPath).VersionInfo.FileVersion; packageRuntimeIncluded=$true
+} | ConvertTo-Json | Set-Content "$bundle/build-info.json" -Encoding utf8
 & $IsccPath "/DSourceDir=$bundle" "/DOutputDir=$out" "/DAppVersion=$version" "/DFileVersion=$fileVersion" "$PSScriptRoot/SweetCherry.iss"
 if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed.' }
-Compress-Archive -Path $bundle -DestinationPath "$out/SweetCherry-$version-windows-x64.zip" -Force
+& "$PSScriptRoot/package-portable.ps1" -BundlePath $bundle -DestinationPath "$out/sweetcherry_${version}_all_os_portable.zip"
 # Standalone attribution archive; identical notice files are already inside both application packages.
-Compress-Archive -Path @((Join-Path $bundle 'THIRD-PARTY-NOTICES.md'), (Join-Path $bundle 'licenses')) -DestinationPath "$out/SweetCherry-$version-notices.zip" -Force
-Get-ChildItem $out -File | Where-Object { $_.Extension -in @('.exe','.zip') } | ForEach-Object {
+Compress-Archive -Path @((Join-Path $bundle 'THIRD-PARTY-NOTICES.md'), (Join-Path $bundle 'licenses')) -DestinationPath "$out/sweetcherry-${version}-third_party_licences.zip" -Force
+# Hash only this build's three public products, never leftovers from another version.
+@("sweetcherry_${version}_all_os_portable.zip", "sweetcherry_${version}_all_os_portable_with_java_and_setup.exe", "sweetcherry-${version}-third_party_licences.zip") | ForEach-Object {
+    Get-Item (Join-Path $out $_)
+} | ForEach-Object {
     "$( (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() )  $($_.Name)"
-} | Set-Content "$out/SHA256SUMS.txt" -Encoding ascii
+} | Set-Content "$out/sha256sums.txt" -Encoding ascii

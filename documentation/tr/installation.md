@@ -1,11 +1,13 @@
-# SweetCherry 1.6.0 — hazır Windows paketini kullanma
+# SweetCherry 1.7.0 — hazır paketleri kullanma
 
-[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.6.0) Windows 10/11 **64 bit** için bir ürün dosyası indirin:
+[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.7.0) işletim sisteminize uygun kullanım biçimini seçin:
 
-- `SweetCherry-1.6.0-windows-x64-setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
-- `SweetCherry-1.6.0-windows-x64.zip`: tamamını çıkarıp `SweetCherry.exe` çalıştırabileceğiniz portable paket.
+- `sweetcherry_1.7.0_all_os_portable_with_java_and_setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
+- `sweetcherry_1.7.0_all_os_portable.zip`: Java içermeyen portable paket. Sisteminize/işlemcinize uygun Java 17+ kurulu olmalıdır.
 
-İkisinde de Java 17 vardır; ayrıca Java kurmanız gerekmez. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
+Yalnız setup EXE, Windows x64 Java 17 içerir; Windows 10/11 x64 üzerinde ayrıca Java kurmanız gerekmez. Adında all_os olsa da kurucu EXE ve içindeki Java yalnız Windows x64 içindir. ZIP tüm sistemlerin scriptlerini içerir: Windows için `run.bat`, Linux/Raspberry Pi için `sh ./launcher.sh` (masaüstü) veya `sh ./run.sh` (terminal), macOS için `sh ./run.command`. Klasörün tamamını çıkarıp birlikte tutun. ZIP içindeki `SweetCherry.exe` yanındaki Windows runtime klasörünü gerektirir; Java’sız ZIP’te `run.bat` kullanın. macOS ve 32 bit/i386 işletim sistemleri denenmemiştir; uygun Java yanında yerel SQLite/JDBC bağımlılıklarının da uyumu gerekir. Unix ZIP çıkarımında çalıştırma izni korunmazsa scriptleri `sh` ile çağırabilirsiniz. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
+
+Aşağıdaki kontrol penceresi adımları Windows kurucusu içindir; script ile başlatanlar parolayı yerel konsoldan veya oluşan parola dosyasından alabilir.
 
 1. Kurucuda Documents/Desktop gibi yazılabilir bir klasör seçin. Varsayılan, kurucunun yanındaki `SweetCherry` klasörüdür. Yönetici yetkisi gerekmez.
 2. Uygulamayı başlatın. Kontrol penceresinde başlangıç durumunu bekleyin; hazır olduğunda `http://localhost:8080` açılır. **Tarayıcıda Aç** düğmesi de kullanılabilir.
@@ -13,7 +15,7 @@
 4. Girişten sonra demo veri kaynağını seçin. Kendi notlarınızdan önce örnek CTB ile ekranları tanıyabilirsiniz.
 5. Kapatmak için kontrol penceresindeki **SweetCherry’yi Durdur**, tepsi menüsü veya web arayüzündeki yönetici kapatma seçeneğini kullanın. Tarayıcıyı kapatmak uygulamayı durdurmaz.
 
-EXE imzalanmamıştır; Windows uyarı gösterebilir. Dosyanın proje release sayfasından geldiğini kontrol edin. `SHA256SUMS.txt` dosya özetlerini içerir; yayıncı imzasının yerini tutmaz.
+EXE imzalanmamıştır; Windows uyarı gösterebilir. Dosyanın proje release sayfasından geldiğini kontrol edin. `sha256sums.txt` dosya özetlerini içerir; yayıncı imzasının yerini tutmaz.
 
 ## Kendi notlarınız
 

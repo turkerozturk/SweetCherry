@@ -1,17 +1,17 @@
-# SweetCherry 1.6.0 — installation and first use
+# SweetCherry 1.7.0 — installation and first use
 
 SweetCherry is an open-source web companion for CherryTree CTB note databases. It provides browser views, mind maps, editing, and exports. It does not replace CherryTree. The supported starting point is an unencrypted SQLite `.ctb` file; `.ctd`, `.ctx`, and `.ctz` files are outside this guide.
 
 ## Windows 10/11, 64-bit
 
-Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.6.0). Choose one product asset:
+Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.7.0). Choose one product asset:
 
 | Asset | Use |
 | --- | --- |
-| `SweetCherry-1.6.0-windows-x64-setup.exe` | Folder selection wizard and optional shortcuts |
-| `SweetCherry-1.6.0-windows-x64.zip` | Extract and run without an installation wizard |
+| `sweetcherry_1.7.0_all_os_portable_with_java_and_setup.exe` | Folder selection wizard and optional shortcuts |
+| `sweetcherry_1.7.0_all_os_portable.zip` | All-OS scripts and application; requires system Java 17+ |
 
-Both include a Windows x64 Java 17 runtime. You do not need to install Java. The automatically generated **Source code** archives contain source, not the ready-to-run application. Do not run the installer from inside a ZIP.
+Only the setup EXE includes Java 17 (Windows x64). The all-OS ZIP has no Java; install Java 17+ matching your OS/CPU and use its run scripts. Despite its filename, the setup EXE itself runs only on Windows 10/11 x64. The automatically generated **Source code** archives contain source, not the ready-to-run application. Do not run the installer from inside a ZIP.
 
 ### Installer
 
@@ -20,15 +20,15 @@ Both include a Windows x64 Java 17 runtime. You do not need to install Java. The
 3. Optionally create Desktop/Start menu shortcuts, then finish and start SweetCherry.
 4. The control window shows startup progress. When ready, the browser opens `http://localhost:8080`. You can also use **Open in Browser**.
 
-The EXE is unsigned; Windows may show a reputation warning. Confirm the download came from this project's release page. `SHA256SUMS.txt` provides the published file hashes. This does not claim that the EXE has a verified publisher signature.
+The EXE is unsigned; Windows may show a reputation warning. Confirm the download came from this project's release page. `sha256sums.txt` provides the published file hashes. This does not claim that the EXE has a verified publisher signature.
 
 ### Portable ZIP
 
-Extract the entire ZIP. Open the extracted `SweetCherry` folder and double-click `SweetCherry.exe`. Keep `runtime`, the JAR, scripts, and configuration together. Removing `runtime` prevents the EXE from starting.
+Extract the entire ZIP and keep the complete `SweetCherry` folder together. With Java 17+ installed, use `run.bat` on Windows, `sh ./launcher.sh` (desktop) or `sh ./run.sh` (terminal) on Linux/Raspberry Pi, and `sh ./run.command` on macOS. The included `SweetCherry.exe` requires the Windows runtime from the setup package; use `run.bat` for the Java-free ZIP. On Unix, invoking scripts with `sh` also works when ZIP extraction does not preserve executable permissions. The setup package creates a portable folder with Java; no uninstaller is registered.
 
 ## First login
 
-Click **Copy Admin Password** in the control window, paste into the browser password field and sign in; the administrator username is prefilled. First startup also creates `login-credentials.properties` in the application folder. See [first-start help](../tr/first-start.md#english) for local console output, Linux desktop launching and configuration defaults.
+When using the Windows control window, click **Copy Admin Password**, paste into the browser password field and sign in; the administrator username is prefilled. Script users can read the generated password in the local console or credentials file. First startup also creates `login-credentials.properties` in the application folder. See [first-start help](../tr/first-start.md#english) for local console output, Linux desktop launching and configuration defaults.
 
 | Account | Username | Password entry |
 | --- | --- | --- |
@@ -90,13 +90,13 @@ After stopping, you may copy or move the application folder. Recreate shortcuts 
 
 ## Other systems and source builds
 
-The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.6.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.6.0.zip), extract it, and run:
+The same Java-free ZIP is intended for Windows, Linux (including Raspberry Pi ARM), and macOS with a matching Java 17+ runtime and native dependencies. macOS and 32-bit/i386 systems have not been tested; Java portability alone does not guarantee native SQLite/JDBC compatibility. The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.7.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.7.0.zip), extract it, and run:
 
 - Windows: `first-run.bat`
 - Linux/Raspberry Pi: `sh ./first-run.sh`
 - macOS: `sh ./first-run.sh` or `first-run.command`
 
-The first build needs internet access to download Maven/dependencies. Scripts produce `release/SweetCherry`. Later, run its `run.bat`, Linux `launcher.sh` (desktop) / `run.sh` (terminal), or macOS `run.command` from that folder; rebuilding is unnecessary. On Linux, `sh ./release/SweetCherry/install-desktop.sh` creates optional per-user shortcuts. macOS has not been verified on a physical Mac.
+The first build needs internet access to download Maven/dependencies. Scripts produce `release/SweetCherry`. Use that entire generated folder, including data, tenant definitions, scripts, documentation and licences; copying only the JAR is insufficient for the documented first-use setup. Later, run its `run.bat`, Linux `launcher.sh` (desktop) / `run.sh` (terminal), or macOS `run.command` from that folder; rebuilding is unnecessary. On Linux, `sh ./release/SweetCherry/install-desktop.sh` creates optional per-user shortcuts. macOS has not been verified on a physical Mac.
 
 ## Troubleshooting and network access
 

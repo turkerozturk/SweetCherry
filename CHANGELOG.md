@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.7.0]
+
+- Publish a Java-free all-OS portable ZIP, Windows x64 setup with Java, clearly named third-party licences ZIP and lowercase checksums; keep build metadata inside the application packages.
+
 - Download custom single-record HTML layouts as offline A4 PDFs with embedded fonts/images, safe print CSS and page totals.
 
 - Add customizable single-record HTML layouts stored as Plain Text nodes under `_views`, bounded text-node placeholders, a configurable server-rendered clock, shared field diagnostics and confirmed example creation. Render sanitized layouts in an isolated frame without changing the CTB schema or existing report routes.

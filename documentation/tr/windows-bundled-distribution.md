@@ -1,10 +1,10 @@
-# Windows x64: Java içeren EXE ve portable ZIP
+# Dağıtım: Java’sız all-OS ZIP ve Java içeren Windows kurucusu
 
-Bu paket Windows 10/11 x64 içindir. 32-bit Windows ve ayrı ARM64 paketi henüz hedeflenmez. Kullanıcının Java kurması gerekmez. Geliştirme makinesinde Maven derlemesi için Java/JDK gereksinimi sürer.
+Setup EXE Windows 10/11 x64 içindir. Java’sız ZIP, aynı uygulama ve tüm işletim sistemi scriptlerini içerir. ZIP’i sisteminize uygun Java 17+ ile Windows, Linux/Raspberry Pi veya macOS üzerinde kullanabilirsiniz; macOS ve 32 bit sistemler denenmemiştir. 32-bit Windows ve ayrı ARM64 paketi henüz hedeflenmez. Kullanıcının Java kurması gerekmez. Geliştirme makinesinde Maven derlemesi için Java/JDK gereksinimi sürer.
 
 ## Mevcut klasör korunur
 
-Normal `mvnw.cmd clean package`, önceki gibi `release/SweetCherry` üretir. Windows paketleme adımı **bu klasöre** `SweetCherry.exe`, `SweetCherry.ico`, `runtime/` ve `windows-bundle.json` ekler. Dış YAML yoksa paketleme Maven’in filtrelenmiş `target/classes/application.yml` dosyasını buraya kopyalar. JAR, YAML, CTBDATA, allTenants, exportedFiles ve run scriptleri aynı yerde kalır. `run.bat` varsa yanındaki runtime’ı, yoksa sistem Java’sını kullanır. Linux/macOS scriptleri değişmez.
+Normal `mvnw.cmd clean package`, önceki gibi `release/SweetCherry` üretir. Windows paketleme adımı **bu klasöre** `SweetCherry.exe`, `SweetCherry.ico`, `runtime/` ve `build-info.json` ekler. Dış YAML yoksa paketleme Maven’in filtrelenmiş `target/classes/application.yml` dosyasını buraya kopyalar. JAR, YAML, CTBDATA, allTenants, exportedFiles ve run scriptleri aynı yerde kalır. `run.bat` varsa yanındaki runtime’ı, yoksa sistem Java’sını kullanır. Linux/macOS scriptleri değişmez.
 
 Launch4j EXE çalışma dizinini kendi klasörüne alır ve yalnız `runtime/` altında Java arar. Ana port 8443, ek HTTP portu 8080 ve tarayıcı açılması mevcut run scriptleriyle aynıdır. EXE varsayılanları JVM sistem özellikleridir; kullanıcı komut satırından `--server.port=...` gibi Spring seçenekleriyle bunları değiştirebilir. SSL ayarı yoksa bu portlar HTTP’dir. Sistem Java’sı veya PATH değiştirilmez. GUI çalıştırıcı konsol açmaz; sorun halinde `run.bat` ile tanı koyun ve `myapp.log` dosyasına bakın. İlk giriş bilgileri mevcut `login-credentials.properties` dosyasındadır; yayımlanan paket bu dosyayı içermez, ilk çalıştırmada oluşur.
 
@@ -14,7 +14,7 @@ Tek EXE çalıştırıcısı aynı anda ikinci bir örnek başlatmaz (Launch4j m
 
 Inno Setup EXE’si kendi bulunduğu klasörün altındaki `SweetCherry` klasörünü önerir. Kullanıcı yazılabilir başka bir klasör seçebilir. Yönetici yükseltmesi istenmez. EXE’nin yanına yazılamıyorsa Documents/Desktop gibi bir yer seçin; Program Files altında değiştirilebilir CTB tutmak önerilmez. Masaüstü ve Başlat menüsü kısayolları isteğe bağlıdır. Taskbar’a sabitleme Windows kullanıcısının işlemidir; kurucu bunu otomatik yapmaz.
 
-Portable dağıtım için kaldırıcı/kaldırma kaydı üretilmez. Silmek için uygulamayı kapatıp istenen dosyaları elle kaldırın; veri içeren klasörü bilinçsizce silmeyin. Klasör taşınınca kısayolları yeniden oluşturun. ZIP’in içindeki `SweetCherry` klasörünü çıkarıp EXE’ye çift tıklamak da aynı çalıştırma biçimidir.
+Portable dağıtım için kaldırıcı/kaldırma kaydı üretilmez. Silmek için uygulamayı kapatıp istenen dosyaları elle kaldırın; veri içeren klasörü bilinçsizce silmeyin. Klasör taşınınca kısayolları yeniden oluşturun. Java’sız ZIP’in tamamını çıkarın ve sistem Java 17+ ile `run.bat` kullanın; ZIP içinde runtime yoktur, `SweetCherry.exe` yalnız setup ile gelen runtime yanında çalışır.
 
 Güncellemeden önce uygulamayı kapatın. Kurucu mevcut `application.yml`, `CTBDATA/demo.ctb` ve `allTenants/demo.txt` dosyalarını değiştirmez; başka CTB/tenant dosyalarını ve `login-credentials.properties` dosyasını silmez. Uygulama/runtime dosyaları yenilenir. Korunan eski YAML’ye yeni ayarların gerektiğinde elle birleştirilmesi gerekir. ZIP’i kullanılan klasörün üzerine topluca açmak aynı koruma güvencesini vermez; yeni klasörde açıp kullanıcı dosyalarını bilinçli aktarın.
 
@@ -23,15 +23,15 @@ CTB dosyaları başka konumlarda kalabilir; mevcut tenant bağlantıları kullan
 ## GitHub Actions ile oluşturma
 
 1. Bu dosyaları push edin. Normal CI önceki gibi çalışır; yeni paketleme her push’ta çalışmaz.
-2. GitHub → Actions → **Windows x64 bundled distribution** → **Run workflow**. Geliştirme denemesinde main’i, release paketinde sürüm etiketini seçin. Dosya adının sürümü checkout’taki `pom.xml` sürümünden alınır.
+2. GitHub → Actions → **Portable distribution (Windows builder)** → **Run workflow**. Geliştirme denemesinde main’i, release paketinde sürüm etiketini seçin. Dosya adının sürümü checkout’taki `pom.xml` sürümünden alınır.
 3. Windows runner normal Maven `clean package` ile testleri çalıştırır. Temurin’in en güncel Java 17 Windows x64 JRE paketini resmi Adoptium API üzerinden çözer; yayımlanan SHA-256 ile indirilen dosyayı doğrular. Tam runtime’ın lisans/legal dosyaları korunur.
-4. Launch4j EXE, `windows-launcher` Maven profilindeki `launch4j-maven-plugin:2.7.0` ile oluşturulur. Plugin Launch4j 3.50 core ve platform araçlarını Maven repository üzerinden çözer; SourceForge ZIP indirmesi yapılmaz. Normal `clean package` bu plugini çalıştırmaz; bundle scripti yalnız ilgili Maven goal’u çağırır. Runner’da Inno Setup 6 bulunmalıdır; yoksa açık hata ile durur. Araç ve runtime sürümleri `windows-bundle.json` içinde kaydedilir.
+4. Launch4j EXE, `windows-launcher` Maven profilindeki `launch4j-maven-plugin:2.7.0` ile oluşturulur. Plugin Launch4j 3.50 core ve platform araçlarını Maven repository üzerinden çözer; SourceForge ZIP indirmesi yapılmaz. Normal `clean package` bu plugini çalıştırmaz; bundle scripti yalnız ilgili Maven goal’u çağırır. Runner’da Inno Setup 6 bulunmalıdır; yoksa açık hata ile durur. Araç ve runtime sürümleri `build-info.json` içinde kaydedilir.
 5. Sihirbaz geçici klasöre sessiz kurulup varolan kullanıcı dosyalarını koruduğu kontrol edilir. Boşluk ve Türkçe karakterli klasörde, farklı çalışma dizininden, sistem JAVA_HOME/PATH olmadan **üretilen EXE** başlatılır ve localhost giriş sayfasının HTTP 200 dönmesi ve giriş alanlarını içermesi doğrulanır; boş tenant fixture’ı için genel sağlık yanıtı ayrıca tanı amacıyla loglanır. Sadece CI test süreci test sonunda kapatılır; kullanıcı süreçlerine uygulanmaz.
-6. Başarılı artifact’ten şunları indirin: `SweetCherry-<version>-windows-x64-setup.exe`, `SweetCherry-<version>-windows-x64.zip`, `SHA256SUMS.txt`, `windows-bundle.json`. Artifact 14 gün tutulur; kalıcı dağıtım için GitHub Release’e dosyaları yükleyin. İş akışı release veya tag oluşturmaz/yayımlamaz.
+6. Başarılı artifact’ten şunları indirin: `sweetcherry_<version>_all_os_portable_with_java_and_setup.exe`, `sweetcherry_<version>_all_os_portable.zip`, `sweetcherry-<version>-third_party_licences.zip`, `sha256sums.txt`. Artifact 14 gün tutulur; kalıcı dağıtım için GitHub Release’e dosyaları yükleyin. İş akışı release veya tag oluşturmaz/yayımlamaz.
 
 Artifact indirmesi GitHub’ın dış ZIP’ini verir; bunun içindeki **ürün ZIP’i** portable dağıtımdır. Kaynak kod ZIP’i Java içeren ürün değildir. GitHub Releases birden fazla asset kabul eder; dosya başına sınır 2 GiB’dir. JAR/runtime sıkıştırılsa da kesin boyut derleme sonucuyla ölçülür; `jlink` küçültmesi şimdilik yoktur.
 
-Runtime en güncel Java 17 olarak seçildiğinden aynı commit farklı tarihlerde farklı runtime alabilir. Yayımlanan `windows-bundle.json` sürüm ve checksum’ı kaydeder; tam tekrar üretim için o belirli runtime arşivini kullanın. Java güvenlik güncellemeleri sonrasında yeni dağıtım yayımlanmalıdır; kullanıcının sistem Java’sını güncellemesi bu runtime’ı güncellemez.
+Runtime en güncel Java 17 olarak seçildiğinden aynı commit farklı tarihlerde farklı runtime alabilir. Paket içindeki `build-info.json` sürüm ve checksum’ı kaydeder; tam tekrar üretim için o belirli runtime arşivini kullanın. Java güvenlik güncellemeleri sonrasında yeni dağıtım yayımlanmalıdır; kullanıcının sistem Java’sını güncellemesi bu runtime’ı güncellemez.
 
 ## Yerel paketleme (isteğe bağlı)
 
@@ -74,3 +74,10 @@ Durdurma Spring context'i kapatır; mevcut graceful shutdown kullanılır. Web a
 CI sunucu smoke testi GUI'yi kapatarak çalışır. Gerçek Windows testinde başlangıç penceresi, tarayıcı, arka planda çalışma, tepsiden geri açma, pencereden/webden kapatma ve dolu portta hata mesajı kontrol edilmelidir. EXE mutex'i ikinci sunucu sürecini engellemeye devam eder; ikinci tıklama mevcut kontrol penceresini öne getirmez, tepsi kullanılır.
 
 Kontrol penceresi varsayılan kullanıcı adlarının `admin` / `user` olduğunu ve şifrelerin `login-credentials.properties` dosyasında bulunduğunu kalıcı olarak açıklar. `admin.password` kullanıcı adı değil ayar anahtarıdır. **Uygulama Klasörü** düğmesi dosyanın bulunduğu klasörü açar; şifreler kontrol penceresinde veya loglarda gösterilmez. YAML'deki özel kullanıcı adı/şifre ayarları varsa onlar önceliklidir. Dosyada şifre değişikliği yeniden başlatmadan sonra geçerli olur. Windows'ta **Logu Aç** Notepad kullanır, `.log` dosya ilişkilendirmesine dayanmaz. Web menüsündeki kapatma düğmesi tüm kullanıcıların erişiminin kesileceğini bildiren onay ister; sunucudaki POST/CSRF/admin kontrolleri korunur.
+
+
+## Yeni asset düzeni
+
+Java’sız ZIP ayrı staging klasöründen, yalnız `runtime/` çıkarılarak üretilir; kurucunun kaynak klasörü ve Java’sı korunur. `build-info.json` iki paketin içinde bulunur, ayrı asset değildir. `architecture` ve `java` alanları Windows paketleme runtime’ını tanımlar; `packageRuntimeIncluded` ZIP’te false, setup klasöründe true olur. ZIP’teki EXE Windows’a özgüdür ve runtime ister; diğer scriptler sistem Java’sını kullanır.
+
+`THIRD-PARTY-NOTICES.md`, `licenses/` ve uygulamanın `LICENSE` dosyası her iki pakette korunur. Ayrı `sweetcherry-<version>-third_party_licences.zip` hızlı erişim için ek kopyadır; kullanıcıların bunu ayrıca indirmesi gerekmez. Eski `finalize-release-notices.ps1` yalnız 1.0.0 taslağına ait tarihsel repack aracıdır, yeni sürümlerde kullanılmaz.
