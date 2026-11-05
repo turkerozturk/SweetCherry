@@ -1,10 +1,14 @@
-# Bundled quick-start guide; read-only to preserve the original instructions.
 name=SweetCherry Quick Start (EN)
 security-role=ADMIN
 datasource.url=jdbc:sqlite:CTBDATA/sweetcherry-quickstart-en.ctb
 datasource.driver-class-name=org.sqlite.JDBC
-custom.isWritable=false
+# datasource.username=admin
+# datasource.password=admin
+custom.isWritable=true
 custom.allowLegacySchemaUpgrade=false
-custom.newNodeName=New Node
+custom.newNodeName=Click the Properties and Edit buttons
 custom.newNodeTags=
+# Shared size limit for rich-text images and attachments (decimal MB, 1-20).
 custom.maxEmbeddedFileSizeMB=9
+custom.allowLegacySchemaUpgrade=false
+custom.databaseIcon=CT_EN
