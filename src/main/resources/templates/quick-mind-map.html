@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title th:text="${rootNodeName} + ' - Quick Mind Map'">
+    <title th:text="#{quickmap.mermaidTitle(${rootNodeName})}">
         Quick Mind Map
     </title>
 
@@ -90,31 +90,31 @@
         <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
 
         <span class="badge text-bg-secondary"
-              th:text="${rootNodeId == 0 ? 'Tüm üst düğümler' : 'Node ' + rootNodeId}">
+              th:text="${rootNodeId == 0 ? #messages.msg('quickmap.allRoots') : #messages.msg('quickmap.node', rootNodeId)}">
             Node
         </span>
 
         <a class="btn btn-sm btn-outline-primary" th:if="${rootNodeId != 0}"
-           th:href="@{/quick-mind-map/all(level=${maximumLevel},icons=${icons},colors=${colors},foldChat=${foldChat})}">Tüm düğümler</a>
+           th:href="@{/quick-mind-map/all(level=${maximumLevel},icons=${icons},colors=${colors},foldChat=${foldChat})}" th:text="#{quickmap.allNodes}">All nodes</a>
 
         <span class="badge text-bg-light border"
-              th:text="'Level ' + ${maximumLevel}">
+              th:text="#{quickmap.levelValue(${maximumLevel})}">
             Level
         </span>
 
         <span th:if="${foldChat}"
-              class="badge text-bg-light border">
-            chat dalları kapalı
+              class="badge text-bg-light border" th:text="#{quickmap.foldChat}">
+            Chat branches initially folded
         </span>
 
         <span th:if="${colors}"
-              class="badge text-bg-light border">
-            renkler açık
+              class="badge text-bg-light border" th:text="#{quickmap.colorsOn}">
+            Colors enabled
         </span>
 
         <span th:if="${icons}"
-              class="badge text-bg-warning">
-            ikon sınıfları açık
+              class="badge text-bg-warning" th:text="#{quickmap.iconsOn}">
+            Icons enabled
         </span>
     </div>
 
@@ -124,7 +124,7 @@
                   class="d-flex flex-wrap align-items-center gap-2"
                   th:action="@{/quick-mind-map/{nodeId}(nodeId=${rootNodeId == 0 ? 'all' : rootNodeId})}">
 
-                <label for="level" class="small mb-0">Level</label>
+                <label for="level" class="small mb-0" th:text="#{quickmap.level}">Level</label>
                 <input id="level"
                        class="form-control form-control-sm"
                        style="width: 5rem"
@@ -134,25 +134,25 @@
                        step="1"
                        th:value="${maximumLevel}">
 
-                <label for="icons" class="small mb-0 ms-1">İkon</label>
+                <label for="icons" class="small mb-0 ms-1" th:text="#{quickmap.icons}">İkon</label>
                 <select id="icons"
                         class="form-select form-select-sm w-auto"
                         name="icons">
-                    <option value="true" th:selected="${icons}">Göster</option>
-                    <option value="false" th:selected="${!icons}">Gizle</option>
+                    <option value="true" th:selected="${icons}" th:text="#{quickmap.show}">Göster</option>
+                    <option value="false" th:selected="${!icons}" th:text="#{quickmap.hide}">Gizle</option>
                 </select>
 
-                <label for="colors" class="small mb-0 ms-1">Renk</label>
+                <label for="colors" class="small mb-0 ms-1" th:text="#{quickmap.colors}">Renk</label>
                 <select id="colors"
                         class="form-select form-select-sm w-auto"
                         name="colors">
-                    <option value="true" th:selected="${colors}">Göster</option>
-                    <option value="false" th:selected="${!colors}">Gizle</option>
+                    <option value="true" th:selected="${colors}" th:text="#{quickmap.show}">Göster</option>
+                    <option value="false" th:selected="${!colors}" th:text="#{quickmap.hide}">Gizle</option>
                 </select>
 
                 <input type="hidden" name="foldChat" th:value="${foldChat}">
 
-                <button type="submit" class="btn btn-sm btn-primary">
+                <button type="submit" class="btn btn-sm btn-primary" th:text="#{quickmap.apply}">
                     Uygula
                 </button>
             </form>
@@ -195,6 +195,8 @@ mindmap
         const contentBaseUrl = /*[[@{/quick-node-content/}]]*/ '/quick-node-content/';
         const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
         const zeroIconUrl = /*[[@{/img/icons/zero.svg}]]*/ '/img/icons/zero.svg';
+        const openContentLabel = /*[[#{quickmap.openContent}]]*/ 'Open node content in a new tab';
+        const contentIconLabel = /*[[#{quickmap.contentIcon}]]*/ 'Open content';
 
         mermaid.initialize({
             startOnLoad: false,
@@ -247,7 +249,7 @@ mindmap
                 link.href = contentBaseUrl + encodeURIComponent(contentNodeId);
                 link.target = '_blank';
                 link.rel = 'noopener';
-                link.title = 'Düğüm içeriğini yeni sekmede aç';
+                link.title = openContentLabel;
 
                 const image = document.createElement('img');
                 image.className = hasVisibleNodeIcon
@@ -256,7 +258,7 @@ mindmap
                 image.src = hasVisibleNodeIcon
                     ? iconBaseUrl + encodeURIComponent(iconName) + '.png'
                     : zeroIconUrl;
-                image.alt = 'İçeriği aç';
+                image.alt = contentIconLabel;
                 image.dataset.iconName = iconName || 'zero';
 
                 link.append(image);

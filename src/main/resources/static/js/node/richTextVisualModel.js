@@ -14,14 +14,18 @@
             if (node.nodeType === 3) { add(node.nodeValue, inherited, node); return; }
             if (node.nodeType !== 1) return;
             if (node.dataset && node.dataset.richCaret) {
+                let attributes=inherited;
+                if(node.dataset.richAttributes) {
+                    try { attributes=JSON.parse(node.dataset.richAttributes); } catch (_) { /* retain inherited formatting */ }
+                }
                 const start = offset;
                 for (const child of node.childNodes) {
                     if (child.nodeType === 3) {
                         const value = child.nodeValue.replace(/\u200B/g,'');
                         const from = offset;
-                        if (value) add(value, inherited);
+                        if (value) add(value, attributes);
                         positions.set(child,{start:from,end:offset,caret:true});
-                    } else visit(child,inherited);
+                    } else visit(child,attributes);
                 }
                 positions.set(node,{start,end:offset,boundaries:[start,offset]});
                 return;
@@ -74,7 +78,11 @@
     function restore(editor,start,end) {
         const model = scan(editor), doc = editor.ownerDocument;
         function point(position) {
-            for (const [node, record] of model.positions) {
+            // A collapsed caret at a link/object boundary belongs to its neutral landing pad.
+            const pad=start===end ? [...model.positions].find(([node,record])=>
+                node.nodeType===3 && record.caret && record.start===position && record.end===position) : null;
+            const positions=pad ? [pad,...model.positions] : model.positions;
+            for (const [node, record] of positions) {
                 if (node.nodeType === 3 && position >= record.start && position <= record.end) {
                     if (record.caret) {
                         let offset=0, length=0;

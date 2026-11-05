@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title th:text="${node.name} + ' - İçerik'">Düğüm içeriği</title>
+    <title th:text="#{quickcontent.title(${node.name})}">Düğüm içeriği</title>
 
     <div th:replace="~{common/meta :: headerCssLibraries}"></div>
 
@@ -113,22 +113,22 @@
             th:text="${node.name}">Düğüm</h1>
 
         <span class="badge text-bg-secondary"
-              th:text="'Node ' + ${requestedNodeId}">Node</span>
+              th:text="#{quickmap.node(${requestedNodeId})}">Node</span>
 
         <span th:if="${isAlias}"
               class="badge text-bg-warning"
-              th:text="'Alias → ' + ${contentNodeId}">Alias</span>
+              th:text="#{quickcontent.alias(${contentNodeId})}">Alias</span>
 
         <a class="btn btn-sm btn-outline-secondary"
            target="_blank"
            rel="noopener"
-           th:href="@{/nodes/{nodeId}(nodeId=${requestedNodeId})}">
+           th:href="@{/nodes/{nodeId}(nodeId=${requestedNodeId})}" th:text="#{quickcontent.fullPage}">
             Tam sayfa
         </a>
 
         <button type="button"
                 class="btn btn-sm btn-outline-secondary"
-                onclick="window.close()">
+                onclick="window.close()" th:text="#{quickcontent.close}">
             Kapat
         </button>
     </header>
@@ -136,7 +136,7 @@
     <article class="card shadow-sm">
         <div class="card-body quick-node-content">
             <div th:if="${hasEmptyContent}"
-                 class="text-secondary text-center py-4">
+                 class="text-secondary text-center py-4" th:text="#{quickcontent.empty}">
                 Bu düğümün içeriği boş.
             </div>
 
@@ -161,12 +161,13 @@
 
 <script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/highlight.min.js}"></script>
 <script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/cherry-highlight.js}"></script>
-<script>
+<script th:inline="javascript">
     (() => {
         'use strict';
 
+        const openImageLabel = /*[[#{quickcontent.openImage}]]*/ 'Open original image in a new tab';
         document.querySelectorAll('.quick-node-content img').forEach(image => {
-            image.title = image.title || 'Gerçek boyutta yeni sekmede aç';
+            image.title = image.title || openImageLabel;
             image.tabIndex = 0;
 
             const openImage = () => {

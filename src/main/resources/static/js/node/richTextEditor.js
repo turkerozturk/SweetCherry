@@ -144,7 +144,7 @@
             }
             offset = finish;
         }
-        delete attributes.__sweet_object;
+        attributes = window.RichTextEditorSupport.insertionAttributes(runs,start,end);
         runs = [...before, ...(text ? [{text, attributes}] : []), ...after];
         return true;
     }
@@ -162,8 +162,8 @@
     });
 
     /** Applies a property only to selected text; alignment covers all touched paragraphs. */
-    function format(key, value, toggle = false) {
-        let [start, end] = selection;
+    function format(key, value, toggle = false, targetRange = null) {
+        let [start, end] = targetRange || selection;
         if (start === end) { document.getElementById('selectionHint').hidden = false; return; }
         captureSelection();
         if (key === 'justification') {
@@ -189,7 +189,9 @@
         }
         const remove = toggle && selected.every(run => run.attributes[key] === value);
         for (const run of selected) {
-            if (key === 'externalLinkRemove') {
+            if (key === 'linkRemove') {
+                delete run.attributes.link;
+            } else if (key === 'externalLinkRemove') {
                 if ((run.attributes.link || '').startsWith('webs ')) delete run.attributes.link;
             } else if (key === 'clear') {
                 for (const property of ['weight','style','underline','strikethrough','family','foreground','background','scale','justification']) delete run.attributes[property];
@@ -230,6 +232,17 @@
         const url=new URL(value);
         if (!['http:','https:'].includes(url.protocol) || !url.hostname || url.username || url.password || url.href.length>4091) throw new Error('Invalid URL');
         return url.href;
+    }
+    const dismissLink=document.getElementById('richDismissLink');
+    if(dismissLink) {
+        dismissLink.addEventListener('pointerdown',event=>event.preventDefault());
+        dismissLink.addEventListener('click',()=>{
+            if(composing)return;
+            rememberSelection();
+            const range=selection[0]===selection[1]
+                ? window.RichTextEditorSupport.linkRange(runs,selection[0]) : [...selection];
+            if(range)format('linkRemove','',false,range);
+        });
     }
     const autoLink=document.getElementById('richAutoLink');
     if(autoLink)autoLink.addEventListener('click',()=>{
@@ -412,7 +425,13 @@
             }
             paragraph = document.createElement('div'); paragraph.style.margin = '0';
         }
-        for (const run of runs) {
+        const caret = (attributes = {}) => {
+            const span = document.createElement('span'); span.dataset.richCaret = 'true';
+            span.dataset.richAttributes = JSON.stringify(attributes);
+            span.appendChild(document.createTextNode('\u200B')); return span;
+        };
+        for (let runIndex=0; runIndex<runs.length; runIndex++) {
+          const run=runs[runIndex];
           if (run.attributes.__sweet_object) {
             modelOffset += count(run.text);
             const key = run.attributes.__sweet_object;
@@ -427,10 +446,6 @@
                 image.alt = object.label; image.style.maxWidth = '100%'; image.style.maxHeight = '220px';
                 image.draggable = false; slot.appendChild(image);
             } else slot.textContent = '[' + object.label + ']';
-            const caret = () => {
-                const span = document.createElement('span'); span.dataset.richCaret = 'true';
-                span.appendChild(document.createTextNode('\u200B')); return span;
-            };
             if (object.codebox && openCodebox) {
                 const code=codeboxChanges[key] || object.codebox;
                 const source=document.createElement('pre');source.textContent=code.text;
@@ -490,6 +505,11 @@
                 paragraph.appendChild(span);
             }
             if (index < lines.length - 1) flush(true);
+          }
+          const link=run.attributes.link;
+          if(visual() && run.text && link && runs[runIndex+1]?.attributes.link!==link) {
+              const attributes={...run.attributes};delete attributes.link;
+              paragraph.appendChild(caret(attributes));
           }
         }
         flush(true);

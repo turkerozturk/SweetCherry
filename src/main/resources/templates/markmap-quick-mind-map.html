@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title th:text="${rootNodeName} + ' - Markmap Quick Mind Map'">
+    <title th:text="#{quickmap.markmapTitle(${rootNodeName})}">
         Markmap Quick Mind Map
     </title>
 
@@ -34,6 +34,16 @@
             overflow: hidden;
         }
 
+        .markmap-page-only { padding: 0 !important; }
+        .markmap-page-only .mind-map-toolbar { display: none !important; }
+        .markmap-page-only .mind-map-panel { border: 0; border-radius: 0; }
+        #markmapCanvasToggle {
+            position: absolute; top: 8px; right: 8px; z-index: 2;
+            width: 32px; height: 32px; padding: 5px;
+            background: rgba(255,255,255,.92); color: #343a40;
+            border: 1px solid #adb5bd; border-radius: 4px;
+        }
+        #markmapCanvasToggle:focus-visible { outline: 2px solid #0d6efd; outline-offset: 2px; }
         .mind-map-toolbar {
             flex: 0 0 auto;
         }
@@ -165,14 +175,14 @@
         <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
 
         <span class="badge text-bg-secondary"
-              th:text="${rootNodeId == 0 ? 'Tüm üst düğümler' : 'Node ' + rootNodeId}">Node</span>
+              th:text="${rootNodeId == 0 ? #messages.msg('quickmap.allRoots') : #messages.msg('quickmap.node', rootNodeId)}">Node</span>
 
         <a class="btn btn-sm btn-outline-primary" th:if="${rootNodeId != 0}"
-           th:href="@{/markmap-quick-mind-map/all(level=${maximumLevel},icons=${icons},colors=${colors},foldChat=${foldChat})}">Tüm düğümler</a>
+           th:href="@{/markmap-quick-mind-map/all(level=${maximumLevel},icons=${icons},colors=${colors},foldChat=${foldChat})}" th:text="#{quickmap.allNodes}">All nodes</a>
 
         <span th:if="${foldChat}"
-              class="badge text-bg-light border">
-            chat dalları başlangıçta kapalı
+              class="badge text-bg-light border" th:text="#{quickmap.foldChat}">
+            Chat branches initially folded
         </span>
 
         <form class="d-flex flex-wrap align-items-center gap-1 ms-md-auto mind-map-controls"
@@ -183,7 +193,7 @@
                    name="foldChat"
                    th:value="${foldChat}">
 
-            <label for="level" class="small mb-0 ms-1">Seviye</label>
+            <label for="level" class="small mb-0 ms-1" th:text="#{quickmap.level}">Seviye</label>
             <input id="level"
                    class="form-control form-control-sm mind-map-level"
                    type="number"
@@ -192,23 +202,23 @@
                    step="1"
                    th:value="${maximumLevel}">
 
-            <label for="icons" class="small mb-0 ms-1">İkon</label>
+            <label for="icons" class="small mb-0 ms-1" th:text="#{quickmap.icons}">İkon</label>
             <select id="icons"
                     class="form-select form-select-sm mind-map-toggle"
                     name="icons">
-                <option value="true" th:selected="${icons}">Göster</option>
-                <option value="false" th:selected="${!icons}">Gizle</option>
+                <option value="true" th:selected="${icons}" th:text="#{quickmap.show}">Göster</option>
+                <option value="false" th:selected="${!icons}" th:text="#{quickmap.hide}">Gizle</option>
             </select>
 
-            <label for="colors" class="small mb-0 ms-1">Renk</label>
+            <label for="colors" class="small mb-0 ms-1" th:text="#{quickmap.colors}">Renk</label>
             <select id="colors"
                     class="form-select form-select-sm mind-map-toggle"
                     name="colors">
-                <option value="true" th:selected="${colors}">Göster</option>
-                <option value="false" th:selected="${!colors}">Gizle</option>
+                <option value="true" th:selected="${colors}" th:text="#{quickmap.show}">Göster</option>
+                <option value="false" th:selected="${!colors}" th:text="#{quickmap.hide}">Gizle</option>
             </select>
 
-            <button type="submit" class="btn btn-sm btn-primary">
+            <button type="submit" class="btn btn-sm btn-primary" th:text="#{quickmap.apply}">
                 Uygula
             </button>
         </form>
@@ -216,9 +226,16 @@
 
     <div class="card shadow-sm mind-map-panel">
         <div class="card-body">
+            <button type="button" id="markmapCanvasToggle" aria-pressed="false"
+                    th:title="#{quickmap.expandPage}" th:aria-label="#{quickmap.expandPage}"
+                    th:attr="data-expand=#{quickmap.expandPage},data-restore=#{quickmap.restorePage}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>
+                </svg>
+            </button>
             <svg id="markmap"
                  role="group"
-                 th:attr="aria-label=${rootNodeName} + ' düşünce haritası'">
+                 th:attr="aria-label=#{quickmap.canvasLabel(${rootNodeName})}">
             </svg>
         </div>
     </div>
@@ -249,6 +266,8 @@
 </div>
 <script th:if="${markmapCanAdd}" th:src="@{/js/markmap/quickChild.js}"></script>
 
+<script th:src="@{/js/markmap/canvasView.js}"></script>
+
 <!-- Markmap View, tarayıcı sürümünde global d3 nesnesini kullanır. -->
 <script th:src="@{/js/thirdparty/markmap/d3.min.js}"></script>
 <script th:src="@{/js/thirdparty/markmap/markmap-view.min.js}"></script>
@@ -268,6 +287,8 @@
         const contentBaseUrl = /*[[@{/quick-node-content/}]]*/ '/quick-node-content/';
         const iconBaseUrl = /*[[@{/img/ctbicons/}]]*/ '/img/ctbicons/';
         const zeroIconUrl = /*[[@{/img/icons/zero.svg}]]*/ '/img/icons/zero.svg';
+        const openContentLabel = /*[[#{quickmap.openContent}]]*/ 'Open node content in a new tab';
+        const contentIconLabel = /*[[#{quickmap.contentIcon}]]*/ 'Open content';
         const viewScaleStorageKey = 'sweetCherry.markmap.viewScale';
         const defaultViewScale = 1;
         const data = JSON.parse(dataJson);
@@ -423,12 +444,12 @@
                     '<a class="markmap-content-link" href="'
                     + escapeHtmlAttribute(contentUrl)
                     + '" target="_blank" rel="noopener"'
-                    + ' title="Düğüm içeriğini yeni sekmede aç">'
+                    + ' title="' + escapeHtmlAttribute(openContentLabel) + '">'
                     + '<img class="'
                     + iconClasses
                     + '" src="'
                     + escapeHtmlAttribute(iconUrl)
-                    + '" alt="İçeriği aç"'
+                    + '" alt="' + escapeHtmlAttribute(contentIconLabel) + '"'
                     + ' data-icon-name="'
                     + escapeHtmlAttribute(safeIconName)
                     + '"></a>';

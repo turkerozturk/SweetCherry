@@ -16,3 +16,7 @@ Hata durumunda yazdığınız ad diyalogda kalır. Doğrulama hatasını düzelt
 2. Seviye sınırındaki bir düğümde ve kapalı `chat` dalında deneyin. Yeni çocuk yenilenen haritada görünmeli. Ad ve ikon bağlantıları önceki gibi çalışmalı.
 3. Tab + Enter/Space ile açın, Enter ile kaydedin; başka bir girişi Escape ile iptal edin. Telefonda + üzerine gelmeden görünmeli.
 4. USER veya salt-okunur bağlantıda ekleme kontrolleri görünmemeli. Eski diyalog açıkken başka sekmeden veritabanı değiştirip kayıt deneyin; yeni seçilen veritabanında düğüm oluşmamalı.
+
+## Sayfayı kaplayan harita
+
+Köşedeki genişlet simgesi araç çubuğunu gizleyip haritayı web sayfasının tamamına yayar; tarayıcı tam ekranına geçmez. Aynı düğme veya Escape normal görünüme döndürür. Açık diyalog varsa Escape önce o diyaloğu kapatır. Her yüklemede varsayılan normal görünümdür; görünüm değiştirmek haritanın zoom veya verisini sıfırlamaz.

@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Localize quick Markmap/Mermaid and quick-content pages; add an optional page-filling Markmap canvas toggle with Escape restoration.
+- Stop hyperlink inheritance at the right edge in the rich-text editor, including composition input, and add one-click link dismissal with undo/redo while preserving text and formatting.
+
 - Add hover/focus/touch child creation to Markmap with a name-only dialog, existing guarded quick-note writes, exact shared-occurrence parent IDs and refresh/reveal after confirmed save.
 
 ## [1.7.0]

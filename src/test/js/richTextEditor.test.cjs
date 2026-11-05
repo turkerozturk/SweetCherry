@@ -15,7 +15,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
             setAttribute() {}, contains(target) { return this.childNodes.some(n => n === target || n.contains && n.contains(target)); },
             focus() {}, setSelectionRange(start, end) {this.selectionStart = start; this.selectionEnd = end;}};
     }
-    const ids = Object.fromEntries(['richPasteImage','richClipboardHint','richAutoLink','richAutoLinkError','richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
+    const ids = Object.fromEntries(['richDismissLink','richPasteImage','richClipboardHint','richAutoLink','richAutoLinkError','richSeparator','richObjects','richAllowDeletion','richDeletionIcon','richObjectDialog','richObjectList','richObjectDelete','richObjectCancel','richDeleted','richDeletionHint','richText','richPreview','richEditForm','selectionHint','richXml','clearFormat','richUndo','richRedo','richImages','richAddImage','richImageFile','richImageStatus','richFiles','richAddFile','richFilePicker','richLink','richLinkDialog','richLinkUrl','richLinkError','richLinkApply','richLinkRemove','richLinkCancel','richTables','richTable','richTableDialog','richTableRows','richTableColumns','richTableCells','richTableError','richTableApply','richTableResize','richTableCancel','richPreviewTitle','richTextLabel'].map(id => [id, element(id)]));
     if (options.codeboxes) {
         for (const id of ['richCodebox','richCodeboxDialog','richCodeboxText','richCodeboxSearch','richCodeboxLanguages','richCodeboxSelected','richCodeboxError','richCodeboxCancel','richCodeboxApply','richCodeboxes']) ids[id]=element(id);
         ids.richCodeboxLanguages.querySelectorAll=()=>[];
@@ -418,4 +418,36 @@ test('rich recovery preserves formatted history and staged image metadata/payloa
  fresh.runs();assert.equal(Object.keys(JSON.parse(fresh.ids.richImages.value)).length,1);
  fresh.key('z');assert.equal(fresh.ids.richText.value,'A😀B\nC');assert.equal(fresh.runs()[1].attributes.weight,'heavy');
  fresh.key('z');assert.equal(fresh.dirty(),false);fresh.key('y');fresh.key('y');assert.equal(fresh.ids.richText.value.startsWith('\uFFFC'),true);
+});
+
+
+test('typing at a link right edge is plain text, while typing inside a formatted link keeps it',()=>{
+ for(const link of ['webs https://example.org','node 42']) {
+  const initial=[{text:'😀a',attributes:{link,weight:'heavy'}},{text:'b',attributes:{link,style:'italic'}}];
+  const end=editor(initial);end.select(4,4);end.type('😀ab suffix');
+  const saved=end.runs();assert.equal(text(saved),'😀ab suffix');assert.equal(saved.at(-1).attributes.link,undefined);
+  assert.equal(saved[0].attributes.link,link);end.key('z');assert.equal(text(end.runs()),'😀ab');end.key('y');assert.equal(end.runs().at(-1).attributes.link,undefined);
+  const inside=editor(initial);inside.select(2,2);inside.type('😀Xab');
+  assert(inside.runs().filter(run=>run.text.includes('X')).every(run=>run.attributes.link===link));
+ }
+});
+
+test('dismiss at a caret removes the entire formatted link without changing text, styles or neighbours',()=>{
+ for(const link of ['webs https://example.org','node 42']) {
+  const e=editor([{text:'Before ',attributes:{}},{text:'ab',attributes:{link,weight:'heavy'}},{text:'cd',attributes:{link,style:'italic'}},{text:' Next',attributes:{link:'webs https://other.org'}}]);
+  e.select(10,10);e.fire('richDismissLink','click');
+  assert.equal(text(e.runs()),'Before abcd Next');assert.equal(e.ids.richText.selectionStart,10);
+  assert.equal(e.runs()[1].attributes.link,undefined);assert.equal(e.runs()[1].attributes.weight,'heavy');
+  assert.equal(e.runs()[2].attributes.link,undefined);assert.equal(e.runs()[2].attributes.style,'italic');
+  assert.equal(e.runs()[3].attributes.link,'webs https://other.org');
+  e.key('z');assert.equal(e.runs()[1].attributes.link,link);e.key('y');assert.equal(e.runs()[1].attributes.link,undefined);
+ }
+});
+
+test('pasted trailing links do not capture subsequent typing',()=>{
+ const e=editor([{text:'Start ',attributes:{}}]);e.select(6,6);
+ const ticket=e.bridge().capture();e.bridge().insert(ticket,[{text:'Last link',attributes:{link:'webs https://example.org'}}]);
+ e.type('Start Last link then normal');
+ assert.equal(e.runs().find(run=>run.text==='Last link').attributes.link,'webs https://example.org');
+ assert.equal(e.runs().at(-1).attributes.link,undefined);
 });

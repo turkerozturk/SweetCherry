@@ -24,6 +24,35 @@
         if(bytes.length>=3 && bytes[0]===255 && bytes[1]===216 && bytes[2]===255)return 'image/jpeg';
         throw new Error('type');
     }
-    const api={objectId,imageMime};
+    /** Code-point offsets; formatting splits must not terminate a logical hyperlink. */
+    function linkRange(runs, caret) {
+        let offset=0;
+        const segments=runs.map(run=>{const start=offset;offset+=Array.from(run.text).length;return {run,start,end:offset};});
+        const linked=item=>item.end>item.start && !item.run.attributes.__sweet_object && !!item.run.attributes.link;
+        let index=segments.findIndex(item=>linked(item) && item.start<=caret && caret<item.end);
+        if(index<0)index=segments.findIndex(item=>linked(item) && item.end===caret);
+        if(index<0)return null;
+        const link=segments[index].run.attributes.link;
+        let first=index,last=index;
+        while(first>0 && !segments[first-1].run.attributes.__sweet_object && segments[first-1].run.attributes.link===link)first--;
+        while(last+1<segments.length && !segments[last+1].run.attributes.__sweet_object && segments[last+1].run.attributes.link===link)last++;
+        return [segments[first].start,segments[last].end];
+    }
+    function insertionAttributes(runs,start,end) {
+        let offset=0,attributes={},leftLink='',rightLink='';
+        for(const run of runs){
+            const finish=offset+Array.from(run.text).length;
+            if(offset<=start && start<=finish)attributes={...run.attributes};
+            if(!run.attributes.__sweet_object){
+                if(offset<start && start<=finish)leftLink=run.attributes.link||'';
+                if(offset<=start && start<finish)rightLink=run.attributes.link||'';
+            }
+            offset=finish;
+        }
+        if(start===end && leftLink && leftLink!==rightLink)delete attributes.link;
+        delete attributes.__sweet_object;
+        return attributes;
+    }
+    const api={objectId,imageMime,linkRange,insertionAttributes};
     if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.RichTextEditorSupport=api;
 })(typeof window==='undefined'?globalThis:window);

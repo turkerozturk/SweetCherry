@@ -12,3 +12,14 @@ test('cloud files with missing/generic MIME types are recognized by PNG/JPEG byt
  assert.equal(await support.imageMime(png),'image/png');assert.equal(await support.imageMime(jpeg),'image/jpeg');
  await assert.rejects(()=>support.imageMime(new Blob(['not an image'],{type:'application/octet-stream'})),/type/);
 });
+
+test('link insertion ends only at the right edge, keeping other formatting and code-point offsets',()=>{
+ const {insertionAttributes,linkRange}=require('../../main/resources/static/js/node/richTextEditorSupport.js');
+ const runs=[{text:'😀a',attributes:{link:'webs https://example.org',weight:'heavy'}},{text:'b',attributes:{link:'webs https://example.org',style:'italic'}}];
+ assert.equal(insertionAttributes(runs,1,1).link,'webs https://example.org');
+ assert.equal(insertionAttributes(runs,2,2).link,'webs https://example.org');
+ assert.deepEqual(insertionAttributes(runs,3,3),{style:'italic'});
+ assert.equal(insertionAttributes(runs,1,3).link,'webs https://example.org');
+ assert.deepEqual(linkRange(runs,2),[0,3]);assert.deepEqual(linkRange(runs,3),[0,3]);
+ assert.equal(linkRange(runs,4),null);
+});

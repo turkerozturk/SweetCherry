@@ -45,3 +45,14 @@ test('caret pads around a lone object never enter the text or offset model',()=>
  editor.ownerDocument={getSelection:()=>({rangeCount:1,anchorNode:right,anchorOffset:1,focusNode:right,focusOffset:1})};
  assert.deepEqual(model.selection(editor),[1,1]);
 });
+
+
+test('neutral pads override link inheritance for composition text and are preferred at collapsed boundaries',()=>{
+ const linked=text('ab'),padText=text('\u200B'),pad=element('SPAN',[padText],{weight:'heavy'});pad.dataset.richCaret='true';
+ const editor=root([element('DIV',[element('SPAN',[linked],{link:'webs https://example.org'}),pad])]);
+ let start;
+ editor.ownerDocument={createRange:()=>({setStart(node,offset){start=[node,offset];},setEnd(){}}),getSelection:()=>({removeAllRanges(){},addRange(){}})};
+ model.restore(editor,2,2);assert.equal(start[0],padText);assert.equal(start[1],1);
+ padText.nodeValue='\u200B新';
+ assert.deepEqual(model.scan(editor).runs,[{text:'ab',attributes:{link:'webs https://example.org'}},{text:'新',attributes:{weight:'heavy'}}]);
+});

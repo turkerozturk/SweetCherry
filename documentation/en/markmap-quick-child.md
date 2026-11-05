@@ -16,3 +16,7 @@ If saving is rejected, the name stays in the dialog. A validation error can be c
 2. Repeat at the current depth limit and beneath a folded `chat` node. The refreshed map should expose the new child. Confirm name navigation and icon content links still work.
 3. Open the dialog with Tab + Enter/Space, submit with Enter, and cancel another entry with Escape. On a touchscreen, check that + is visible without hover.
 4. As USER or on a read-only connection, creation controls should be absent. Switch databases in another tab before submitting an old dialog: it must not create in the newly selected database.
+
+## Page-filling map
+
+The corner expand icon hides the toolbar and fills the web page with the map, without browser fullscreen. Click it again or press Escape to restore the normal view. Open dialogs keep their own Escape action. Normal view is the default on each load; changing the view does not reset the map zoom or its data.
