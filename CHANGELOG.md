@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add an optional balanced two-sided Markmap layout using measured subtree geometry; preserve the default rightward layout, readable text, node actions and per-branch folding.
+
 - Localize quick Markmap/Mermaid and quick-content pages; add an optional page-filling Markmap canvas toggle with Escape restoration.
 - Stop hyperlink inheritance at the right edge in the rich-text editor, including composition input, and add one-click link dismissal with undo/redo while preserving text and formatting.
 

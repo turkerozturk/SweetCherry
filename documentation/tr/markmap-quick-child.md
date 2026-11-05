@@ -20,3 +20,11 @@ Hata durumunda yazdığınız ad diyalogda kalır. Doğrulama hatasını düzelt
 ## Sayfayı kaplayan harita
 
 Köşedeki genişlet simgesi araç çubuğunu gizleyip haritayı web sayfasının tamamına yayar; tarayıcı tam ekranına geçmez. Aynı düğme veya Escape normal görünüme döndürür. Açık diyalog varsa Escape önce o diyaloğu kapatır. Her yüklemede varsayılan normal görünümdür; görünüm değiştirmek haritanın zoom veya verisini sıfırlamaz.
+
+## Yerleşim
+
+Diğer kontrollerin yanındaki **Yerleşim** listesinden **Sağa doğru** (varsayılan) veya **İki yana dengeli** seçip Uygula düğmesine basın. Dengeli görünüm kökü, saklanan okunabilir zoom ölçeğinde ortalar. Ana dallar, kapalı dalların altındaki düğümler de sayılarak alt ağaç büyüklüklerine göre dağıtılır; her tarafta kendi sıraları korunur. Tek ana dal varsa sağda kalır. Shared düğümler dahil bütün alt ağaç seçilen tarafta kalır; dalı kapatmak tarafını değiştirmez.
+
+Adla gezinme, tüm düğümler bağlantısı ve hızlı çocuk ekledikten sonraki yenileme yerleşimi korur. Tercih URL'deki `layout=balanced` görüntüleme ayarıdır; CTB'ye veya Freeplane stiline yazılmaz. Metinler, ikon bağlantıları, +, zoom/kaydırma ve sayfayı kaplayan görünüm kullanılmaya devam eder. Büyük haritalar okunabilir ölçekte ekran dışına taşabilir; kaydırarak veya zoom ile inceleyin.
+
+Uyarlama, paketteki Markmap'in ölçüm/çizim işlevlerini kullanır; üçüncü taraf dosyası değiştirilmez. Kütüphane güncellenirken iki taraftaki çizgiler, dal açma/kapama ve tıklama/klavye kontrolleri tekrar doğrulanmalıdır.

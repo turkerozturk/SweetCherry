@@ -54,6 +54,8 @@
             min-height: 31px;
         }
 
+        .mind-map-layout { width: 10rem; }
+
         .mind-map-level {
             width: 4.75rem;
         }
@@ -218,6 +220,11 @@
                 <option value="false" th:selected="${!colors}" th:text="#{quickmap.hide}">Gizle</option>
             </select>
 
+            <label for="layout" class="small mb-0 ms-1" th:text="#{quickmap.layout}">Layout</label>
+            <select id="layout" name="layout" class="form-select form-select-sm mind-map-layout">
+                <option value="right" th:text="#{quickmap.layoutRight}">Rightward</option>
+                <option value="balanced" th:text="#{quickmap.layoutBalanced}">Balanced, both sides</option>
+            </select>
             <button type="submit" class="btn btn-sm btn-primary" th:text="#{quickmap.apply}">
                 Uygula
             </button>
@@ -271,6 +278,7 @@
 <!-- Markmap View, tarayıcı sürümünde global d3 nesnesini kullanır. -->
 <script th:src="@{/js/thirdparty/markmap/d3.min.js}"></script>
 <script th:src="@{/js/thirdparty/markmap/markmap-view.min.js}"></script>
+<script th:src="@{/js/markmap/bilateral.js}"></script>
 
 <script th:inline="javascript">
     (async () => {
@@ -291,6 +299,13 @@
         const contentIconLabel = /*[[#{quickmap.contentIcon}]]*/ 'Open content';
         const viewScaleStorageKey = 'sweetCherry.markmap.viewScale';
         const defaultViewScale = 1;
+        const layout = new URLSearchParams(window.location.search).get('layout') === 'balanced' ? 'balanced' : 'right';
+        document.getElementById('layout').value = layout;
+        document.querySelectorAll('.mind-map-toolbar a[href]').forEach(link => {
+            const url = new URL(link.href);
+            url.searchParams.set('layout', layout);
+            link.href = url.pathname + url.search;
+        });
         const data = JSON.parse(dataJson);
         const canAddChildren = /*[[${markmapCanAdd}]]*/ false;
         const addChildLabel = /*[[#{markmap.child.add}]]*/ 'Add child node';
@@ -318,19 +333,22 @@
         }
 
         const {Markmap} = window.markmap;
-        const markmap = new Markmap('#markmap', options);
+        const MapClass = layout === 'balanced' ? window.SweetCherryMarkmapLayout.createClass(Markmap) : Markmap;
+        const markmap = new MapClass('#markmap', options);
         await markmap.setData(data);
 
         // Bütün ağacı ekrana sığdırmak yerine kökü okunabilir ölçekte solda
         // açar. Aynı sekmedeki sonraki haritalarda son zoom seviyesi korunur.
-        window.addEventListener('load', () => {
+        const initializeView = () => {
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     placeRootAtReadableScale(readSavedScale());
                     rememberScaleAfterInteraction();
                 });
             });
-        });
+        };
+        if (document.readyState === 'complete') initializeView();
+        else window.addEventListener('load', initializeView, {once: true});
 
         function placeRootAtReadableScale(scale) {
             const svgElement = markmap.svg.node();
@@ -346,7 +364,9 @@
             const rootCenterY = rootRect.y + rootRect.height / 2;
             const transform = d3.zoomIdentity
                 .translate(
-                    leftPadding - rootRect.x * safeScale,
+                    layout === 'balanced'
+                        ? viewport.width / 2 - (rootRect.x + rootRect.width / 2) * safeScale
+                        : leftPadding - rootRect.x * safeScale,
                     viewport.height / 2 - rootCenterY * safeScale
                 )
                 .scale(safeScale);
@@ -493,6 +513,7 @@
                 window.location.origin
             );
 
+            url.searchParams.set('layout', layout);
             url.searchParams.set('level', String(maximumLevel));
             url.searchParams.set('icons', String(iconsEnabled));
             url.searchParams.set('colors', String(colorsEnabled));

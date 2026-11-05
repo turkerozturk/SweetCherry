@@ -20,3 +20,11 @@ If saving is rejected, the name stays in the dialog. A validation error can be c
 ## Page-filling map
 
 The corner expand icon hides the toolbar and fills the web page with the map, without browser fullscreen. Click it again or press Escape to restore the normal view. Open dialogs keep their own Escape action. Normal view is the default on each load; changing the view does not reset the map zoom or its data.
+
+## Layout
+
+Select **Rightward** (default) or **Balanced, both sides** beside the other map controls, then Apply. Balanced view centers the root at the remembered readable zoom scale. First-level branches are assigned by full subtree size; order is preserved within each side. A single branch remains on the right. The entire subtree follows its assigned side, including shared occurrences. Folding does not change side assignment.
+
+Name navigation, the all-nodes link and quick-child refresh preserve the layout. This is a display option in the URL (`layout=balanced`), not a CTB property or a stored Freeplane style. Text, icon links, + actions, pan/zoom and the page-filling toggle remain available. A large map may extend beyond the viewport at a readable scale; pan or zoom to inspect it.
+
+The adapter uses the bundled Markmap's internal measured-layout/render hooks. When upgrading that library, verify connectors and fold/unfold animations on both sides as well as click/keyboard controls. The third-party bundle itself is unchanged.
