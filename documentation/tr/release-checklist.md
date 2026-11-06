@@ -1,23 +1,31 @@
-# SweetCherry 1.7.0 taslak hazırlığı
+# SweetCherry 1.7.0 yayın adımları — 6 Kasım 2026
 
-1.6.0 sonrası yeni özellikler için sürüm **1.7.0**, etiket **v1.7.0** hazırlanır. Bu aşamada yayın yapılmaz. Önceki özellik commit’i `981839e` için kullanıcı 705 başarılı Java testi ve başarılı manuel PDF kontrolü bildirdi. Son hazırlık commit’inin paketleri ayrıca doğrulanır.
+Sürüm **1.7.0**, etiket **v1.7.0**. Son temel commit `23027be` (demo/quick-start tenant ayarları); son özellik commit’i `9a5b715`. Kullanıcı 710 başarılı Java testi ve yeni özellikler için başarılı manuel kontroller bildirdi. Bu yama Türkçe Zengin Metin etiketini ve release/kurulum belgelerini günceller; sürüm zaten 1.7.0’dır.
 
 ## Yamayı uygula ve hazırla
 
 ```bat
 git switch main
 git pull --ff-only
-git apply --check sweetcherry-981839e-release-1.7.0.patch
-git apply sweetcherry-981839e-release-1.7.0.patch
+git apply --check sweetcherry-23027be-release-1.7.0-final.patch
+git apply sweetcherry-23027be-release-1.7.0-final.patch
 git diff --check
 mvnw.cmd clean package
 ```
 
-Önceki portable-packages yamasını ayrıca uygulamayın; bu yama aynı temel commit için tüm paketleme değişikliklerini içerir. Sürüm 1.7.0 olmalı. Paketleme ve belgeler değişir; uygulama özellik kodu değişmez. IntelliJ’den commit/push yapın. Daha geliştirme yapılacaksa etiketi ve paketleri son commit’e kadar erteleyin. Mevcut yayımlanmış etiketleri taşımayın.
+Eski hazırlık yamalarını tekrar uygulamayın. `git diff --check` ve derleme başarılı olmalı. Türkçe dilde düğüm içerik düzenleme menüsünde **Zengin Metin**, editör başlığında **Zengin Metin düzenle** göründüğünü kontrol edin. İngilizce karşılıkları değişmez.
+
+IntelliJ’den **Finalize SweetCherry 1.7.0 release notes and Turkish rich-text label** mesajıyla commit/push yapın. Aşağıdaki etiket **bu yeni son commit’e** konmalı; `23027be` veya eski bir özellik commit’ine konmamalı.
 
 ## Son commit’ten paket üret
 
-Hazır olduğunuzda temiz çalışma ağacında:
+Hazır olduğunuzda temiz çalışma ağacında aşağıdakileri kontrol edin. `git status --short` boş olmalı, `git log -1` az önce push edilen son hazırlığı göstermeli. `git tag -l v1.7.0` doluysa aşağıdaki tag oluşturma komutunu çalıştırmayın: mevcut etiketin commit’ini kontrol edin, yayımlanmış etiketi taşımayın.
+
+```bat
+git tag -l v1.7.0
+```
+
+Etiket henüz yoksa:
 
 ```bat
 git status --short
@@ -27,7 +35,7 @@ git tag -a v1.7.0 -m "SweetCherry 1.7.0"
 
 Etiketi IntelliJ ile veya `git push origin v1.7.0` komutuyla gönderin. GitHub → Actions → **Portable distribution (Windows builder)** → Run workflow → **v1.7.0** seçin. Sadece deneme için main’den çalıştırılabilir; yayın paketi son etiketten üretilmelidir. Eski 1.0.0 notices repack görevini kullanmayın.
 
-Workflow Java 17 ile Maven test/paketleme, Java’sız ZIP içerik karşılaştırması ve sistem Java’sı olmadan Windows setup/launcher kontrolü yapar. **sweetcherry-release-assets** artifact’ini indirip dış ZIP’i açın.
+Workflow’un başarılı bittiğini doğrulayın; yalnız normal CI başarısı paketleme doğrulaması değildir. Workflow Java 17 ile Maven test/paketleme, Java’sız ZIP içerik karşılaştırması ve sistem Java’sı olmadan Windows setup/launcher kontrolü yapar. **sweetcherry-release-assets** artifact’ini indirip dış ZIP’i açın.
 
 ## Dört asset
 
@@ -64,8 +72,19 @@ Java’sız ZIP’i temiz klasöre çıkarıp uygun Java 17+ ile Windows’ta `r
 
 `LICENSE`, `THIRD-PARTY-NOTICES.md`, `licenses/`, örnek CTB/tenant dosyaları ve scriptler pakette olmalı. Kullanılmış uygulama klasörünüzü, özel CTB/parola/ayarlarınızı paketlemeyin.
 
-## Draft kaydet
+## Taslak kaydet ve son kontrol
 
 GitHub → Releases → Draft a new release. Mevcut son etiketi ve **SweetCherry 1.7.0** başlığını seçin. Açıklamaya ayrıca verilen kısa Markdown metnini yapıştırın; uzun [v1.7.0.md](../releases/v1.7.0.md) dosyasının tamamını yapıştırmayın. Dört asset’i ekleyip **Save draft** kullanın. Yayına kadar tarih, son değişiklikler, test bilgisi ve bağlantıların son etikete ait olduğunu tekrar kontrol edin.
 
 Henüz etiket oluşturmak istemiyorsanız şimdilik açıklamayı hazırlayıp yerel saklayın veya GitHub’ın hedef commit/new tag alanlarını taslakta bırakın; yayın öncesi etiketi son commit’e sabitleyin. Taslaktayken main’de gelişen kod, önceden yüklenmiş paketleri kendiliğinden güncellemez. Yeni commit eklendiyse son etiketten yeniden derleyip tüm dört asset’i ve açıklamayı birlikte yenileyin. Yayımlanmış etiketi veya paketleri sessizce değiştirmeyin.
+
+## Yayımla
+
+Son paketler ve taslak kontrol edildikten sonra GitHub Release ekranında:
+
+1. Tag **v1.7.0**, başlık **SweetCherry 1.7.0** olmalı; kısa açıklamanın tarihini fiili yayın gününe göre güncelleyin.
+2. Dört yüklenen asset doğru sürüm/commit’e ait olmalı. Ayrı `build-info.json` veya workflow’un dış artifact ZIP’ini yüklemeyin.
+3. **Set as a pre-release** işaretli olmasın. Kararlı yayın olarak **Set as the latest release** seçin.
+4. Hazır olduğunuzda **Publish release** seçin. Yayın sayfasındaki kılavuz ve ayrıntılı sürüm notu bağlantılarını açıp kontrol edin.
+
+Bu hazırlık kendi başına tag veya release oluşturmaz. Yayımlanan etiketi taşımayın; sonraki değişiklikleri yeni sürümde yayımlayın.

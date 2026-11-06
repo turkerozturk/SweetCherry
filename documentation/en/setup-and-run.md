@@ -112,7 +112,7 @@ Raw content search operates on stored `node.txt`, including rich-text XML. Searc
 
 ## Bundled quick-start guides
 
-`CTBDATA/sweetcherry-hizli-baslangic.ctb` and `CTBDATA/sweetcherry-quickstart-en.ctb` contain the Turkish and English quick-start guides. Select **SweetCherry Quick Start (TR)** or **SweetCherry Quick Start (EN)** in the data source list. Their `allTenants/quickstart-tr.txt` and `quickstart-en.txt` definitions are read-only. The guides have no images; TODO bodies are intentionally empty. They can also be opened in CherryTree.
+`CTBDATA/sweetcherry-hizli-baslangic.ctb` and `CTBDATA/sweetcherry-quickstart-en.ctb` contain the Turkish and English quick-start guides. Select **SweetCherry Quick Start (TR)** or **SweetCherry Quick Start (EN)** in the data source list. Their bundled `allTenants/quickstart-tr.txt` and `quickstart-en.txt` definitions are writable in 1.7.0 so ADMIN users can try editing. To preserve a guide unchanged, set `custom.isWritable=false` or practice on a separate copy. Existing external tenant files are not overwritten by a normal source build. The guides have no images; TODO bodies are intentionally empty. They can also be opened in CherryTree.
 
 **What is a tenant?** In SweetCherry, this technical term means a data source connection definition. It comes from the application's multitenancy architecture. Switching sources resembles opening/closing files in a desktop application. A file in `allTenants` stores the database path/connection and opening settings, not the notes themselves. Several definitions may point to one CTB; deleting a definition does not delete the CTB.
 

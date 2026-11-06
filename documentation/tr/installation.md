@@ -41,7 +41,7 @@ Eski CTB'nin desteklenen şema güncellemesi dosyayı değiştirir; izin vermede
 
 ## Dağıtımdaki hızlı başlangıç kılavuzları
 
-`CTBDATA/sweetcherry-hizli-baslangic.ctb` ve `CTBDATA/sweetcherry-quickstart-en.ctb`, Türkçe ve İngilizce hızlı başlangıç kılavuzlarıdır. Veri kaynağı listesinden **SweetCherry Quick Start (TR)** veya **SweetCherry Quick Start (EN)** seçilebilir. `allTenants/quickstart-tr.txt` ve `quickstart-en.txt` bağlantıları salt okunurdur. Kılavuzlar resimsizdir; TODO içerikleri sonraki kullanım için boş bırakılmıştır. CherryTree ile de açılabilirler.
+`CTBDATA/sweetcherry-hizli-baslangic.ctb` ve `CTBDATA/sweetcherry-quickstart-en.ctb`, Türkçe ve İngilizce hızlı başlangıç kılavuzlarıdır. Veri kaynağı listesinden **SweetCherry Quick Start (TR)** veya **SweetCherry Quick Start (EN)** seçilebilir. 1.7.0 paketindeki `allTenants/quickstart-tr.txt` ve `quickstart-en.txt` bağlantıları ADMIN ile düzenleme denenebilmesi için yazılabilirdir. Kılavuzu değiştirmeden korumak için `custom.isWritable=false` yapın veya ayrı bir kopyada çalışın. Normal kaynak derlemesi mevcut dış tenant dosyalarının üzerine yazmaz. Kılavuzlar resimsizdir; TODO içerikleri sonraki kullanım için boş bırakılmıştır. CherryTree ile de açılabilirler.
 
 **Tenant ne demek?** SweetCherry'de kullanıcıya sunulan bir veri kaynağı bağlantı tanımıdır. Teknik ad, uygulamanın çoklu veritabanı (multitenancy) yapısından gelir. Masaüstü uygulamasında dosya açma/kapatmaya benzer biçimde veritabanları arasında geçiş yaparsınız. `allTenants` içindeki dosya notların kendisini değil, veritabanının yolunu/bağlantısını ve açılma ayarlarını tutar. Bir CTB'ye birden fazla tanımla bağlanılabilir; tanımı silmek CTB'yi silmez.
 
