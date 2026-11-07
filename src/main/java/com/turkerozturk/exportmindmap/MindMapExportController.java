@@ -430,6 +430,10 @@ public class MindMapExportController {
     ) throws XMLStreamException {
 
         NodeIcon icon = displayNode.getNodeIcon();
+        // Unambiguous round-trip identity, including no-icon roots with a separate database emblem.
+        writer.writeEmptyElement("attribute");
+        writer.writeAttribute("NAME", "sweetcherry.node-icon");
+        writer.writeAttribute("VALUE", icon == null ? "zero" : icon.getIconName());
 
         if (icon == null
                 || icon.getIconName() == null

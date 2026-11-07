@@ -20,6 +20,7 @@
                     || url.pathname.startsWith('/markmap-quick-mind-map/')
                     || url.pathname.startsWith('/export-node-to-pdf/')
                     || url.pathname === '/mindmap-export'
+                    || url.pathname === '/mindmap-import'
                     || url.pathname === '/bookmarks')) return;
                 url.searchParams.set('_tenantView', pageView);
                 link.href = url.pathname + url.search + url.hash;

@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Import Freeplane/FreeMind MM files through a localized, reviewed upload into a new final root branch; preserve hierarchy, readable notes/details, direct title styling, dates and SweetCherry icon references, with atomic writes and explicit conversion limits.
+
 ## [1.7.0]
 
 - Add an optional balanced two-sided Markmap layout using measured subtree geometry; preserve the default rightward layout, readable text, node actions and per-branch folding.

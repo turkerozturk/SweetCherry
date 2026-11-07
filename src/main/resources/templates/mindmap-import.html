@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{mmImport.title}"></title></head>
+<body><section layout:fragment="content" class="container py-3">
+<h1 th:text="#{mmImport.title}"></h1>
+<p><strong th:text="#{mmImport.target}"></strong> <span th:text="${currentTenantName}"></span></p>
+<p th:text="#{mmImport.help}"></p>
+<p class="alert alert-warning" th:text="#{mmImport.limits}"></p>
+<div role="alert" class="alert alert-danger" th:if="${mmImportError != null}" th:text="${#messages.msg(mmImportError)}"></div>
+<div role="status" class="alert alert-success" th:if="${mmImportCount != null}" th:text="#{mmImport.success(${mmImportCount})}"></div>
+<form th:if="${preview == null}" th:action="@{/mindmap-import/preview}" method="post" enctype="multipart/form-data">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<label class="form-label" for="mm-file" th:text="#{mmImport.file}"></label>
+<input class="form-control mb-3" id="mm-file" type="file" name="file" accept=".mm,application/x-freemind,text/xml,application/xml" required>
+<button class="btn btn-primary" type="submit" th:text="#{mmImport.preview}"></button>
+</form>
+<th:block th:if="${preview != null}">
+<h2 th:text="#{mmImport.review}"></h2>
+<p><strong th:text="${preview.rootName()}"></strong> · <span th:text="#{mmImport.count(${preview.count()})}"></span></p>
+<ul th:if="${!preview.warnings().isEmpty()}"><li th:each="warning : ${preview.warnings()}"><span th:text="${#messages.msg('mmImport.warning.' + warning.key)}"></span>: <span th:text="${warning.value}"></span></li></ul>
+<p th:text="#{mmImport.sample}"></p>
+<ol><li th:each="node, stat : ${preview.nodes()}" th:if="${stat.index lt 100}" th:text="${node.name()}"></li></ol>
+<form th:action="@{/mindmap-import/confirm}" method="post" class="d-inline">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<input type="hidden" name="token" th:value="${token}">
+<button class="btn btn-primary" type="submit" th:text="#{mmImport.confirm}"></button>
+</form>
+<form th:action="@{/mindmap-import/cancel}" method="post" class="d-inline">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<button class="btn btn-secondary" type="submit" th:text="#{mmImport.cancel}"></button>
+</form>
+</th:block>
+</section></body></html>
