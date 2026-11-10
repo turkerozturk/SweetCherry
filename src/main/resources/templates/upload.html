@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layout}">
 <head>
-    <title>Dosya Yükleme</title>
+    <title th:text="#{uploadPage.title}"></title>
 </head>
 <body>
 
 <section layout:fragment="content">
 
-<h1>Dosya Yükleme Sonucu</h1>
+<h1 th:text="#{uploadPage.resultTitle}"></h1>
 
 
 
 
-<div th:if="${message}">
-    <p th:text="${message}"></p>
+<div th:if="${messageKey}">
+    <p th:text="${#messages.msg(messageKey, messageArgument)}"></p>
 </div>
 
 <form th:if="${uploadSucceeded}" th:action="@{/reload-datasources}" method="post">
-    <button class="btn btn-primary" type="submit" title="Veri Kaynaklarını Yeniden Yükle">
+    <button class="btn btn-primary" type="submit" th:title="#{uploadPage.reloadTitle}">
         <i class="fa-solid fa-rotate"></i>
-        <span>Yeniden Yükle</span>
+        <span th:text="#{uploadPage.reload}"></span>
     </button>
 </form>
 

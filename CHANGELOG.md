@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Localize data-source upload and session information pages, including upload outcomes and debug labels, and correct session timestamp formatting; add close controls to both quick mind maps, keeping Markmap close available in page-filling mode.
+
 - Import ZIP folder/file trees through a localized preview/confirm wizard, appending new roots with canonical syntax/icon detection, optional extension removal, bounded binary attachments and oversized-file metadata. Guard writes with tenant/admin checks and one transaction.
 
 - Render HTML-syntax notes with jsoup sanitization and sandboxed readers; add an HTML shortcut in Node Properties and a source/live-preview editor with formatting tools, history and recovery. Preserve original HTML source in CTB storage.

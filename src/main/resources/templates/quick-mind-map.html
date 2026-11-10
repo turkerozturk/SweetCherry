@@ -156,6 +156,8 @@
                     Uygula
                 </button>
             </form>
+            <button type="button" id="quickMapClose" class="btn btn-sm btn-outline-secondary" data-close-page
+                    th:attr="data-close-fallback=@{/}" th:title="#{quick.close}" th:aria-label="#{quick.close}"><span aria-hidden="true">×</span></button>
         </div>
     </div>
 
@@ -329,5 +331,6 @@ mindmap
 
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 
+<script th:src="@{/js/common/closePage.js}" defer></script>
 </body>
 </html>

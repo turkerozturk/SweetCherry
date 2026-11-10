@@ -33,12 +33,18 @@ import java.util.Locale;
 
 @Service
 public class StorageService {
+    public static final class UploadException extends IOException {
+        private final String messageKey;
+        UploadException(String messageKey) { super(messageKey); this.messageKey=messageKey; }
+        public String messageKey() { return messageKey; }
+    }
+
 
 
 
     public String uploadImageToFileSystem(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
-            throw new IOException("Dosya boş olamaz");
+            throw new UploadException("uploadPage.error.empty");
         }
 
         String fileName = file.getOriginalFilename();
@@ -46,21 +52,21 @@ public class StorageService {
                 || !fileName.toLowerCase(Locale.ROOT).endsWith(".txt")
                 || !fileName.matches("[\\p{L}\\p{N} _.-]+")
                 || fileName.startsWith(".") || fileName.contains("..")) {
-            throw new IOException("Yalnızca geçerli adlı .txt veri kaynağı dosyaları yüklenebilir");
+            throw new UploadException("uploadPage.error.name");
         }
         Path directory = Path.of(MultitenantConfiguration.PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES)
                 .toAbsolutePath().normalize();
         Path targetFileFullPath = directory.resolve(fileName).normalize();
         if (!targetFileFullPath.startsWith(directory)) {
-            throw new IOException("Geçersiz dosya yolu");
+            throw new UploadException("uploadPage.error.path");
         }
         try (var input = file.getInputStream()) {
             Files.copy(input, targetFileFullPath);
         } catch (FileAlreadyExistsException exception) {
-            throw new IOException("Bu adda bir veri kaynağı dosyası zaten var: " + fileName, exception);
+            throw new UploadException("uploadPage.error.exists");
         }
 
-        return "upload process completed";
+        return fileName;
     }
 
 

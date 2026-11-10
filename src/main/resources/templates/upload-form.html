@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layout}">
 <head>
-    <title>Dosya Yükleme</title>
+    <title th:text="#{uploadPage.title}"></title>
     <th:block layout:fragment="pageSpecificCssStyles">
 
 
@@ -20,11 +20,11 @@
 
         <div class="row text-center">
 
-            <h1>Dosya Yükleme Formu</h1>
+            <h1 th:text="#{uploadPage.formTitle}"></h1>
             <p><a class="btn btn-success" th:href="@{/tenants/wizard}" th:text="#{wizard.create}"></a></p>
 
             <form method="post" th:action="@{/upload-database}" enctype="multipart/form-data">
-                <label for="file">Dosya Seç:</label>
+                <label for="file" th:text="#{uploadPage.chooseFile}"></label>
                 <input type="file" id="file" name="dosya" accept=".txt"/>
                 <button class="btn btn-primary" type="submit" th:title="#{selectdatasource.upload}">
                     <i class="fas fa-upload"></i>

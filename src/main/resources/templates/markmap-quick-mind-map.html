@@ -38,11 +38,12 @@
         .markmap-page-only .mind-map-toolbar { display: none !important; }
         .markmap-page-only .mind-map-panel { border: 0; border-radius: 0; }
         #markmapCanvasToggle {
-            position: absolute; top: 8px; right: 8px; z-index: 2;
+            position: absolute; top: 8px; right: 48px; z-index: 2;
             width: 32px; height: 32px; padding: 5px;
             background: rgba(255,255,255,.92); color: #343a40;
             border: 1px solid #adb5bd; border-radius: 4px;
         }
+        #quickMapClose { position:absolute; top:8px; right:8px; z-index:2; width:32px; height:32px; padding:0; font-size:24px; line-height:1; background:rgba(255,255,255,.92); }
         #markmapCanvasToggle:focus-visible { outline: 2px solid #0d6efd; outline-offset: 2px; }
         .mind-map-toolbar {
             flex: 0 0 auto;
@@ -233,6 +234,8 @@
 
     <div class="card shadow-sm mind-map-panel">
         <div class="card-body">
+            <button type="button" id="quickMapClose" class="btn btn-sm btn-outline-secondary" data-close-page
+                    th:attr="data-close-fallback=@{/}" th:title="#{quick.close}" th:aria-label="#{quick.close}"><span aria-hidden="true">×</span></button>
             <button type="button" id="markmapCanvasToggle" aria-pressed="false"
                     th:title="#{quickmap.expandPage}" th:aria-label="#{quickmap.expandPage}"
                     th:attr="data-expand=#{quickmap.expandPage},data-restore=#{quickmap.restorePage}">
@@ -557,5 +560,6 @@
 
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 
+<script th:src="@{/js/common/closePage.js}" defer></script>
 </body>
 </html>

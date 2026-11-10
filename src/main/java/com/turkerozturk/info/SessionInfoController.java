@@ -82,13 +82,13 @@ public class SessionInfoController {
 
 
         Map<String, Object> servletContextParams = new HashMap<>();
-        servletContextParams.put("Context Path", servletContext.getContextPath());
-        servletContextParams.put("Server Info", servletContext.getServerInfo());
-        servletContextParams.put("Servlet Context Name", servletContext.getServletContextName());
-        servletContextParams.put("Major Version", servletContext.getMajorVersion());
-        servletContextParams.put("Minor Version", servletContext.getMinorVersion());
-        servletContextParams.put("Effective Major Version", servletContext.getEffectiveMajorVersion());
-        servletContextParams.put("Effective Minor Version", servletContext.getEffectiveMinorVersion());
+        servletContextParams.put("sessionInfo.context.path", servletContext.getContextPath());
+        servletContextParams.put("sessionInfo.context.server", servletContext.getServerInfo());
+        servletContextParams.put("sessionInfo.context.name", servletContext.getServletContextName());
+        servletContextParams.put("sessionInfo.context.major", servletContext.getMajorVersion());
+        servletContextParams.put("sessionInfo.context.minor", servletContext.getMinorVersion());
+        servletContextParams.put("sessionInfo.context.effectiveMajor", servletContext.getEffectiveMajorVersion());
+        servletContextParams.put("sessionInfo.context.effectiveMinor", servletContext.getEffectiveMinorVersion());
 
         model.addAttribute("servletContextParams", servletContextParams);
 

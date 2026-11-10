@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="tr" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
 <head>
-    <title>Oturum bilgisi</title>
+    <title th:text="#{sessionInfo.title}"></title>
 
 
 </head>
@@ -11,49 +11,49 @@
 
 
 
-    <h1>Oturum bilgisi</h1>
-    <p class="text-muted">Oturumun boşta kalma sınırı ve zamanları.</p>
-    <p class="alert alert-warning" th:if="${debug}">Geliştirme görünümü açık: bu sayfa oturum ve çerez değerlerini içerir. Ekran görüntüsü veya sayfa kaynağını paylaşmayın.</p>
+    <h1 th:text="#{sessionInfo.title}"></h1>
+    <p class="text-muted" th:text="#{sessionInfo.help}"></p>
+    <p class="alert alert-warning" th:if="${debug}" th:text="#{sessionInfo.debugWarning}"></p>
 
 
     <table class="table">
         <tr>
-            <th>Bilgi</th>
-            <th>Değer</th>
+            <th th:text="#{sessionInfo.information}"></th>
+            <th th:text="#{sessionInfo.value}"></th>
         </tr>
         <tr>
-            <td>Boşta kalma sınırı (saniye)</td>
+            <td th:text="#{sessionInfo.idleLimit}"></td>
             <td th:text="${sessionMaxInactiveInterval}"></td>
         </tr>
         <tr>
-            <td>Oturum oluşturulma zamanı</td>
-            <td th:text="${#dates.format(sessionCreationTime, 'dd-MM-yyyy HH:mm:ss')}"></td>
+            <td th:text="#{sessionInfo.created}"></td>
+            <td th:text="${#dates.format(new java.util.Date(sessionCreationTime), 'dd-MM-yyyy HH:mm:ss')}"></td>
         </tr>
         <tr>
-            <td>Son erişim zamanı</td>
-            <td th:text="${#dates.format(sessionLastAccessedTime, 'dd-MM-yyyy HH:mm:ss')}"></td>
+            <td th:text="#{sessionInfo.accessed}"></td>
+            <td th:text="${#dates.format(new java.util.Date(sessionLastAccessedTime), 'dd-MM-yyyy HH:mm:ss')}"></td>
         </tr>
         <tr th:if="${debug}">
-            <td>Session ID</td>
+            <td th:text="#{sessionInfo.id}"></td>
             <td th:text="${sessionId}"></td>
         </tr>
 
     </table>
 
 
-    <h2 th:if="${debug}">Session Attributes</h2>
+    <h2 th:if="${debug}" th:text="#{sessionInfo.attributes}"></h2>
     <table class="table table-striped" th:if="${debug}">
         <tr th:each="entry : ${sessionAttributes}">
-            <td th:text="'Session Attribute: ' + ${entry.key}"></td>
+            <td th:text="#{sessionInfo.sessionAttribute(${entry.key})}"></td>
             <td th:text="${entry.value}"></td>
         </tr>
     </table>
 
-    <h2 th:if="${debug}">Cookies</h2>
+    <h2 th:if="${debug}" th:text="#{sessionInfo.cookies}"></h2>
     <table class="table table-striped" th:if="${debug}">
         <tr>
-            <th>Cookie Name</th>
-            <th>Cookie Value</th>
+            <th th:text="#{sessionInfo.cookieName}"></th>
+            <th th:text="#{sessionInfo.cookieValue}"></th>
         </tr>
         <tr th:each="entry : ${cookies}">
             <td th:text="${entry.key}"></td>
@@ -61,52 +61,52 @@
         </tr>
     </table>
 
-    <h2 th:if="${debug}">ServletContext Parameters</h2>
+    <h2 th:if="${debug}" th:text="#{sessionInfo.contextParameters}"></h2>
     <table class="table table-striped" th:if="${debug}">
         <tr>
-            <th>Parameter</th>
-            <th>Value</th>
+            <th th:text="#{sessionInfo.parameter}"></th>
+            <th th:text="#{sessionInfo.value}"></th>
         </tr>
         <tr th:each="entry : ${servletContextParams}">
-            <td th:text="${entry.key}"></td>
+            <td th:text="${#messages.msg(entry.key)}"></td>
             <td th:text="${entry.value}"></td>
         </tr>
     </table>
 
 
-    <h2 th:if="${debug}">ServletContext Attributes</h2>
+    <h2 th:if="${debug}" th:text="#{sessionInfo.contextAttributes}"></h2>
     <table class="table table-striped" th:if="${debug}">
         <tr>
-            <th>Attribute</th>
-            <th>Value</th>
+            <th th:text="#{sessionInfo.attribute}"></th>
+            <th th:text="#{sessionInfo.value}"></th>
         </tr>
         <tr th:each="entry : ${servletContextAttributes}">
-            <td th:text="'Context Attribute: ' + ${entry.key}"></td>
+            <td th:text="#{sessionInfo.contextAttribute(${entry.key})}"></td>
             <td th:text="${entry.value}"></td>
         </tr>
     </table>
 
-    <h2 th:if="${debug}">SessionStorage Information</h2>
+    <h2 th:if="${debug}" th:text="#{sessionInfo.sessionStorage}"></h2>
     <table id="sessionStorageTable" class="table table-striped" th:if="${debug}">
         <tr>
-            <th>Key</th>
-            <th>Value</th>
+            <th th:text="#{sessionInfo.key}"></th>
+            <th th:text="#{sessionInfo.value}"></th>
         </tr>
     </table>
 
-    <h2 th:if="${debug}">localStorage Information</h2>
+    <h2 th:if="${debug}" th:text="#{sessionInfo.localStorage}"></h2>
     <table id="localStorageTable" class="table table-striped" th:if="${debug}">
         <tr>
-            <th>Key</th>
-            <th>Value</th>
+            <th th:text="#{sessionInfo.key}"></th>
+            <th th:text="#{sessionInfo.value}"></th>
         </tr>
     </table>
 
-    <h2 th:if="${debug}">IndexedDB Information</h2>
+    <h2 th:if="${debug}" th:text="#{sessionInfo.indexedDB}"></h2>
     <table id="indexedDBTable" class="table table-striped" th:if="${debug}">
         <tr>
-            <th>Key</th>
-            <th>Value</th>
+            <th th:text="#{sessionInfo.key}"></th>
+            <th th:text="#{sessionInfo.value}"></th>
         </tr>
     </table>
 

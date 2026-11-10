@@ -81,12 +81,13 @@ public class UploadController {
     @PostMapping("/upload-database")
     public String uploadImageToFileSystem(@RequestParam("dosya") MultipartFile file, Model model) throws IOException {
         try {
-            String uploadImage = storageService.uploadImageToFileSystem(file);
-            model.addAttribute("message", "Dosya başarılı bir şekilde yüklendi: " + uploadImage);
+            storageService.uploadImageToFileSystem(file);
+            model.addAttribute("messageKey", "uploadPage.success");
             model.addAttribute("uploadSucceeded", true);
         } catch (IOException e) {
-            model.addAttribute("message", "Dosya yükleme sırasında bir hata oluştu: " + e.getMessage());
+            model.addAttribute("messageKey", e instanceof StorageService.UploadException known ? known.messageKey() : "uploadPage.error.failed");
         }
+        model.addAttribute("messageArgument", java.util.Objects.toString(file.getOriginalFilename(), ""));
         return "upload";
     }
 
