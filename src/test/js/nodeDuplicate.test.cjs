@@ -5,7 +5,7 @@ async function controls(state,confirm=true,ok=true) {
     const buttons=['single','subtree'].map(kind=>({dataset:{duplicate:kind},disabled:true}));
     const error={textContent:''};
     const form={dataset:{stateUrl:'/nodes/duplicate/1/state',error:'Reload',confirmSingle:'Copy?',confirmSubtree:'Copy %COUNT% entries?'},
-        elements:{_tenantView:{value:'tenant'},revision:{value:''},withSubnodes:{value:'false'}},
+        elements:{_tenantView:{value:'tenant'},revision:{value:''},withSubnodes:{value:'false'},createShared:{value:'false'}},
         matches:()=>true,querySelectorAll:()=>buttons,querySelector:()=>error};
     vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/node/nodeDuplicate.js'),'utf8'),{
         URL,window:{location:{href:'https://example.test/tree'},confirm(message){question=message;return confirm;}},
@@ -26,11 +26,13 @@ test('cancelled copy leaves controls and payload unchanged',async()=>{
     const c=await controls(state,false);assert.equal(c.submit('single'),true);assert.equal(c.form.dataset.duplicateReady,'ready');
     assert.equal(c.form.elements.withSubnodes.value,'false');assert.ok(c.buttons.every(button=>!button.disabled));
 });
-test('alias or unsupported subtree cannot be copied with descendants',async()=>{
-    for(const data of [{...state,shared:true},{...state,subtreeCount:0}]) {
-        const c=await controls(data);assert.equal(c.buttons[0].disabled,false);assert.equal(c.buttons[1].disabled,true);
-        assert.equal(c.submit('subtree'),true);
-    }
+test('shared roots can copy their descendants; empty subtrees remain disabled',async()=>{
+    const shared=await controls({...state,shared:true});
+    assert.equal(shared.buttons[1].disabled,false);assert.equal(shared.submit('subtree'),false);
+    assert.equal(shared.form.elements.createShared.value,'false');assert.equal(shared.form.elements.withSubnodes.value,'true');
+    const empty=await controls({...state,subtreeCount:0});
+    assert.equal(empty.buttons[0].disabled,false);assert.equal(empty.buttons[1].disabled,true);
+    assert.equal(empty.submit('subtree'),true);
 });
 test('failed state leaves duplicate operations disabled',async()=>{
     const c=await controls(state,true,false);assert.equal(c.error.textContent,'Reload');assert.ok(c.buttons.every(button=>button.disabled));

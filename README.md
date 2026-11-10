@@ -35,11 +35,11 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | **Read and edit** | Desktop/mobile readers; supported rich text, Plain Text, Markdown and [HTML](documentation/en/html-notes.md) editing; live preview; images, attachments, tables, codeboxes and offline LaTeX; browser-local recovery drafts. |
 | **Find and organise** | Quick switch, quick note capture, advanced search, saved filters, backlinks, searchable tags, batch tag management, bookmarks, recent activity and weekly/monthly calendars. |
 | **Explore the tree** | Markmap and Mermaid views; quick child creation in Markmap; balanced two-sided layout and a page-filling canvas; node movement, duplication and shared nodes. |
-| **Export and exchange** | PDF with hierarchical navigation; CTB export/import with remapped internal IDs; Freeplane/FreeMind export with optional note text and icons; folder-tree text ZIP export; custom record reports and HTML/PDF layouts. |
+| **Export and exchange** | PDF with hierarchical navigation; CTB export/import with remapped internal IDs; Freeplane/FreeMind export and [MM import](documentation/en/freeplane-import.md); folder-tree text ZIP export and [ZIP import](documentation/en/zip-import.md); custom record reports and HTML/PDF layouts. |
 | **Back up and recover** | Verified CTB snapshots, optional schedules and retention, backup downloads, reviewed deletion and recovery into a separate working copy. |
-| **Connect and configure** | Data-source wizard; SQLite, MariaDB/MySQL and PostgreSQL connections; application settings editors; local use or explicitly configured network access. |
+| **Connect and configure** | Data-source wizard with [empty CTB creation](documentation/en/empty-ctb.md); SQLite, MariaDB/MySQL and PostgreSQL connections; application settings editors; local use or explicitly configured network access. |
 
-**On `main`:** [Freeplane/FreeMind MM import](documentation/en/freeplane-import.md) adds a reviewed mind-map tree as a new final root branch. This feature is newer than the 1.7.0 release; use a source build to try it until a later release includes it. Other source changes may also be unreleased.
+**New in 1.8.0:** import Freeplane/FreeMind maps and ZIP folder trees, edit HTML source with live preview, and create empty CTB databases from the data-source wizard. [Release details](documentation/releases/v1.8.0.md).
 
 ## Documentation
 
@@ -48,7 +48,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | [English installation and usage](documentation/en/setup-and-run.md) | [First-start help / İlk çalıştırma](documentation/tr/first-start.md) |
 | [Türkçe kurulum ve kullanım](documentation/tr/installation.md) | [English feature guides](documentation/en) · [Türkçe özellik kılavuzları](documentation/tr) |
 | [Import folders and files from ZIP](documentation/en/zip-import.md) | [ZIP içe aktarım kılavuzu](documentation/tr/zip-import.md) |
-| [Changes and upgrade notes](CHANGELOG.md) | [1.7.0 release notes](documentation/releases/v1.7.0.md) · [All release notes](documentation/releases) |
+| [Changes and upgrade notes](CHANGELOG.md) | [1.8.0 release notes](documentation/releases/v1.8.0.md) · [All release notes](documentation/releases) |
 
 **Automatically generated documentation is also available on [DeepWiki](https://deepwiki.com/turkerozturk/SweetCherry).** Use it to explore the repository and codebase. DeepWiki is an external, automatically generated resource; check the version-matched project guides for installation instructions, supported behavior and limits.
 

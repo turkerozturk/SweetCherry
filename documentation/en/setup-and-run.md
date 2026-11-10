@@ -1,15 +1,15 @@
-# SweetCherry 1.7.0 — installation and first use
+# SweetCherry 1.8.0 — installation and first use
 
 SweetCherry is an open-source web companion for CherryTree CTB note databases. It provides browser views, mind maps, editing, and exports. It does not replace CherryTree. The supported starting point is an unencrypted SQLite `.ctb` file; `.ctd`, `.ctx`, and `.ctz` files are outside this guide.
 
 ## Windows 10/11, 64-bit
 
-Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.7.0). Choose one product asset:
+Open [SweetCherry Releases](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.8.0). Choose one product asset:
 
 | Asset | Use |
 | --- | --- |
-| `sweetcherry_1.7.0_all_os_portable_with_java_and_setup.exe` | Folder selection wizard and optional shortcuts |
-| `sweetcherry_1.7.0_all_os_portable.zip` | All-OS scripts and application; requires system Java 17+ |
+| `sweetcherry_1.8.0_all_os_portable_with_java_and_setup.exe` | Folder selection wizard and optional shortcuts |
+| `sweetcherry_1.8.0_all_os_portable.zip` | All-OS scripts and application; requires system Java 17+ |
 
 Only the setup EXE includes Java 17 (Windows x64). The all-OS ZIP has no Java; install Java 17+ matching your OS/CPU and use its run scripts. Despite its filename, the setup EXE itself runs only on Windows 10/11 x64. The automatically generated **Source code** archives contain source, not the ready-to-run application. Do not run the installer from inside a ZIP.
 
@@ -90,7 +90,7 @@ After stopping, you may copy or move the application folder. Recreate shortcuts 
 
 ## Other systems and source builds
 
-The same Java-free ZIP is intended for Windows, Linux (including Raspberry Pi ARM), and macOS with a matching Java 17+ runtime and native dependencies. macOS and 32-bit/i386 systems have not been tested; Java portability alone does not guarantee native SQLite/JDBC compatibility. The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.7.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.7.0.zip), extract it, and run:
+The same Java-free ZIP is intended for Windows, Linux (including Raspberry Pi ARM), and macOS with a matching Java 17+ runtime and native dependencies. macOS and 32-bit/i386 systems have not been tested; Java portability alone does not guarantee native SQLite/JDBC compatibility. The bundled Windows runtime is not for Linux, Raspberry Pi, or macOS. Install a JDK 17+ to build from source. Download the tagged [v1.8.0 source ZIP](https://github.com/turkerozturk/SweetCherry/archive/refs/tags/v1.8.0.zip), extract it, and run:
 
 - Windows: `first-run.bat`
 - Linux/Raspberry Pi: `sh ./first-run.sh`
@@ -112,7 +112,7 @@ Raw content search operates on stored `node.txt`, including rich-text XML. Searc
 
 ## Bundled quick-start guides
 
-`CTBDATA/sweetcherry-hizli-baslangic.ctb` and `CTBDATA/sweetcherry-quickstart-en.ctb` contain the Turkish and English quick-start guides. Select **SweetCherry Quick Start (TR)** or **SweetCherry Quick Start (EN)** in the data source list. Their bundled `allTenants/quickstart-tr.txt` and `quickstart-en.txt` definitions are writable in 1.7.0 so ADMIN users can try editing. To preserve a guide unchanged, set `custom.isWritable=false` or practice on a separate copy. Existing external tenant files are not overwritten by a normal source build. The guides have no images; TODO bodies are intentionally empty. They can also be opened in CherryTree.
+`CTBDATA/sweetcherry-hizli-baslangic.ctb` and `CTBDATA/sweetcherry-quickstart-en.ctb` contain the Turkish and English quick-start guides. Select **SweetCherry Quick Start (TR)** or **SweetCherry Quick Start (EN)** in the data source list. Their bundled `allTenants/quickstart-tr.txt` and `quickstart-en.txt` definitions are writable in 1.8.0 so ADMIN users can try editing. To preserve a guide unchanged, set `custom.isWritable=false` or practice on a separate copy. Existing external tenant files are not overwritten by a normal source build. The guides have no images; TODO bodies are intentionally empty. They can also be opened in CherryTree.
 
 **What is a tenant?** In SweetCherry, this technical term means a data source connection definition. It comes from the application's multitenancy architecture. Switching sources resembles opening/closing files in a desktop application. A file in `allTenants` stores the database path/connection and opening settings, not the notes themselves. Several definitions may point to one CTB; deleting a definition does not delete the CTB.
 

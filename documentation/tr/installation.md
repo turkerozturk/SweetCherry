@@ -1,9 +1,9 @@
-# SweetCherry 1.7.0 — hazır paketleri kullanma
+# SweetCherry 1.8.0 — hazır paketleri kullanma
 
-[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.7.0) işletim sisteminize uygun kullanım biçimini seçin:
+[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.8.0) işletim sisteminize uygun kullanım biçimini seçin:
 
-- `sweetcherry_1.7.0_all_os_portable_with_java_and_setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
-- `sweetcherry_1.7.0_all_os_portable.zip`: Java içermeyen portable paket. Sisteminize/işlemcinize uygun Java 17+ kurulu olmalıdır.
+- `sweetcherry_1.8.0_all_os_portable_with_java_and_setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
+- `sweetcherry_1.8.0_all_os_portable.zip`: Java içermeyen portable paket. Sisteminize/işlemcinize uygun Java 17+ kurulu olmalıdır.
 
 Yalnız setup EXE, Windows x64 Java 17 içerir; Windows 10/11 x64 üzerinde ayrıca Java kurmanız gerekmez. Adında all_os olsa da kurucu EXE ve içindeki Java yalnız Windows x64 içindir. ZIP tüm sistemlerin scriptlerini içerir: Windows için `run.bat`, Linux/Raspberry Pi için `sh ./launcher.sh` (masaüstü) veya `sh ./run.sh` (terminal), macOS için `sh ./run.command`. Klasörün tamamını çıkarıp birlikte tutun. ZIP içindeki `SweetCherry.exe` yanındaki Windows runtime klasörünü gerektirir; Java’sız ZIP’te `run.bat` kullanın. macOS ve 32 bit/i386 işletim sistemleri denenmemiştir; uygun Java yanında yerel SQLite/JDBC bağımlılıklarının da uyumu gerekir. Unix ZIP çıkarımında çalıştırma izni korunmazsa scriptleri `sh` ile çağırabilirsiniz. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
 
@@ -41,7 +41,7 @@ Eski CTB'nin desteklenen şema güncellemesi dosyayı değiştirir; izin vermede
 
 ## Dağıtımdaki hızlı başlangıç kılavuzları
 
-`CTBDATA/sweetcherry-hizli-baslangic.ctb` ve `CTBDATA/sweetcherry-quickstart-en.ctb`, Türkçe ve İngilizce hızlı başlangıç kılavuzlarıdır. Veri kaynağı listesinden **SweetCherry Quick Start (TR)** veya **SweetCherry Quick Start (EN)** seçilebilir. 1.7.0 paketindeki `allTenants/quickstart-tr.txt` ve `quickstart-en.txt` bağlantıları ADMIN ile düzenleme denenebilmesi için yazılabilirdir. Kılavuzu değiştirmeden korumak için `custom.isWritable=false` yapın veya ayrı bir kopyada çalışın. Normal kaynak derlemesi mevcut dış tenant dosyalarının üzerine yazmaz. Kılavuzlar resimsizdir; TODO içerikleri sonraki kullanım için boş bırakılmıştır. CherryTree ile de açılabilirler.
+`CTBDATA/sweetcherry-hizli-baslangic.ctb` ve `CTBDATA/sweetcherry-quickstart-en.ctb`, Türkçe ve İngilizce hızlı başlangıç kılavuzlarıdır. Veri kaynağı listesinden **SweetCherry Quick Start (TR)** veya **SweetCherry Quick Start (EN)** seçilebilir. 1.8.0 paketindeki `allTenants/quickstart-tr.txt` ve `quickstart-en.txt` bağlantıları ADMIN ile düzenleme denenebilmesi için yazılabilirdir. Kılavuzu değiştirmeden korumak için `custom.isWritable=false` yapın veya ayrı bir kopyada çalışın. Normal kaynak derlemesi mevcut dış tenant dosyalarının üzerine yazmaz. Kılavuzlar resimsizdir; TODO içerikleri sonraki kullanım için boş bırakılmıştır. CherryTree ile de açılabilirler.
 
 **Tenant ne demek?** SweetCherry'de kullanıcıya sunulan bir veri kaynağı bağlantı tanımıdır. Teknik ad, uygulamanın çoklu veritabanı (multitenancy) yapısından gelir. Masaüstü uygulamasında dosya açma/kapatmaya benzer biçimde veritabanları arasında geçiş yaparsınız. `allTenants` içindeki dosya notların kendisini değil, veritabanının yolunu/bağlantısını ve açılma ayarlarını tutar. Bir CTB'ye birden fazla tanımla bağlanılabilir; tanımı silmek CTB'yi silmez.
 
