@@ -15,10 +15,11 @@ class TenantWizardControllerTest {
         when(service.save(any())).thenReturn("Demo");when(selection.setTenant(eq("Demo"),any())).thenReturn("redirect:/");
         var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup(new TenantWizardController(service,selection)).build();
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/tenants/wizard")
-            .param("databaseIcon","CHERRY_BLUE").param("name","Demo"))
+            .param("databaseIcon","CHERRY_BLUE").param("name","Demo").param("createEmpty","true").param("databaseFilename","new-notes.ctb"))
             .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl("/"));
         var saved=org.mockito.ArgumentCaptor.forClass(TenantWizardForm.class);verify(service).save(saved.capture());
         assertThat(saved.getValue().databaseIcon).isEqualTo("CHERRY_BLUE");
+        assertThat(saved.getValue().createEmpty).isTrue();assertThat(saved.getValue().databaseFilename).isEqualTo("new-notes.ctb");
     }
     @Test void browseListsOnlyFoldersAndCtbWithoutContentAndDisablesCaching()throws Exception {
         Files.createDirectory(directory.resolve("notes"));Files.writeString(directory.resolve("one.ctb"),"payload");Files.writeString(directory.resolve("secret.txt"),"private");

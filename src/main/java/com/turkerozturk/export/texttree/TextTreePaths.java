@@ -4,9 +4,9 @@ import java.text.Normalizer;
 import java.util.*;
 
 /** Portable ZIP components: no traversal, absolute paths or case-insensitive sibling collisions. */
-final class TextTreePaths {
+public final class TextTreePaths {
     private final Set<String> used=new HashSet<>();
-    static String safe(String value,long id){
+    public static String safe(String value,long id){
         String result=Normalizer.normalize(Objects.toString(value,""),Normalizer.Form.NFC)
                 .replaceAll("[\\p{Cntrl}\\\\/:*?\"<>|]","_").strip().replaceAll("[. ]+$","");
         var bounded=new StringBuilder();int bytes=0;

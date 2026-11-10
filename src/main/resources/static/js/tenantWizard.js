@@ -3,11 +3,22 @@
     const form=document.getElementById('tenantWizardForm'); if(!form)return;
     const type=document.getElementById('type'), path=document.getElementById('path'), name=document.getElementById('name');
     const dialog=document.getElementById('wizardFiles'), folder=document.getElementById('wizardFolder'), entries=document.getElementById('wizardEntries'), status=document.getElementById('wizardBrowseStatus');
+    const create=document.getElementById('createEmpty'), filename=document.getElementById('databaseFilename');
     let parent='', autoName=name.value==='', sequence=0;
     name.addEventListener('input',()=>{autoName=false;});
-    function defaultName(){if(autoName||name.value===''){name.value=path.value.split(/[\\/]/).pop();autoName=true;}}
+    function defaultName(){if(autoName||name.value===''){name.value=create?.checked?(filename.value?filename.value+(/\.ctb$/i.test(filename.value)?'':'.ctb'):''):path.value.split(/[\\/]/).pop();autoName=true;}}
     path.addEventListener('change',defaultName);
-    function connectionType(){document.getElementById('wizardSqlite').hidden=type.value!=='sqlite';document.getElementById('wizardRemote').hidden=type.value==='sqlite';path.required=type.value==='sqlite';document.getElementById('url').required=type.value!=='sqlite';}
+    function connectionType(){
+        const sqlite=type.value==='sqlite';
+        if(create){create.disabled=!sqlite;if(!sqlite)create.checked=false;}
+        const fresh=sqlite&&create?.checked;
+        document.getElementById('wizardSqlite').hidden=!sqlite;document.getElementById('wizardRemote').hidden=sqlite;
+        document.getElementById('wizardExistingCtb').hidden=Boolean(fresh);path.required=sqlite&&!fresh;path.disabled=Boolean(fresh);
+        if(filename){filename.required=Boolean(fresh);filename.disabled=!fresh;document.getElementById('wizardNewCtb').hidden=!fresh;}
+        document.getElementById('url').required=!sqlite;
+    }
+    create?.addEventListener('change',()=>{connectionType();if(create.checked)document.getElementById('writable').checked=true;defaultName();});
+    filename?.addEventListener('input',defaultName);
     type.addEventListener('change',connectionType);connectionType();
     const browseUrl=form.action.replace(/\/$/,'')+'/browse';
     async function browse(value){

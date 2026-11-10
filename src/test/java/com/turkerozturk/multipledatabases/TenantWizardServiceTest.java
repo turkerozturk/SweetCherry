@@ -84,4 +84,83 @@ class TenantWizardServiceTest {
         f.url="jdbc:postgresql://localhost/notes";f.maxEmbeddedFileSizeMB="21";assertThatThrownBy(()->wizard.save(f)).hasMessage("wizard.invalidLimit");
         f.maxEmbeddedFileSizeMB="9.5";assertThatThrownBy(()->wizard.save(f)).hasMessage("wizard.invalidLimit");
     }
+    private TenantWizardForm empty(String filename) {
+        var f=new TenantWizardForm();f.createEmpty=true;f.databaseFilename=filename;f.writable=true;return f;
+    }
+    @Test void createsAnEmptyModernCtbAndConfigAndOpensItWithoutSchemaUpgrade()throws Exception {
+        var f=empty("Türkçe notlar");assertThat(wizard.save(f)).isEqualTo("Türkçe notlar.ctb");
+        Path database=directory.resolve("CTBDATA/Türkçe notlar.ctb");
+        assertThat(Files.isRegularFile(database)).isTrue();
+        var config=properties(directory.resolve("allTenants").resolve(holder.getCustomProperties(f.name).get("propertyFileName")));
+        assertThat(config.getProperty("datasource.url")).isEqualTo("jdbc:sqlite:"+database.toAbsolutePath());
+        var source=(ManagedTenantDataSource)routing.getResolvedDataSources().get(f.name);source.activate(true);
+        try(var connection=source.getConnection();var statement=connection.createStatement()) {
+            CtbSchemaCompatibility.ensure(connection,false,true);
+            for(String table:List.of("node","children","bookmark","image","grid","codebox"))try(var rows=statement.executeQuery("SELECT COUNT(*) FROM "+table)){rows.next();assertThat(rows.getLong(1)).isZero();}
+            statement.execute("INSERT INTO node VALUES(1,'First','note','plain-text','',0,0,0,0,0,0,1,1)");
+            statement.execute("INSERT INTO children VALUES(1,0,1,0)");
+        }
+        assertThat(wizard.edit(f.name).createEmpty).isFalse();
+    }
+    @Test void existingFilesCaseVariantsAndSqliteSidecarsAreNeverOverwritten()throws Exception {
+        Path data=Files.createDirectories(directory.resolve("CTBDATA"));
+        for(String name:List.of("notes.ctb","CASE.CTB","wal.ctb-wal","shm.ctb-shm","journal.ctb-journal"))Files.writeString(data.resolve(name),"keep");
+        for(String name:List.of("notes","case","wal","shm","journal"))assertThatThrownBy(()->wizard.save(empty(name))).hasMessage("wizard.newCtb.exists");
+        try(var files=Files.list(data)){for(Path file:files.toList())assertThat(Files.readString(file)).isEqualTo("keep");}
+        assertThat(routing.getResolvedDataSources()).isEmpty();
+    }
+    @Test void danglingTenantReferencesBlockCreationIncludingFileUriAndCaseVariants()throws Exception {
+        Path configs=Files.createDirectories(directory.resolve("allTenants"));Path database=directory.resolve("CTBDATA/missing.ctb");
+        for(String url:List.of("jdbc:sqlite:"+database,"jdbc:sqlite:"+database.toString().toUpperCase(Locale.ROOT),"jdbc:sqlite:"+database.toUri()+"?mode=rw")) {
+            var p=new Properties();p.setProperty("datasource.url",url);try(var writer=Files.newBufferedWriter(configs.resolve("unloaded.txt"),StandardCharsets.UTF_8)){p.store(writer,"");}
+            assertThatThrownBy(()->wizard.save(empty("missing"))).as("Tenant URL: %s",url).hasMessage("wizard.newCtb.referenced");assertThat(Files.exists(database)).isFalse();
+        }
+    }
+    @Test void portableFilenameValidationAndUnsupportedCreationModesHaveNoDatabaseSideEffects()throws Exception {
+        for(String name:List.of("../bad","folder/bad","a\\b","CON","aux.txt","COM¹","CONIN$","CON .ctb",".hidden","bad?name","trailing ","a".repeat(200),"bad#name"))
+            assertThatThrownBy(()->wizard.save(empty(name))).as(name).hasMessage("wizard.newCtb.filename");
+        var f=empty("new");f.type="postgresql";assertThatThrownBy(()->wizard.save(f)).hasMessage("wizard.newCtb.mode");
+        assertThat(Files.exists(directory.resolve("CTBDATA"))).isFalse();
+        assertThat(EmptyCtbCreation.references("jdbc:sqlite:CTBDATA/name.ctb",Path.of("CTBDATA/name.ctb"))).isTrue();
+        assertThat(EmptyCtbCreation.references("jdbc:sqlite:file:CTBDATA/name.ctb?mode=ro",Path.of("CTBDATA/name.ctb"))).isTrue();
+    }
+    @Test void configurationFailureRemovesOnlyTheDatabaseCreatedByThisSave()throws Exception {
+        var configuration=mock(MultitenantConfiguration.class);var tenants=mock(TenantService.class);when(tenants.getAllTenants()).thenReturn(Map.of());
+        doThrow(new java.io.IOException("test failure")).when(configuration).installTenantConfig(any(),any(),any(),any(),any());
+        var service=new TenantWizardService(tenants,new CustomPropertiesHolder(),configuration,directory.resolve("allTenants"));
+        Path other=directory.resolve("other.ctb");Files.writeString(other,"keep");
+        assertThatThrownBy(()->service.save(empty("cleanup"))).isInstanceOf(java.io.IOException.class);
+        assertThat(Files.exists(directory.resolve("CTBDATA/cleanup.ctb"))).isFalse();assertThat(Files.readString(other)).isEqualTo("keep");
+    }
+    @Test void missingConfigDirectoryAccessAndDuplicateTenantNameLeaveNoNewDatabase()throws Exception {
+        Path db=ctb();var first=new TenantWizardForm();first.name="Existing";first.path=db.toString();wizard.save(first);
+        var f=empty("never-created");f.name="Existing";assertThatThrownBy(()->wizard.save(f)).hasMessage("wizard.duplicateName");assertThat(Files.exists(directory.resolve("CTBDATA/never-created.ctb"))).isFalse();
+        Path badDirectory=Files.writeString(directory.resolve("not-a-directory"),"keep");
+        var service=new TenantWizardService(mock(TenantService.class),new CustomPropertiesHolder(),mock(MultitenantConfiguration.class),badDirectory);
+        assertThatThrownBy(()->service.save(empty("never-created"))).isInstanceOf(java.io.IOException.class);
+        assertThat(Files.exists(directory.resolve("CTBDATA/never-created.ctb"))).isFalse();assertThat(Files.readString(badDirectory)).isEqualTo("keep");
+    }
+
+    @Test void aFileInPlaceOfCtbdataIsNotChanged()throws Exception {
+        Path blocker=Files.writeString(directory.resolve("CTBDATA"),"keep");
+        assertThatThrownBy(()->wizard.save(empty("new"))).hasMessage("wizard.newCtb.directory");assertThat(Files.readString(blocker)).isEqualTo("keep");
+    }
+    @Test void aRegisteredMissingDatabaseBlocksCreationEvenWithoutAConfigFile()throws Exception {
+        var pool=new com.zaxxer.hikari.HikariDataSource();pool.setJdbcUrl("jdbc:sqlite:"+directory.resolve("CTBDATA/registered.ctb"));
+        var source=mock(ManagedTenantDataSource.class);when(source.configuration()).thenReturn(pool);
+        routing.setTargetDataSources(Map.of("Registered",source));routing.afterPropertiesSet();
+        assertThatThrownBy(()->wizard.save(empty("registered"))).hasMessage("wizard.newCtb.referenced");
+        assertThat(Files.exists(directory.resolve("CTBDATA/registered.ctb"))).isFalse();pool.close();
+    }
+
+    @Test void fileUriReferencesDecodeSpacesUnicodeAndMissingParentDirectories()throws Exception {
+        Path existing=Files.createDirectories(directory.resolve("Türkçe folder with spaces"));
+        Path target=existing.resolve("missing-parent/CTBDATA/notes.ctb");
+        assertThat(EmptyCtbCreation.references("jdbc:sqlite:"+target.toUri()+"?mode=rw",target)).isTrue();
+        String canonical=java.text.Normalizer.normalize(existing.toRealPath().resolve("missing-parent/CTBDATA/notes.ctb").toString(),java.text.Normalizer.Form.NFKC).toLowerCase(Locale.ROOT);
+        assertThat(EmptyCtbCreation.key(target)).isEqualTo(canonical);
+        assertThat(EmptyCtbCreation.references("jdbc:sqlite:"+target.resolveSibling("other.ctb").toUri(),target)).isFalse();
+        assertThat(Files.exists(target.getParent())).isFalse();
+    }
+
 }

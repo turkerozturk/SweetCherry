@@ -12,7 +12,15 @@
         <div class="row g-3">
             <div class="col-md-6"><label for="type" th:text="#{wizard.type}"></label><select class="form-select" th:field="*{type}"><option value="sqlite">SQLite CTB</option><option value="mysql">MySQL</option><option value="mariadb">MariaDB</option><option value="postgresql">PostgreSQL</option></select></div>
             <div class="col-md-6"><label for="name" th:text="#{wizard.name}"></label><input class="form-control" th:field="*{name}" maxlength="160"><small th:text="#{wizard.defaultName}"></small></div>
-            <div class="col-12" id="wizardSqlite"><label for="path" th:text="#{wizard.path}"></label><div class="input-group"><input class="form-control" th:field="*{path}"><button type="button" id="wizardBrowse" class="btn btn-outline-secondary" th:text="#{wizard.browse}"></button></div><small th:text="#{wizard.network}"></small></div>
+            <div class="col-12" id="wizardSqlite">
+                <label class="d-block mb-2" th:if="${#strings.isEmpty(wizard.tenant)}"><input type="checkbox" id="createEmpty" th:field="*{createEmpty}"> <span th:text="#{wizard.newCtb.option}"></span></label>
+                <div id="wizardNewCtb" th:if="${#strings.isEmpty(wizard.tenant)}">
+                    <label for="databaseFilename" th:text="#{wizard.newCtb.filenameLabel}"></label>
+                    <input class="form-control" th:field="*{databaseFilename}" maxlength="160" placeholder="notes.ctb">
+                    <p class="form-text" th:text="#{wizard.newCtb.help}"></p>
+                </div>
+                <div id="wizardExistingCtb"><label for="path" th:text="#{wizard.path}"></label><div class="input-group"><input class="form-control" th:field="*{path}"><button type="button" id="wizardBrowse" class="btn btn-outline-secondary" th:text="#{wizard.browse}"></button></div><small th:text="#{wizard.network}"></small></div>
+            </div>
             <div class="col-12" id="wizardRemote"><label for="url" th:text="#{wizard.url}"></label><input class="form-control" th:field="*{url}" maxlength="4000" placeholder="jdbc:postgresql://server:5432/notes"></div>
             <div class="col-md-6"><label for="username" th:text="#{wizard.username}"></label><input class="form-control" th:field="*{username}" maxlength="256" autocomplete="off"></div>
             <div class="col-md-6"><label for="wizardPassword" th:text="#{wizard.password}"></label><input class="form-control" id="wizardPassword" name="password" type="password" maxlength="1024" autocomplete="new-password"><small th:text="#{wizard.passwordHelp}"></small><label class="d-block"><input type="checkbox" th:field="*{clearPassword}"> <span th:text="#{wizard.clearPassword}"></span></label></div>
@@ -40,7 +48,7 @@
             </div>
             <div class="col-md-6"><label for="newNodeName" th:text="#{wizard.newNodeName}"></label><input class="form-control" th:field="*{newNodeName}" maxlength="1000"></div>
             <div class="col-md-6"><label for="newNodeTags" th:text="#{wizard.newNodeTags}"></label><input class="form-control" th:field="*{newNodeTags}" maxlength="1000"></div>
-            <div class="col-12"><label><input type="checkbox" th:field="*{writable}"> <span th:text="#{wizard.writable}"></span></label></div>
+            <div class="col-12"><label><input type="checkbox" id="writable" th:field="*{writable}"> <span th:text="#{wizard.writable}"></span></label></div>
             <div class="col-12"><label><input type="checkbox" th:field="*{allowLegacySchemaUpgrade}"> <span th:text="#{wizard.upgrade}"></span></label><p class="small" th:text="#{wizard.upgradeHelp}"></p></div>
         </div>
         <p class="mt-3" th:text="#{wizard.confirmHelp}"></p>

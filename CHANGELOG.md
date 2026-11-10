@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Create an empty SQLite CTB in CTBDATA together with a new tenant connection, with portable filename validation, file/config-reference collision checks, current schema initialization and cleanup on save failure.
+
 - Localize data-source upload and session information pages, including upload outcomes and debug labels, and correct session timestamp formatting; add close controls to both quick mind maps, keeping Markmap close available in page-filling mode.
 
 - Import ZIP folder/file trees through a localized preview/confirm wizard, appending new roots with canonical syntax/icon detection, optional extension removal, bounded binary attachments and oversized-file metadata. Guard writes with tenant/admin checks and one transaction.

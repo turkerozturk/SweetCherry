@@ -258,7 +258,14 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                 .username(properties.getProperty("datasource.username")).password(properties.getProperty("datasource.password")).build(),
                 "true".equals(properties.getProperty(CtbSchemaCompatibility.SETTING)));
         try {
-            if (oldTenant == null) Files.write(file, bytes, java.nio.file.StandardOpenOption.CREATE_NEW);
+            if (oldTenant == null) {
+                boolean created=false;
+                try {
+                    try(var output=Files.newOutputStream(file,java.nio.file.StandardOpenOption.CREATE_NEW,java.nio.file.StandardOpenOption.WRITE)) {
+                        created=true;output.write(bytes);
+                    }
+                } catch(IOException error) {if(created)try{Files.deleteIfExists(file);}catch(IOException cleanup){error.addSuppressed(cleanup);}throw error;}
+            }
             else {
                 Path temporary = Files.createTempFile(file.getParent(), ".tenant-edit-", ".tmp");
                 try { Files.write(temporary, bytes); Files.move(temporary, file, java.nio.file.StandardCopyOption.ATOMIC_MOVE, java.nio.file.StandardCopyOption.REPLACE_EXISTING); }

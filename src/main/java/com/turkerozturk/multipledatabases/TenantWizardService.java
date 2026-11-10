@@ -13,6 +13,7 @@ public class TenantWizardService {
     private final CustomPropertiesHolder custom;
     private final MultitenantConfiguration configuration;
     private final Path directory;
+    private final Path databases;
     private static final Map<String,String> DRIVERS = Map.of("sqlite","org.sqlite.JDBC","mysql","com.mysql.cj.jdbc.Driver","mariadb","org.mariadb.jdbc.Driver","postgresql","org.postgresql.Driver");
     @org.springframework.beans.factory.annotation.Autowired
     public TenantWizardService(TenantService tenants, CustomPropertiesHolder custom, MultitenantConfiguration configuration) {
@@ -20,6 +21,7 @@ public class TenantWizardService {
     }
     TenantWizardService(TenantService tenants, CustomPropertiesHolder custom, MultitenantConfiguration configuration, Path directory) {
         this.tenants=tenants; this.custom=custom; this.configuration=configuration; this.directory=directory;
+        this.databases=directory.toAbsolutePath().normalize().getParent().resolve("CTBDATA");
     }
     private Path resolve(String tenant) throws IOException {
         Path file=TenantConfigDownloadController.resolve(tenants,custom,directory,tenant);
@@ -65,9 +67,11 @@ public class TenantWizardService {
         boolean editing=f.tenant!=null&&!f.tenant.isBlank(); Path file=editing?resolve(f.tenant):null;
         Properties p=editing?read(file):new Properties();
         if(editing&&!revision(file).equals(f.revision)) throw new IllegalArgumentException("wizard.stale");
+        if(f.createEmpty && (editing||!f.type.equals("sqlite")))throw new IllegalArgumentException("wizard.newCtb.mode");
+        Path newDatabase=f.createEmpty?EmptyCtbCreation.target(databases,EmptyCtbCreation.filename(f.databaseFilename)):null;
         String url;
         if(f.type.equals("sqlite")) {
-            Path database=ctb(f.path); url="jdbc:sqlite:"+database;
+            Path database=f.createEmpty?newDatabase:ctb(f.path); url="jdbc:sqlite:"+database;
             if(f.name==null||f.name.isBlank())f.name=database.getFileName().toString();
         } else {
             url=f.url==null?"":f.url.trim();
@@ -89,7 +93,16 @@ public class TenantWizardService {
         if(!editing)file=directory.resolve("tenant-"+UUID.randomUUID()+".txt");
         var writer=new StringWriter();p.store(writer,"SweetCherry tenant configuration");
         if(writer.toString().getBytes(StandardCharsets.UTF_8).length>65536)throw new IllegalArgumentException("wizard.largeConfig");
-        configuration.installTenantConfig(editing?f.tenant:null,file,writer.toString().getBytes(StandardCharsets.UTF_8),p,editing?f.revision:null);
+        if(f.createEmpty) {
+            // Share the registration lock with reload/edit/delete operations.
+            synchronized(configuration) {
+                EmptyCtbCreation.available(newDatabase,directory,tenants);
+                try(var created=EmptyCtbCreation.create(newDatabase)) {
+                    configuration.installTenantConfig(null,file,writer.toString().getBytes(StandardCharsets.UTF_8),p,null);
+                    created.keep();
+                }
+            }
+        } else configuration.installTenantConfig(editing?f.tenant:null,file,writer.toString().getBytes(StandardCharsets.UTF_8),p,editing?f.revision:null);
         return f.name;
     }
 }

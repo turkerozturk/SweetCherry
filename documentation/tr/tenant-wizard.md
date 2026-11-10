@@ -15,4 +15,12 @@ MySQL/MariaDB/PostgreSQL için tür, JDBC adresi ve kullanıcı bilgileri yazıl
 
 Düzenleme bilinmeyen property anahtarlarını korur, fakat Properties biçiminde yeniden yazıldığı için yorumlar/satır düzeni korunmaz. Dosya başka yerde değiştirilmişse revision kontrolü eski formun üzerine yazmasını engeller. Seçili tenant dışında başka havuzlar kapatılmaz. Kullanımdaki havuz düzenlemesi reddedilir. Dosya kaydedilip bağlantı açılamazsa config kayıtlı kalır; normal açılış uyarısını izleyerek düzeltebilirsiniz.
 
-SweetCherry yedek almaz. Şema geçişine veya içerik yazmaya izin vermeden önce CTB dosyanızın kopyasını kendiniz alın. Bu sihirbaz yeni boş CTB oluşturmaz. [Eski CTB şemaları](legacy-ctb-schema.md).
+Bu sihirbaz mevcut CTB dosyalarının yedeğini almaz. Şema geçişine veya içerik yazmaya izin vermeden önce CTB dosyanızın kopyasını kendiniz alın. Yeni boş CTB oluşturmak için aşağıdaki seçeneği kullanın. [Eski CTB şemaları](legacy-ctb-schema.md).
+
+## Yeni ve boş CTB oluşturma
+
+Yönetici olarak `/tenants/wizard` sayfasını açıp SQLite türünde **CTBDATA içinde yeni, boş SQLite CTB oluştur** seçeneğini işaretleyin. Dosya adını girin; `.ctb` uzantısı yazılmazsa eklenir. Dosya uygulamanın çalışma klasöründeki `CTBDATA` içine, güncel CTB şemasıyla ve hiç düğüm içermeden oluşturulur. Yeni dosya seçeneği işaretlendiğinde yazma erişimi de işaretlenir; kaydetmeden önce değiştirebilirsiniz. JavaScript kapalıysa yazma erişimini kendiniz seçin. Kaydetme, bağlantı ayarını da oluşturur ve mevcut veritabanı seçme akışını kullanır.
+
+Mevcut CTB, klasör, sembolik bağlantı veya SQLite yardımcı dosyası (`-wal`, `-shm`, `-journal`) bulunan adlar kullanılamaz. Büyük/küçük harf ve Unicode normalizasyon farkları da çakışma kabul edilir. Henüz dosyası bulunmasa bile aynı yolu gösteren kayıtlı veya `allTenants` içindeki başka bir `.txt` bağlantı ayarı varsa oluşturma reddedilir. Mevcut veritabanına bağlanma ve bağlantı düzenleme işlemleri önceki gibi çalışır; yeni CTB oluşturma yalnızca yeni SQLite bağlantısında kullanılabilir.
+
+Dosya adı mevcut taşınabilir dosya adı kurallarıyla doğrulanır: klasör yolu, ayrılmış Windows aygıt adları, başta/sonda boşluk, geçersiz karakterler ve aşırı uzun adlar reddedilir. Ad Türkçe harf veya boşluk içerebilir. Hedef dosya mevcut içeriği ezmeden oluşturulur. Şema ya da tenant kaydı başarısız olursa yalnızca bu işlemde oluşturulan yeni CTB temizlenir. Dosya/ayar çakışmaları Türkçe/İngilizce mesajlarla gösterilir; erişim ve disk hatalarında dosya yolu ve izinler kontrol edilmelidir. `CTBDATA` klasörünün kendisi sembolik bağlantı olamaz.

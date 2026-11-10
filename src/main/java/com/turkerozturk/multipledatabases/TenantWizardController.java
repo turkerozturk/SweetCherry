@@ -17,7 +17,7 @@ public class TenantWizardController {
     private final DatabaseSwitchController selection;
     public TenantWizardController(TenantWizardService service, DatabaseSwitchController selection){this.service=service;this.selection=selection;}
     @InitBinder("wizard")
-    public void bind(org.springframework.web.bind.WebDataBinder binder){binder.setAllowedFields("tenant","revision","name","type","path","url","username","password","clearPassword","role","writable","allowLegacySchemaUpgrade","newNodeName","newNodeTags","maxEmbeddedFileSizeMB","databaseIcon");}
+    public void bind(org.springframework.web.bind.WebDataBinder binder){binder.setAllowedFields("tenant","revision","name","type","createEmpty","databaseFilename","path","url","username","password","clearPassword","role","writable","allowLegacySchemaUpgrade","newNodeName","newNodeTags","maxEmbeddedFileSizeMB","databaseIcon");}
     @ModelAttribute("databaseIconOptions")
     public java.util.List<com.turkerozturk.helpers.NodeIcon> databaseIconOptions(){
         return java.util.Arrays.stream(com.turkerozturk.helpers.NodeIcon.values())
