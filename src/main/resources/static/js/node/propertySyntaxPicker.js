@@ -21,5 +21,6 @@
     details.addEventListener('toggle',()=>{if(syntax.disabled)details.open=false;});
     choices.forEach(button=>button.addEventListener('click',()=>choose(button.dataset.syntax)));
     markdown.addEventListener('click',()=>{if(locked)return;radio.checked=true;radio.dispatchEvent(new Event('change',{bubbles:true}));choose('markdown');search.value='';filter();details.open=false;});
+    document.getElementById('propertyHtml')?.addEventListener('click',()=>{if(locked)return;radio.checked=true;radio.dispatchEvent(new Event('change',{bubbles:true}));choose('html');search.value='';filter();details.open=false;});
     sync();
 })();

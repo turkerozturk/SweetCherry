@@ -82,7 +82,7 @@ public class NodeContentParserService {
         if (com.turkerozturk.markdown.NodeMarkup.supports(node.getSyntax())) {
             var session=request==null?null:request.getSession(false);
             String token=session==null?"":(String)session.getAttribute(com.turkerozturk.multipledatabases.TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN);
-            node.setTxtAsHtml(com.turkerozturk.markdown.NodeMarkup.render(node.getSyntax(),node.getTxt(),token));
+            node.setTxtAsHtml(com.turkerozturk.markdown.NodeMarkup.view(node.getSyntax(),node.getTxt(),token));
         } else if (!"plain-text".equals(node.getSyntax()) && !"custom-colors".equals(node.getSyntax())) {
             node.setTxtAsHtml(CodeHighLighter.mappedhighlightLanguage(node.getSyntax(), node.getTxt()));
         } else if ("custom-colors".equals(node.getSyntax())) {

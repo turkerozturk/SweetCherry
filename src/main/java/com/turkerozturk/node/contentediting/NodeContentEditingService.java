@@ -42,6 +42,8 @@ public class NodeContentEditingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Text is required.");
         }
         Node node = editableNode(nodeId);
+        if ("html".equals(node.getSyntax()) && text.length()>com.turkerozturk.html.HtmlNodeRenderer.MAX_CHARACTERS)
+            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "HTML source is too large");
         if (java.util.Objects.equals(node.getTxt(), text)) return;
         // Recheck flags in the UPDATE in case CherryTree or another tab changed them after the SELECT.
         int updated = entityManager.createNativeQuery("UPDATE node SET txt = :text, ts_lastsave = :timestamp "

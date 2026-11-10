@@ -32,7 +32,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 
 | Area | Features |
 | --- | --- |
-| **Read and edit** | Desktop/mobile readers; supported rich text, Plain Text and Markdown editing; live preview; images, attachments, tables, codeboxes and offline LaTeX; browser-local recovery drafts. |
+| **Read and edit** | Desktop/mobile readers; supported rich text, Plain Text, Markdown and [HTML](documentation/en/html-notes.md) editing; live preview; images, attachments, tables, codeboxes and offline LaTeX; browser-local recovery drafts. |
 | **Find and organise** | Quick switch, quick note capture, advanced search, saved filters, backlinks, searchable tags, batch tag management, bookmarks, recent activity and weekly/monthly calendars. |
 | **Explore the tree** | Markmap and Mermaid views; quick child creation in Markmap; balanced two-sided layout and a page-filling canvas; node movement, duplication and shared nodes. |
 | **Export and exchange** | PDF with hierarchical navigation; CTB export/import with remapped internal IDs; Freeplane/FreeMind export with optional note text and icons; folder-tree text ZIP export; custom record reports and HTML/PDF layouts. |

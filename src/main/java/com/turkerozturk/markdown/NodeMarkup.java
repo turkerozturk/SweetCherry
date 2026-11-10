@@ -6,7 +6,7 @@ import org.jsoup.nodes.Element;
 
 /** Small explicit registry: future node markup renderers can be added without changing CTB storage. */
 public final class NodeMarkup {
-    private static final Map<String,NodeMarkupRenderer> RENDERERS=Map.of("markdown",new MarkdownRenderer());
+    private static final Map<String,NodeMarkupRenderer> RENDERERS=Map.of("markdown",new MarkdownRenderer(),"html",new com.turkerozturk.html.HtmlNodeRenderer());
     private NodeMarkup(){}
     public static boolean supports(String syntax){return syntax!=null&&RENDERERS.containsKey(syntax);}
     public static String render(String syntax,String source){return render(syntax,source,"");}
@@ -22,6 +22,11 @@ public final class NodeMarkup {
             if(!href.startsWith("#"))link.attr("target","_blank").attr("rel","noopener noreferrer");
         }
         return fragment.body().html();
+    }
+    /** Reader and calendar HTML stays isolated; reports and PDF use sanitized fragments. */
+    public static String view(String syntax,String source,String tenantToken){
+        String fragment=render(syntax,source,tenantToken);
+        return "html".equals(syntax) ? com.turkerozturk.html.HtmlNodeRenderer.frame(com.turkerozturk.html.HtmlNodeRenderer.document(fragment)) : fragment;
     }
     public static String forPdf(String syntax,String source){
         var fragment=Jsoup.parseBodyFragment(render(syntax,source));fragment.outputSettings().prettyPrint(false);

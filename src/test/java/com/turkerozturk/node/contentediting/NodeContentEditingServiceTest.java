@@ -108,4 +108,19 @@ class NodeContentEditingServiceTest {
         verifyNoInteractions(manager);
     }
 
+    @Test void htmlSavesExactSourceAndRejectsOversizedInputBeforeWriting() {
+        var properties=mock(NodePropertiesService.class);when(properties.writable()).thenReturn(true);
+        var node=new Node();node.setSyntax("html");when(properties.realNode(15L)).thenReturn(node);
+        var manager=mock(EntityManager.class);var query=mock(Query.class);
+        when(manager.createNativeQuery(anyString())).thenReturn(query);
+        when(query.setParameter(anyString(),any())).thenReturn(query);when(query.executeUpdate()).thenReturn(1);
+        var service=new NodeContentEditingService(properties);ReflectionTestUtils.setField(service,"entityManager",manager);
+        String source="<!doctype html>\n<p class='original'>Türkçe &amp; text</p><script>example()</script>";
+        service.update(15L,source);verify(query).setParameter("text",source);
+        clearInvocations(manager,query);
+        assertThatThrownBy(()->service.update(15L,"x".repeat(com.turkerozturk.html.HtmlNodeRenderer.MAX_CHARACTERS+1)))
+                .isInstanceOf(ResponseStatusException.class).hasMessageContaining("413");
+        verifyNoInteractions(manager,query);
+    }
+
 }

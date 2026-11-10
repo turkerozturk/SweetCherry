@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
-<head><title th:text="${node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle')}"></title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/node/editorLayout.css}"></head>
+<head><title th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/node/editorLayout.css}"></head>
 <body>
 <section layout:fragment="content" class="container-fluid py-1 plain-editor-page">
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
-    <h1 class="fs-5 mb-1" th:text="${node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle')}"></h1>
+    <h1 class="fs-5 mb-1" th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></h1>
     <p class="mb-1"><strong th:text="${node.name}">Düğüm adı</strong>
         <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>
-    <p class="text-muted small mb-1" th:text="${node.syntax == 'markdown' ? #messages.msg('markdown.sourceHelp') : #messages.msg('markdown.plainHelp')}"></p>
+    <p class="text-muted small mb-1" th:text="${node.syntax == 'html' ? #messages.msg('html.sourceHelp') : (node.syntax == 'markdown' ? #messages.msg('markdown.sourceHelp') : #messages.msg('markdown.plainHelp'))}"></p>
     <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>
 <form id="plainEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
@@ -42,11 +42,28 @@
 <button type="button" id="markdownPreviewToggle" class="btn btn-sm btn-outline-primary" aria-controls="markdownPreviewPane" aria-expanded="false" th:text="#{markdown.preview}"></button>
 <span class="markdown-preview-heading"><label><input type="checkbox" id="markdownAutoPreview" checked> <span th:text="#{markdown.autoPreview}"></span></label><button id="markdownRefresh" type="button" class="btn btn-sm btn-outline-secondary" th:text="#{markdown.refresh}"></button></span><span id="markdownPreviewStatus" role="status" aria-live="polite"></span>
 </div>
-<div id="markdownShell" th:classappend="${node.syntax == 'markdown'} ? 'md-editor-shell'">
+<div th:if="${node.syntax == 'html'}" id="htmlTools" class="markdown-toolbar" th:attr="data-preview-url=@{/nodes/html/{id}/preview(id=${node.nodeId})},data-loading=#{markdown.loading},data-failed=#{markdown.failed}">
+<button type="button" class="btn btn-sm btn-outline-secondary" data-html-before="&lt;strong&gt;" data-html-after="&lt;/strong&gt;" th:title="#{richtext.edit.bold}"><b>B</b></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-html-before="&lt;em&gt;" data-html-after="&lt;/em&gt;" th:title="#{richtext.edit.italic}"><i>I</i></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-html-before="&lt;h2&gt;" data-html-after="&lt;/h2&gt;" th:title="#{markdown.heading}">H</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-html-before="&lt;p&gt;" data-html-after="&lt;/p&gt;" th:title="#{html.paragraph}">¶</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-html-before="&lt;ul&gt;&#10;&lt;li&gt;" data-html-after="&lt;/li&gt;&#10;&lt;/ul&gt;" th:title="#{markdown.list}">•</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-html-before="&lt;pre&gt;&lt;code&gt;" data-html-after="&lt;/code&gt;&lt;/pre&gt;" th:title="#{html.codeBlock}">&lt;/&gt;</button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-html-before="&lt;a href=&quot;https://&quot;&gt;" data-html-after="&lt;/a&gt;" th:title="#{markdown.link}"><i class="fas fa-link" aria-hidden="true"></i></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" th:attr="data-html-text=#{html.tableSource}" th:title="#{markdown.table}"><i class="fas fa-table" aria-hidden="true"></i></button>
+<button type="button" id="htmlPreviewToggle" class="btn btn-sm btn-outline-primary" aria-controls="htmlPreviewPane" aria-expanded="false" th:text="#{html.preview}"></button>
+<label class="small"><input type="checkbox" id="htmlAutoPreview" checked> <span th:text="#{markdown.autoPreview}"></span></label>
+<button id="htmlRefresh" type="button" class="btn btn-sm btn-outline-secondary" th:text="#{markdown.refresh}"></button>
+<span id="htmlPreviewStatus" role="status" aria-live="polite"></span>
+</div>
+<div id="markdownShell" th:classappend="${node.syntax == 'markdown' or node.syntax == 'html'} ? 'md-editor-shell'">
 <div class="plain-writing-pane">        <textarea id="nodeText" name="text" class="form-control font-monospace" rows="20"
                   spellcheck="false" th:text="${node.txt}"></textarea></div>
 <section th:if="${node.syntax == 'markdown'}" id="markdownPreviewPane" hidden>
 <div id="markdownPreview" class="markdown-preview"></div>
+</section>
+<section th:if="${node.syntax == 'html'}" id="htmlPreviewPane" hidden>
+<iframe id="htmlPreview" class="html-preview" th:title="#{html.previewTitle}" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
 </section></div>
 
     </form>
@@ -55,6 +72,7 @@
 <script th:src="@{/js/node/plainTextEditor.js}"></script>
 <script th:src="@{/js/node/editorViewport.js}"></script>
 <script th:if="${node.syntax == 'markdown'}" th:src="@{/js/markdown/markdownEditor.js}"></script>
+<script th:if="${node.syntax == 'html'}" th:src="@{/js/html/htmlEditor.js}"></script>
 </section>
 </body>
 </html>

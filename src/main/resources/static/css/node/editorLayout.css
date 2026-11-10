@@ -15,3 +15,11 @@
  .plain-editor-page #markdownPreview{flex:1;height:0;min-height:0;max-height:none;overflow:auto}
  .plain-editor-page #editorRecovery{max-height:22dvh;overflow:auto}
 }
+
+/* HTML shares the source editor/history; its preview is an opaque-origin sandbox. */
+#htmlPreviewPane{min-width:0;min-height:0}#htmlPreviewStatus{font-size:.85rem}#htmlPreviewStatus:empty{display:none}
+.html-preview{display:block;width:100%;height:55vh;min-height:20rem;border:1px solid #aaa;border-radius:.3rem;background:#fff}
+@media(min-width:900px) and (min-height:500px){
+ .plain-editor-page #htmlPreviewPane{display:flex;flex-direction:column;overflow:hidden}
+ .plain-editor-page #htmlPreview{flex:1;height:0;min-height:0;max-height:none}
+}
