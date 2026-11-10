@@ -39,6 +39,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                 || request.getRequestURI().startsWith(request.getContextPath() + "/exportWithSubNodes/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/exportedFiles/import/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/mindmap-import/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/zip-import/")
                 || request.getRequestURI().equals(request.getContextPath() + "/system/backups/start")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/cherrytemplatetasks/create")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/cherrytemplatenode/")

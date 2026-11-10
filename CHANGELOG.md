@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Import ZIP folder/file trees through a localized preview/confirm wizard, appending new roots with canonical syntax/icon detection, optional extension removal, bounded binary attachments and oversized-file metadata. Guard writes with tenant/admin checks and one transaction.
+
 - Render HTML-syntax notes with jsoup sanitization and sandboxed readers; add an HTML shortcut in Node Properties and a source/live-preview editor with formatting tools, history and recovery. Preserve original HTML source in CTB storage.
 
 - Import Freeplane/FreeMind MM files through a localized, reviewed upload into a new final root branch; preserve hierarchy, readable notes/details, direct title styling, dates and SweetCherry icon references, with atomic writes and explicit conversion limits.

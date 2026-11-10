@@ -47,6 +47,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | --- | --- |
 | [English installation and usage](documentation/en/setup-and-run.md) | [First-start help / İlk çalıştırma](documentation/tr/first-start.md) |
 | [Türkçe kurulum ve kullanım](documentation/tr/installation.md) | [English feature guides](documentation/en) · [Türkçe özellik kılavuzları](documentation/tr) |
+| [Import folders and files from ZIP](documentation/en/zip-import.md) | [ZIP içe aktarım kılavuzu](documentation/tr/zip-import.md) |
 | [Changes and upgrade notes](CHANGELOG.md) | [1.7.0 release notes](documentation/releases/v1.7.0.md) · [All release notes](documentation/releases) |
 
 **Automatically generated documentation is also available on [DeepWiki](https://deepwiki.com/turkerozturk/SweetCherry).** Use it to explore the repository and codebase. DeepWiki is an external, automatically generated resource; check the version-matched project guides for installation instructions, supported behavior and limits.

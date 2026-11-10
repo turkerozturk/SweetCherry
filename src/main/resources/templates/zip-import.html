@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{zipImport.title}"></title></head>
+<body><section layout:fragment="content" class="container py-3">
+<h1 th:text="#{zipImport.title}"></h1>
+<p><strong th:text="#{zipImport.target}"></strong> <span th:text="${currentTenantName}"></span></p>
+<p th:text="#{zipImport.help}"></p>
+<p class="alert alert-info" th:text="#{zipImport.limits(${zipUploadBytes},${zipAttachmentBytes})}"></p>
+<div role="alert" class="alert alert-danger" th:if="${zipImportError != null}" th:text="${#messages.msg(zipImportError)}"></div>
+<div role="status" class="alert alert-success" th:if="${zipImportCount != null}" th:text="#{zipImport.success(${zipImportCount})}"></div>
+<form th:if="${preview == null}" th:action="@{/zip-import/preview}" method="post" enctype="multipart/form-data">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<label class="form-label" for="zip-file" th:text="#{zipImport.file}"></label>
+<input class="form-control mb-3" id="zip-file" type="file" name="file" accept=".zip,application/zip" required>
+<label class="form-check"><input class="form-check-input" type="checkbox" name="removeExtension" value="true"><span th:text="#{zipImport.removeExtension}"></span></label>
+<label class="form-check"><input class="form-check-input" type="checkbox" name="attachments" value="true" checked><span th:text="#{zipImport.attachments}"></span></label>
+<label class="form-check"><input class="form-check-input" type="checkbox" name="metadata" value="true" checked><span th:text="#{zipImport.metadata}"></span></label>
+<label class="form-label mt-3" for="zip-charset" th:text="#{zipImport.charset}"></label>
+<select id="zip-charset" name="charset" class="form-select mb-2"><option value="UTF-8">UTF-8</option><option value="windows-1254">Windows-1254</option><option value="windows-1252">Windows-1252</option><option value="ISO-8859-9">ISO-8859-9</option></select>
+<p class="small" th:text="#{zipImport.encodingHelp}"></p>
+<button class="btn btn-primary" type="submit" th:text="#{zipImport.preview}"></button>
+</form>
+<th:block th:if="${preview != null}">
+<h2 th:text="#{zipImport.review}"></h2>
+<p th:text="#{zipImport.count(${preview.count()},${preview.count('TEXT')},${preview.count('ATTACHMENT')},${preview.count('METADATA')},${preview.count('SKIP')})}"></p>
+<p th:text="#{zipImport.sample}"></p>
+<div class="table-responsive"><table class="table table-sm"><thead><tr><th th:text="#{zipImport.path}"></th><th th:text="#{zipImport.name}"></th><th th:text="#{zipImport.action}"></th><th th:text="#{zipImport.syntax}"></th><th th:text="#{zipImport.size}"></th></tr></thead>
+<tbody><tr th:each="entry, stat : ${preview.entries()}" th:if="${stat.index lt 200}"><td th:text="${entry.path()}"></td><td th:text="${entry.name()}"></td><td th:text="${#messages.msg('zipImport.action.' + entry.action().name())}"></td><td th:text="${entry.syntax()}"></td><td th:text="${entry.size() lt 0 ? '—' : entry.size()}"></td></tr></tbody></table></div>
+<form th:action="@{/zip-import/confirm}" method="post" class="d-inline">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="token" th:value="${token}">
+<button class="btn btn-primary" type="submit" th:disabled="${preview.count() == 0}" th:text="#{zipImport.confirm}"></button>
+</form>
+<form th:action="@{/zip-import/cancel}" method="post" class="d-inline"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="btn btn-secondary" type="submit" th:text="#{zipImport.cancel}"></button></form>
+</th:block>
+</section></body></html>
