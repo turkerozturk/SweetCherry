@@ -395,12 +395,14 @@ public class NodeController {
         return childrenService.getNaviNodesByFatherId(fatherId).stream()
                 .map(child -> new NavigationChild(child.nodeId(), child.name(),
                         child.nodeIcon().getIconName(), child.hasChildren(),
-                        child.titleColorAsHtmlHex(), child.isReadOnly(), child.boldnessBit()))
+                        child.titleColorAsHtmlHex(), child.isReadOnly(), child.boldnessBit(),child.excludedFromSearch(),child.bookmarked()))
                 .toList();
     }
 
     public record NavigationChild(long nodeId, String name, String iconName,
-                                  boolean hasChildren, String titleColor, boolean readOnly, boolean bold) { }
+                                  boolean hasChildren, String titleColor, boolean readOnly, boolean bold,boolean excludedFromSearch,boolean bookmarked) {
+        public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,false,false);}
+    }
 
     @Value("${myapp.tree.default-width:600}")
     private int treeDefaultWidth = 600;
@@ -655,6 +657,8 @@ public class NodeController {
 
         model.addAttribute("viewMode", viewMode);
 
+        var navigation=(List<NaviNode>)model.getAttribute("siblingNaviNodes");
+        model.addAttribute("nodeBookmarked",navigation!=null && navigation.stream().anyMatch(item->item.nodeId()==nodeId && item.bookmarked()));
         return "node/mobileReader";
 
 

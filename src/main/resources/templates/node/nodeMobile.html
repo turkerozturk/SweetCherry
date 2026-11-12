@@ -299,6 +299,7 @@
 
             <div>
 
+                <th:block th:replace="~{node/nodeStatusIcons :: headerStates(${node},${nodeBookmarked})}"></th:block>
                 <span class="h1"
                       th:text="${node.name}"></span>
                 &nbsp;

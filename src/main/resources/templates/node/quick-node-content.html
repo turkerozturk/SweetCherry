@@ -104,13 +104,14 @@
             }
         }
     </style>
+<link rel="stylesheet" th:href="@{/css/node/nodeStatusIcons.css}">
 </head>
 
 <body class="bg-light">
 <main class="container-fluid quick-content-shell pb-4">
     <header class="quick-content-header d-flex flex-wrap align-items-center gap-2 py-2 border-bottom mb-3">
         <h1 class="h5 mb-0 me-auto quick-content-title"
-            th:text="${node.name}">Düğüm</h1>
+            ><th:block th:replace="~{node/nodeStatusIcons :: headerStates(${node},${nodeBookmarked})}"></th:block><span th:text="${node.name}">Düğüm</span></h1>
 
         <span class="badge text-bg-secondary"
               th:text="#{quickmap.node(${requestedNodeId})}">Node</span>

@@ -349,6 +349,11 @@ public class Node {
         this.hasImage = hasImage;
     }
 
+    /** CherryTree stores search exclusions in the first two bits of level, not tree depth. */
+    public boolean isExcludeThisNode() { return (level & 1L) != 0; }
+    public boolean isExcludeSubnodes() { return (level & 2L) != 0; }
+    public boolean isSearchExcluded() { return (level & 3L) != 0; }
+
     public long getLevel() {
         return level;
     }

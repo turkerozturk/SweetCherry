@@ -57,12 +57,8 @@
                                        th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
                                     ></i>
 
-                                    <th:block th:if="${siblingNaviNode.isReadOnly == true}">
-                                        <img th:src="@{/img/icons/ct_locked.svg}"/>
-                                    </th:block>
-
                                     <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
-                                         th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
+                                         th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/><th:block th:replace="~{node/nodeStatusIcons :: treeStates(${siblingNaviNode})}"></th:block>
 
                                     <span th:text="${siblingNaviNode.name}"
                                           th:style="${'color:' + siblingNaviNode.titleColorAsHtmlHex + ';'}"
@@ -76,12 +72,8 @@
                                        th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
                                     ></i>
 
-                                    <th:block th:if="${siblingNaviNode.isReadOnly == true}">
-                                        <img th:src="@{/img/icons/ct_locked.svg}"/>
-                                    </th:block>
-
                                     <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
-                                         th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
+                                         th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/><th:block th:replace="~{node/nodeStatusIcons :: treeStates(${siblingNaviNode})}"></th:block>
 
                                     <span th:text="${siblingNaviNode.name}"
                                           id="selectedNaviNodeItem"
@@ -99,12 +91,8 @@
                                        th:style="${siblingNaviNode.hasChildren ? '' : 'visibility: hidden;'}"
                                 ></i>
 
-                                <th:block th:if="${siblingNaviNode.isReadOnly == true}">
-                                    <img th:src="@{/img/icons/ct_locked.svg}"/>
-                                </th:block>
-
                                 <img th:src="@{/img/icons/__${siblingNaviNode.nodeIcon.iconName}__.svg}"
-                                     th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/>
+                                     th:alt="${'/img/icons/' + siblingNaviNode.nodeIcon.iconName}" class="childiconcss"/><th:block th:replace="~{node/nodeStatusIcons :: treeStates(${siblingNaviNode})}"></th:block>
 
                                 <span th:text="${siblingNaviNode.name}"
                                       th:style="${'color:' + siblingNaviNode.titleColorAsHtmlHex + ';'}"

@@ -251,4 +251,26 @@ class NodePropertiesServiceTest {
         verify(query,never()).executeUpdate();
     }
 
+    @Test void savesAllSearchFlagCombinationsWithoutReplacingOtherLevelBits() {
+        for (int flags=0;flags<4;flags++) {
+            var node=new Node();node.setSyntax("plain-text");node.setLevel(0xA4|flags);
+            assertThat(node.isExcludeThisNode()).isEqualTo((flags&1)!=0);
+            assertThat(node.isExcludeSubnodes()).isEqualTo((flags&2)!=0);
+            assertThat(node.isSearchExcluded()).isEqualTo(flags!=0);
+            var query=mock(Query.class);var service=serviceWith(node,query);
+            service.update(12,"Name",false,TitleColor.NONE,NodeIcon.OTHER,false,null,null,null,(flags&1)!=0,(flags&2)!=0);
+            verify(query).setParameter("searchFlags",(long)flags);
+            var manager=(EntityManager)ReflectionTestUtils.getField(service,"entityManager");
+            verify(manager).createNativeQuery(argThat(sql->sql.contains("level = (COALESCE(level,0) & -4) | :searchFlags")));
+        }
+    }
+    @Test void legacyPropertyUpdatesLeaveSearchFlagsUntouched() {
+        var node=new Node();node.setSyntax("plain-text");node.setLevel(3);
+        var query=mock(Query.class);var service=serviceWith(node,query);
+        service.update(12,"Name",false,TitleColor.NONE,NodeIcon.OTHER,false);
+        var manager=(EntityManager)ReflectionTestUtils.getField(service,"entityManager");
+        verify(manager).createNativeQuery(argThat(sql->!sql.contains("level =")));
+        verify(query,never()).setParameter(eq("searchFlags"),any());
+    }
+
 }

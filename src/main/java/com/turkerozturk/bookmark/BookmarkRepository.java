@@ -24,6 +24,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
+    @org.springframework.data.jpa.repository.Query("select b.nodeId from Bookmark b where b.nodeId in :ids")
+    java.util.List<Long> findExistingIds(@org.springframework.data.repository.query.Param("ids") java.util.Collection<Long> ids);
+
     void deleteByNodeId(Long nodeId);
 
 }

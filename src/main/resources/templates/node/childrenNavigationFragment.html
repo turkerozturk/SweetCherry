@@ -34,12 +34,8 @@
                            th:style="${childNode.hasChildren ? '' : 'visibility: hidden;'}"
                         ></i>
 
-                        <th:block th:if="${childNode.isReadOnly == true}">
-                            <img th:src="@{/img/icons/ct_locked.svg}"/>
-                        </th:block>
-
                         <img th:src="@{/img/icons/__${childNode.nodeIcon.iconName}__.svg}"
-                             th:alt="${'/img/icons/' + childNode.nodeIcon.iconName}" class="childiconcss"/>
+                             th:alt="${'/img/icons/' + childNode.nodeIcon.iconName}" class="childiconcss"/><th:block th:replace="~{node/nodeStatusIcons :: treeStates(${childNode})}"></th:block>
 
                         <span th:text="${childNode.name}"
                               th:style="${'color:' + childNode.titleColorAsHtmlHex + ';'}"

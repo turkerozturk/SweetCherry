@@ -1,5 +1,16 @@
 /* Expand tree branches without navigating away from the selected node. */
 (() => {
+    function statusIcons(node) {
+        const flags=[];
+        if(node.readOnly)flags.push(['ct_locked','locked']);
+        if(node.excludedFromSearch)flags.push(['ct_ghost','excluded']);
+        if(node.bookmarked)flags.push(['ct_pin','pinned']);
+        if(!flags.length)return null;
+        const stack=document.createElement('span');stack.className='node-state-stack';stack.dataset.count=String(flags.length);
+        const labels=document.getElementById('nodeStatusLabels')?.dataset||{};
+        for(const [name,key] of flags){const icon=document.createElement('img');icon.src='/img/ctbicons/'+name+'.png';icon.alt=labels[key]||'';icon.title=labels[key]||'';stack.append(icon);}
+        return stack;
+    }
     const sidebar = document.getElementById('sideBarContent');
     if (!sidebar) return;
     const tenantView = sidebar.dataset.tenantView;
@@ -21,8 +32,8 @@
         link.href = '/nodes/' + encodeURIComponent(child.nodeId);
         link.title = child.name;
         link.className = 'linkinternal';
-        if (child.readOnly) link.append(icon('ct_locked'));
         link.append(icon(child.iconName));
+        const states=statusIcons(child);if(states)link.append(states);
         const title = document.createElement('span');
         title.textContent = child.name;
         if (/^#[0-9a-fA-F]{6}$/.test(child.titleColor)) title.style.color = child.titleColor;

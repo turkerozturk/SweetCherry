@@ -1,5 +1,16 @@
 (() => {
     'use strict';
+    function statusIcons(node) {
+        const flags=[];
+        if(node.readOnly)flags.push(['ct_locked','locked']);
+        if(node.excludedFromSearch)flags.push(['ct_ghost','excluded']);
+        if(node.bookmarked)flags.push(['ct_pin','pinned']);
+        if(!flags.length)return null;
+        const stack=document.createElement('span');stack.className='node-state-stack';stack.dataset.count=String(flags.length);
+        const labels=document.getElementById('nodeStatusLabels')?.dataset||{};
+        for(const [name,key] of flags){const icon=document.createElement('img');icon.src='/img/ctbicons/'+name+'.png';icon.alt=labels[key]||'';icon.title=labels[key]||'';stack.append(icon);}
+        return stack;
+    }
     const body = document.body, tree = document.getElementById('readerTreeNodes');
     const token = body.dataset.tenantToken;
     const key = 'sweetcherry:reader:' + token;
@@ -63,7 +74,7 @@
             if (id === body.dataset.selectedId) link.setAttribute('aria-current','page');
             const icon = document.createElement('img');
             if (/^[a-zA-Z0-9_-]+$/.test(node.iconName)) icon.src = '/img/icons/' + node.iconName + '.svg';
-            icon.alt = ''; row.append(fold, icon, link); li.append(row); list.append(li);
+            icon.alt = ''; row.append(fold, icon);const states=statusIcons(node);if(states)row.append(states);row.append(link); li.append(row); list.append(li);
             if (node.hasChildren) {
                 fold.type = 'button'; fold.textContent = '+'; fold.setAttribute('aria-expanded','false');
                 fold.setAttribute('aria-label', node.name);

@@ -20,6 +20,12 @@
 <div class="form-check"><input id="bold" class="form-check-input" type="checkbox" name="bold" value="true" th:checked="${bold}"><label class="form-check-label" for="bold" th:text="#{node.properties.bold}"></label></div>
 <div class="form-check"><input id="contentReadOnly" class="form-check-input" type="checkbox" name="contentReadOnly" value="true" th:checked="${contentReadOnly}"><label class="form-check-label" for="contentReadOnly" th:text="#{node.properties.readOnly}"></label></div>
 </div></div>
+<fieldset class="col-12 d-flex align-items-center flex-wrap gap-3" data-search-exclusions>
+<legend class="float-none w-auto fs-6 mb-0" th:text="#{node.excludeSearches}"></legend>
+<label><input type="checkbox" name="excludeThisNode" value="true" th:checked="${node.excludeThisNode}"> <span th:text="#{node.excludeThisNode}"></span></label>
+<label><input type="checkbox" name="excludeSubnodes" value="true" th:checked="${node.excludeSubnodes}"> <span th:text="#{node.excludeSubnodes}"></span></label>
+<input type="hidden" name="excludeThisNode" value="false"><input type="hidden" name="excludeSubnodes" value="false">
+</fieldset>
 <fieldset class="col-md-6"><legend class="fs-6" th:text="#{titlecolor.label}"></legend>
 <label th:if="${originalColor != null}" th:title="${originalColor}" class="property-color">
 <input type="radio" name="color" value="KEEP" th:checked="${selectedColor == 'KEEP'}"><span class="property-swatch" th:style="|background-color:${originalColor}|" aria-hidden="true"></span><span th:text="#{titlecolor.keep}"></span></label>

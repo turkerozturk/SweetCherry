@@ -79,6 +79,13 @@ public class NodePropertiesService {
     @Transactional
     public void update(long nodeId,String name,boolean bold,TitleColor color,NodeIcon icon,boolean contentReadOnly,
             NodeType nodeType,String codeSyntax,String tags) {
+        update(nodeId,name,bold,color,icon,contentReadOnly,nodeType,codeSyntax,tags,null,null);
+    }
+
+    /** Null flags preserve values for older callers; the properties form submits both explicitly. */
+    @Transactional
+    public void update(long nodeId,String name,boolean bold,TitleColor color,NodeIcon icon,boolean contentReadOnly,
+            NodeType nodeType,String codeSyntax,String tags,Boolean excludeThisNode,Boolean excludeSubnodes) {
         if (!writable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
@@ -106,6 +113,7 @@ public class NodePropertiesService {
         // Explicit columns avoid merging the entity's bookmark/children relationships.
         String sql = "UPDATE node SET name = :name, is_richtxt = :rich, is_ro = :icon, ts_lastsave = :timestamp"
                 + (tags!=null ? ", tags = :tags" : "")
+                + (excludeThisNode!=null && excludeSubnodes!=null ? ", level = (COALESCE(level,0) & -4) | :searchFlags" : "")
                 + (syntaxChanged ? ", syntax = :syntax" : "")
                 + " WHERE node_id = :id"
                 + (syntaxChanged ? (oldSyntax == null ? " AND syntax IS NULL" : " AND syntax = :oldSyntax")
@@ -116,6 +124,7 @@ public class NodePropertiesService {
                 .setParameter("icon", concatIconIdAndIsReadOnly)
                 .setParameter("timestamp", com.turkerozturk.node.NodeTimestamps.now())
                 .setParameter("id", nodeId);
+        if(excludeThisNode!=null && excludeSubnodes!=null)query.setParameter("searchFlags",(excludeThisNode?1L:0L)|(excludeSubnodes?2L:0L));
         if(tags!=null)query.setParameter("tags",normalizedTags);
         if (syntaxChanged) {
             query.setParameter("syntax", newSyntax);

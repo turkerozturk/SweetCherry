@@ -1,0 +1,13 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<span th:fragment="headerStates(node, bookmarked)" class="node-title-states" th:if="${node != null and (node.isReadOnly or bookmarked == true or node.searchExcluded)}">
+<img th:if="${node.isReadOnly}" th:src="@{/img/ctbicons/ct_locked.png}" th:alt="#{node.status.readOnly}" th:title="#{node.status.readOnly}">
+<img th:if="${bookmarked == true}" th:src="@{/img/ctbicons/ct_pin.png}" th:alt="#{node.status.bookmarked}" th:title="#{node.status.bookmarked}">
+<img th:if="${node.searchExcluded}" th:src="@{/img/ctbicons/ct_ghost.png}" th:alt="#{node.status.excluded}" th:title="#{node.status.excluded}">
+</span>
+<span th:fragment="treeStates(item)" th:if="${item.isReadOnly or item.excludedFromSearch or item.bookmarked}" class="node-state-stack"
+      th:attr="data-count=${(item.isReadOnly ? 1 : 0) + (item.excludedFromSearch ? 1 : 0) + (item.bookmarked ? 1 : 0)}">
+<img th:if="${item.isReadOnly}" th:src="@{/img/ctbicons/ct_locked.png}" th:alt="#{node.status.readOnly}" th:title="#{node.status.readOnly}">
+<img th:if="${item.excludedFromSearch}" th:src="@{/img/ctbicons/ct_ghost.png}" th:alt="#{node.status.excluded}" th:title="#{node.status.excluded}">
+<img th:if="${item.bookmarked}" th:src="@{/img/ctbicons/ct_pin.png}" th:alt="#{node.status.bookmarked}" th:title="#{node.status.bookmarked}">
+</span>
+</body></html>

@@ -39,6 +39,7 @@ public class ChildrenService {
 
     @Autowired
     private NodeRepository nodeRepository;
+    @Autowired private com.turkerozturk.bookmark.BookmarkRepository bookmarkRepository;
 
     public List<Children> getChildren() {
         List<Children> children = childrenRepository.findAll();
@@ -73,6 +74,8 @@ public class ChildrenService {
         Map<Long, Node> displayNodes = nodeRepository.findByNodeIdIn(displayIds).stream()
                 .collect(Collectors.toMap(Node::getNodeId, Function.identity()));
 
+        // One scalar lookup for the whole branch, not a query for each icon.
+        var bookmarks=rows.isEmpty()?java.util.Set.<Long>of():new java.util.HashSet<>(bookmarkRepository.findExistingIds(rows.stream().map(Children::getNodeId).toList()));
         List<NaviNode> result = new ArrayList<>();
         for (int i = 0; i < rows.size(); i++) {
             Children row = rows.get(i);
@@ -86,7 +89,7 @@ public class ChildrenService {
             result.add(new NaviNode(row.getNodeId(), display.getName(), display.getNodeIcon(),
                     !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
                     display.getTitleColorAsHtmlHex(), display.isReadOnly(), display.isBoldnessBit(),
-                    (int) row.getSequence(), previous, next));
+                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId())));
         }
         return result;
     }

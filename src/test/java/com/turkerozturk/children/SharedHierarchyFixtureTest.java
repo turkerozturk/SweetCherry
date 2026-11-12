@@ -56,6 +56,7 @@ class SharedHierarchyFixtureTest {
         when(children.findByFatherIdOrderBySequenceAsc(anyLong())).thenAnswer(c -> childrenOf(c.getArgument(0)));
         when(nodes.findById(anyLong())).thenAnswer(c -> content.get(c.<Long>getArgument(0)));
         when(nodes.findByNodeIdIn(anyList())).thenAnswer(c -> c.<List<Long>>getArgument(0).stream().map(content::get).toList());
+        ReflectionTestUtils.setField(childService,"bookmarkRepository",mock(com.turkerozturk.bookmark.BookmarkRepository.class));
         for (Object service : List.of(childService, nodeService)) {
             ReflectionTestUtils.setField(service, "childrenRepository", children);
             ReflectionTestUtils.setField(service, "nodeRepository", nodes);

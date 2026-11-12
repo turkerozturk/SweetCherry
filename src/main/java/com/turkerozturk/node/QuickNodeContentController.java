@@ -16,6 +16,7 @@ public class QuickNodeContentController {
     private final ChildrenRepository childrenRepository;
     private final NodeRepository nodeRepository;
     private final NodeContentParserService nodeContentParserService;
+    @org.springframework.beans.factory.annotation.Autowired private com.turkerozturk.bookmark.BookmarkRepository bookmarkRepository;
 
     public QuickNodeContentController(
             ChildrenRepository childrenRepository,
@@ -72,6 +73,7 @@ public class QuickNodeContentController {
                         || rawText.isBlank();
 
         model.addAttribute("node", node);
+        model.addAttribute("nodeBookmarked",bookmarkRepository!=null ? bookmarkRepository.existsById(nodeId) : node.getBookmark()!=null);
         model.addAttribute("requestedNodeId", nodeId);
         model.addAttribute("contentNodeId", contentNodeId);
         model.addAttribute("isAlias", isAlias);

@@ -1,6 +1,17 @@
 /* Persistent desktop navigation; node content changes independently from the tree. */
 (() => {
     'use strict';
+    function statusIcons(node) {
+        const flags=[];
+        if(node.readOnly)flags.push(['ct_locked','locked']);
+        if(node.excludedFromSearch)flags.push(['ct_ghost','excluded']);
+        if(node.bookmarked)flags.push(['ct_pin','pinned']);
+        if(!flags.length)return null;
+        const stack=document.createElement('span');stack.className='node-state-stack';stack.dataset.count=String(flags.length);
+        const labels=document.getElementById('nodeStatusLabels')?.dataset||{};
+        for(const [name,key] of flags){const icon=document.createElement('img');icon.src='/img/ctbicons/'+name+'.png';icon.alt=labels[key]||'';icon.title=labels[key]||'';stack.append(icon);}
+        return stack;
+    }
     const workspace = document.getElementById('tree-workspace');
     if (!workspace) return;
     const token = workspace.dataset.tenantView;
@@ -108,8 +119,8 @@
         const link = document.createElement('a');
         link.href = url('/tree', {nodeId: child.nodeId});
         link.title = child.name;
-        if (child.readOnly) link.append(image('ct_locked'));
         link.append(image(child.iconName));
+        const states=statusIcons(child);if(states)link.append(states);
         const name = document.createElement('span');
         name.textContent = child.name;
         if (/^#[0-9a-fA-F]{1,6}$/.test(child.titleColor)) name.style.color = '#' + child.titleColor.slice(1).padStart(6, '0');
