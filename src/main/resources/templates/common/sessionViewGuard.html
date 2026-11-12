@@ -7,6 +7,10 @@
             const pageView = /*[[${tenantViewToken}]]*/ '';
             const checkUrl = /*[[@{/session-view}]]*/ '/session-view';
             const homeUrl = /*[[@{/}]]*/ '/';
+            const expiredMessage = /*[[#{sessionGuard.expired}]]*/ '';
+            const changedMessage = /*[[#{sessionGuard.changed}]]*/ '';
+            const unverifiedMessage = /*[[#{sessionGuard.unverified}]]*/ '';
+            const homeLabel = /*[[#{sessionGuard.home}]]*/ '';
             let blocked = false;
 
             // Bağlantılar eski sekmeden açılırsa sunucu da eski CTB işaretini görsün.
@@ -32,16 +36,16 @@
                 try {
                     const response = await fetch(checkUrl, {credentials: 'same-origin', cache: 'no-store'});
                     if (!response.ok || response.redirected) {
-                        block('Oturum sona erdi. Yeniden giriş yapın.', homeUrl);
+                        block(expiredMessage, homeUrl);
                         return;
                     }
                     const current = await response.json();
                     if (current.view !== pageView) {
-                        block('Başka bir CTB seçildi. Bu sekmedeki sayfa artık güncel değil.', homeUrl);
+                        block(changedMessage, homeUrl);
                     }
                 } catch (_) {
                     // Geçici ağ hatası eski sayfadan işlem yapılmasına izin vermesin.
-                    block('Bağlantı doğrulanamadı. Sayfayı yeniden açın.', homeUrl);
+                    block(unverifiedMessage, homeUrl);
                 }
             }
 
@@ -56,7 +60,7 @@
                 text.textContent = message;
                 const link = document.createElement('a');
                 link.href = url;
-                link.textContent = 'Ana sayfaya git';
+                link.textContent = homeLabel;
                 box.append(text, link);
                 overlay.append(box);
                 document.body.append(overlay);
