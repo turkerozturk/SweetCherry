@@ -3,7 +3,7 @@ package com.turkerozturk.error;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.boot.webmvc.error.ErrorAttributes;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.web.context.request.ServletWebRequest;

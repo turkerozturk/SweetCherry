@@ -1,6 +1,5 @@
 package com.turkerozturk.quickmindmap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.multipledatabases.TenantContext;
@@ -43,11 +42,11 @@ class AllRootsMindMapTest {
         assertThat(singleMermaid.get("rootParentNodeId")).isEqualTo(0L);
 
         MarkmapQuickMindMapController markmap = new MarkmapQuickMindMapController(
-                children, nodes, new ObjectMapper(), mock(com.turkerozturk.node.properties.NodePropertiesService.class));
+                children, nodes, tools.jackson.databind.json.JsonMapper.builder().build(), mock(com.turkerozturk.node.properties.NodePropertiesService.class));
         ExtendedModelMap markmapModel = new ExtendedModelMap();
         assertThat(markmap.showAllRoots(3, false, false, false, markmapModel))
                 .isEqualTo("markmap-quick-mind-map");
-        var json = new ObjectMapper().readTree((String) markmapModel.get("markmapDataJson"));
+        var json = tools.jackson.databind.json.JsonMapper.builder().build().readTree((String) markmapModel.get("markmapDataJson"));
         assertThat(json.get("content").asText()).isEqualTo("Demo Database");
         assertThat(json.get("children").size()).isEqualTo(2);
         assertThat(json.get("children").get(1).get("payload").get("nodeId").asLong())

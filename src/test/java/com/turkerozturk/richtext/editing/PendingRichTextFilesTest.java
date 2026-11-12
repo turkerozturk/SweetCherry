@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class PendingRichTextFilesTest {
     private String json(String name, byte[] bytes) throws Exception {
-        return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-file:test", java.util.Map.of("name", name, "data", java.util.Base64.getEncoder().encodeToString(bytes))));
+        return tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(java.util.Map.of("new-file:test", java.util.Map.of("name", name, "data", java.util.Base64.getEncoder().encodeToString(bytes))));
     }
     @Test void preservesBinaryAndUnicodeBasename() throws Exception {
         byte[] original = {0, 1, (byte) 255, (byte) 137};

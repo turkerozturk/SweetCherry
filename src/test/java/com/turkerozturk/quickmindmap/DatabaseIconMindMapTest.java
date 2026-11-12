@@ -5,7 +5,6 @@ import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.node.NodeRepository;
 import com.turkerozturk.quickmindmapmarkmap.MarkmapQuickMindMapController;
 import com.turkerozturk.exportmindmap.MindMapExportController;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.ExtendedModelMap;
 import org.junit.jupiter.api.*;
@@ -19,14 +18,14 @@ class DatabaseIconMindMapTest {
     TenantIcons icons(){var holder=new CustomPropertiesHolder();holder.addCustomProperties("Demo",Map.of(TenantIcons.PROPERTY,"cherry_blue"));TenantContext.setCurrentTenant("Demo");return new TenantIcons(holder);}
     @Test void mermaidAndMarkmapDatabaseRootsRespectIconsSwitch()throws Exception {
         var children=mock(ChildrenRepository.class);var nodes=mock(NodeRepository.class);
-        var mermaid=new QuickMindMapController(children,nodes);var markmap=new MarkmapQuickMindMapController(children,nodes,new ObjectMapper(),mock(com.turkerozturk.node.properties.NodePropertiesService.class));
+        var mermaid=new QuickMindMapController(children,nodes);var markmap=new MarkmapQuickMindMapController(children,nodes,tools.jackson.databind.json.JsonMapper.builder().build(),mock(com.turkerozturk.node.properties.NodePropertiesService.class));
         var icons=icons();ReflectionTestUtils.setField(mermaid,"tenantIcons",icons);ReflectionTestUtils.setField(markmap,"tenantIcons",icons);
         for(boolean enabled:List.of(true,false)) {
             var model=new ExtendedModelMap();mermaid.showAllRoots(0,enabled,false,false,model);
             var entries=(List<?>)model.get("iconNodes");assertThat(entries).hasSize(enabled?1:0);
             if(enabled)assertThat(entries.get(0).toString()).contains("ct-node-0","cherry_blue");
             model=new ExtendedModelMap();markmap.showAllRoots(0,enabled,false,false,model);
-            var root=new ObjectMapper().readTree((String)model.get("markmapDataJson"));
+            var root=tools.jackson.databind.json.JsonMapper.builder().build().readTree((String)model.get("markmapDataJson"));
             assertThat(root.path("payload").has("iconName")).isEqualTo(enabled);
             if(enabled)assertThat(root.path("payload").path("iconName").asText()).isEqualTo("cherry_blue");
         }

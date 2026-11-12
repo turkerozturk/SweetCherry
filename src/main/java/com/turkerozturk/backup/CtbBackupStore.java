@@ -1,6 +1,6 @@
 package com.turkerozturk.backup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
@@ -23,7 +23,9 @@ public class CtbBackupStore {
     }
     public record Catalog(List<Backup> backups,int invalid) {}
     private final Path configured;
-    private final ObjectMapper json=new ObjectMapper();
+    // Legacy manifests omit the later automatic/count primitive fields. Keep their zero/false defaults.
+    private final ObjectMapper json=tools.jackson.databind.json.JsonMapper.builder()
+            .disable(tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES).build();
     public CtbBackupStore(CtbBackupSettings settings) { configured=Path.of(settings.getDirectory()).toAbsolutePath().normalize(); }
     public String directory() { return configured.toString(); }
     Path root() throws IOException {

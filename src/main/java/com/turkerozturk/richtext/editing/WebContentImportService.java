@@ -48,7 +48,7 @@ public class WebContentImportService {
                     var resource=fetcher.fetch(absolute,limit,deadline,budget);
                     if(!Set.of("image/png","image/jpeg").contains(resource.type()))throw new Problem("type");
                     String raw="data:"+resource.type()+";base64,"+Base64.getEncoder().encodeToString(resource.bytes());
-                    var json=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(Map.of("new-image:web",raw));
+                    var json=tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(Map.of("new-image:web",raw));
                     byte[] png=PendingRichTextImages.decode(json,limit).get("new-image:web");total+=png.length;
                     key="image"+images.size();images.put(key,"data:image/png;base64,"+Base64.getEncoder().encodeToString(png));cached.put(absolute,key);
                 }

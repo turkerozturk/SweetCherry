@@ -28,8 +28,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.servlet.ServletWebServerFactory;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -250,7 +250,7 @@ public class SweetCherry implements CommandLineRunner {
     public ServletWebServerFactory servletWebServerFactory() {
 
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-        factory.addAdditionalTomcatConnectors(connector());
+        factory.addAdditionalConnectors(connector());
         return factory;
 
     }

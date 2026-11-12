@@ -4,7 +4,7 @@ import com.turkerozturk.node.properties.NodePropertiesService;
 import com.turkerozturk.richtext.editing.EmbeddedUploadPolicy;
 import jakarta.persistence.*;
 import org.hibernate.Session;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
+import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

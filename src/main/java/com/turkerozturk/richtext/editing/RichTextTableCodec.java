@@ -28,10 +28,10 @@ final class RichTextTableCodec {
     static Map<String, List<List<String>>> decode(String json) {
         try {
             if (json == null || json.length() > 2_000_000) throw new IllegalArgumentException("Table data too large");
-            var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);
+            var root = tools.jackson.databind.json.JsonMapper.builder().build().readTree(json);
             if (root == null || !root.isObject() || root.size() > 20) throw new IllegalArgumentException("Invalid table data");
             var result = new LinkedHashMap<String, List<List<String>>>();
-            var fields = root.fields();
+            var fields = root.properties().iterator();
             while (fields.hasNext()) {
                 var field = fields.next();
                 if (!field.getKey().matches("(?:new-table:[a-zA-Z0-9-]{1,64}|grid:[0-9]+)") || !field.getValue().isArray())
@@ -49,7 +49,7 @@ final class RichTextTableCodec {
                 validate(rows); result.put(field.getKey(), List.copyOf(rows));
             }
             return Map.copyOf(result);
-        } catch (java.io.IOException error) { throw new IllegalArgumentException("Invalid table data", error); }
+        } catch (tools.jackson.core.JacksonException error) { throw new IllegalArgumentException("Invalid table data", error); }
     }
 
     /** Preserves existing table attributes and dimensions; new tables use automatic column widths. */

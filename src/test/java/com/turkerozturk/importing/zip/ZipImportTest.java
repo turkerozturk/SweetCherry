@@ -5,7 +5,7 @@ import com.turkerozturk.node.properties.NodePropertiesService;
 import com.turkerozturk.richtext.editing.EmbeddedUploadPolicy;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
+import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
 import org.springframework.test.util.ReflectionTestUtils;
 import java.nio.charset.*;
 import java.nio.file.*;

@@ -6,7 +6,6 @@ import java.util.Base64;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import javax.imageio.ImageIO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Validates local clipboard/file images and normalizes them to CTB PNG binary payloads. */
 final class PendingRichTextImages {
@@ -21,10 +20,10 @@ final class PendingRichTextImages {
     static Map<String, byte[]> decode(String json, int limit) {
         try {
             if (json == null || json.length() > EmbeddedUploadPolicy.JSON_CHARACTERS) throw new IllegalArgumentException("Image upload too large");
-            var root = new ObjectMapper().readTree(json);
+            var root = tools.jackson.databind.json.JsonMapper.builder().build().readTree(json);
             if (root == null || !root.isObject() || root.size() > 10) throw new IllegalArgumentException("Invalid image list");
             var result = new LinkedHashMap<String, byte[]>();
-            var fields = root.fields();
+            var fields = root.properties().iterator();
             long total = 0;
             while (fields.hasNext()) {
                 var field = fields.next();
@@ -55,6 +54,6 @@ final class PendingRichTextImages {
                 }
             }
             return Map.copyOf(result);
-        } catch (java.io.IOException error) { throw new IllegalArgumentException("Invalid image upload", error); }
+        } catch (java.io.IOException | tools.jackson.core.JacksonException error) { throw new IllegalArgumentException("Invalid image upload", error); }
     }
 }

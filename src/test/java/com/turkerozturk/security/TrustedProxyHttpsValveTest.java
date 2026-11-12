@@ -25,7 +25,7 @@ class TrustedProxyHttpsValveTest {
             assertThat(new LoginClientAddressResolver("192.168.0.2").resolve(request)).isEqualTo("203.0.113.7");
             return null;
         }).when(next).invoke(eq(request), any(Response.class));
-        valve.invoke(request, new Response());
+        valve.invoke(request, new Response(new org.apache.coyote.Response()));
         assertThat(request.isSecure()).isFalse();
         assertThat(request.getScheme()).isEqualTo("http");
         assertThat(request.getServerPort()).isEqualTo(8080);
@@ -57,7 +57,7 @@ class TrustedProxyHttpsValveTest {
         request.setServerPort(9443);
         var valve = new TrustedProxyHttpsValve("192.168.0.2", 443);
         valve.setNext(mock(Valve.class));
-        valve.invoke(request, new Response());
+        valve.invoke(request, new Response(new org.apache.coyote.Response()));
         assertThat(request.isSecure()).isTrue();
         assertThat(request.getServerPort()).isEqualTo(9443);
     }
@@ -69,7 +69,7 @@ class TrustedProxyHttpsValveTest {
         Valve next = mock(Valve.class);
         valve.setNext(next);
         doThrow(new jakarta.servlet.ServletException("test")).when(next).invoke(eq(request), any(Response.class));
-        assertThatThrownBy(() -> valve.invoke(request, new Response())).isInstanceOf(jakarta.servlet.ServletException.class);
+        assertThatThrownBy(() -> valve.invoke(request, new Response(new org.apache.coyote.Response()))).isInstanceOf(jakarta.servlet.ServletException.class);
         assertThat(request.isSecure()).isFalse();
         assertThat(request.getScheme()).isEqualTo("http");
         assertThat(request.getServerPort()).isEqualTo(8080);
@@ -92,13 +92,12 @@ class TrustedProxyHttpsValveTest {
             assertThat(request.getServerPort()).isEqualTo(8080);
             return null;
         }).when(next).invoke(eq(request), any(Response.class));
-        valve.invoke(request, new Response());
+        valve.invoke(request, new Response(new org.apache.coyote.Response()));
         verify(next).invoke(eq(request), any(Response.class));
     }
 
     private Request request(String peer, String protocol) {
-        var request = new Request(new Connector());
-        request.setCoyoteRequest(new org.apache.coyote.Request());
+        var request = new Request(new Connector(), new org.apache.coyote.Request());
         request.getCoyoteRequest().scheme().setString("http");
         request.setServerPort(8080);
         request.setRemoteAddr(peer);

@@ -1,6 +1,6 @@
 package com.turkerozturk.node.filter.saved;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.turkerozturk.helpers.NodeIcon;
 import org.springframework.stereotype.Service;
 import java.io.*;
@@ -40,8 +40,9 @@ public class SavedFiltersStore {
         if(!Files.isRegularFile(file)||Files.size(file)>MAX_BYTES)throw new IOException("Invalid preference file");
         byte[] bytes;try(var in=Files.newInputStream(file)){bytes=in.readNBytes(MAX_BYTES+1);}
         if(bytes.length>MAX_BYTES)throw new IOException("Preference file too large");
-        Document doc=mapper.readValue(bytes,Document.class);
+        Document doc;
         try {
+            doc=mapper.readValue(bytes,Document.class);
             if(doc.version()!=1||doc.presets()==null||doc.presets().size()>50)throw new IllegalArgumentException();
             Set<String> ids=new HashSet<>(),names=new HashSet<>();
             for(Preset p:doc.presets()) {

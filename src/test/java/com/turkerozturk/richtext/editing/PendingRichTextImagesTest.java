@@ -9,7 +9,7 @@ class PendingRichTextImagesTest {
         for (String format : java.util.List.of("png", "jpeg")) {
             var out = new java.io.ByteArrayOutputStream(); javax.imageio.ImageIO.write(image, format, out);
             String data = "data:image/" + format + ";base64," + java.util.Base64.getEncoder().encodeToString(out.toByteArray());
-            String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-image:test", data));
+            String json = tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(java.util.Map.of("new-image:test", data));
             byte[] png = PendingRichTextImages.decode(json).get("new-image:test");
             assertThat(png[0]).isEqualTo((byte) 137);
             var decoded = javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(png));
@@ -31,7 +31,7 @@ class PendingRichTextImagesTest {
         var out = new java.io.ByteArrayOutputStream();
         javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(2, 2, java.awt.image.BufferedImage.TYPE_INT_RGB), "png", out);
         String data = "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(out.toByteArray());
-        String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-image:test", data));
+        String json = tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(java.util.Map.of("new-image:test", data));
         assertThatThrownBy(() -> PendingRichTextImages.decode(json, 1)).isInstanceOf(IllegalArgumentException.class);
         assertThat(PendingRichTextImages.decode(json, 10000)).hasSize(1);
     }

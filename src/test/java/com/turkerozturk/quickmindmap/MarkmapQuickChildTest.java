@@ -1,6 +1,5 @@
 package com.turkerozturk.quickmindmap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.node.Node;
@@ -26,7 +25,7 @@ class MarkmapQuickChildTest {
     @Test void onlyWritableAdminsReceiveCreationControls() {
         var properties = mock(NodePropertiesService.class);
         var controller = new MarkmapQuickMindMapController(mock(ChildrenRepository.class),
-                mock(NodeRepository.class), new ObjectMapper(), properties);
+                mock(NodeRepository.class), tools.jackson.databind.json.JsonMapper.builder().build(), properties);
         var request = new MockHttpServletRequest();
         when(properties.writable()).thenReturn(true);
         assertThat(controller.canAddChildren(request)).isFalse();
@@ -45,7 +44,7 @@ class MarkmapQuickChildTest {
         var display = new Node(); display.setName("<Shared parent>");
         when(children.findByNodeId(id)).thenReturn(alias);
         when(nodes.findById(10L)).thenReturn(display);
-        var mapper = new ObjectMapper();
+        var mapper = tools.jackson.databind.json.JsonMapper.builder().build();
         var controller = new MarkmapQuickMindMapController(children, nodes, mapper, mock(NodePropertiesService.class));
         var model = new ExtendedModelMap();
         controller.showMarkmapQuickMindMap(id, 0, false, false, false, model);

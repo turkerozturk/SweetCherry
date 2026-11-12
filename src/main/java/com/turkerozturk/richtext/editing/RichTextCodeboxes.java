@@ -28,10 +28,10 @@ public final class RichTextCodeboxes {
     static Map<String, Value> decode(String json) {
         try {
             if (json == null || json.length() > 2_000_000) throw new IllegalArgumentException("Codebox data too large");
-            var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);
+            var root = tools.jackson.databind.json.JsonMapper.builder().build().readTree(json);
             if (root == null || !root.isObject() || root.size() > 20) throw new IllegalArgumentException("Invalid codebox data");
             var result = new LinkedHashMap<String, Value>();
-            var fields = root.fields();
+            var fields = root.properties().iterator();
             while (fields.hasNext()) {
                 var entry = fields.next(); var value = entry.getValue();
                 if (!entry.getKey().matches("(?:new-codebox:[a-zA-Z0-9-]{1,64}|codebox:[0-9]+)")
@@ -43,7 +43,7 @@ public final class RichTextCodeboxes {
                 result.put(entry.getKey(), new Value(text, syntax));
             }
             return Map.copyOf(result);
-        } catch (java.io.IOException error) { throw new IllegalArgumentException("Invalid codebox data", error); }
+        } catch (tools.jackson.core.JacksonException error) { throw new IllegalArgumentException("Invalid codebox data", error); }
     }
     static boolean supported(String syntax) { return languages().stream().anyMatch(language -> language.syntax().equals(syntax)); }
 }

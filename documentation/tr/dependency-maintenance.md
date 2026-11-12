@@ -1,5 +1,7 @@
 # Maven bağımlılık bakımı ve release doğrulaması
 
+> Güncel durum (2026-11-13): Spring Boot 4.1.2 ve Java 17 kullanılıyor; Springdoc 3.2.0, layout dialect 4.0.1 ve Boot tarafından yönetilen Spring Framework 7.0.10 ile Jackson 3 geçişi yapıldı. Aşağıdaki önceki incelemelerdeki Boot 3.5 / Springdoc 2.x kararları tarihseldir. Son geçiş ve doğrulama için [güvenlik incelemesi](security-alert-review.md#3f71f76-üzerinde-spring-boot-4-geçişi-2026-11-13).
+
 İlk inceleme: 2026-10-05 (`dded6a0`). Son sürüm kaydı: 2026-10-06, `pom.xml` commit'i `9908748d625bc5e0f93e2407abf1917fcac26d78`.
 
 Güncel sürüm tablosu aşağıdaki POM durumunu gösterir; sonraki tarihsel bölümler önceki güncelleme adımlarını korur.

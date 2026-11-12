@@ -93,3 +93,42 @@ These upgrades target the 16 non-Spring dependency alerts in the supplied list. 
 - https://github.com/advisories/GHSA-qv9r-c865-cp47
 - https://github.com/orphan-oss/ognl/releases/tag/OGNL_3_4_13
 - https://github.com/cure53/DOMPurify/releases/tag/3.4.17
+
+
+## Spring Boot 4 migration on 3f71f76 (2026-11-13)
+
+The application now uses Spring Boot **4.1.2**, while the Java source/runtime baseline remains **17**. Framework, Security, Hibernate, Jackson and Tomcat are upgraded together through Boot dependency management. The earlier Tomcat 10 and Jackson 2 BOM overrides are removed rather than mixing generations. The reviewed OGNL override remains. Springdoc is upgraded to 3.2.0 and the Thymeleaf layout dialect to 4.0.1. The published `thymeleaf-extras-springsecurity6` module remains in use at Boot's managed version; the artifact name does not select the runtime Spring Security generation.
+
+Application JSON code uses Jackson 3, including Boot's injected mapper. Parsing failures continue to map to the existing validation/error contracts. Old backup manifests can omit the later automatic-backup fields, and saved-filter parse errors remain IO failures. Existing files are not rewritten during the migration. Some third-party dependencies still use Jackson 2; Boot manages that family separately at a patched version.
+
+Boot's modular packages, environment-processor registration, Tomcat connector configuration and locale-cookie API are updated. The obsolete Maven `executable` option is removed: the supported scripts and launcher already use `java -jar` and do not need a shell script prepended to the JAR. Spring Security's same-origin relative login redirect is retained, including HTTPS/HSTS checks.
+
+### The two remaining Dependabot alerts
+
+Boot 4.1.2 manages Spring Framework **7.0.10**. The XsltView and SSE-fragment advisories list 7.0.9 as a fixed OSS version. This dependency upgrade therefore addresses the affected versions behind alerts #18 and #19. Wait for GitHub dependency submission and alert re-evaluation before reporting them closed; local tests cannot determine GitHub's current alert status.
+
+### The three remaining CodeQL alerts
+
+A framework upgrade does not itself resolve these application dataflow reports. No queries are disabled and no alerts are automatically dismissed.
+
+| Alert | Reviewed boundary | Follow-up |
+| --- | --- | --- |
+| #23, `PublicWebFetcher` | Only HTTP/HTTPS on default ports; every DNS answer must be public. Checked immutable DNS answers are supplied to the actual connection manager. Automatic redirects are disabled and each redirect is revalidated and pinned again. Import additionally requires ADMIN, a writable note and CSRF. | Review the current full source-to-sink trace against `checkedDns`, `request`, `PublicWebFetcherSecurityTest` and `WebContentImportSecurityTest`. If the trace only omits these custom controls, document a false-positive decision with this evidence. |
+| #22, `TenantConnectionPolicy` | Configuring a connection is an ADMIN operation. Local/private MariaDB, MySQL and PostgreSQL servers are intentionally supported. Driver classes and JDBC prefixes are restricted; SQLite remote resources are rejected before pool registration. | Decide against the deployment's trust model. ADMIN must be trusted to choose server-side database endpoints; if this capability is delegated to untrusted users, add deployment-specific destination allowlists first. |
+| #20, `TenantWizardService.ctb` | ADMIN intentionally selects an existing server-side CTB, including outside CTBDATA. The path is canonicalized; a regular `.ctb` file and SQLite magic header are required. This is not a general download endpoint. | Review authorization and the full alert path. Confining this picker to CTBDATA would remove supported behavior. Do not claim the path is untainted merely because it is normalized. |
+
+### Local verification for this migration
+
+On 64-bit Linux with Corretto 17.0.21, `clean package` passed **782 Java tests** with no failures/errors/skips. All **147 JavaScript tests** passed. The packaged JAR was started in an isolated folder: administrator login, language-cookie changes, CTB selection, tenant wizard, node content/properties, Markmap/Mermaid quick maps and quick content returned successful pages. The optional API documentation endpoint was enabled only for this smoke check and returned valid OpenAPI JSON. The JAR dependency list was checked for Framework 7.0.10, Security 7.1.2, Hibernate 7.4.13.Final, Tomcat 11.0.27, Jackson 3.1.7 / 2.21.7, HttpClient 5.6.5 and HttpCore 5.4.4. This is not a Windows, 32-bit, external-database or CodeQL scan result.
+
+### Checks before publishing a new binary
+
+Run `mvnw.cmd clean package` and `node --test src/test/js/*.test.cjs`. In a clean test folder, try login/logout, changing language, opening and creating CTBs, rich-text/Markdown/HTML edits, saved filters, backup listing/creation/restore and CTB/ZIP/Freeplane exports/imports. Verify the launcher and Windows setup build. If used, test real MariaDB/MySQL/PostgreSQL connections and native/trusted-proxy HTTPS. The automated SQLite JPA tests cover routed reads, pagination and transactional updates but do not replace checks against those database servers. 32-bit OS/JVM operation remains untested; Java 17 compatibility alone does not establish native SQLite/launcher support.
+
+### Migration references
+
+- https://docs.spring.io/spring-boot/system-requirements.html
+- https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide
+- https://springdoc.org/
+- https://spring.io/security/cve-2026-47884/
+- https://spring.io/security/cve-2026-47890/

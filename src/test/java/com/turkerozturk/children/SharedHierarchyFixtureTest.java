@@ -1,6 +1,5 @@
 package com.turkerozturk.children;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkerozturk.node.*;
 import com.turkerozturk.exportmindmap.MindMapExportController;
 import com.turkerozturk.quickmindmap.QuickMindMapController;
@@ -82,7 +81,7 @@ class SharedHierarchyFixtureTest {
         verify(children,never()).findByFatherIdOrderBySequenceAsc(2L);
     }
     @Test void markmapIncludesNestedSharedChildren() throws Exception {
-        var mapper = new ObjectMapper(); var model = new ExtendedModelMap();
+        var mapper = tools.jackson.databind.json.JsonMapper.builder().build(); var model = new ExtendedModelMap();
         new MarkmapQuickMindMapController(children,nodes,mapper,mock(com.turkerozturk.node.properties.NodePropertiesService.class)).showMarkmapQuickMindMap(11,10,false,false,false,model);
         var root = mapper.readTree((String)model.get("markmapDataJson"));
         assertThat(root.get("children").size()).isEqualTo(3);

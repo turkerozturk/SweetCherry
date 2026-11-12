@@ -14,7 +14,7 @@ class ChildrenControllerValidationTest {
         var controller = new ChildrenController();
         ReflectionTestUtils.setField(controller,"childrenService",service);
         var mvc = MockMvcBuilders.standaloneSetup(controller)
-                .setSingleView(new org.springframework.web.servlet.view.json.MappingJackson2JsonView())
+                .setSingleView(new org.springframework.web.servlet.view.json.JacksonJsonView())
                 .build();
         for (String id : List.of("m","-1","1.5","9223372036854775808")) {
             mvc.perform(get("/father").param("fatherId",id)).andExpect(status().isOk())
@@ -29,7 +29,7 @@ class ChildrenControllerValidationTest {
         var controller = new ChildrenController();
         ReflectionTestUtils.setField(controller,"childrenService",service);
         var mvc = MockMvcBuilders.standaloneSetup(controller)
-                .setSingleView(new org.springframework.web.servlet.view.json.MappingJackson2JsonView())
+                .setSingleView(new org.springframework.web.servlet.view.json.JacksonJsonView())
                 .build();
         mvc.perform(get("/father")).andExpect(status().isOk());
         mvc.perform(get("/father").param("fatherId","0")).andExpect(status().isOk());

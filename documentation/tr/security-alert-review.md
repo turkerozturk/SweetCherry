@@ -60,3 +60,24 @@ Java testleri ve paketleme Linux'ta çalıştırılır. Gerçek Windows ve uzak 
 Chromium kontrolünde zararlı script/event/SVG/MathML/template girdileri çalışmadı; parser sırasında kaynak isteği veya canlı belgeye HTML eklenmesi gözlenmedi. Başlık, kalın yazı, bağlantı, tablo ve güvenilir görsel token'ı senaryoları geçti. Bu sonuç bütün olası girdiler için garanti değildir.
 
 Sonraki büyük geçişten önce rich-text yapıştırma/URL import, CTB export–indirme–silme, veritabanı seçimi/oluşturma ve görünüm değiştirmeyi manuel deneyin. Push sonrası GitHub taramalarını tekrar değerlendirin. Uyarı numarası eşlemesi ve resmî kaynaklar İngilizce incelemenin ikinci aşama bölümündedir.
+
+
+## 3f71f76 üzerinde Spring Boot 4 geçişi (2026-11-13)
+
+Spring Boot **4.1.2** sürümüne geçildi; Java tabanı **17** olarak korundu. Spring Framework, Security, Hibernate, Jackson ve Tomcat birlikte Boot bağımlılık yönetimine bırakıldı. Önceki Tomcat 10 ve Jackson 2 BOM sabitlemeleri kaldırıldı; incelenmiş OGNL sabitlemesi korundu. Springdoc 3.2.0 ve Thymeleaf layout dialect 4.0.1 kullanılıyor. Yayınlanmış `thymeleaf-extras-springsecurity6` modülü Boot'un yönettiği sürümde kullanılmaya devam ediyor; adındaki 6, çalışan Spring Security sürümünü belirlemiyor.
+
+Uygulamanın JSON kodları Jackson 3'e taşındı. Eski yedek kataloglarında sonradan eklenen otomatik yedekleme alanlarının bulunmaması destekleniyor; bozuk kayıtlı filtreler mevcut IO hata akışını kullanıyor. Geçiş mevcut dosyaları yeniden yazmıyor. Bazı üçüncü taraf kütüphaneler için Jackson 2'nin düzeltilmiş sürümleri ayrıca Boot tarafından yönetiliyor. Boot paketleri, environment processor kaydı, Tomcat ek bağlantı noktası ve dil çerezi API'leri uyarlandı. Betikler zaten `java -jar` kullandığından artık desteklenmeyen Maven `executable` seçeneği kaldırıldı. Security'nin aynı origin üzerinde göreli giriş yönlendirmesi korundu; HTTPS/HSTS kontrolleri sürüyor.
+
+Dependabot #18 ve #19 için düzeltilmiş OSS Spring Framework sürümü 7.0.9'dur. Boot 4.1.2'nin yönettiği **7.0.10**, bu iki bağımlılık uyarısının etkilenen sürümlerini giderir. GitHub bağımlılık grafiği yenilenmeden uyarıların kapandığı söylenmemelidir.
+
+Kalan CodeQL uyarıları bu sürüm yükseltmesinden ayrıdır; bastırma veya otomatik kapatma yapılmadı:
+
+- **#23:** Web içeriği aktarımında tüm DNS yanıtları doğrulanıyor, değiştirilemez yanıtlar gerçek bağlantı yöneticisine veriliyor ve her yönlendirme yeniden doğrulanıyor. ADMIN, yazılabilir not ve CSRF kontrolleri de var. Tam veri akışı `PublicWebFetcherSecurityTest` ve `WebContentImportSecurityTest` ile birlikte incelenmeli; özel doğrulamaların analiz tarafından tanınmadığı doğrulanırsa gerekçeli false-positive kararı verilebilir.
+- **#22:** ADMIN'in localhost veya özel ağdaki veritabanına bağlanabilmesi amaçlanan işlevdir. Sürücü/JDBC eşleştirmesi denetlenir ve SQLite uzak kaynakları reddedilir. ADMIN bu yetki için güvenilir kabul edilmelidir; güvenilmeyen kişilere bağlantı yapılandırması verilecekse dağıtıma özel hedef izin listesi gerekir.
+- **#20:** ADMIN sunucuda CTBDATA dışındaki mevcut bir CTB'yi de seçebilir. Gerçek yol, normal dosya, `.ctb` uzantısı ve SQLite başlığı denetlenir. Normalizasyon tek başına güvenlik kanıtı değildir; tam uyarı akışı ve yetkilendirme birlikte incelenmelidir.
+
+64 bit Linux / Corretto 17.0.21 üzerinde `clean package` başarılı: **782 Java testi**, sıfır hata/başarısızlık/atlama. **147 JavaScript testi** de geçti. Paketlenen JAR ayrı klasörde çalıştırılarak giriş, dil değiştirme, CTB seçimi, tenant sihirbazı, düğüm içeriği/özellikleri, iki mind map görünümü ve quick content kontrol edildi. Yalnızca bu denemede etkinleştirilen API dokümantasyonu geçerli OpenAPI JSON döndürdü. Bunlar Windows, 32 bit, uzak veritabanı veya CodeQL taraması sonucu değildir.
+
+`mvnw.cmd clean package` ve `node --test src/test/js/*.test.cjs` sonrasında temiz bir deneme klasöründe giriş/çıkış, dil değiştirme, CTB açma/oluşturma, editörler, kayıtlı filtreler, yedek oluşturma/geri yükleme ve import/export işlemleri denenmelidir. Launcher ve Windows paketleme ayrıca kontrol edilmelidir. Kullanılıyorsa gerçek MariaDB/MySQL/PostgreSQL sunucuları ile HTTPS/proxy kurulumu denenmelidir. Otomatik SQLite JPA testleri bu sunucuların yerini tutmaz. **32 bit işletim sistemi/JVM desteği test edilmedi**; Java 17 uyumluluğu, yerel SQLite veya launcher desteğini tek başına garanti etmez.
+
+Sürüm tablosu, ayrıntılı inceleme ve resmi kaynaklar için [İngilizce bölüm](../en/security-alert-review.md#spring-boot-4-migration-on-3f71f76-2026-11-13).

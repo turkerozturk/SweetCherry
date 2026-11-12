@@ -1,9 +1,9 @@
 package com.turkerozturk.quickmindmapmarkmap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.turkerozturk.children.Children;
 import com.turkerozturk.children.ChildrenRepository;
 import com.turkerozturk.helpers.NodeIcon;
@@ -85,7 +85,7 @@ public class MarkmapQuickMindMapController {
         }
         try {
             model.addAttribute("markmapDataJson", objectMapper.writeValueAsString(root));
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Markmap verisi JSON biçimine dönüştürülemedi.", exception);
         }
@@ -152,7 +152,7 @@ public class MarkmapQuickMindMapController {
         final String markmapDataJson;
         try {
             markmapDataJson = objectMapper.writeValueAsString(markmapRoot);
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "Markmap verisi JSON biçimine dönüştürülemedi.",

@@ -57,7 +57,8 @@ class SecurityTransportTest {
                 request.setServerPort(443);
                 return request;
             })).andExpect(status().isFound())
-                    .andExpect(redirectedUrl("https://notes.example.org/login"))
+                    // Security 7 uses a same-origin relative redirect, preserving the browser's HTTPS scheme.
+                    .andExpect(redirectedUrl("/login"))
                     .andExpect(header().string("Referrer-Policy", "same-origin"))
                     .andExpect(header().string("Strict-Transport-Security", "max-age=31536000"));
         }

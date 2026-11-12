@@ -3,7 +3,6 @@ package com.turkerozturk.richtext.editing;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Base64;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Decodes attachments without treating their content as HTML, an image or a filesystem path. */
 final class PendingRichTextFiles {
@@ -14,11 +13,11 @@ final class PendingRichTextFiles {
     static Map<String, File> decode(String json, int limit) {
         try {
             if (json == null || json.length() > EmbeddedUploadPolicy.JSON_CHARACTERS) throw new IllegalArgumentException("File upload too large");
-            var root = new ObjectMapper().readTree(json);
+            var root = tools.jackson.databind.json.JsonMapper.builder().build().readTree(json);
             if (root == null || !root.isObject() || root.size() > 10) throw new IllegalArgumentException("Invalid file list");
             var result = new LinkedHashMap<String, File>();
             long total = 0;
-            var fields = root.fields();
+            var fields = root.properties().iterator();
             while (fields.hasNext()) {
                 var field = fields.next(); var object = field.getValue();
                 if (!field.getKey().matches("new-file:[a-zA-Z0-9-]{1,64}") || !object.isObject() || object.size() != 2
@@ -33,6 +32,6 @@ final class PendingRichTextFiles {
                 result.put(field.getKey(), new File(name, bytes));
             }
             return Map.copyOf(result);
-        } catch (java.io.IOException error) { throw new IllegalArgumentException("Invalid file upload", error); }
+        } catch (tools.jackson.core.JacksonException error) { throw new IllegalArgumentException("Invalid file upload", error); }
     }
 }

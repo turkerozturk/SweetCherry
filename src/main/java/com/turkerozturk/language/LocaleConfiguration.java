@@ -70,10 +70,9 @@ public class LocaleConfiguration implements WebMvcConfigurer {
 
     @Bean(name = "localeResolver")
     public LocaleResolver localeResolver() {
-        CookieLocaleResolver clr = new CookieLocaleResolver();
+        CookieLocaleResolver clr = new CookieLocaleResolver("locale");
         clr.setDefaultLocaleFunction(request -> initialLocale(request, configuredLanguage));
-        clr.setCookieName("locale");
-        clr.setCookieMaxAge(3600); // Set the cookie max age as per your requirement
+        clr.setCookieMaxAge(java.time.Duration.ofHours(1));
         return clr;
     }
 

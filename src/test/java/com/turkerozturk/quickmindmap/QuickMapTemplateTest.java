@@ -36,7 +36,7 @@ class QuickMapTemplateTest {
                 assertThat(html).doesNotContain("??quickmap.");
                 assertThat(doc.selectFirst("label[for=level]").text()).isEqualTo(locale.getLanguage().equals("en")?"Level":"Seviye");
                 assertThat(doc.selectFirst("button[type=submit]").text()).isEqualTo(locale.getLanguage().equals("en")?"Apply":"Uygula");
-                assertThat(new com.fasterxml.jackson.databind.ObjectMapper().readValue(html.split("const openContentLabel = ")[1].split(";")[0],String.class)).isEqualTo(locale.getLanguage().equals("en")?"Open node content in a new tab":"Düğüm içeriğini yeni sekmede aç");
+                assertThat(tools.jackson.databind.json.JsonMapper.builder().build().readValue(html.split("const openContentLabel = ")[1].split(";")[0],String.class)).isEqualTo(locale.getLanguage().equals("en")?"Open node content in a new tab":"Düğüm içeriğini yeni sekmede aç");
                 if(page.startsWith("markmap")) {
                     assertThat(doc.selectFirst("#markmapCanvasToggle").attr("aria-pressed")).isEqualTo("false");
                     assertThat(doc.selectFirst("main").classNames()).doesNotContain("markmap-page-only");
@@ -58,7 +58,7 @@ class QuickMapTemplateTest {
             assertThat(doc.selectFirst("h1").text()).isEqualTo(node.getName());
             assertThat(doc.selectFirst("button").text()).isEqualTo(locale.getLanguage().equals("en")?"Close":"Kapat");
             assertThat(doc.selectFirst(".quick-node-content").text()).isEqualTo(locale.getLanguage().equals("en")?"This node has no content.":"Bu düğümün içeriği boş.");
-            assertThat(new com.fasterxml.jackson.databind.ObjectMapper().readValue(html.split("const openImageLabel = ")[1].split(";")[0],String.class)).isEqualTo(locale.getLanguage().equals("en")?"Open original image in a new tab":"Görseli gerçek boyutta yeni sekmede aç");
+            assertThat(tools.jackson.databind.json.JsonMapper.builder().build().readValue(html.split("const openImageLabel = ")[1].split(";")[0],String.class)).isEqualTo(locale.getLanguage().equals("en")?"Open original image in a new tab":"Görseli gerçek boyutta yeni sekmede aç");
             assertThat(html).doesNotContain("??quickcontent.");
         }
     }

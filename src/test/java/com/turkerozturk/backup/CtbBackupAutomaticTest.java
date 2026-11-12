@@ -37,7 +37,7 @@ class CtbBackupAutomaticTest {
         assertThatThrownBy(()->s.getAutomatic().setRetryMinutes(-1)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(()->s.getAutomatic().setKeepLast(-1)).isInstanceOf(IllegalArgumentException.class);
         var store=new CtbBackupStore(s);String id="20261102-000000-"+UUID.randomUUID();Path file=store.file(id);Files.copy(fixture("legacy"),file);
-        var json=new com.fasterxml.jackson.databind.ObjectMapper();var old=new LinkedHashMap<String,Object>();old.put("id",id);old.put("fileName",file.getFileName().toString());old.put("sourceName","Old");old.put("created","2026-11-02T00:00:00Z");old.put("bytes",Files.size(file));old.put("sha256",CtbBackupStore.sha256(file));old.put("counts",Map.of("node",1));
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();var old=new LinkedHashMap<String,Object>();old.put("id",id);old.put("fileName",file.getFileName().toString());old.put("sourceName","Old");old.put("created","2026-11-02T00:00:00Z");old.put("bytes",Files.size(file));old.put("sha256",CtbBackupStore.sha256(file));old.put("counts",Map.of("node",1));
         json.writeValue(store.root().resolve("backup-"+id+".json").toFile(),old);
         assertThat(store.checked(id).automatic()).isFalse();assertThat(store.checked(id).sourceKey()).isNull();
     }

@@ -169,7 +169,7 @@ class RichTextEditingServiceTest {
         var picture = new java.awt.image.BufferedImage(1, 1, java.awt.image.BufferedImage.TYPE_INT_RGB);
         var bytes = new java.io.ByteArrayOutputStream(); javax.imageio.ImageIO.write(picture, "png", bytes);
         String data = "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(bytes.toByteArray());
-        String images = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-image:test", data));
+        String images = tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(java.util.Map.of("new-image:test", data));
         String revision = service.open(12).revision();
         service.save(12, "<node><rich_text>😀</rich_text><rich_text __sweet_object='new-image:test'>\uFFFC</rich_text><rich_text>Text</rich_text></node>", revision, images);
         var stored = RichTextEditingService.readObjects(connection, 12);
@@ -183,7 +183,7 @@ class RichTextEditingServiceTest {
         addImage();
         var picture=new java.awt.image.BufferedImage(2,2,java.awt.image.BufferedImage.TYPE_INT_RGB);
         var bytes=new java.io.ByteArrayOutputStream();javax.imageio.ImageIO.write(picture,"png",bytes);
-        var images=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-image:import","data:image/png;base64,"+java.util.Base64.getEncoder().encodeToString(bytes.toByteArray())));
+        var images=tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(java.util.Map.of("new-image:import","data:image/png;base64,"+java.util.Base64.getEncoder().encodeToString(bytes.toByteArray())));
         service.save(12,"<node><rich_text>😀</rich_text><rich_text __sweet_object='image:1'>\uFFFC</rich_text><rich_text __sweet_object='new-image:import'>\uFFFC</rich_text><rich_text __sweet_object='new-table:import'>\uFFFC</rich_text><rich_text>Türkçe</rich_text></node>",service.open(12).revision(),images,"{}","{\"new-table:import\":[[\"Header\"],[\"Value\"]]}");
         var stored=RichTextEditingService.readObjects(connection,12);assertThat(stored).hasSize(3);
         var old=stored.stream().filter(o->o.reference().table().equals("image")&&o.reference().offset()==1).findFirst().orElseThrow();
@@ -196,7 +196,7 @@ class RichTextEditingServiceTest {
 
     @Test void savesAttachmentFilenameAndUnchangedBinaryInImageTable() throws Exception {
         byte[] original = {0, 1, (byte) 255, (byte) 137};
-        String files = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("new-file:test",
+        String files = tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(java.util.Map.of("new-file:test",
                 java.util.Map.of("name", "Türkçe test.bin", "data", java.util.Base64.getEncoder().encodeToString(original))));
         service.save(12, "<node><rich_text>😀</rich_text><rich_text __sweet_object='new-file:test'>\uFFFC</rich_text></node>", service.open(12).revision(), "{}", files);
         var stored = RichTextEditingService.readObjects(connection, 12);
