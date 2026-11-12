@@ -38,4 +38,14 @@ class ApplicationSettingsTest {
   assertThatThrownBy(()->new ApplicationSettingsService(environment).file()).isInstanceOf(java.io.IOException.class);
  }
  @Test void cannotCreateOrEditUnloadedConfig(){var service=new ApplicationSettingsService(new StandardEnvironment());assertThatThrownBy(service::read).isInstanceOf(java.io.IOException.class);}
+ @Test void rejectsJavaClassTagsAndCustomTagsWithoutConstructingObjects(){
+  for(String yaml:List.of("myapp: !!java.util.HashMap {debug: false}\n", "extra: !!javax.script.ScriptEngineManager []\nmyapp: {}\n", "extra: !custom value\nmyapp: {}\n", "extra: {!custom key: value}\nmyapp: {}\n"))
+   assertThatThrownBy(()->ApplicationSettingsService.update(yaml,values())).isInstanceOf(RuntimeException.class);
+ }
+ @Test void rejectsExcessiveNestingWhilePreservingOrdinaryYamlTypes(){
+  String nested="extra: "+"[".repeat(80)+"value"+"]".repeat(80)+"\nmyapp: {}\n";
+  assertThatThrownBy(()->ApplicationSettingsService.update(nested,values())).isInstanceOf(RuntimeException.class);
+  String yaml="extra: {date: 2026-11-12, nothing: null, values: [1, true, text]}\nmyapp: {}\n";
+  assertThat(ApplicationSettingsService.update(yaml,values())).startsWith(yaml);
+ }
 }

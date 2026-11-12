@@ -16,6 +16,10 @@ import org.springframework.stereotype.Component;
 /** No cookies, credentials, proxies or automatic redirects. Every connection uses checked DNS answers. */
 @Component
 class PublicWebFetcher {
+    @FunctionalInterface interface AddressLookup { InetAddress[] resolve(String host) throws UnknownHostException; }
+    private final AddressLookup lookup;
+    PublicWebFetcher() { this(InetAddress::getAllByName); }
+    PublicWebFetcher(AddressLookup lookup) { this.lookup = Objects.requireNonNull(lookup); }
     static final class Budget {
         private int remaining=20_000_000;
         void take(int bytes){remaining-=bytes;if(remaining<0)throw new Problem("large");}
@@ -47,45 +51,57 @@ class PublicWebFetcher {
                 && !(a==32 && c==1 && (d<2 || d==13 && (b[3]&255)==184));
     }
     static InetAddress[] checkedAddresses(String host) throws UnknownHostException {
-        var addresses=InetAddress.getAllByName(host);
-        if(addresses.length==0 || Arrays.stream(addresses).anyMatch(a->!publicAddress(a)))throw new Problem("blocked");
+        return checkedAddresses(host, InetAddress::getAllByName);
+    }
+    private static InetAddress[] checkedAddresses(String host, AddressLookup lookup) throws UnknownHostException {
+        // Own the array before validating it; callers and resolvers cannot mutate the pin later.
+        var addresses = lookup.resolve(host).clone();
+        if(addresses.length==0 || Arrays.stream(addresses).anyMatch(a->a==null || !publicAddress(a)))throw new Problem("blocked");
         return addresses;
     }
-    @SuppressWarnings("deprecation") // Raw response is necessary: never drain an oversized/redirect body.
+    static DnsResolver checkedDns(String hostname, AddressLookup lookup) throws UnknownHostException {
+        final InetAddress[] pinned = checkedAddresses(hostname, lookup);
+        return new DnsResolver() {
+            private void checkHost(String host) throws UnknownHostException {
+                if(!hostname.equalsIgnoreCase(host))throw new UnknownHostException("Unexpected import host");
+            }
+            public InetAddress[] resolve(String host) throws UnknownHostException {
+                checkHost(host);return pinned.clone();
+            }
+            public String resolveCanonicalHostname(String host) throws UnknownHostException {
+                checkHost(host);return hostname;
+            }
+        };
+    }
     Resource fetch(String value,int limit,long deadline,Budget budget) throws IOException {
         URI uri=allowedUri(value);
         for(int redirects=0;redirects<=4;redirects++) {
             if(System.nanoTime()>deadline)throw new Problem("timeout");
-            final String hostname=uri.getHost();
-            // Resolve once for this hop. The socket connector receives only these checked addresses;
-            // it cannot perform a second DNS lookup after validation (DNS rebinding).
-            final InetAddress[] pinned=checkedAddresses(hostname);
-            var dns=new DnsResolver() {
-                public InetAddress[] resolve(String host) throws UnknownHostException {
-                    if(!host.equalsIgnoreCase(hostname))throw new UnknownHostException();return pinned.clone();
-                }
-                public String resolveCanonicalHostname(String host) { return host; }
-            };
-            long remaining=Math.max(1,Math.min(8000,(deadline-System.nanoTime())/1_000_000));
-            var timeout=Timeout.ofMilliseconds(remaining);
-            var manager=PoolingHttpClientConnectionManagerBuilder.create().setDnsResolver(dns)
-                    .setDefaultConnectionConfig(ConnectionConfig.custom().setConnectTimeout(timeout).setSocketTimeout(timeout).build()).build();
-            try(var client=HttpClients.custom().setConnectionManager(manager).disableRedirectHandling().disableCookieManagement()
-                    .disableAuthCaching().disableAutomaticRetries().disableContentCompression()
-                    .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(timeout).build())
-                    .setUserAgent("SweetCherry web-content import").build()) {
-                var get=new HttpGet(uri);get.setHeader("Accept","text/html,application/xhtml+xml,image/png,image/jpeg");
-                final URI current=uri;
-                Resource result;
-                try(var response=client.execute(get)) {
-                    try { result=readResponse(response,current,limit,deadline,budget); }
-                    finally { response.close(org.apache.hc.core5.io.CloseMode.IMMEDIATE); }
-                }
-                if(!result.type().equals("redirect"))return result;
-                uri=result.uri();
-            }
+            // Resolve and validate again at every redirect, including redirects to the same host.
+            DnsResolver dns = checkedDns(uri.getHost(), lookup);
+            Resource result = request(uri, dns, limit, deadline, budget);
+            if(!result.type().equals("redirect"))return result;
+            uri=allowedUri(result.uri().toString());
         }
         throw new Problem("network");
+    }
+    /** One hop only. The connector receives the checked resolver, never a fresh DNS lookup. */
+    @SuppressWarnings("deprecation") // Raw response is necessary: never drain an oversized/redirect body.
+    Resource request(URI uri,DnsResolver dns,int limit,long deadline,Budget budget) throws IOException {
+        long remaining=Math.max(1,Math.min(8000,(deadline-System.nanoTime())/1_000_000));
+        var timeout=Timeout.ofMilliseconds(remaining);
+        var manager=PoolingHttpClientConnectionManagerBuilder.create().setDnsResolver(dns)
+                .setDefaultConnectionConfig(ConnectionConfig.custom().setConnectTimeout(timeout).setSocketTimeout(timeout).build()).build();
+        try(var client=HttpClients.custom().setConnectionManager(manager).disableRedirectHandling().disableCookieManagement()
+                .disableAuthCaching().disableAutomaticRetries().disableContentCompression()
+                .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(timeout).build())
+                .setUserAgent("SweetCherry web-content import").build()) {
+            var get=new HttpGet(uri);get.setHeader("Accept","text/html,application/xhtml+xml,image/png,image/jpeg");
+            try(var response=client.execute(get)) {
+                try { return readResponse(response,uri,limit,deadline,budget); }
+                finally { response.close(org.apache.hc.core5.io.CloseMode.IMMEDIATE); }
+            }
+        }
     }
     static Resource readResponse(org.apache.hc.core5.http.ClassicHttpResponse response,URI current,int limit,long deadline,Budget budget) throws IOException {
 

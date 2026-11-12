@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -146,7 +145,6 @@ public class MultitenantConfiguration implements ApplicationContextAware {
                 continue;
             }
             Properties tenantProperties = new Properties();
-            DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
 
             String errorMessage =
                     String.format("Problematic %s file in %s folder. The error message is:\n",
@@ -163,21 +161,16 @@ public class MultitenantConfiguration implements ApplicationContextAware {
 
                 if (dsHumanFriendlyName != null && dsDriverClassName != null && dsUrl != null
                         && !dsHumanFriendlyName.isEmpty() && !dsDriverClassName.isEmpty() && !dsUrl.isEmpty()) {
-                    dataSourceBuilder.driverClassName(dsDriverClassName);
-                    dataSourceBuilder.username(dsUsername);
-                    dataSourceBuilder.password(dsPassword);
-                    dataSourceBuilder.url(dsUrl);
+                    TenantConnectionPolicy.validate(dsDriverClassName, dsUrl);
                     String registrationName = dsHumanFriendlyName;
                     String schemaPermission = tenantProperties.getProperty(CtbSchemaCompatibility.SETTING, "false").trim();
                     boolean schemaUpgradeEnabled = "true".equalsIgnoreCase(schemaPermission) || "1".equals(schemaPermission);
                     if (!resolvedDataSources.containsKey(dsHumanFriendlyName)) {
-                        resolvedDataSources.put(dsHumanFriendlyName, new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
-                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build(), schemaUpgradeEnabled));
+                        resolvedDataSources.put(dsHumanFriendlyName, new ManagedTenantDataSource(() -> TenantConnectionPolicy.pool(dsDriverClassName, dsUrl, dsUsername, dsPassword), schemaUpgradeEnabled));
                     } else {
                         registrationName = dsHumanFriendlyName + "(random: " + StringHelper.generateRandomString(3) + ")";
                         resolvedDataSources.put(registrationName,
-                                new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
-                                        .driverClassName(dsDriverClassName).url(dsUrl).username(dsUsername).password(dsPassword).build(), schemaUpgradeEnabled));
+                                new ManagedTenantDataSource(() -> TenantConnectionPolicy.pool(dsDriverClassName, dsUrl, dsUsername, dsPassword), schemaUpgradeEnabled));
                     }
                     if (debugEnabled) logger.info("Data source: " + dsHumanFriendlyName +
                             ", db: " + tenantProperties.getProperty("datasource.url"));
@@ -243,6 +236,12 @@ public class MultitenantConfiguration implements ApplicationContextAware {
 
     /** Writes one wizard config and replaces only its registration, leaving other sources/pools intact. */
     public synchronized void installTenantConfig(String oldTenant, Path file, byte[] bytes, Properties properties, String expectedRevision) throws IOException {
+        // Validate before closing the old pool or writing any configuration.
+        String driver = properties.getProperty("datasource.driver-class-name");
+        String url = properties.getProperty("datasource.url");
+        String username = properties.getProperty("datasource.username");
+        String password = properties.getProperty("datasource.password");
+        TenantConnectionPolicy.validate(driver, url);
         var routing = (MultitenantDataSource) dataSource();
         var current = routing.getResolvedDataSources();
         String name = properties.getProperty("name");
@@ -253,9 +252,7 @@ public class MultitenantConfiguration implements ApplicationContextAware {
             if (!(current.get(oldTenant) instanceof ManagedTenantDataSource managed)) throw new IllegalStateException("Unsupported data source lifecycle");
             managed.close();
         }
-        var replacement = new ManagedTenantDataSource(() -> (com.zaxxer.hikari.HikariDataSource) DataSourceBuilder.create()
-                .driverClassName(properties.getProperty("datasource.driver-class-name")).url(properties.getProperty("datasource.url"))
-                .username(properties.getProperty("datasource.username")).password(properties.getProperty("datasource.password")).build(),
+        var replacement = new ManagedTenantDataSource(() -> TenantConnectionPolicy.pool(driver, url, username, password),
                 "true".equals(properties.getProperty(CtbSchemaCompatibility.SETTING)));
         try {
             if (oldTenant == null) {

@@ -30,7 +30,7 @@ public class CtbExportService {
     public synchronized Result export(long root, boolean descendants, boolean collection) throws IOException, SQLException {
         Path directory = Path.of(applicationPath, exportingFolderName).toAbsolutePath().normalize();
         Files.createDirectories(directory);
-        String tenant = TenantContext.getCurrentTenant().replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "_");
+        String tenant = TenantContext.getCurrentTenant().replaceAll("[\\\\/:*?\"<>|#\\p{Cntrl}]", "_");
         String filename = collection ? "exportednodes.ctb" : "export_" + tenant + "_" + root + ".ctb";
         Path destination = directory.resolve(filename);
         // Reuse the transaction connection when exporting back into the selected SQLite file.
@@ -51,7 +51,7 @@ public class CtbExportService {
         boolean success = false;
         try {
             int count;
-            try (var target = DriverManager.getConnection("jdbc:sqlite:" + output)) {
+            try (var target = com.turkerozturk.security.LocalSqliteConnections.open(output)) {
                 target.setAutoCommit(false);
                 try {
                     try (var statement = target.createStatement()) {

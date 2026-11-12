@@ -48,6 +48,8 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<!-- Temporary Boot 3.5 override; see documentation/en/security-alert-review.md. -->
+		<tomcat.version>10.1.61</tomcat.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- Reviewed overrides: see documentation/tr/dependency-maintenance.md. -->

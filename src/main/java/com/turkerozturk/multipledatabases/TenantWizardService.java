@@ -77,6 +77,7 @@ public class TenantWizardService {
             url=f.url==null?"":f.url.trim();
             if(!url.startsWith("jdbc:"+f.type+"://")||url.contains("\n")||url.contains("\r")||url.length()>4000)throw new IllegalArgumentException("wizard.invalidUrl");
         }
+        TenantConnectionPolicy.validate(DRIVERS.get(f.type),url);
         f.name=f.name==null?"":f.name.trim();
         if(f.name.isBlank()||f.name.length()>160||f.name.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("wizard.invalidName");
         if(tenants.getAllTenants().containsKey(f.name)&&!f.name.equals(f.tenant))throw new IllegalArgumentException("wizard.duplicateName");

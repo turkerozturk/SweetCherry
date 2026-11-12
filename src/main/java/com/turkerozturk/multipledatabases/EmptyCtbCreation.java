@@ -90,7 +90,7 @@ final class EmptyCtbCreation implements AutoCloseable {
         var owned=new EmptyCtbCreation(target);
         try {
             var settings=new SQLiteConfig();settings.resetOpenMode(SQLiteOpenMode.CREATE);
-            try(var connection=DriverManager.getConnection("jdbc:sqlite:"+target,settings.toProperties());
+            try(var connection=com.turkerozturk.security.LocalSqliteConnections.open(target,settings);
                 var schema=EmptyCtbCreation.class.getResourceAsStream("/schemas/schema-sqlite.sql")) {
                 if(schema==null)throw new IOException("Missing CTB schema");
                 connection.setAutoCommit(false);

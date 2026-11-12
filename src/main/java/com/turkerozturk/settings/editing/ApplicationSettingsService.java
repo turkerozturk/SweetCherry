@@ -6,6 +6,7 @@ import org.springframework.boot.origin.OriginLookup;
 import org.springframework.boot.origin.TextResourceOrigin;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.nodes.*;
 import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
@@ -104,19 +105,29 @@ public class ApplicationSettingsService {
         }
     }
     private static Map<String,ScalarNode> nodes(String yaml){
-        LoaderOptions options=new LoaderOptions();options.setAllowDuplicateKeys(false);options.setMaxAliasesForCollections(0);options.setCodePointLimit(1048576);
-        var parser=new Yaml(options);var documents=parser.composeAll(new StringReader(yaml)).iterator();
+        LoaderOptions options=new LoaderOptions();options.setAllowDuplicateKeys(false);options.setMaxAliasesForCollections(0);options.setCodePointLimit(1048576);options.setNestingDepthLimit(50);
+        options.setTagInspector(tag -> false);
+        // Composition must never become arbitrary Java-object construction.
+        var parser=new Yaml(new SafeConstructor(options));var documents=parser.composeAll(new StringReader(yaml)).iterator();
         if(!documents.hasNext())throw new IllegalArgumentException("invalid");Node root=documents.next();
         if(documents.hasNext()||!(root instanceof MappingNode))throw new IllegalArgumentException("invalid");
         Map<String,ScalarNode> result=new HashMap<>();walk(root,"",result,new HashSet<>());return result;
     }
     private static void walk(Node node,String prefix,Map<String,ScalarNode> result,Set<Node> seen){
         if(!seen.add(node))throw new IllegalArgumentException("invalid");
+        // Reject local/custom tags as well as global class tags, even in untouched settings.
+        if(!allowedTag(node))throw new IllegalArgumentException("invalid");
         if(node instanceof MappingNode mapping){Set<String> keys=new HashSet<>();
-            for(var entry:mapping.getValue()){if(!(entry.getKeyNode() instanceof ScalarNode key)||!keys.add(key.getValue())||key.getValue().equals("<<"))throw new IllegalArgumentException("invalid");
+            for(var entry:mapping.getValue()){if(!(entry.getKeyNode() instanceof ScalarNode key)||!allowedTag(key)||!keys.add(key.getValue())||key.getValue().equals("<<"))throw new IllegalArgumentException("invalid");
                 walk(entry.getValueNode(),prefix.isEmpty()?key.getValue():prefix+"."+key.getValue(),result,seen);}
         }else if(node instanceof ScalarNode scalar){if(result.put(prefix,scalar)!=null)throw new IllegalArgumentException("invalid");}
         else if(node instanceof SequenceNode sequence){for(Node item:sequence.getValue())walk(item,prefix+"[]",new HashMap<>(),seen);}
+    }
+    private static boolean allowedTag(Node node) {
+        Set<Tag> tags = node instanceof MappingNode ? Set.of(Tag.MAP)
+                : node instanceof SequenceNode ? Set.of(Tag.SEQ)
+                : Set.of(Tag.STR,Tag.NULL,Tag.BOOL,Tag.INT,Tag.FLOAT,Tag.TIMESTAMP,Tag.BINARY);
+        return tags.contains(node.getTag());
     }
     private static String hash(String text){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8)));}catch(Exception error){throw new IllegalStateException(error);}}
 }
