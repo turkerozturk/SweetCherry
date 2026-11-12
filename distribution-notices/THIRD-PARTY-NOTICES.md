@@ -241,3 +241,8 @@ Flexmark Java 0.64.8 is used under the BSD 2-Clause License, including the Atlas
 | `flexmark-util-visitor` | [sources](https://repo.maven.apache.org/maven2/com/vladsch/flexmark/flexmark-util-visitor/0.64.8/flexmark-util-visitor-0.64.8-sources.jar) |
 
 The transitive `org.jetbrains:annotations:24.0.1` uses Apache License 2.0; see [Apache 2.0](licenses/upstream-reference/Apache-2.0.txt), [source copyright header](licenses/source-notices/annotations-24.0.1/SOURCE-COPYRIGHT-HEADERS.txt) and the [versioned sources](https://repo.maven.apache.org/maven2/org/jetbrains/annotations/24.0.1/annotations-24.0.1-sources.jar). The earlier JAR inventory remains a historical release snapshot; these additions are recorded here.
+
+
+## Clipboard HTML sanitization (2026-11-12)
+
+DOMPurify 3.4.17 is bundled unmodified for offline rich-text paste and webpage import. It is dual-licensed Apache-2.0 OR MPL-2.0; SweetCherry uses the Apache-2.0 alternative. See [upstream license](licenses/upstream-reference/DOMPurify-LICENSE.txt), [versioned source](https://github.com/cure53/DOMPurify/tree/3.4.17) and [source archive](https://github.com/cure53/DOMPurify/archive/refs/tags/3.4.17.tar.gz). The local asset includes its original copyright/license header and a SOURCE.md recording its upstream commit and SHA-256.

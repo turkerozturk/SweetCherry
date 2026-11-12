@@ -24,3 +24,39 @@ Tomcat güncellemesi Spring Framework açıklarını düzeltmez. Boot 3.5.16 son
 5. Push sonrasında CodeQL ve dependency submission tamamlanınca kalan uyarıları inceleyin. Spring uyarılarını bu yamayla çözülmüş olarak kapatmayın.
 
 Ayrıntılı uyarı eşlemesi ve resmî kaynaklar: [İngilizce inceleme](../en/security-alert-review.md).
+
+## 2e4047c sonrası ikinci yama — 2026-11-12
+
+Paylaşılan 18 Dependabot ve 18 CodeQL uyarısına göre hazırlanmıştır. Uyarılar otomatik kapatılmaz veya bastırılmaz.
+
+### Bağımlılıklar
+
+- Jackson BOM: 2.21.4 → 2.21.7; core/databind ve ilgili modüller birlikte yönetilir. BOM'un seçtiği annotations sürümünün 2.21 olması normaldir.
+- HttpClient: 5.5.2 → 5.6.3; HttpCore ve HTTP/2 modülü: 5.3.6 → 5.4.3. Bu Core sürümü yeni Client parent'ında da kullanılır.
+- Log4j API ve köprü bileşenleri: 2.24.3 → 2.25.5.
+- OGNL: transitif sürüm yerine dependency management ile 3.4.13.
+- Spring Framework 6.2.19 değişmez. Dependabot #18 ve #19 için Boot 4 geçişi hâlâ gereklidir.
+
+Bu sürümler listedeki Spring dışındaki 16 Dependabot uyarısını hedefler. Gerçekte hangilerinin kapandığı push ve bağımlılık grafiği yenilenmesinden sonra doğrulanır.
+
+### Uygulama değişiklikleri
+
+- HTML yapıştırma önce yerel/offline DOMPurify 3.4.17 ile temizlenir; ardından mevcut CTB metin/özellik/tablo dönüşümü uygulanır. Temizleyici yüklenmemişse ham HTML'ye geri dönülmez. Biçimler, güvenli bağlantılar, tablolar ve sunucudan alınan güvenilir görsel token'ları korunur. Lisans ve kaynak bilgileri dağıtıma eklenir.
+- `viewMode` tercih cookie'sine HttpOnly ve SameSite=Lax eklenir; HTTPS isteğinde Secure olur. Yerel HTTP kullanımında tercih cookie'si çalışmaya devam eder. Bu cookie kimlik doğrulama bilgisi içermez. HTTPS durumu keyfî proxy başlığından değil, servlet isteğinden ve mevcut güvenilir proxy mekanizmasından gelir.
+- Export, listeleme, indirme ve silme ortak klasör sınırı kullanır. Normalize edilmiş yol, tek parça dosya/klasör adı ve sembolik bağlantı kontrolleri uygulanır. Collection export sembolik bağlantıyı SQLite olarak açmadan reddeder. Bu kontroller, aynı anda dosya sistemini değiştirebilen bir yerel yöneticiyi atomik olarak izole eden bir sandbox değildir.
+- Aramanın ORDER BY sütunu ve yönü sabit switch seçeneklerinden üretilir; filtre değerleri parametre olarak bağlanmaya devam eder.
+- CTB seçiminde kontrol karakterleri ve aşırı uzun girdi Path oluşturulmadan reddedilir. ADMIN'in CTBDATA dışındaki mevcut bir CTB'yi seçebilmesi korunur; gerçek yol, uzantı, normal dosya ve SQLite başlık kontrolleri devam eder.
+
+### Kalan CodeQL değerlendirmeleri
+
+SSRF #22/#23 için önceki sürücü/URL, yetki, DNS sabitleme ve yönlendirme kontrolleri geçerlidir. Uyarının ortak yardımcıya taşınması tek başına açık bulunduğu veya yanlış alarm olduğu anlamına gelmez. Veri akışı ve kurulumun güven sınırı değerlendirilmeden uyarı kapatılmaz. ADMIN'in özel ağdaki veritabanına bağlanması ve kendi CTB dosyasını seçmesi kasıtlı özelliklerdir.
+
+Cookie uyarısı HTTP dalında kalırsa, yalnızca görünüm tercihi içeren bu cookie ile oturum cookie'lerinin politikası ayrı değerlendirilmelidir. Güvenlik uyarılarını susturmak için yerel HTTP desteği kaldırılmaz.
+
+### Kontrol
+
+Java testleri ve paketleme Linux'ta çalıştırılır. Gerçek Windows ve uzak veritabanı bağlantıları ayrıca denenmelidir. Dosya sistemi/izinler sembolik bağlantı oluşturmaya izin vermiyorsa yalnızca ilgili symlink testleri açık bir varsayımla atlanır.
+
+Chromium kontrolünde zararlı script/event/SVG/MathML/template girdileri çalışmadı; parser sırasında kaynak isteği veya canlı belgeye HTML eklenmesi gözlenmedi. Başlık, kalın yazı, bağlantı, tablo ve güvenilir görsel token'ı senaryoları geçti. Bu sonuç bütün olası girdiler için garanti değildir.
+
+Sonraki büyük geçişten önce rich-text yapıştırma/URL import, CTB export–indirme–silme, veritabanı seçimi/oluşturma ve görünüm değiştirmeyi manuel deneyin. Push sonrası GitHub taramalarını tekrar değerlendirin. Uyarı numarası eşlemesi ve resmî kaynaklar İngilizce incelemenin ikinci aşama bölümündedir.

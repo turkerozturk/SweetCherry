@@ -22,7 +22,7 @@ package com.turkerozturk.export.exportedfiles;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -52,7 +51,7 @@ public class FileDownloadController {
             if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS)) {
                 return ResponseEntity.notFound().build();
             }
-            Resource resource = new UrlResource(filePath.toUri());
+            Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists() && resource.isReadable()) {
                 return ResponseEntity.ok()
@@ -62,7 +61,7 @@ public class FileDownloadController {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (MalformedURLException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }

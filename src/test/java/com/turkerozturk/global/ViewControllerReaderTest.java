@@ -46,6 +46,16 @@ class ViewControllerReaderTest {
         }
     }
 
+    @Test void preferenceCookieUsesSecureOnlyForTrustedHttpsAndIsNeverScriptReadable() {
+        for(boolean secure:new boolean[]{false,true}) {
+            var request=new MockHttpServletRequest();request.setSecure(secure);
+            request.addHeader("X-Forwarded-Proto","https"); // A header alone must not mark HTTP secure.
+            var response=new MockHttpServletResponse();new ViewController().changeView("tree",response,request);
+            var cookie=response.getCookie("viewMode");assertThat(cookie.getSecure()).isEqualTo(secure);
+            assertThat(cookie.isHttpOnly()).isTrue();assertThat(cookie.getAttribute("SameSite")).isEqualTo("Lax");
+            assertThat(cookie.getPath()).isEqualTo("/");assertThat(cookie.getMaxAge()).isEqualTo(7*24*60*60);
+        }
+    }
     private String change(String referer, String mode) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Referer", referer);

@@ -50,6 +50,12 @@
 		<java.version>17</java.version>
 		<!-- Temporary Boot 3.5 override; see documentation/en/security-alert-review.md. -->
 		<tomcat.version>10.1.61</tomcat.version>
+        <!-- Reviewed security maintenance on the existing major/minor lines; see security-alert-review.md. -->
+        <jackson-bom.version>2.21.7</jackson-bom.version>
+        <httpclient5.version>5.6.3</httpclient5.version>
+        <httpcore5.version>5.4.3</httpcore5.version>
+        <log4j2.version>2.25.5</log4j2.version>
+        <sweetcherry.ognl.version>3.4.13</sweetcherry.ognl.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- Reviewed overrides: see documentation/tr/dependency-maintenance.md. -->
@@ -426,6 +432,12 @@
 
 
 	</dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency><groupId>ognl</groupId><artifactId>ognl</artifactId><version>${sweetcherry.ognl.version}</version></dependency>
+        </dependencies>
+    </dependencyManagement>
 
 	<build>
 

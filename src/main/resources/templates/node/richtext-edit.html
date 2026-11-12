@@ -154,6 +154,7 @@
 </dialog>
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <script src="/js/node/richTextVisualModel.js"></script>
+<script src="/js/thirdparty/dompurify/purify.min.js"></script>
 <script src="/js/node/richTextClipboard.js"></script>
 <script th:src="@{/js/common/editorRecovery.js}"></script>
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>

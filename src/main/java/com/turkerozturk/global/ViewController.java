@@ -45,6 +45,9 @@ public class ViewController {
         mode = normalizeMode(mode);
         Cookie cookie = new Cookie("viewMode", mode);
         cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(request.isSecure()); // Native TLS or HTTPS metadata accepted by our trusted-proxy valve.
+        cookie.setAttribute("SameSite", "Lax");
         cookie.setMaxAge(7 * 24 * 60 * 60); // 1 week
         response.addCookie(cookie);
 

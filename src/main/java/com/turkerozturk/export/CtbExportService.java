@@ -1,6 +1,7 @@
 package com.turkerozturk.export;
 
 import com.turkerozturk.multipledatabases.TenantContext;
+import com.turkerozturk.export.exportedfiles.ExportedFilePaths;
 import com.turkerozturk.multipledatabases.CustomPropertiesHolder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -28,11 +29,11 @@ public class CtbExportService {
 
     @Transactional
     public synchronized Result export(long root, boolean descendants, boolean collection) throws IOException, SQLException {
-        Path directory = Path.of(applicationPath, exportingFolderName).toAbsolutePath().normalize();
+        Path directory = ExportedFilePaths.folder(applicationPath, exportingFolderName);
         Files.createDirectories(directory);
         String tenant = TenantContext.getCurrentTenant().replaceAll("[\\\\/:*?\"<>|#\\p{Cntrl}]", "_");
         String filename = collection ? "exportednodes.ctb" : "export_" + tenant + "_" + root + ".ctb";
-        Path destination = directory.resolve(filename);
+        Path destination = ExportedFilePaths.resolve(directory, filename);
         // Reuse the transaction connection when exporting back into the selected SQLite file.
         // A second writer connection cannot commit while this transaction holds its read lock.
         if (collection && Files.exists(destination)) {
@@ -67,10 +68,11 @@ public class CtbExportService {
             if (!collection) {
                 Path previous = null;
                 if (Files.exists(destination)) {
-                    previous = directory.resolve(filename + "__" + LocalDateTime.now().format(
+                    previous = ExportedFilePaths.resolve(directory, filename + "__" + LocalDateTime.now().format(
                             DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + ".old");
                     Files.move(destination, previous);
                 }
+                ExportedFilePaths.requirePlainFile(destination);
                 try { Files.move(output, destination); }
                 catch (IOException failure) {
                     if (previous != null) Files.move(previous, destination);

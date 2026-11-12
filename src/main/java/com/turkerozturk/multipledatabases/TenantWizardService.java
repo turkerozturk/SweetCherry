@@ -51,6 +51,8 @@ public class TenantWizardService {
     }
     private static boolean permission(String s){return s!=null&&(s.trim().equals("1")||s.trim().equalsIgnoreCase("true"));}
     static Path ctb(String input) throws IOException {
+        if(input==null||input.isBlank()||input.length()>4096||input.codePoints().anyMatch(Character::isISOControl))
+            throw new IllegalArgumentException("wizard.invalidPath");
         Path path=Path.of(input).toAbsolutePath().normalize().toRealPath();
         if(!Files.isRegularFile(path)||!path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".ctb")) throw new IllegalArgumentException("wizard.invalidCtb");
         // JDBC SQLite URL metacharacters must never become URI/query/SQL options.

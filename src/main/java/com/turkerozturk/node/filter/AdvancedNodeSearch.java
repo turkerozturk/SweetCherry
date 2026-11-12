@@ -40,7 +40,17 @@ public class AdvancedNodeSearch {
   date(predicates,values,"n.ts_creation",f.getTsCreationStartFilter(),false);date(predicates,values,"n.ts_creation",f.getTsCreationEndFilter(),true);
   date(predicates,values,"n.ts_lastsave",f.getTsModificationStartFilter(),false);date(predicates,values,"n.ts_lastsave",f.getTsModificationEndFilter(),true);
   if(f.getNodeIcons()!=null&&!f.getNodeIcons().isEmpty()){var icons=NodeService.iconFilterValues(f.getNodeIcons());predicates.add("n.is_ro IN ("+String.join(",",Collections.nCopies(icons.size(),"?"))+")");values.addAll(icons);}
-  String order=SORT.get(f.getSortBy())+" "+f.getSortDirection()+(!f.getSortBy().equals("id")?",c.node_id ASC":"");
+  // SQL identifiers/directions cannot be bound as values: select only literal grammar.
+  String column=switch(f.getSortBy()) {
+   case "id" -> "c.node_id"; case "name" -> "LOWER(n.name)"; case "created" -> "n.ts_creation";
+   case "modified" -> "n.ts_lastsave"; case "tags" -> "LOWER(n.tags)"; case "syntax" -> "n.syntax";
+   default -> throw new IllegalArgumentException("Invalid sort column");
+  };
+  String direction=switch(f.getSortDirection()) {
+   case "asc" -> "ASC"; case "desc" -> "DESC";
+   default -> throw new IllegalArgumentException("Invalid sort direction");
+  };
+  String order=column+" "+direction+(!f.getSortBy().equals("id")?",c.node_id ASC":"");
   return new Plan(predicates.isEmpty()?"":" WHERE "+String.join(" AND ",predicates),List.copyOf(values),order);
  }
  private static void text(List<String> predicates,List<Object> values,List<String> columns,String input,String mode,boolean prefix){

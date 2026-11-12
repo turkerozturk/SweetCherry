@@ -91,8 +91,21 @@
         if(items.length&&items[items.length-1].separator){const run=items[items.length-1];run.text=run.text.slice(0,-1);if(!run.text)items.pop();}
         return items.map(item=>item.table||item.image?item:{text:item.text,attributes:item.attributes});
     }
-    /** Parses clipboard HTML in a template; the inert source tree is never attached to the document. */
-    function fromHtml(html,doc,importedImages={}){if(html.length>2000000)throw new Error('Clipboard HTML too large');const template=doc.createElement('template');template.innerHTML=html;return fromDom(template.content,importedImages);}
+    /** Sanitize first, then translate detached DOM into CTB runs; never attach imported HTML. */
+    function fromHtml(html,doc,importedImages={}){
+        if(typeof html!=='string'||html.length>2000000)throw new Error('Clipboard HTML too large');
+        const purifier=doc.defaultView?.DOMPurify||root.DOMPurify;
+        if(!purifier?.isSupported)throw new Error('Clipboard sanitizer unavailable');
+        const fragment=purifier.sanitize(html,{
+            RETURN_DOM_FRAGMENT:true,ALLOW_DATA_ATTR:false,ALLOW_ARIA_ATTR:false,
+            ALLOWED_TAGS:['a','p','div','section','article','blockquote','pre','li','ul','ol','h1','h2','h3','h4','h5','h6',
+                'br','img','table','thead','tbody','tfoot','tr','th','td','span','b','strong','i','em','u','s','strike','del','code','tt','small','sub','sup','font'],
+            ALLOWED_ATTR:['style','href','src','alt','align','color','colspan','rowspan','data-import-image'],
+            FORBID_TAGS:['script','style','iframe','object','embed','svg','math','template'],
+            FORBID_CONTENTS:['script','style','iframe','object','embed','svg','math','template']
+        });
+        return fromDom(fragment,importedImages);
+    }
     function fromInternal(json){
         if(json.length>2000000)throw new Error('Clipboard too large');const rows=JSON.parse(json);
         if(!Array.isArray(rows)||rows.length>10000)throw new Error('Invalid clipboard');let length=0;

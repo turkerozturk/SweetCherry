@@ -49,4 +49,14 @@ class AdvancedNodeSearchTest {
  }
  @Test void grammarUsesParametersAndPortableTagConcatenation(){var f=new FormSearch();f.setTagsFilter("a% b_");var sqlite=AdvancedNodeSearch.plan(f,"SQLite");var maria=AdvancedNodeSearch.plan(f,"MariaDB");assertThat(sqlite.where()).contains("||").doesNotContain("a%");assertThat(maria.where()).contains("CONCAT(");assertThat(maria.values()).containsExactly("% a!% %","% b!_ %");}
  @Test void validationStopsBadBoundsAndAcceptsFutureDates(){try(var factory=jakarta.validation.Validation.buildDefaultValidatorFactory()){var validator=factory.getValidator();var f=new FormSearch();f.setTsCreationStartFilter(java.sql.Date.valueOf("2090-01-01"));assertThat(validator.validate(f)).isEmpty();f.setTsCreationEndFilter(java.sql.Date.valueOf("2080-01-01"));assertThat(validator.validate(f)).isNotEmpty();f.setTsCreationEndFilter(null);f.setQuery("word ".repeat(34));assertThatThrownBy(()->AdvancedNodeSearch.plan(f,"SQLite")).isInstanceOf(IllegalArgumentException.class);}}
+ @Test void sortGrammarUsesOnlyFixedTokensAndRejectsDirectionInjection(){
+  for(String column:List.of("id","name","created","modified","tags","syntax"))for(String direction:List.of("asc","desc")){
+   var f=new FormSearch();f.setSortBy(column);f.setSortDirection(direction);
+   assertThat(AdvancedNodeSearch.plan(f,"SQLite").order()).endsWith(column.equals("id")?direction.toUpperCase(Locale.ROOT):direction.toUpperCase(Locale.ROOT)+",c.node_id ASC");
+  }
+  for(String direction:List.of("desc; DROP TABLE node","asc --","ASC","desc NULLS FIRST")){
+   var f=new FormSearch();f.setSortDirection(direction);
+   assertThatThrownBy(()->AdvancedNodeSearch.plan(f,"SQLite")).isInstanceOf(IllegalArgumentException.class);
+  }
+ }
 }

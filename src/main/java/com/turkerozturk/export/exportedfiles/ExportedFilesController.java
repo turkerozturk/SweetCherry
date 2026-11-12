@@ -54,7 +54,7 @@ public class ExportedFilesController {
 
     @GetMapping("/exportedFiles")
     public String listFiles(Model model) {
-        String directoryPath = applicationPath + File.separator + exportingFolderName;
+        String directoryPath = ExportedFilePaths.folder(applicationPath, exportingFolderName).toString();
         if (debugEnabled) logger.info("Exported Files directory Path: " + directoryPath);
 
         File directory = new File(directoryPath);

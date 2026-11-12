@@ -60,3 +60,16 @@ test('imported images inside tables are placed after the plain table and retain 
  const result=clipboard.fromDom(source,{image0:'data:image/png;base64,AQID'});
  assert.deepEqual(result[0].table,[['Cell Photo']]);assert.equal(result.filter(item=>item.image).length,1);
 });
+
+test('HTML paste fails closed when its sanitizer is missing or unsupported',()=>{
+ assert.throws(()=>clipboard.fromHtml('<img src=x onerror=bad()>',{}),/sanitizer unavailable/);
+ assert.throws(()=>clipboard.fromHtml('<p>text</p>',{defaultView:{DOMPurify:{isSupported:false}}}),/sanitizer unavailable/);
+});
+test('HTML paste translates only the sanitized fragment and preserves import image tokens',()=>{
+ let received;
+ const clean=fragment([element('STRONG',[text('Safe')]),element('IMG',[],{'data-import-image':'image0',alt:'Photo'})]);
+ const doc={defaultView:{DOMPurify:{isSupported:true,sanitize:(html,options)=>{received=options;return clean;}}}};
+ const result=clipboard.fromHtml('<script>unsafe()</script>',doc,{image0:'data:image/png;base64,AQID'});
+ assert.equal(content(result),'Safe\uFFFC');assert.equal(result[0].attributes.weight,'heavy');
+ assert.equal(result[1].image,'data:image/png;base64,AQID');assert.equal(received.RETURN_DOM_FRAGMENT,true);
+});
