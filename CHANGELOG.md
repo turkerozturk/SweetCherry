@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-11-13
+
+- Remove browser-side XML reparsing from wiki-link preflight; pass serialized XML directly to the hardened server reader and retain encoded-markup regression coverage.
+
 - Resolve rich-text [[name]] / [[name|label]] expressions into ordinary CherryTree internal links on save, with breadcrumb/ID selection for duplicate names, explicit keep-as-text review for unresolved names, persistent escaping and transactional target revalidation. Preserve formatting and embedded-object positions.
 - Move Connection Map above Mind Map 1 in the view menu and use the same diagram icon.
 
