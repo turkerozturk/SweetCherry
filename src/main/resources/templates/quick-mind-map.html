@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -81,6 +81,7 @@
       kullanılarak üretilir.
     -->
     <style th:if="${colors}" th:text="${mermaidColorCss}"></style>
+<link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 
 <body class="bg-light">
@@ -203,7 +204,7 @@ mindmap
         mermaid.initialize({
             startOnLoad: false,
             securityLevel: 'strict',
-            theme: 'default',
+            theme: document.documentElement.dataset.bsTheme === 'dark' ? 'dark' : 'default',
             mindmap: {
                 useMaxWidth: false
             }

@@ -17,8 +17,32 @@ import com.turkerozturk.sunandmoon.AstronomyCoordinates;
 
 @Service
 public class ApplicationSettingsService {
-    public record Setting(String key,String type,String fallback,long maximum) {}
+    public record Setting(String key,String type,String fallback,long maximum) {
+        public boolean numeric(){return ApplicationSettingsService.numeric(this);}
+        public long minimum(){return ApplicationSettingsService.minimum(this);}
+        public List<String> choices(){return ApplicationSettingsService.choices(this);}
+    }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.appearance.theme","theme","light",0),
+        new Setting("myapp.default-language","language","",0),
+        new Setting("myapp.home.open-latest-modified","boolean","true",0),
+        new Setting("myapp.home.modified-minimum","nonnegative","5",1000),
+        new Setting("myapp.home.created-minimum","nonnegative","5",1000),
+        new Setting("myapp.tree.default-width","width","600",1900),
+        new Setting("myapp.calendar.first-day-of-week","weekday","MONDAY",0),
+        new Setting("myapp.calendar.time-zone","systemzone","system",0),
+        new Setting("myapp.calendar.max-entries","number","10000",50000),
+        new Setting("myapp.calendar.day-max-entries","number","300",2000),
+        new Setting("myapp.calendar.day-preview-max-characters","number","600",20000),
+        new Setting("myapp.calendar.day-preview-max-lines","number","8",100),
+        new Setting("myapp.text-tree-export.max-nodes","number","10000",100000),
+        new Setting("myapp.text-tree-export.max-depth","number","64",256),
+        new Setting("myapp.text-tree-export.max-node-characters","number","8388608",2147483647),
+        new Setting("myapp.text-tree-export.max-text-bytes","number","67108864",2147483647),
+        new Setting("myapp.custom-lists.views.date-time-format","dateformat","yyyy-MM-dd HH:mm:ss",0),
+        new Setting("myapp.custom-lists.views.time-zone","optionalzone","",0),
+        new Setting("myapp.custom-lists.views.max-design-characters","number","131072",1048576),
+        new Setting("myapp.custom-lists.views.max-rendered-characters","number","16777216",67108864),
         new Setting("astronomy.enabled","boolean","true",0),
         new Setting("astronomy.latitude","latitude","51.4779",0),
         new Setting("astronomy.longitude","longitude","-0.0015",0),
@@ -83,7 +107,7 @@ public class ApplicationSettingsService {
         if(!allowed.equals(values.keySet()))throw new IllegalArgumentException("invalid");
         var nodes=nodes(yaml);record Edit(int start,int end,String value){}List<Edit> edits=new ArrayList<>();StringBuilder extra=new StringBuilder();
         for(var setting:SETTINGS){String value=values.get(setting.key());validate(setting,value);
-            String scalar=setting.type().equals("boolean")||setting.type().equals("number")?value:"'"+value.replace("'","''")+"'";
+            String scalar=setting.type().equals("boolean")||numeric(setting)?value:"'"+value.replace("'","''")+"'";
             ScalarNode node=nodes.get(setting.key());
             if(node==null)extra.append(setting.key()).append(": ").append(scalar).append("\n");
             else edits.add(new Edit(yaml.offsetByCodePoints(0,node.getStartMark().getIndex()),yaml.offsetByCodePoints(0,node.getEndMark().getIndex()),scalar));
@@ -93,17 +117,26 @@ public class ApplicationSettingsService {
         if(!extra.isEmpty())result.append("\n# Settings added by SweetCherry\n").append(extra);
         nodes(result.toString());return result.toString();
     }
+    public static boolean numeric(Setting setting){return Set.of("number","nonnegative","width").contains(setting.type());}
+    public static long minimum(Setting setting){return setting.type().equals("nonnegative")?0:setting.type().equals("width")?20:1;}
+    public static List<String> choices(Setting setting){return switch(setting.type()){case "theme" -> List.of("light","dark");case "language" -> List.of("","en","tr");case "weekday" -> List.of("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY");default -> List.of();};}
     private static void validate(Setting setting,String value){
         if(value==null||value.length()>160||value.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("invalid");
         switch(setting.type()) {
             case "boolean" -> {if(!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("invalid");}
-            case "number" -> {if(!value.matches("[1-9][0-9]*")||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
+            case "number","nonnegative","width" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
+            case "theme","language" -> {if(!choices(setting).contains(value))throw new IllegalArgumentException("invalid");}
+            case "weekday" -> {if(!value.matches("[1-7]"))java.time.DayOfWeek.valueOf(value.toUpperCase(Locale.ROOT));}
+            case "systemzone" -> {if(!value.equalsIgnoreCase("system"))zone(value);}
+            case "optionalzone" -> {if(!value.isBlank())zone(value);}
+            case "dateformat" -> {if(value.isBlank()||value.length()>128)throw new IllegalArgumentException("invalid");java.time.format.DateTimeFormatter.ofPattern(value,Locale.ROOT);}
             case "latitude" -> AstronomyCoordinates.parse(value,true);
             case "longitude" -> AstronomyCoordinates.parse(value,false);
-            case "timezone" -> java.time.ZoneId.of(value);
+            case "timezone" -> zone(value);
             default -> throw new IllegalArgumentException("invalid");
         }
     }
+    private static void zone(String value){try{java.time.ZoneId.of(value);}catch(java.time.DateTimeException invalid){throw new IllegalArgumentException("invalid",invalid);}}
     private static Map<String,ScalarNode> nodes(String yaml){
         LoaderOptions options=new LoaderOptions();options.setAllowDuplicateKeys(false);options.setMaxAliasesForCollections(0);options.setCodePointLimit(1048576);options.setNestingDepthLimit(50);
         options.setTagInspector(tag -> false);

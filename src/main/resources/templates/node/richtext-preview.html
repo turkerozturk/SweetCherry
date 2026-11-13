@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,7 +17,7 @@
         .error { color: #a12626; padding: 1rem; }
         @media (max-width: 800px) { main { grid-template-columns: 1fr; } iframe { height: 65dvh; } }
     </style>
-</head>
+<link rel="stylesheet" th:href="@{/css/theme.css}"></head>
 <body>
 <header>
     <h1 th:text="${preview.name}">Node</h1>

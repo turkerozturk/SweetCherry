@@ -161,6 +161,8 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  appearance:
+    theme: light # light (existing appearance) or dark; restart after changing.
   custom-lists:
     views:
       date-time-format: "yyyy-MM-dd HH:mm:ss"

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
 
+<link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 <body>
 <h1>Dashboard</h1>

@@ -133,3 +133,19 @@ The **33~** button in both rich-text and plain-text editors inserts 33 tildes an
 In **Node Properties**, change Rich Text to Plain Text or a supported code syntax (including Markdown or HTML), then choose Save. An explicit Yes/No dialog explains the data loss. Formatting is removed; table cells, codebox text and link targets become readable text. Embedded images, attachments and anchors are removed, leaving filenames or placeholders. Back up the database and save any needed attachments first. Shared occurrences of the same node also change. This page cannot undo the conversion; conversion back to Rich Text is not supported.
 
 If the source changes after confirmation preparation, the operation is rejected. Content and object removal are saved in one transaction. Conversion is limited to 2,000,000 source/object-text characters and 2,000 objects. For a locked node, clear the read-only setting, save and reopen Properties before changing its type. Plain Text/code-to-code changes retain the existing source text; selecting Markdown or HTML changes its interpretation rather than generating markup.
+
+### Appearance and safe application settings
+
+The default remains the existing light appearance. To enable dark application chrome, add or edit this in the active external `application.yml`, then restart SweetCherry:
+
+```yaml
+myapp:
+  appearance:
+    theme: dark # light or dark; default: light
+```
+
+The administrator can also select **Light** or **Dark** on **System → Application settings** (`/system/settings`). The theme is application-wide, including login, desktop/mobile navigation, calendars, mind maps and editors; it does not follow the browser/OS theme. Rich-text note paper, visual rich-text editing, rendered code snippets and sandboxed HTML previews retain a light content surface so stored colors, images and formatting stay readable. Stored note contents and title colors, exported documents and the desktop launcher are unchanged.
+
+The settings page now also exposes the initial language; opening the latest modified note; home created/modified list minima (0 hides the corresponding list); initial desktop tree width; calendar week start, time zone, entry/card limits and day-preview character/line limits; folder/text export limits; and record-layout date/time format, optional time zone and template/output limits. Saved browser choices still take priority over initial language/tree defaults. Calendar `system` uses the operating-system/JVM time zone; an empty record-layout time zone does the same. All values are validated, changes preserve YAML comments/unrelated settings, and the page distinguishes saved values from the effective values used by the running process. Restart after saving; command-line/environment overrides still take priority.
+
+Only the active external YAML can be edited here. Network listeners, proxy/TLS/login/security settings, credentials, storage paths, backup deletion/retention policy, operations profiles and arbitrary YAML keys remain outside this form. Existing dedicated backup controls and documented YAML configuration still apply.

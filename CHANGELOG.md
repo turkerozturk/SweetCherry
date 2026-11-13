@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add an opt-in application-wide dark theme, keeping the existing light appearance by default and preserving authored note colors on light content paper. Configure it through application.yml or the administrator settings form after restart.
+- Expose validated language, home activity, initial tree width, calendar/day-preview, folder-export and record-layout settings in the existing safe YAML editor, with localized choices and numeric bounds.
+
 - Allow explicitly confirmed Rich Text conversion to Plain Text, Markdown, HTML or another supported syntax. Preserve readable text, table cells, codebox text and link targets; remove embedded objects atomically, reject stale content and clarify data loss before saving. Improve the Node Properties layout on narrow screens.
 
 - Add a localized daily calendar with chronological responsive note cards, bounded text previews, attachment/image/table/codebox counts, day navigation and existing tag filters/date editing. Configure preview characters/lines and day-entry limits in application.yml; retain metadata-only month/week reads.

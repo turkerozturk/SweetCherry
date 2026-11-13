@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}">
 <head>
     <title th:text="#{login.signin}">SweetCherry Sign in</title>
 
@@ -69,6 +69,7 @@
         @media (max-height:520px) {body{align-items:flex-start;padding:8px 0}.form-signin{padding:10px 15px}}
     </style>
 
+<link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 
 <!--/*-->

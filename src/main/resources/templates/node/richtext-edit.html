@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<html th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
-<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"></head>
+<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/theme.css}"></head>
 <body>
 <header class="rich-page-header"><h1 th:text="#{richtext.edit.title}"></h1><strong th:text="${editor.node.name}"></strong></header>
 <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>

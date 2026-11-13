@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -105,6 +105,7 @@
         }
     </style>
 <link rel="stylesheet" th:href="@{/css/node/nodeStatusIcons.css}">
+<link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 
 <body class="bg-light">
@@ -147,7 +148,7 @@
                      th:text="${node.txt}">İçerik</pre>
 
                 <div th:if="${node.syntax eq 'custom-colors'}"
-                     class="rendered-node-content"
+                     class="rendered-node-content theme-note-paper"
                      th:utext="${node.txtAsHtml}">İçerik</div>
 
                 <div th:unless="${node.syntax == null

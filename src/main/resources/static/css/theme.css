@@ -1,0 +1,53 @@
+/* Application chrome only. Light mode intentionally has no overrides.
+   Never invert images or rewrite stored note/title colors. */
+@media screen {
+html[data-bs-theme="dark"] {
+    color-scheme:dark;
+    --sc-bg:#151a21;--sc-panel:#202731;--sc-raised:#293340;
+    --sc-text:#e5eaf0;--sc-muted:#b2becb;--sc-line:#536171;--sc-link:#91c5ff;
+    --bs-link-color:var(--sc-link);--bs-link-hover-color:#b5d8ff;
+    --bs-body-bg:var(--sc-bg);--bs-body-color:var(--sc-text);
+    --bs-secondary-color:var(--sc-muted);--bs-border-color:var(--sc-line);
+}
+html[data-bs-theme="dark"] body{background:var(--sc-bg)!important;color:var(--sc-text)!important}
+html[data-bs-theme="dark"] :is(.bg-light,.bg-white,.navbar,.offcanvas,.dropdown-menu,.card,dialog,
+ #workspace-content,.workspace-node-header,#workspace-tree-pane,#workspace-status,#readerDrawer,
+ .reader-controls,.quick-content-header,.mind-map-panel,.mind-map-panel .card-body,
+ #richControls,.node-backlinks,.reader-context,.reader-context-navigation,.property-actions,
+ .markdown-preview,.tag-choice-list,.property-icon-list,.property-syntax-list){background:var(--sc-panel)!important;color:var(--sc-text);border-color:var(--sc-line)!important}
+html[data-bs-theme="dark"] :is(.navbar,.bg-light,.bg-white){--bs-bg-opacity:1;--bs-navbar-color:var(--sc-muted);--bs-navbar-active-color:var(--sc-text);--bs-navbar-brand-color:var(--sc-text);--bs-navbar-brand-hover-color:#fff;--bs-navbar-hover-color:#fff}
+html[data-bs-theme="dark"] :is(.text-dark,.text-black,#clock,.note,.workspace-database,.workspace-fold,
+ .reader-title,.reader-controls .btn,#readerDrawer a,.reader-breadcrumbs a,.reader-tree a){color:var(--sc-text)!important}
+html[data-bs-theme="dark"] :is(.text-muted,.text-secondary,.cal-entry time){color:var(--sc-muted)!important}
+html[data-bs-theme="dark"] :is(.workspace-tree-row a,.reader-context-list a):not([style*="color"]){color:var(--sc-text)}
+html[data-bs-theme="dark"] :is(.workspace-tree-row a,.reader-tree a)[aria-current="page"]{background:#304d70;outline-color:#91c5ff}
+html[data-bs-theme="dark"] :is(#workspace-splitter,#richToolsSplitter){background:var(--sc-line)}
+html[data-bs-theme="dark"] :is(.cal-day,.cal-day-card,.cal-weekday,.cal-week thead th){background:var(--sc-panel);border-color:var(--sc-line)}
+html[data-bs-theme="dark"] .cal-other{background:var(--sc-bg)}
+html[data-bs-theme="dark"] .cal-entry{background:var(--sc-raised);color:var(--sc-text)}
+html[data-bs-theme="dark"] .cal-entry:is(:hover,:focus-visible){background:#304d70}
+html[data-bs-theme="dark"] :is(.cal-month,.cal-week td,.cal-week th,.cal-dialog form,.cal-object-counts>span){border-color:var(--sc-line)}
+html[data-bs-theme="dark"] :is(input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=hidden]),textarea,select){background-color:var(--sc-bg);color:var(--sc-text);border-color:var(--sc-line)}
+html[data-bs-theme="dark"] :is(input,textarea)::placeholder{color:var(--sc-muted);opacity:1}
+html[data-bs-theme="dark"] :is(input,textarea,select):disabled{background-color:var(--sc-raised);color:var(--sc-muted)}
+html[data-bs-theme="dark"] :is(button:not([class]),.toolbar button,.actions button){background:var(--sc-raised);color:var(--sc-text);border:1px solid var(--sc-line);border-radius:.25rem}
+html[data-bs-theme="dark"] .btn-outline-primary{--bs-btn-color:var(--sc-link);--bs-btn-border-color:#6ea8fe}
+html[data-bs-theme="dark"] :is(.btn-outline-secondary,.btn-outline-dark){--bs-btn-color:var(--sc-text);--bs-btn-border-color:var(--sc-line);--bs-btn-hover-bg:#435367;--bs-btn-hover-color:#fff}
+html[data-bs-theme="dark"] :is(.tag-badge,.property-syntax-choice[aria-pressed=true]){background:var(--sc-raised);color:var(--sc-text);border-color:var(--sc-line)}
+html[data-bs-theme="dark"] :is(#quickMapClose,#markmapCanvasToggle){background:var(--sc-raised)!important;color:var(--sc-text)!important}
+html[data-bs-theme="dark"] :is(.markmap-foreign,.markmap-node){color:var(--sc-text)}
+html[data-bs-theme="dark"] .markmap-node text{fill:var(--sc-text)}
+html[data-bs-theme="dark"] :is(.node-markup pre,.node-markup blockquote,.hljs){background:var(--sc-panel);color:var(--sc-text);border-color:var(--sc-line)}
+/* A zero title-color value is CherryTree's default, rather than an authored color.
+   Server templates may emit #0; browser-created rows normalize it to rgb(0, 0, 0). */
+html[data-bs-theme="dark"] :is(.workspace-tree-row,.reader-tree,.home-activity,.reader-context-list,.cal-page)
+ :is([style*="color:#0;"],[style$="color:#0"],[style*="color:#000000;"],[style$="color:#000000"],[style*="color: rgb(0, 0, 0)"]),
+html[data-bs-theme="dark"] .cal-entry:is([style*="color:#0;"],[style*="color:#000000;"]){color:var(--sc-text)!important}
+/* Note paper preserves explicit black text, highlights, grid borders and authored colors. */
+html[data-bs-theme="dark"] :is(.theme-note-paper,#richPreview,.rt-visual,.html-preview){color-scheme:light;background:#fff;color:#20242a;border-radius:.25rem;padding:.65rem}
+html[data-bs-theme="dark"] .theme-note-paper a{color:#0645ad}
+html[data-bs-theme="dark"] .hljs,html[data-bs-theme="dark"] .theme-note-paper .hljs{background:#f3f4f5;color:#20242a}
+html[data-bs-theme="dark"] .theme-note-paper :is(.node-markup pre,.node-markup blockquote){background:#f5f5f5;color:#20242a}
+html[data-bs-theme="dark"] #nodeContent:not(.theme-note-paper) :is(table,td,th){border-color:var(--sc-line)!important}
+html[data-bs-theme="dark"] a:focus-visible,html[data-bs-theme="dark"] button:focus-visible{outline:3px solid #91c5ff;outline-offset:2px}
+}

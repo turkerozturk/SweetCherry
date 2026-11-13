@@ -345,3 +345,19 @@ Veritabanları için [özel ikon](database-icons.md) tanımlanabilir.
 ## Derleme çıktısını taşıma
 
 Derleme sonrasında oluşan `release/SweetCherry` klasörünün **tamamını** kullanın veya taşıyın. Yalnız JAR dosyasını almak, belgelenen ilk açılış için gereken örnek CTB, tenant tanımları, scriptler ve lisans belgelerini dışarıda bırakır. `release` altındaki uygulama klasörünün yapısını koruyun.
+
+### Tema ve güvenli uygulama ayarları
+
+Varsayılan mevcut açık görünümdür. Koyu arayüz için etkin harici `application.yml` dosyasına aşağıdaki ayarı ekleyin veya mevcut değeri değiştirip SweetCherry'yi yeniden başlatın:
+
+```yaml
+myapp:
+  appearance:
+    theme: dark # light veya dark; varsayılan: light
+```
+
+Yönetici **Sistem → Uygulama ayarları** (`/system/settings`) sayfasından da **Açık** veya **Koyu** seçebilir. Tema giriş, masaüstü/mobil gezinme, takvim, mindmap ve editör arayüzlerinde uygulama genelinde geçerlidir; tarayıcı/işletim sistemi temasını izlemez. Kaydedilmiş renkleri ve biçimlendirmeyi okunabilir tutmak için zengin metin not yüzeyi, görsel zengin metin editörü, renklendirilmiş kod çıktısı ve korumalı HTML önizlemeleri açık içerik zemini kullanır. Kaydedilmiş notlar, başlık renkleri, dışa aktarılan belgeler ve masaüstü launcher değişmez.
+
+Ayarlar sayfasına başlangıç dili; son değiştirilen notu açma; ana sayfadaki oluşturulan/değiştirilen not listelerinin en az sayısı (0 ilgili listeyi gizler); başlangıç ağaç genişliği; takvim haftasının başlangıcı, saat dilimi, öğe/kart sınırları ve günlük önizleme karakter/satır sınırları; klasör/metin dışa aktarma sınırları; kayıt tasarımı tarih/saat biçimi, isteğe bağlı saat dilimi ve şablon/çıktı sınırları da eklendi. Tarayıcıda kaydedilmiş dil ve ağaç genişliği seçimleri başlangıç değerlerinden önceliklidir. Takvimde `system`, kayıt tasarımı saat diliminde boş değer işletim sistemi/JVM saat dilimini kullanır. Değerler doğrulanır; YAML yorumları ve ilgisiz ayarlar korunur. Sayfa kaydedilmiş değerlerle çalışan uygulamanın etkin değerlerini ayrı gösterir. Kaydettikten sonra yeniden başlatın; komut satırı/ortam değişkeni öncelikleri geçerliliğini korur.
+
+Bu form yalnızca etkin harici YAML dosyasını düzenler. Ağ, proxy/TLS/giriş/güvenlik ayarları, kimlik bilgileri, depolama yolları, yedek silme/saklama politikası, operations profilleri ve keyfi YAML anahtarları kapsam dışındadır. Mevcut özel yedekleme kontrolleri ve belgelenmiş YAML yapılandırması kullanılmaya devam eder.
