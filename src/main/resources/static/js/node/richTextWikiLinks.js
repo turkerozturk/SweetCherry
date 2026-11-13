@@ -10,8 +10,7 @@
    if(event.defaultPrevented)return;if(approved){approved=false;return;}
    form.elements.wikiChoices.value='{}';form.elements.keepUnresolvedWikiLinks.value='false';
    const xml=form.elements.xml.value;
-   const parsed=new DOMParser().parseFromString(xml,'application/xml');
-   if(!(parsed.documentElement?.textContent||'').includes('[[')){status.textContent='';return;}
+   // Send serialized XML as opaque text. Only the server's hardened XML reader interprets it.
    event.preventDefault();if(pending)return;pending=true;form.inert=true;
    form.elements.wikiChoices.value='{}';form.elements.keepUnresolvedWikiLinks.value='false';status.textContent=dialog.dataset.loading;
    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
