@@ -42,10 +42,16 @@ public class InternalLinkReportService {
     public Report inspect(Options options) {
         return entityManager.unwrap(Session.class).doReturningWork(connection->inspect(connection,options));
     }
-    static Report inspect(Connection connection, Options options) throws SQLException {
+    Report graphIndex() {
+        return entityManager.unwrap(Session.class).doReturningWork(c->inspect(c,new Options("","all",1000,1),true));
+    }
+    static Report inspect(Connection connection, Options options) throws SQLException {return inspect(connection,options,false);}
+    private static Report inspect(Connection connection, Options options, boolean graph) throws SQLException {
         var metadata=new HashMap<Long,Meta>();
         try(var query=connection.createStatement();var rows=query.executeQuery("SELECT node_id,name,is_ro,is_richtxt,syntax FROM node")) {
+            if(graph)query.setMaxRows(10001);
             while(rows.next()) {
+                if(graph&&metadata.size()>=10000)throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE);
                 var display=new Node();display.setIsReadOnly16bit(rows.getLong(3));display.setIsRichText(rows.getLong(4));
                 String syntax=Objects.requireNonNullElse(rows.getString(5),"plain-text");display.setSyntax(syntax);
                 display.parseNodeIconAndReadOnlyFlag();display.parseNodeTitleColorAndBoldnessAndTextType();
@@ -57,6 +63,7 @@ public class InternalLinkReportService {
         try(var query=connection.createStatement();var rows=query.executeQuery("SELECT node_id,father_id,COALESCE(master_id,0) FROM children ORDER BY node_id")) {
             while(rows.next()) {
                 long id=rows.getLong(1),master=rows.getLong(3),content=master==0?id:master;
+                if(graph&&branches.size()>=20000)throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE);
                 branches.put(id,new Branch(id,rows.getLong(2),content,master!=0));
                 contentPlaces.computeIfAbsent(content,key->new ArrayList<>()).add(id);
             }
@@ -65,11 +72,14 @@ public class InternalLinkReportService {
             Branch requested=branches.get(options.targetId());
             if(requested==null||!metadata.containsKey(requested.content()))return null;
         }
+        if(graph&&branches.size()>20000)throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE);
         var anchors=new HashMap<Long,Set<String>>();var objectLinks=new HashMap<Long,List<Link>>();
         String sql="SELECT node_id,"+JdbcIdentifiers.quote(connection,"offset")+",filename,anchor,link FROM image WHERE "
                 + "(anchor IS NOT NULL AND anchor<>'') OR (link IS NOT NULL AND link<>'')";
+        int graphObjects=0;
         try(var query=connection.createStatement();var rows=query.executeQuery(sql)) {
             while(rows.next()) {
+                if(graph&&++graphObjects>50000)throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE);
                 long id=rows.getLong(1);String anchor=rows.getString(4),value=rows.getString(5);
                 if(anchor!=null&&!anchor.isEmpty())anchors.computeIfAbsent(id,key->new HashSet<>()).add(anchor);
                 if(internal(value))objectLinks.computeIfAbsent(id,key->new ArrayList<>()).add(new Link("object",rows.getInt(2),
@@ -80,8 +90,9 @@ public class InternalLinkReportService {
         var places=new HashMap<Long,Place>();
         for(long id:branches.keySet())places.put(id,place(id,branches,metadata,false));
         var result=new Collector(options,places,branches,metadata,anchors);
+        result.graph=graph;
         var reader=new RichTextXmlReader();
-        boolean panel=options.targetId()!=null;
+        boolean panel=options.targetId()!=null||graph;
         String contents=panel ? "SELECT node_id,CASE WHEN LENGTH(txt)<=2000000 THEN txt ELSE NULL END,LENGTH(txt) FROM node WHERE syntax='custom-colors' ORDER BY node_id"
                 : "SELECT node_id,txt FROM node WHERE syntax='custom-colors' ORDER BY node_id";
         long inspectedCharacters=0;int inspectedNodes=0;
@@ -120,6 +131,7 @@ public class InternalLinkReportService {
                     }
                     for(var link:objectLinks.getOrDefault(id,List.of())){found=true;result.add(sources,link);}
                     if(found)result.sourceContents++;
+                    if(graph&&result.graphCapped)break;
                 }
             }
         }
@@ -147,6 +159,7 @@ public class InternalLinkReportService {
     private static String normalize(String value){return java.text.Normalizer.normalize(value.toLowerCase(Locale.ROOT),java.text.Normalizer.Form.NFD).replaceAll("\\p{M}+","").replace('ı','i');}
     private static String shortText(String value,int maximum){return value.length()>maximum?value.substring(0,maximum)+"…":value;}
     private static final class Collector {
+        boolean graph,graphCapped;
         final Map<Long,Meta> metadata;final Map<Long,Place> detailed=new HashMap<>();
         final Options options;final Map<Long,Place> places;final Map<Long,Branch> branches;final Map<Long,Set<String>> anchors;
         final List<Row> rows=new ArrayList<>();final List<Issue> issues=new ArrayList<>();final Set<Long> sources=new HashSet<>();
@@ -170,12 +183,13 @@ public class InternalLinkReportService {
             String state=parsed.number()==null?"invalid":target==null||!target.available()?"missingNode":
                     !parsed.anchor().isEmpty()&&!anchors.getOrDefault(branches.get(target.id()).content(),Set.of()).contains(parsed.anchor())?"missingAnchor":"ok";
             for(Place source:sourcePlaces) {
+                if(graph&&links>=50000){if(!graphCapped)issue(source.id(),source,"scanLimit");graphCapped=true;return;}
                 links++;if(source.available())sources.add(source.id());
                 switch(state){case "missingNode"->missingNodes++;case "missingAnchor"->missingAnchors++;case "invalid"->invalidLinks++;default->{}}
                 if(options.status().equals("broken")&&state.equals("ok")||options.status().equals("ok")&&!state.equals("ok"))continue;
                 if(!query.isEmpty()&&!normalize(source.name()+" "+source.id()+" "+(target==null?"":target.name())+" "+parsed.id()+" "+parsed.anchor()+" "+link.label()).contains(query))continue;
                 long position=matched++;
-                if(position<(long)(options.page()-1)*options.limit()||rows.size()>=options.limit())continue;
+                if(position<(long)(options.page()-1)*options.limit()||rows.size()>=(graph?10000:options.limit()))continue;
                 String fragment=parsed.anchor().isEmpty()||!state.equals("ok")?"":"#"+java.net.URLEncoder.encode(parsed.anchor(),java.nio.charset.StandardCharsets.UTF_8).replace("+","%20");
                 rows.add(new Row(details(source),link.kind(),link.offset(),shortText(link.label(),2000),shortText(link.value(),4096),parsed.id(),details(target),parsed.anchor(),fragment,state));
             }

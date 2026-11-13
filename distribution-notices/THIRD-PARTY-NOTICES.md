@@ -28,6 +28,8 @@ CherryTree icon files were taken from CherryTree sources and converted/resized f
 
 ## Browser assets and fonts
 
+- Cytoscape.js 3.35.0: MIT, bundled offline for the focused connection map. Upstream: https://js.cytoscape.org/ . Original licence: `licenses/cytoscape-3.35.0-LICENSE.txt`; the asset directory also contains its licence and pinned source reference.
+
 - D3 7.9.0: ISC license; included upstream license text controls.
 - Markmap: MIT. Bundled version could not be positively determined; no exact version is asserted. Its bundle includes d3-flextree 2.1.2. The current upstream d3-flextree license reference is WTFPL v2, not MIT; `d3-flextree-LICENSE-current.txt` is labelled as a current reference, not verified against the bundled release tag.
 - Mermaid local bundle identifies version 12.0.0, MIT. Its bundled copyright/license block is preserved verbatim in `MERMAID-BUNDLED-NOTICES.txt`, including DOMPurify (Apache-2.0/MPL-2.0), Lodash and Cytoscape credits. Consult these component notices as well as the Mermaid license.

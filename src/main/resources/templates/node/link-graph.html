@@ -1,0 +1,15 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{graph.title}"></title><section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/linkGraph.css}"></section></head>
+<body><main layout:fragment="content" id="linkGraphPage" class="container-fluid p-2" th:attr="data-focus=${graphNodeId},data-token=${tenantViewToken},data-api=@{/nodes/link-graph/data},data-content=@{/nodes/calendar/},data-node=@{/nodes/},data-icons=@{/img/ctbicons/},data-loading=#{graph.loading},data-error=#{graph.error},data-warning=#{graph.warning},data-more=#{graph.more},data-empty=#{graph.empty},data-focus-label=#{graph.focus},data-in=#{graph.in},data-out=#{graph.out},data-both=#{graph.both},data-parent=#{graph.parent},data-child=#{graph.child},data-shared=#{graph.shared}">
+<h1 class="h4" th:text="#{graph.title}"></h1><p class="small mb-1" th:text="#{graph.help}"></p>
+<div class="graph-controls">
+<button id="graphBack" class="btn btn-sm btn-outline-secondary" type="button" disabled th:text="#{graph.back}"></button><button id="graphForward" class="btn btn-sm btn-outline-secondary" type="button" disabled th:text="#{graph.forward}"></button>
+<form id="graphJump"><label for="graphId" th:text="#{graph.id}"></label> <input id="graphId" type="text" inputmode="numeric" pattern="[1-9][0-9]{0,18}" required maxlength="19" size="12"><button class="btn btn-sm btn-outline-primary" th:text="#{graph.go}"></button></form>
+<label><input id="graphHierarchy" type="checkbox"> <span th:text="#{graph.hierarchy}"></span></label>
+<label for="graphLimit" th:text="#{graph.limit}"></label><select id="graphLimit" class="form-select form-select-sm"><option>40</option><option>100</option><option>200</option></select>
+<button id="graphRefresh" class="btn btn-sm btn-outline-primary" type="button" th:text="#{graph.refresh}"></button><button id="graphFit" class="btn btn-sm btn-outline-secondary" type="button" th:text="#{graph.fit}"></button>
+<a id="graphOpen" class="btn btn-sm btn-outline-primary" hidden target="_blank" rel="noopener" th:text="#{graph.open}"></a>
+</div><p id="graphStatus" role="status" aria-live="polite"></p><p id="graphWarning" class="alert alert-warning p-2" hidden></p>
+<div class="graph-workspace"><section class="graph-map"><div id="linkGraphCanvas" role="img" th:aria-label="#{graph.title}"></div><details><summary th:text="#{graph.list}"></summary><ul id="graphList" class="list-unstyled"></ul></details></section>
+<aside class="graph-preview"><h2 id="graphFocusName" class="h6"></h2><iframe id="graphPreview" th:title="#{graph.content}" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="same-origin"></iframe></aside></div>
+</main><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/thirdparty/cytoscape/cytoscape.min.js}"></script><script defer th:src="@{/js/node/linkGraph.js}"></script></section></body></html>

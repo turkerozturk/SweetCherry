@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add an offline, read-only focused connection map using Cytoscape.js: incoming/outgoing internal links, optional hierarchy, shared occurrences, content preview, accessible navigation list and focus history. Keep bounded tenant/view-scoped derived indexes with rescan and partial-result warnings; retain the CTB schema.
+
 - Add an opt-in application-wide dark theme, keeping the existing light appearance by default and preserving authored note colors on light content paper. Configure it through application.yml or the administrator settings form after restart.
 - Expose validated language, home activity, initial tree width, calendar/day-preview, folder-export and record-layout settings in the existing safe YAML editor, with localized choices and numeric bounds.
 

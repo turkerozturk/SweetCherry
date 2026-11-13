@@ -71,7 +71,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
 
     private boolean dialogApi(HttpServletRequest request) {
         String path=request.getRequestURI();String context=request.getContextPath();
-        return path.startsWith(context + "/nodes/quick/") || path.startsWith(context + "/nodes/backlinks/")
+        return path.equals(context + "/nodes/link-graph/data") || path.startsWith(context + "/nodes/quick/") || path.startsWith(context + "/nodes/backlinks/")
                 || path.startsWith(context + "/nodes/saved-filters");
     }
 
