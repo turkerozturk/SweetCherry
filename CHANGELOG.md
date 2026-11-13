@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add a localized daily calendar with chronological responsive note cards, bounded text previews, attachment/image/table/codebox counts, day navigation and existing tag filters/date editing. Configure preview characters/lines and day-entry limits in application.yml; retain metadata-only month/week reads.
+
 ## [1.8.1] - 2026-11-13
 
 - Upgrade to Spring Boot 4.1.2 and its compatible Spring Framework, Security, Hibernate, Tomcat and Jackson stack while retaining Java 17. Update reviewed HTTP, logging and expression-library dependencies; preserve older backup manifests and saved filters.

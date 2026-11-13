@@ -30,7 +30,15 @@ class CalendarSecurityTest {
             var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
             var session=new MockHttpSession();session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");
             var service=context.getBean(CalendarService.class);TenantContext.setCurrentTenant("Notes");
-            mvc.perform(get("/nodes/calendar/month").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk());verify(service).view(eq("month"),any(),any(),eq("any"),any());clearInvocations(service);
+            mvc.perform(get("/nodes/calendar/month").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk());verify(service).view(eq("month"),any(),any(),eq("any"),any());
+            var date=java.time.LocalDate.of(2026,11,13);
+            var day=new CalendarService.Day(date,"Day","Fri",true,true,java.util.List.of());
+            when(service.view(eq("day"),any(),any(),any(),any())).thenReturn(new CalendarService.View("day",date,date.minusDays(1),date.plusDays(1),true,true,"Day","UTC",java.util.List.of(day),java.util.List.of(),0,false,java.util.List.of(),"any"));
+            for(String path:java.util.List.of("/nodes/calendar/day","/calendar/day")){
+                mvc.perform(get(path).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk());
+                mvc.perform(get(path).session(session).param("_tenantView","stale").with(user("reader").roles("USER"))).andExpect(status().isConflict());
+            }
+            clearInvocations(service);
             mvc.perform(post("/nodes/calendar/11/created").session(session).param("_tenantView","current").param("expectedCreated","1").param("expectedModified","2").param("local","2030-01-01T00:00").with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
             mvc.perform(post("/nodes/calendar/11/created").session(session).param("_tenantView","stale").param("expectedCreated","1").param("expectedModified","2").param("local","2030-01-01T00:00").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
             mvc.perform(post("/nodes/calendar/11/created").session(session).param("_tenantView","current").with(user("admin").roles("ADMIN"))).andExpect(result->org.assertj.core.api.Assertions.assertThat(result.getResponse().getStatus()).isIn(302,403));

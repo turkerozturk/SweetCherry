@@ -35,7 +35,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | Area | Features |
 | --- | --- |
 | **Read and edit** | Desktop/mobile readers; supported rich text, Plain Text, Markdown and [HTML](documentation/en/html-notes.md) editing; live preview; images, attachments, tables, codeboxes and offline LaTeX; browser-local recovery drafts. |
-| **Find and organise** | Quick switch, quick note capture, advanced search, saved filters, backlinks, searchable tags, batch tag management, bookmarks, recent activity and weekly/monthly calendars. |
+| **Find and organise** | Quick switch, quick note capture, advanced search, saved filters, backlinks, searchable tags, batch tag management, bookmarks, recent activity and daily/weekly/monthly calendars. |
 | **Explore the tree** | Markmap and Mermaid views; quick child creation in Markmap; balanced two-sided layout and a page-filling canvas; node movement, duplication and shared nodes. |
 | **Export and exchange** | PDF with hierarchical navigation; CTB export/import with remapped internal IDs; Freeplane/FreeMind export and [MM import](documentation/en/freeplane-import.md); folder-tree text ZIP export and [ZIP import](documentation/en/zip-import.md); custom record reports and HTML/PDF layouts. |
 | **Back up and recover** | Verified CTB snapshots, optional schedules and retention, backup downloads, reviewed deletion and recovery into a separate working copy. |
@@ -57,6 +57,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 <details>
 <summary>Guides for specific tasks</summary>
 
+- [Daily calendar and preview settings](documentation/en/daily-calendar.md) · [Günlük takvim](documentation/tr/daily-calendar.md)
 - [CTB backups and recovery](documentation/en/ctb-backups.md)
 - [Advanced search](documentation/en/advanced-search.md) · [Saved filters and backlinks](documentation/en/saved-filters-backlinks.md)
 - [Quick switch and quick notes](documentation/tr/quick-notes.md) (Turkish)

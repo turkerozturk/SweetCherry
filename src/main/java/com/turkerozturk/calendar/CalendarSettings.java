@@ -16,6 +16,12 @@ public class CalendarSettings {
         catch(RuntimeException invalid){parsedZone=ZoneId.systemDefault();org.slf4j.LoggerFactory.getLogger(getClass()).warn("Invalid myapp.calendar.time-zone; using system time zone.");}
         this.firstDay=parsed;this.zone=parsedZone;maxEntries=Math.max(1,Math.min(50000,limit));
     }
+    @Value("${myapp.calendar.day-preview-max-characters:600}") private int previewCharacters=600;
+    @Value("${myapp.calendar.day-preview-max-lines:8}") private int previewLines=8;
+    @Value("${myapp.calendar.day-max-entries:300}") private int dayEntries=300;
+    public int previewCharacters(){return Math.max(1,Math.min(20000,previewCharacters));}
+    public int previewLines(){return Math.max(1,Math.min(100,previewLines));}
+    public int dayEntries(){return Math.min(maxEntries,Math.max(1,Math.min(2000,dayEntries)));}
     static DayOfWeek firstDay(String value){String text=value.strip().toUpperCase(Locale.ROOT);return text.matches("[1-7]")?DayOfWeek.of(Integer.parseInt(text)):DayOfWeek.valueOf(text);}
     public DayOfWeek firstDay(){return firstDay;}
     public ZoneId zone(){return zone;}

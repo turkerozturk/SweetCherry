@@ -12,13 +12,16 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import static org.assertj.core.api.Assertions.*;
 class CalendarTemplateTest {
  @Test void monthAndWeekRenderEscapedTitlesTagsDatesAndProtectedDialogInBothLanguages()throws Exception {
-  for(String mode:List.of("month","week"))for(Locale locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))) {
+  for(String mode:List.of("month","week","day"))for(Locale locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))) {
    var entry=new CalendarService.Entry("11","1","<script>Long title</script>","ct_code",true,"#3584E4",true,false,1793193300L,123,"2026-10-28T14:15","14:15",List.of("one,two"));
    var days=new ArrayList<CalendarService.Day>();LocalDate date=LocalDate.of(2026,10,26);
-   for(int i=0;i<(mode.equals("month")?42:7);i++)days.add(new CalendarService.Day(date.plusDays(i),date.plusDays(i).toString(),"Mon",true,i==0,i==0?List.of(entry):List.of()));
+   for(int i=0;i<(mode.equals("day")?1:mode.equals("month")?42:7);i++)days.add(new CalendarService.Day(date.plusDays(i),date.plusDays(i).toString(),"Mon",true,i==0,i==0?List.of(entry):List.of()));
    var hours=new ArrayList<CalendarService.Hour>();for(int i=0;i<24;i++){var cells=new ArrayList<List<CalendarService.Entry>>();for(int d=0;d<7;d++)cells.add(i==14&&d==0?List.of(entry):List.of());hours.add(new CalendarService.Hour("14:00",cells));}
    var view=new CalendarService.View(mode,date,date.minusMonths(1),date.plusMonths(1),true,true,"October 2026","Europe/Istanbul",days,hours,1,false,List.of("one,two"),"any");
-   String html=render(Map.of("calendar",view,"calendarEditable",true,"calendarTags",List.of("one,two","<tag>"),"invalidCalendarDate",false),locale);
+   var model=new HashMap<String,Object>(Map.of("calendar",view,"calendarEditable",true,"calendarTags",List.of("one,two","<tag>"),"invalidCalendarDate",false));
+   if(mode.equals("day")){model.put("previewLines",8);model.put("dayPreviews",Map.of("1",new CalendarDayPreviews.Preview("Preview <script>attack()</script>",false,false,2,3,4,1,false)));}
+   String html=render(model,locale);
+   if(mode.equals("day")){assertThat(html).contains("Preview &lt;script&gt;attack()&lt;/script&gt;").doesNotContain("<script>attack()</script>");assertThat(org.jsoup.Jsoup.parse(html).select(".cal-day-card")).hasSize(1);assertThat(org.jsoup.Jsoup.parse(html).select(".cal-object-counts>span")).hasSize(4);}
    assertThat(html).contains("calendarCreatedForm","name=\"_tenantView\"","&lt;script&gt;Long title&lt;/script&gt;","&lt;tag&gt;","data-id=\"11\"","data-content-id=\"1\"","Europe/Istanbul").doesNotContain("??calendar.","<script>Long title</script>");
    var document=org.jsoup.Jsoup.parse(html);assertThat(document.select(".cal-entry")).isNotEmpty();assertThat(document.select("#calendarDialog")).hasSize(1);
   }

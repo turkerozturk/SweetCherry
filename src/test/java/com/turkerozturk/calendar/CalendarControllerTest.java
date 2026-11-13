@@ -17,6 +17,15 @@ class CalendarControllerTest {
   verify(service).view("month",LocalDate.of(2026,10,28),List.of("one,two","C++"),"any",Locale.ENGLISH);
   mvc.perform(get("/nodes/calendar/week").param("date","bad").locale(Locale.ENGLISH)).andExpect(status().isOk()).andExpect(model().attribute("invalidCalendarDate",true));
  }
+ @Test void dayCanonicalAndShortRoutesLoadPreviewsAndKeepTheSelectedDate()throws Exception {
+  var service=mock(CalendarService.class);var tags=mock(NodeTagService.class);when(tags.catalogue()).thenReturn(List.of());
+  var date=LocalDate.of(2026,11,13);var day=new CalendarService.Day(date,"Day","Fri",true,true,List.of());
+  var view=new CalendarService.View("day",date,date.minusDays(1),date.plusDays(1),true,true,"Day","UTC",List.of(day),List.of(),0,false,List.of(),"any");
+  when(service.view(eq("day"),eq(date),any(),eq("any"),any())).thenReturn(view);when(service.previews(List.of())).thenReturn(Map.of());
+  var mvc=MockMvcBuilders.standaloneSetup(new CalendarController(service,new CalendarSettings("MONDAY","UTC",10000),mock(NodePropertiesService.class),tags)).setViewResolvers((name,locale)->new org.springframework.web.servlet.view.InternalResourceView("/test-calendar-view")).build();
+  for(String path:List.of("/nodes/calendar/day","/calendar/day"))mvc.perform(get(path).param("date",date.toString())).andExpect(status().isOk()).andExpect(model().attribute("calendar",view)).andExpect(model().attribute("previewLines",8)).andExpect(view().name("calendar/calendar"));
+  verify(service,times(2)).previews(List.of());
+ }
  @Test void saveAndContentUseNoStoreJsonAndExposeOnlyErrorCodes()throws Exception {
   var service=mock(CalendarService.class);var mvc=MockMvcBuilders.standaloneSetup(new CalendarController(service,new CalendarSettings("MONDAY","UTC",10000),mock(NodePropertiesService.class),mock(NodeTagService.class))).build();
   mvc.perform(post("/nodes/calendar/11/created").param("expectedCreated","1").param("expectedModified","2").param("local","2030-02-03T04:05").param("_tenantView","v")).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.saved").value(true));

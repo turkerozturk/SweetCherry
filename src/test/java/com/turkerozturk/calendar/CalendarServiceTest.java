@@ -69,5 +69,40 @@ class CalendarServiceTest {
         var january=limited.view("month",LocalDate.of(2027,1,1),List.of(),"any",Locale.ENGLISH);assertThat(january.days().get(0).date()).isEqualTo(LocalDate.of(2026,12,27));
         assertThat(limited.view("month",LocalDate.of(9999,12,1),List.of(),"any",Locale.ENGLISH).canNext()).isFalse();
     }
+    @Test void dayUsesLocalMidnightsAndReusesMasterPreviewsWithoutBlobReads()throws Exception {
+        try(var sql=connection.createStatement()){
+            sql.execute("ALTER TABLE node ADD COLUMN txt TEXT");
+            sql.execute("CREATE TABLE image(node_id INTEGER,anchor TEXT,filename TEXT,png BLOB)");
+            sql.execute("CREATE TABLE grid(node_id INTEGER,txt TEXT)");sql.execute("CREATE TABLE codebox(node_id INTEGER,txt TEXT)");
+            sql.execute("UPDATE node SET txt='<node><rich_text>First line\nSecond &amp; third</rich_text></node>',syntax='custom-colors' WHERE node_id=1");
+            sql.execute("INSERT INTO image VALUES(1,'','',zeroblob(1000000)),(1,'','report.pdf',zeroblob(1000000)),(1,'anchor','',NULL)");
+            sql.execute("INSERT INTO grid VALUES(1,'not fetched')");sql.execute("INSERT INTO codebox VALUES(1,'not fetched')");
+            sql.execute("UPDATE node SET ts_creation="+settings.timestamp("2026-10-28T00:00")+" WHERE node_id=1");
+            sql.execute("UPDATE node SET ts_creation="+(settings.timestamp("2026-10-28T23:59")+59)+" WHERE node_id=2");
+            sql.execute("UPDATE node SET ts_creation="+settings.timestamp("2026-10-29T00:00")+" WHERE node_id=3");
+        }
+        var view=service.view("day",LocalDate.of(2026,10,28),List.of(),"any",Locale.ENGLISH);
+        assertThat(view.days()).hasSize(1);assertThat(view.hours()).isEmpty();
+        assertThat(view.previous()).isEqualTo(LocalDate.of(2026,10,27));assertThat(view.next()).isEqualTo(LocalDate.of(2026,10,29));
+        assertThat(view.days().get(0).entries()).extracting(CalendarService.Entry::id).containsExactly("1","11","2");
+        var previews=service.previews(view.days().get(0).entries());assertThat(previews).hasSize(2);
+        var preview=previews.get("1");assertThat(preview.text()).isEqualTo("First line\nSecond & third");
+        assertThat(preview.attachments()).isEqualTo(1);assertThat(preview.images()).isEqualTo(1);
+        assertThat(preview.tables()).isEqualTo(1);assertThat(preview.codeboxes()).isEqualTo(1);
+        org.springframework.test.util.ReflectionTestUtils.setField(settings,"dayEntries",1);
+        assertThat(service.view("day",LocalDate.of(2026,10,28),List.of(),"any",Locale.ENGLISH).truncated()).isTrue();
+    }
+    @Test void dayRangeIncludesDstTransitionDaysWithoutAssumingTwentyFourHours()throws Exception {
+        var berlin=new CalendarSettings("MONDAY","Europe/Berlin",10000);
+        var other=new CalendarService(berlin,properties,mock(RichTextRenderingService.class));
+        ReflectionTestUtils.setField(other,"entityManager",ReflectionTestUtils.getField(service,"entityManager"));
+        for(var date:List.of(LocalDate.of(2026,3,29),LocalDate.of(2026,10,25))){
+            long start=date.atStartOfDay(berlin.zone()).toEpochSecond(),end=date.plusDays(1).atStartOfDay(berlin.zone()).toEpochSecond();
+            try(var sql=connection.createStatement()){
+                sql.execute("UPDATE node SET ts_creation="+start+" WHERE node_id=1");sql.execute("UPDATE node SET ts_creation="+(end-1)+" WHERE node_id=2");sql.execute("UPDATE node SET ts_creation="+end+" WHERE node_id=3");
+            }
+            assertThat(other.view("day",date,List.of(),"any",Locale.ENGLISH).count()).isEqualTo(3);
+        }
+    }
     long value(String column,int id)throws Exception{try(var q=connection.createStatement();var r=q.executeQuery("SELECT "+column+" FROM node WHERE node_id="+id)){r.next();return r.getLong(1);}}
 }

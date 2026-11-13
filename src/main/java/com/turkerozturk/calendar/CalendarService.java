@@ -30,22 +30,26 @@ public class CalendarService {
             String zone,List<Day> days,List<Hour> hours,int count,boolean truncated,List<String> tags,String match) { }
     private record Place(long id,long content,boolean shared) { }
     public View view(String mode,LocalDate anchor,List<String> selected,String match,Locale locale) {
-        if(!Set.of("month","week").contains(mode)||selected.size()>100||!Set.of("any","all").contains(match))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidFilter");
+        if(!Set.of("month","week","day").contains(mode)||selected.size()>100||!Set.of("any","all").contains(match))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidFilter");
         for(String tag:selected)if(tag==null||tag.isEmpty()||tag.length()>NodeTags.MAX_INPUT_CHARACTERS||tag.indexOf(' ')>=0||tag.indexOf('\0')>=0)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidFilter");
-        LocalDate start=(mode.equals("month")?anchor.withDayOfMonth(1):anchor).with(TemporalAdjusters.previousOrSame(settings.firstDay()));
-        int length=mode.equals("month")?42:7;
+        LocalDate start=mode.equals("day")?anchor:(mode.equals("month")?anchor.withDayOfMonth(1):anchor).with(TemporalAdjusters.previousOrSame(settings.firstDay()));
+        int length=mode.equals("day")?1:mode.equals("month")?42:7;
+        int limit=mode.equals("day")?settings.dayEntries():settings.maxEntries();
         long from=start.atStartOfDay(settings.zone()).toEpochSecond(),to=start.plusDays(length).atStartOfDay(settings.zone()).toEpochSecond();
-        var rows=entityManager.unwrap(Session.class).doReturningWork(c->read(c,from,to,selected,match,settings.maxEntries()+1));
-        boolean truncated=rows.size()>settings.maxEntries();if(truncated)rows=rows.subList(0,settings.maxEntries());
+        var rows=entityManager.unwrap(Session.class).doReturningWork(c->read(c,from,to,selected,match,limit+1));
+        boolean truncated=rows.size()>limit;if(truncated)rows=rows.subList(0,limit);
         var days=new ArrayList<Day>();LocalDate today=LocalDate.now(settings.zone());
         var label=DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);var weekday=DateTimeFormatter.ofPattern("EEE",locale);
         for(int i=0;i<length;i++){LocalDate date=start.plusDays(i);var items=new ArrayList<Entry>();for(var row:rows)if(Instant.ofEpochSecond(row.created()).atZone(settings.zone()).toLocalDate().equals(date))items.add(row);
             days.add(new Day(date,date.format(label),date.format(weekday),date.getMonth()==anchor.getMonth()&&date.getYear()==anchor.getYear(),date.equals(today),List.copyOf(items)));}
         var hours=new ArrayList<Hour>();
         if(mode.equals("week"))for(int hour=0;hour<24;hour++){var cells=new ArrayList<List<Entry>>();final int h=hour;for(var day:days)cells.add(day.entries().stream().filter(e->Instant.ofEpochSecond(e.created()).atZone(settings.zone()).getHour()==h).toList());hours.add(new Hour(String.format(Locale.ROOT,"%02d:00",hour),cells));}
-        LocalDate previous=mode.equals("month")?anchor.withDayOfMonth(1).minusMonths(1):anchor.minusWeeks(1),next=mode.equals("month")?anchor.withDayOfMonth(1).plusMonths(1):anchor.plusWeeks(1);
-        String title=mode.equals("month")?anchor.format(DateTimeFormatter.ofPattern("LLLL yyyy",locale)):days.get(0).label()+" – "+days.get(6).label();
+        LocalDate previous=mode.equals("month")?anchor.withDayOfMonth(1).minusMonths(1):mode.equals("day")?anchor.minusDays(1):anchor.minusWeeks(1),next=mode.equals("month")?anchor.withDayOfMonth(1).plusMonths(1):mode.equals("day")?anchor.plusDays(1):anchor.plusWeeks(1);
+        String title=mode.equals("month")?anchor.format(DateTimeFormatter.ofPattern("LLLL yyyy",locale)):mode.equals("day")?days.get(0).label():days.get(0).label()+" – "+days.get(6).label();
         return new View(mode,anchor,previous,next,previous.getYear()>=1,next.getYear()<=9999,title,settings.zone().getId(),List.copyOf(days),List.copyOf(hours),rows.size(),truncated,List.copyOf(selected),match);
+    }
+    public Map<String,CalendarDayPreviews.Preview> previews(List<Entry> entries) {
+        return entityManager.unwrap(Session.class).doReturningWork(c->new CalendarDayPreviews(settings).read(c,entries));
     }
     List<Entry> read(Connection c,long from,long to,List<String> selected,String match,int limit)throws SQLException {
         var places=new HashMap<Long,List<Place>>();

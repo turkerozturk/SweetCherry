@@ -17,13 +17,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class CalendarController {
     private final CalendarService service;private final CalendarSettings settings;private final NodePropertiesService properties;private final NodeTagService tags;
     public CalendarController(CalendarService service,CalendarSettings settings,NodePropertiesService properties,NodeTagService tags){this.service=service;this.settings=settings;this.properties=properties;this.tags=tags;}
-    @GetMapping("/nodes/calendar/{mode:month|week}")
+    @GetMapping({"/nodes/calendar/{mode:month|week|day}","/calendar/{mode:month|week|day}"})
     public String view(@PathVariable String mode,@RequestParam(required=false)String date,@RequestParam(defaultValue="any")String match,HttpServletRequest request,Model model,Locale locale){
         LocalDate anchor=LocalDate.now(settings.zone());boolean invalid=false;
         if(date!=null)try{anchor=LocalDate.parse(date);if(anchor.getYear()<1||anchor.getYear()>9999)throw new IllegalArgumentException();}catch(RuntimeException error){anchor=LocalDate.now(settings.zone());invalid=true;}
         String[] raw=request.getParameterValues("tag");var selected=raw==null?List.<String>of():Arrays.asList(raw);
         var calendar=service.view(mode,anchor,selected,match,locale);model.addAttribute("calendar",calendar);model.addAttribute("invalidCalendarDate",invalid);
         var choices=new TreeSet<String>(com.turkerozturk.node.tags.NodeTags.ORDER);choices.addAll(tags.catalogue());choices.addAll(selected);model.addAttribute("calendarTags",choices);
+        if(mode.equals("day")){model.addAttribute("dayPreviews",service.previews(calendar.days().get(0).entries()));model.addAttribute("previewLines",settings.previewLines());}
         model.addAttribute("calendarEditable",request.isUserInRole("ADMIN")&&properties.writable());return "calendar/calendar";
     }
     @PostMapping("/nodes/calendar/{id}/created") @ResponseBody @PreAuthorize("hasRole('ADMIN')")
