@@ -10,6 +10,8 @@
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" th:value="${editor.revision}">
 <input type="hidden" name="xml" id="richXml">
+<input type="hidden" name="wikiChoices" value="{}"><input type="hidden" name="keepUnresolvedWikiLinks" value="false">
+<p id="richWikiStatus" role="alert" aria-live="polite"></p><small class="wiki-help" th:text="#{wiki.help}"></small>
 <input type="hidden" name="images" id="richImages" value="{}">
 <input type="hidden" name="files" id="richFiles" value="{}">
 <input type="hidden" name="deleted" id="richDeleted" value="[]">
@@ -153,6 +155,7 @@
 <p id="richWebStatus" role="status"></p><pre id="richWebPreview" style="white-space:pre-wrap;max-height:35vh;overflow:auto"></pre>
 </dialog>
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
+<dialog id="richWikiDialog" aria-labelledby="richWikiTitle" th:attr="data-endpoint=@{/nodes/richtext/edit/{id}/wiki-links(id=${editor.node.nodeId})},data-loading=#{wiki.loading},data-error=#{wiki.error},data-missing=#{wiki.missing},data-ambiguous=#{wiki.ambiguous},data-literal=#{wiki.literal},data-shared=#{wiki.shared},data-limit=#{wiki.limit}"><h2 id="richWikiTitle" th:text="#{wiki.title}"></h2><p th:text="#{wiki.explain}"></p><div id="richWikiIssues"></div><div class="wiki-actions"><button id="richWikiCancel" type="button" autofocus th:text="#{wiki.cancel}"></button><button id="richWikiSave" type="button" th:text="#{wiki.save}"></button></div></dialog>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/thirdparty/dompurify/purify.min.js"></script>
 <script src="/js/node/richTextClipboard.js"></script>
@@ -160,6 +163,7 @@
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>
 <script th:src="@{/js/node/richTextImageClipboard.js}"></script>
 <script th:src="@{/js/node/richTextEditorSupport.js}"></script>
+<script th:src="@{/js/node/richTextWikiLinks.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
 <script th:src="@{/js/node/richTextWebImport.js}"></script>
 <script th:src="@{/js/node/richTextInternalLink.js}"></script>

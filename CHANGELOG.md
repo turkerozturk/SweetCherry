@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Resolve rich-text [[name]] / [[name|label]] expressions into ordinary CherryTree internal links on save, with breadcrumb/ID selection for duplicate names, explicit keep-as-text review for unresolved names, persistent escaping and transactional target revalidation. Preserve formatting and embedded-object positions.
+- Move Connection Map above Mind Map 1 in the view menu and use the same diagram icon.
+
 - Add an offline, read-only focused connection map using Cytoscape.js: incoming/outgoing internal links, optional hierarchy, shared occurrences, content preview, accessible navigation list and focus history. Keep bounded tenant/view-scoped derived indexes with rescan and partial-result warnings; retain the CTB schema.
 
 - Add an opt-in application-wide dark theme, keeping the existing light appearance by default and preserving authored note colors on light content paper. Configure it through application.yml or the administrator settings form after restart.

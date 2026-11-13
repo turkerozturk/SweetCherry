@@ -105,6 +105,19 @@ public class RichTextEditingService {
     @Transactional
     public void save(long id, String xml, String expectedRevision, String imageJson, String fileJson,
             String tableJson, String deletedJson, boolean allowObjectDeletion, String codeboxJson) {
+        save(id,xml,expectedRevision,imageJson,fileJson,tableJson,deletedJson,allowObjectDeletion,codeboxJson,"{}",false);
+    }
+    @Transactional(readOnly=true)
+    public RichTextWikiLinks.Preview wikiPreview(long id,String xml){
+        editableNode(id);
+        if(xml==null||xml.length()>2000000)throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
+        final RichTextDocument document;
+        try{document=new RichTextXmlReader().read(xml);}catch(IllegalArgumentException invalid){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid rich-text XML",invalid);}
+        return entityManager.unwrap(org.hibernate.Session.class).doReturningWork(c->RichTextWikiLinks.resolve(c,document,Map.of(),true,true).preview());
+    }
+    @Transactional
+    public void save(long id,String xml,String expectedRevision,String imageJson,String fileJson,String tableJson,String deletedJson,
+            boolean allowObjectDeletion,String codeboxJson,String wikiChoices,boolean keepUnresolvedWikiLinks) {
         Node node = editableNode(id);
         var objects = storedObjects(id);
         if (!revision(node, objects).equals(expectedRevision)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Node changed; reload the editor.");
@@ -149,7 +162,10 @@ public class RichTextEditingService {
             tables.keySet().stream().filter(key -> key.startsWith("new-table:")).forEach(keys::add);
             codeboxes.keySet().stream().filter(key -> key.startsWith("new-codebox:")).forEach(keys::add);
             if (keys.size() > 10) throw new IllegalArgumentException("Too many new objects");
-            saved = new ProtectedRichTextCodec().save(new RichTextXmlReader().read(xml), references(survivors), keys);
+            var edited=new RichTextXmlReader().read(xml);
+            var choices=RichTextWikiLinks.decode(wikiChoices);
+            var resolved=entityManager.unwrap(org.hibernate.Session.class).doReturningWork(c->RichTextWikiLinks.resolve(c,edited,choices,keepUnresolvedWikiLinks,false).document());
+            saved = new ProtectedRichTextCodec().save(resolved, references(survivors), keys);
             var original = "custom-colors".equals(node.getSyntax()) ? new RichTextXmlReader().read(node.getTxt())
                     : new RichTextDocument(List.of());
             entityManager.unwrap(org.hibernate.Session.class).doWork(connection ->

@@ -4,13 +4,13 @@
     <li><a class="dropdown-item" th:href="@{/changeView(mode='tree')}"><i class="fas fa-desktop"></i> <span th:text="#{view.desktop}">Desktop</span> <i th:if="${viewMode == 'tree'}" class="fas fa-check"></i></a></li>
     <li><a class="dropdown-item" th:href="@{/changeView(mode='reader')}"><i class="fas fa-mobile-alt"></i> <span th:text="#{view.mobile}">Mobile</span> <i th:if="${viewMode == 'reader'}" class="fas fa-check"></i></a></li>
     <li th:if="${currentTenantName}"><div class="dropdown-divider"></div></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/link-graph(_tenantView=${tenantViewToken})}" target="_blank" rel="noopener"><i class="fas fa-project-diagram"></i> <span th:text="#{graph.title}"></span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/markmap-quick-mind-map/all}" target="_blank" rel="noopener noreferrer"><i class="fas fa-project-diagram"></i> <span th:text="#{view.mindmap1}">Mind Map 1</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/quick-mind-map/all}" target="_blank" rel="noopener noreferrer"><i class="fas fa-project-diagram"></i> <span th:text="#{view.mindmap2}">Mind Map 2</span></a></li>
     <li th:if="${currentTenantName}"><div class="dropdown-divider"></div></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/cherrytemplatetasks}"><i class="fas fa-list"></i> <span th:text="#{view.special1}">SweetCherry Special 1</span></a></li>
     <li th:if="${currentTenantName}"><hr class="dropdown-divider"></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/timeline/modified(_tenantView=${tenantViewToken})}"><i class="fas fa-clock"></i> <span th:text="#{timeline.recentModified}">Recently Modified</span></a></li>
-    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/link-graph(_tenantView=${tenantViewToken})}" target="_blank" rel="noopener" th:text="#{graph.title}"></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/internal-links(_tenantView=${tenantViewToken})}"><i class="fas fa-link"></i> <span th:text="#{internalReport.title}">Internal Links</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/tags(_tenantView=${tenantViewToken})}"><i class="fas fa-tags"></i> <span th:text="#{tags.viewTitle}">Tags</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/timeline/created(_tenantView=${tenantViewToken})}"><i class="fas fa-plus"></i> <span th:text="#{timeline.recentCreated}">Recently Added</span></a></li>

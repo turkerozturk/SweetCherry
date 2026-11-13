@@ -868,6 +868,7 @@
         }
     };
     const initialContent=contentSignature();
+    window.RichTextWikiLinks?.install(form);
     window.EditorRecovery?.install(form,{
         base:form.querySelector('[name="revision"]').value,
         dirty:()=>contentSignature()!==initialContent,

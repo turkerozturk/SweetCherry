@@ -22,3 +22,5 @@
 #richWritingPane>.note,#richWritingPane>[role=alert]{flex:none;margin:.2rem 0;font-size:.85rem;max-height:15dvh;overflow:auto}
 body:has(#richEditForm) #editorRecovery{max-height:25dvh;margin:.2rem 0;padding:.2rem .4rem;font-size:.8rem}
 .rich-savebar{margin:.2rem 0;gap:.3rem}.rich-savebar button,.rich-savebar a{padding:.2rem .45rem;font-size:.875rem}
+
+#richWikiDialog{width:48rem;max-width:94vw;max-height:90dvh;overflow:auto;border:1px solid #888;border-radius:.4rem;padding:1rem}#richWikiDialog::backdrop{background:#0006}#richWikiIssues section{margin:.7rem 0;padding:.5rem;border:1px solid #aaa;border-radius:.3rem}#richWikiIssues select{max-width:100%;width:100%}.wiki-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1rem}.wiki-help{display:block;margin:.3rem 0;font-size:.85rem}#richWikiStatus:empty{display:none}

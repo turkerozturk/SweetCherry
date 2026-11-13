@@ -45,6 +45,27 @@ class RichTextEditingServiceTest {
         when(query.executeUpdate()).thenReturn(1);
     }
 
+    @Test void wikiSavePersistsOrdinaryLinksAndMovesCodeboxWithoutParsingItsText()throws Exception{
+        try(var sql=connection.createStatement()){
+            sql.execute("CREATE TABLE node(node_id INTEGER,name TEXT,is_ro INTEGER,is_richtxt INTEGER,syntax TEXT)");sql.execute("CREATE TABLE children(node_id INTEGER,father_id INTEGER,master_id INTEGER)");
+            sql.execute("INSERT INTO node VALUES(32,'Target',0,0,'plain-text')");sql.execute("INSERT INTO children VALUES(32,0,0)");
+            sql.execute("INSERT INTO codebox VALUES(12,1,'left','[[Missing]]','python',100,50,1,0,0)");
+        }
+        String revision=service.open(12).revision();
+        service.save(12,"<node><rich_text>[[Target]]</rich_text><rich_text __sweet_object='codebox:1'>\uFFFC</rich_text></node>",revision,"{}","{}","{}","[]",false,"{}","{\"Target\":\"32\"}",false);
+        var xml=org.mockito.ArgumentCaptor.forClass(String.class);verify(query).setParameter(eq("xml"),xml.capture());
+        assertThat(xml.getValue()).contains("link=\"node 32\"","Target").doesNotContain("[[Target]]");
+        try(var sql=connection.createStatement();var row=sql.executeQuery("SELECT offset,txt FROM codebox WHERE node_id=12")){row.next();assertThat(row.getInt(1)).isEqualTo(6);assertThat(row.getString(2)).isEqualTo("[[Missing]]");}
+    }
+    @Test void staleWikiChoiceRejectsSaveBeforeUpdatingTextOrObjects()throws Exception{
+        try(var sql=connection.createStatement()){
+            sql.execute("CREATE TABLE node(node_id INTEGER,name TEXT,is_ro INTEGER,is_richtxt INTEGER,syntax TEXT)");sql.execute("CREATE TABLE children(node_id INTEGER,father_id INTEGER,master_id INTEGER)");
+            sql.execute("INSERT INTO node VALUES(33,'Target',0,0,'plain-text')");sql.execute("INSERT INTO children VALUES(33,0,0)");
+        }
+        String revision=service.open(12).revision();
+        assertThatThrownBy(()->service.save(12,"<node><rich_text>[[Target]]</rich_text></node>",revision,"{}","{}","{}","[]",false,"{}","{\"Target\":\"32\"}",false)).hasMessageContaining("wikiTargetChanged");
+        verify(query,never()).executeUpdate();
+    }
     @Test void insertsCodeboxAtUnicodeOffsetWithRequestedDefaults() throws Exception {
         service.save(12, "<node><rich_text>😀</rich_text><rich_text __sweet_object='new-codebox:test'>\uFFFC</rich_text></node>",
                 service.open(12).revision(), "{}", "{}", "{}", "[]", false,
