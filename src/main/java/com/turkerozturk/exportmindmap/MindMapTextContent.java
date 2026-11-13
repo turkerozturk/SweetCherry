@@ -25,7 +25,8 @@ public class MindMapTextContent {
         return entityManager.unwrap(Session.class).doReturningWork(connection -> text(connection, contentId, text));
     }
 
-    static String text(Connection connection, long id, String xml) throws SQLException {
+    /** Lossy text export shared by explicitly confirmed node-type conversion. */
+    public static String text(Connection connection, long id, String xml) throws SQLException {
         try {
             var objects = new LinkedHashMap<EmbeddedObject,String>();
             String offset = JdbcIdentifiers.quote(connection,"offset");

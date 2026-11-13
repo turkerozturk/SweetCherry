@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Allow explicitly confirmed Rich Text conversion to Plain Text, Markdown, HTML or another supported syntax. Preserve readable text, table cells, codebox text and link targets; remove embedded objects atomically, reject stale content and clarify data loss before saving. Improve the Node Properties layout on narrow screens.
+
 - Add a localized daily calendar with chronological responsive note cards, bounded text previews, attachment/image/table/codebox counts, day navigation and existing tag filters/date editing. Configure preview characters/lines and day-entry limits in application.yml; retain metadata-only month/week reads.
 
 ## [1.8.1] - 2026-11-13

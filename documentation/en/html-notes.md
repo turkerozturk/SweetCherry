@@ -1,6 +1,6 @@
 # HTML notes
 
-In **Node Properties**, select **HTML** next to the Markdown shortcut and save. This selects the `html` code syntax; the normal restrictions on changing rich-text nodes or locked node types still apply. Only the exact `html` syntax uses this view. Other code syntaxes and HTML inside codeboxes remain displayed as code.
+In **Node Properties**, select **HTML** next to the Markdown shortcut and save. This selects the `html` code syntax; Rich Text conversion requires explicit confirmation of formatting and embedded-object loss. Locked nodes must be unlocked and saved first. Only the exact `html` syntax uses this view. Other code syntaxes and HTML inside codeboxes remain displayed as code.
 
 Open **Edit → HTML** to edit the source with a live rendered preview. On larger screens the panes are side by side; on narrow screens they are stacked. The toolbar inserts HTML for bold, italic, headings, paragraphs, lists, code, links and tables around the selection. The source is the editable document; the preview is not a WYSIWYG editor.
 

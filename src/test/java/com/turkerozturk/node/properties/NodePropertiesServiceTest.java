@@ -153,7 +153,7 @@ class NodePropertiesServiceTest {
                 .isInstanceOf(ResponseStatusException.class);
     }
 
-    @Test void lockedOrRichTextContentCannotChangeTypeEvenIfUnlockedInSameRequest() {
+    @Test void lockedNodesCannotChangeTypeAndRichTextRequiresExplicitConfirmation() {
         Node node = new Node();
         node.setSyntax("plain-text");
         node.setIsReadOnly16bit(1);
@@ -170,10 +170,7 @@ class NodePropertiesServiceTest {
         node.setIsRichText(1);
         assertThatThrownBy(() -> service.update(12L, "Name", false, TitleColor.NONE,
                 NodeIcon.OTHER, false, NodeType.PLAIN_TEXT, null))
-                .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> service.update(12L, "Name", false, TitleColor.NONE,
-                NodeIcon.OTHER, false, NodeType.RICH_TEXT, null))
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(ResponseStatusException.class).hasMessageContaining("confirmationRequired");
         verify(query, never()).executeUpdate();
     }
 

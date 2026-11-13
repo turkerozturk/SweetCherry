@@ -50,7 +50,8 @@ public class NodePropertiesController {
         boolean richText = "custom-colors".equals(node.getSyntax()) || (node.getIsRichText() & 1L) != 0;
         model.addAttribute("nodeType", richText ? NodeType.RICH_TEXT
                 : "plain-text".equals(node.getSyntax()) ? NodeType.PLAIN_TEXT : NodeType.CODE);
-        model.addAttribute("syntaxLocked", richText || g);
+        model.addAttribute("syntaxLocked", g);
+        model.addAttribute("richTextSource",richText);
         List<String> syntaxOptions = new ArrayList<>(CodeHighLighter.supportedSyntaxes());
         if (!richText && node.getSyntax() != null && !"plain-text".equals(node.getSyntax())
                 && !syntaxOptions.contains(node.getSyntax())) {
@@ -72,6 +73,14 @@ public class NodePropertiesController {
     public String save(long nodeId,String name,boolean bold,String color,NodeIcon icon,boolean contentReadOnly,NodeType nodeType,String codeSyntax,String tags) {
         return save(nodeId,name,bold,color,icon,contentReadOnly,nodeType,codeSyntax,tags,null,null);
     }
+    public String save(long nodeId,String name,boolean bold,String color,NodeIcon icon,boolean contentReadOnly,
+            NodeType nodeType,String codeSyntax,String tags,Boolean excludeThisNode,Boolean excludeSubnodes){
+        return save(nodeId,name,bold,color,icon,contentReadOnly,nodeType,codeSyntax,tags,excludeThisNode,excludeSubnodes,false,null);
+    }
+    @GetMapping("/nodes/properties/{nodeId}/conversion")
+    public org.springframework.http.ResponseEntity<NodeTypeConversion.Preview> conversion(@PathVariable long nodeId){
+        return org.springframework.http.ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore()).body(service.conversionPreview(nodeId));
+    }
     @PostMapping("/nodes/properties/{nodeId}")
     public String save(@PathVariable long nodeId, @RequestParam String name,
                        @RequestParam(defaultValue = "false") boolean bold,
@@ -79,14 +88,16 @@ public class NodePropertiesController {
                        @RequestParam(defaultValue = "false") boolean contentReadOnly,
                        @RequestParam(required = false) NodeType nodeType,
                        @RequestParam(required = false) String codeSyntax,@RequestParam(required=false) String tags,
-                       @RequestParam(required=false) Boolean excludeThisNode,@RequestParam(required=false) Boolean excludeSubnodes) {
+                       @RequestParam(required=false) Boolean excludeThisNode,@RequestParam(required=false) Boolean excludeSubnodes,
+                       @RequestParam(defaultValue="false") boolean confirmRichTextConversion,@RequestParam(required=false) String conversionRevision) {
         TitleColor selected;
         try {
             selected = "KEEP".equals(color) ? null : TitleColor.valueOf(color);
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid title color");
         }
-        if(excludeThisNode!=null && excludeSubnodes!=null)service.update(nodeId,name,bold,selected,icon,contentReadOnly,nodeType,codeSyntax,tags,excludeThisNode,excludeSubnodes);
+        if(confirmRichTextConversion)service.update(nodeId,name,bold,selected,icon,contentReadOnly,nodeType,codeSyntax,tags,excludeThisNode,excludeSubnodes,true,conversionRevision);
+        else if(excludeThisNode!=null && excludeSubnodes!=null)service.update(nodeId,name,bold,selected,icon,contentReadOnly,nodeType,codeSyntax,tags,excludeThisNode,excludeSubnodes);
         else if(tags==null)service.update(nodeId,name,bold,selected,icon,contentReadOnly,nodeType,codeSyntax);
         else service.update(nodeId,name,bold,selected,icon,contentReadOnly,nodeType,codeSyntax,tags);
         return "redirect:/nodes/" + nodeId;

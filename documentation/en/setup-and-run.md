@@ -127,3 +127,9 @@ The **33~** button in both rich-text and plain-text editors inserts 33 tildes an
 
 
 [Consistent CTB backups](ctb-backups.md)
+
+### Changing a node's content type
+
+In **Node Properties**, change Rich Text to Plain Text or a supported code syntax (including Markdown or HTML), then choose Save. An explicit Yes/No dialog explains the data loss. Formatting is removed; table cells, codebox text and link targets become readable text. Embedded images, attachments and anchors are removed, leaving filenames or placeholders. Back up the database and save any needed attachments first. Shared occurrences of the same node also change. This page cannot undo the conversion; conversion back to Rich Text is not supported.
+
+If the source changes after confirmation preparation, the operation is rejected. Content and object removal are saved in one transaction. Conversion is limited to 2,000,000 source/object-text characters and 2,000 objects. For a locked node, clear the read-only setting, save and reopen Properties before changing its type. Plain Text/code-to-code changes retain the existing source text; selecting Markdown or HTML changes its interpretation rather than generating markup.

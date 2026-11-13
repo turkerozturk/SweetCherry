@@ -1,6 +1,6 @@
 # HTML notları
 
-**Düğüm Özellikleri** sayfasında Markdown kısayolunun yanındaki **HTML** düğmesine basıp kaydedin. Bu işlem `html` kod sözdizimini seçer; zengin metin dönüşümü ve kilitli içerik türleri için mevcut kısıtlamalar geçerlidir. Yalnızca tam olarak `html` sözdizimi bu görünümü kullanır. Diğer kod türleri ve kod kutularındaki HTML kod olarak gösterilmeye devam eder.
+**Düğüm Özellikleri** sayfasında Markdown kısayolunun yanındaki **HTML** düğmesine basıp kaydedin. Bu işlem `html` kod sözdizimini seçer; zengin metin dönüşümü, biçimlendirme ve gömülü nesne kaybı için açık onay gerektirir. Kilitli düğüm önce kilidi kaldırılarak kaydedilmelidir. Yalnızca tam olarak `html` sözdizimi bu görünümü kullanır. Diğer kod türleri ve kod kutularındaki HTML kod olarak gösterilmeye devam eder.
 
 Kaynağı düzenlemek için **Düzenle → HTML** seçeneğini açın. Geniş ekranda kaynak ve canlı önizleme yan yana, dar ekranda alt alta görünür. Araç çubuğu seçili metne kalın, italik, başlık, paragraf, liste, kod, bağlantı ve tablo etiketleri ekler. Düzenlenen belge kaynak metindir; önizleme bir WYSIWYG editörü değildir.
 

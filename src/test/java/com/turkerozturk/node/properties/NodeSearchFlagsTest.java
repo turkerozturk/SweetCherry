@@ -51,6 +51,21 @@ class NodeSearchFlagsTest {
             }
         }
     }
+    @Test void richTextConversionControlsAndWarningsRenderInBothLanguages() {
+        var service=mock(NodePropertiesService.class);when(service.writable()).thenReturn(true);
+        var node=new Node();node.setNodeId(12);node.setName("Rich note");node.setSyntax("custom-colors");node.setIsRichText(1);
+        when(service.realNode(12)).thenReturn(node);
+        for(var locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr")))for(boolean locked:List.of(false,true)) {
+            node.setIsReadOnly16bit(locked?1:0);
+            var model=new org.springframework.ui.ExtendedModelMap();new NodePropertiesController(service).edit(12,model);
+            var doc=org.jsoup.Jsoup.parse(render("node/nodeProperties",model.asMap(),locale));
+            assertThat(doc.selectFirst("#typeRichText").hasAttr("disabled")).isEqualTo(locked);
+            assertThat(doc.selectFirst("#typePlainText").hasAttr("disabled")).isEqualTo(locked);
+            assertThat(doc.selectFirst("#nodePropertiesForm").attr("data-rich-text")).isEqualTo("true");
+            assertThat(doc.selectFirst("#nodeConversionNo").hasAttr("autofocus")).isTrue();
+            assertThat(doc.selectFirst("#nodeConversionDialog").text()).doesNotContain("??").contains(locale.getLanguage().equals("tr")?"dosya":"attachments");
+        }
+    }
     @Test void treeKeepsAllStatusCombinationsInOneSlotAfterOwnIcon() {
         for(int mask=0;mask<8;mask++) {
             var item=new com.turkerozturk.children.NaviNode(12,"Test",NodeIcon.CT_HOME,false,null,

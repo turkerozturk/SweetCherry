@@ -5,8 +5,10 @@
 <body><section layout:fragment="content" class="container py-2 node-properties">
 <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
 <h1 class="fs-4" th:text="#{node.properties.title}"></h1>
-<form id="nodePropertiesForm" th:action="@{/nodes/properties/{nodeId}(nodeId=${node.nodeId})}" method="post">
+<form id="nodePropertiesForm" th:attr="data-rich-text=${richTextSource},data-conversion-url=@{/nodes/properties/{id}/conversion(id=${node.nodeId})},data-conversion-loading=#{node.conversion.loading},data-conversion-failed=#{node.conversion.failed}" th:action="@{/nodes/properties/{nodeId}(nodeId=${node.nodeId})}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<input type="hidden" name="confirmRichTextConversion" value="false"><input type="hidden" name="conversionRevision" value="">
+<p id="nodeConversionStatus" class="text-danger" role="alert" hidden></p>
 <div class="property-actions mb-2"><button type="submit" class="btn btn-sm btn-primary" th:text="#{richtext.edit.save}"></button> <a class="btn btn-sm btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a></div>
 <div class="row g-2">
 <div class="col-md-6">
@@ -20,25 +22,8 @@
 <div class="form-check"><input id="bold" class="form-check-input" type="checkbox" name="bold" value="true" th:checked="${bold}"><label class="form-check-label" for="bold" th:text="#{node.properties.bold}"></label></div>
 <div class="form-check"><input id="contentReadOnly" class="form-check-input" type="checkbox" name="contentReadOnly" value="true" th:checked="${contentReadOnly}"><label class="form-check-label" for="contentReadOnly" th:text="#{node.properties.readOnly}"></label></div>
 </div></div>
-<fieldset class="col-12 d-flex align-items-center flex-wrap gap-3" data-search-exclusions>
-<legend class="float-none w-auto fs-6 mb-0" th:text="#{node.excludeSearches}"></legend>
-<label><input type="checkbox" name="excludeThisNode" value="true" th:checked="${node.excludeThisNode}"> <span th:text="#{node.excludeThisNode}"></span></label>
-<label><input type="checkbox" name="excludeSubnodes" value="true" th:checked="${node.excludeSubnodes}"> <span th:text="#{node.excludeSubnodes}"></span></label>
-<input type="hidden" name="excludeThisNode" value="false"><input type="hidden" name="excludeSubnodes" value="false">
-</fieldset>
-<fieldset class="col-md-6"><legend class="fs-6" th:text="#{titlecolor.label}"></legend>
-<label th:if="${originalColor != null}" th:title="${originalColor}" class="property-color">
-<input type="radio" name="color" value="KEEP" th:checked="${selectedColor == 'KEEP'}"><span class="property-swatch" th:style="|background-color:${originalColor}|" aria-hidden="true"></span><span th:text="#{titlecolor.keep}"></span></label>
-<label th:each="item : ${colors}" th:title="${item.hex()}" class="property-color"><input type="radio" name="color" th:value="${item.name()}" th:checked="${selectedColor == item.name()}"><span th:if="${item.name() != 'NONE'}" class="property-swatch" th:style="|background-color:${item.hex()}|" aria-hidden="true"></span><span th:text="${#messages.msg('titlecolor.' + item.name())}"></span></label>
-</fieldset>
-<div class="col-md-6" data-icon-picker>
-<label for="propertyIconSearch" class="form-label" th:text="#{search.icon}"></label><input id="propertyIconSearch" type="search" class="form-control form-control-sm mb-1" data-icon-search th:placeholder="#{icon.search}" th:attr="aria-label=#{icon.search}">
-<details class="position-relative" data-icon-details><summary class="form-control form-control-sm" th:text="#{search.icon.choose}"></summary>
-<div class="border rounded p-2 property-icon-list"><label th:each="item : ${icons}" class="icon-choice d-flex align-items-center gap-2 py-1"><input type="radio" name="icon" th:value="${item.name()}" th:checked="${selectedIconId == item.iconIdIn16bit}"><img th:if="${item.name() != 'OTHER'}" th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="20" height="20" alt="" loading="lazy"><span data-icon-label th:text="${item.name() == 'OTHER'} ? #{icon.none} : ${item.iconNameForHuman}"></span></label></div></details>
-<div data-icon-selected class="d-flex flex-wrap gap-1 mt-1" aria-live="polite" th:attr="aria-label=#{icon.selected}"></div><small class="form-text" th:text="#{icon.defaultHelp}"></small>
-</div>
 <fieldset class="col-md-6"><legend class="fs-6" th:text="#{node.properties.type}"></legend>
-<div class="form-check"><input id="typeRichText" class="form-check-input" type="radio" name="nodeType" value="RICH_TEXT" th:checked="${nodeType.name() == 'RICH_TEXT'}" disabled><label class="form-check-label" for="typeRichText" th:text="#{node.properties.richLocked}"></label></div>
+<div class="form-check"><input id="typeRichText" class="form-check-input" type="radio" name="nodeType" value="RICH_TEXT" th:checked="${nodeType.name() == 'RICH_TEXT'}" th:disabled="${nodeType.name() != 'RICH_TEXT' or syntaxLocked}"><label class="form-check-label" for="typeRichText" th:text="#{node.type.richText}"></label></div>
 <div class="form-check"><input id="typePlainText" class="form-check-input" type="radio" name="nodeType" value="PLAIN_TEXT" th:checked="${nodeType.name() == 'PLAIN_TEXT'}" th:disabled="${syntaxLocked}"><label class="form-check-label" for="typePlainText" th:text="#{node.type.plainText}"></label></div>
 <div class="form-check"><input id="typeCode" class="form-check-input" type="radio" name="nodeType" value="CODE" th:checked="${nodeType.name() == 'CODE'}" th:disabled="${syntaxLocked}"><label class="form-check-label" for="typeCode" th:text="#{node.properties.code}"></label></div>
 <label for="codeSyntax" class="form-label mt-1" th:text="#{node.properties.codeLanguage}"></label><select id="codeSyntax" name="codeSyntax" class="form-select form-select-sm" required th:attr="data-locked=${syntaxLocked}" th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}"><option value="" th:selected="${nodeType.name() != 'CODE'}" th:text="#{node.properties.chooseLanguage}"></option><option th:each="item : ${syntaxOptions}" th:value="${item}" th:selected="${node.syntax == item}" th:text="${item}"></option></select>
@@ -50,8 +35,32 @@
 <div class="property-syntax-list border rounded p-1" role="group" th:aria-label="#{node.properties.codeLanguage}">
 <button type="button" th:each="item : ${syntaxOptions}" class="property-syntax-choice" th:attr="data-syntax=${item}" th:disabled="${syntaxLocked or nodeType.name() != 'CODE'}"><img th:src="@{/img/ctbicons/{name}.png(name=${syntaxIcons.get(item)})}" width="20" height="20" alt="" loading="lazy"><span th:text="${item}"></span></button>
 </div></details></div>
+<small th:if="${richTextSource and !syntaxLocked}" class="form-text" th:text="#{node.conversion.help}"></small>
 <small th:if="${syntaxLocked}" class="form-text" th:text="#{node.properties.syntaxLocked}"></small>
-</fieldset></div></form>
+</fieldset><fieldset class="col-md-6"><legend class="fs-6" th:text="#{titlecolor.label}"></legend>
+<label th:if="${originalColor != null}" th:title="${originalColor}" class="property-color">
+<input type="radio" name="color" value="KEEP" th:checked="${selectedColor == 'KEEP'}"><span class="property-swatch" th:style="|background-color:${originalColor}|" aria-hidden="true"></span><span th:text="#{titlecolor.keep}"></span></label>
+<label th:each="item : ${colors}" th:title="${item.hex()}" class="property-color"><input type="radio" name="color" th:value="${item.name()}" th:checked="${selectedColor == item.name()}"><span th:if="${item.name() != 'NONE'}" class="property-swatch" th:style="|background-color:${item.hex()}|" aria-hidden="true"></span><span th:text="${#messages.msg('titlecolor.' + item.name())}"></span></label>
+</fieldset>
+<div class="col-md-6" data-icon-picker>
+<label for="propertyIconSearch" class="form-label" th:text="#{search.icon}"></label><input id="propertyIconSearch" type="search" class="form-control form-control-sm mb-1" data-icon-search th:placeholder="#{icon.search}" th:attr="aria-label=#{icon.search}">
+<details class="position-relative" data-icon-details><summary class="form-control form-control-sm" th:text="#{search.icon.choose}"></summary>
+<div class="border rounded p-2 property-icon-list"><label th:each="item : ${icons}" class="icon-choice d-flex align-items-center gap-2 py-1"><input type="radio" name="icon" th:value="${item.name()}" th:checked="${selectedIconId == item.iconIdIn16bit}"><img th:if="${item.name() != 'OTHER'}" th:attr="data-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="20" height="20" alt="" loading="lazy"><span data-icon-label th:text="${item.name() == 'OTHER'} ? #{icon.none} : ${item.iconNameForHuman}"></span></label></div></details>
+<div data-icon-selected class="d-flex flex-wrap gap-1 mt-1" aria-live="polite" th:attr="aria-label=#{icon.selected}"></div><small class="form-text" th:text="#{icon.defaultHelp}"></small>
+</div>
+<fieldset class="col-12 d-flex align-items-center flex-wrap gap-3" data-search-exclusions>
+<legend class="float-none w-auto fs-6 mb-0" th:text="#{node.excludeSearches}"></legend>
+<label><input type="checkbox" name="excludeThisNode" value="true" th:checked="${node.excludeThisNode}"> <span th:text="#{node.excludeThisNode}"></span></label>
+<label><input type="checkbox" name="excludeSubnodes" value="true" th:checked="${node.excludeSubnodes}"> <span th:text="#{node.excludeSubnodes}"></span></label>
+<input type="hidden" name="excludeThisNode" value="false"><input type="hidden" name="excludeSubnodes" value="false">
+</fieldset>
+</div></form>
+<dialog id="nodeConversionDialog" class="node-conversion-dialog" aria-labelledby="nodeConversionTitle">
+<h2 id="nodeConversionTitle" class="fs-5" th:text="#{node.conversion.title}"></h2>
+<p th:text="#{node.conversion.warning}"></p><p th:text="#{node.conversion.objects}"></p>
+<p th:text="#{node.conversion.shared}"></p><p class="fw-bold" th:text="#{node.conversion.backup}"></p>
+<div class="d-flex flex-wrap gap-2 justify-content-end"><button id="nodeConversionNo" type="button" class="btn btn-secondary" autofocus th:text="#{node.conversion.no}"></button><button id="nodeConversionYes" type="button" class="btn btn-danger" th:text="#{node.conversion.yes}"></button></div>
+</dialog>
 <dialog id="nodeTagsDialog" class="node-tags-dialog" aria-labelledby="nodeTagsDialogTitle" th:attr="data-endpoint=@{/nodes/tags/catalog},data-loading=#{tags.loading},data-error=#{tags.error},data-empty=#{tags.noChoices},data-changed=#{tags.changed},data-too-long=#{tags.tooLong}">
 <h2 id="nodeTagsDialogTitle" class="fs-5" th:text="#{tags.choose}"></h2>
 <div data-tag-browser><label for="nodeTagsSearch" th:text="#{tags.filter}"></label><input id="nodeTagsSearch" type="search" class="form-control form-control-sm" data-tag-filter autocomplete="off"><div id="nodeTagsList" class="tag-choice-list" data-tag-list></div><div class="tag-summary" data-tag-summary aria-live="polite"></div></div>
@@ -60,5 +69,5 @@
 </dialog>
 </section>
 <section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/icon-picker.js}"></script><script defer th:src="@{/js/node/tags.js}"></script>
-<script defer th:src="@{/js/node/propertySyntaxPicker.js}"></script>
+<script defer th:src="@{/js/node/propertySyntaxPicker.js}"></script><script defer th:src="@{/js/node/propertyTypeConversion.js}"></script>
 </section></body></html>
