@@ -4,6 +4,16 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-11-13
+
+- Upgrade to Spring Boot 4.1.2 and its compatible Spring Framework, Security, Hibernate, Tomcat and Jackson stack while retaining Java 17. Update reviewed HTTP, logging and expression-library dependencies; preserve older backup manifests and saved filters.
+- Harden YAML settings parsing, JDBC driver/URL registration, local SQLite file handling, web-import DNS pinning and redirect checks. Apply a common export-folder boundary to creation, listing, download and deletion; select search ORDER BY clauses from fixed options.
+- Sanitize pasted rich text through bundled offline DOMPurify before CTB conversion. Set appropriate HttpOnly, SameSite and transport-dependent Secure attributes on the view preference cookie.
+- Add CherryTree-compatible node/subnode search-exclusion properties and show read-only, bookmark and exclusion status icons in content headers and compact tree badges.
+- Localize all stale-session overlay messages in English and Turkish. Add SECURITY.md with private vulnerability reporting guidance and include it in application packages.
+- Refresh the packaged dependency licence inventory and verify its runtime-JAR hashes before Windows bundling.
+- Run the JavaScript regression suite with Node.js 24 in both Windows/Linux CI and the Windows distribution workflow before packaging.
+
 ## [1.8.0] - 2026-11-11
 
 - Create an empty SQLite CTB in CTBDATA together with a new tenant connection, with portable filename validation, file/config-reference collision checks, current schema initialization and cleanup on save failure.

@@ -1,90 +1,120 @@
-# SweetCherry 1.7.0 yayın adımları — 6 Kasım 2026
+# SweetCherry 1.8.1 yayın adımları — 13 Kasım 2026
 
-Sürüm **1.7.0**, etiket **v1.7.0**. Son temel commit `23027be` (demo/quick-start tenant ayarları); son özellik commit’i `9a5b715`. Kullanıcı 710 başarılı Java testi ve yeni özellikler için başarılı manuel kontroller bildirdi. Bu yama Türkçe Zengin Metin etiketini ve release/kurulum belgelerini günceller; sürüm zaten 1.7.0’dır.
+Sürüm **1.8.1**, etiket **v1.8.1**. Bu güvenlik ve bakım hazırlığı `4efb655` üzerine uygulanır. Java tabanı 17 olarak kalır. JavaScript testleri hem Windows/Linux CI'a hem de Windows paketleme görevine eklenir; uygulamayı çalıştırmak için Node.js gerekmez.
 
-## Yamayı uygula ve hazırla
+## 1. Yamayı uygula ve doğrula
+
+Temiz `main` çalışma ağacında:
 
 ```bat
 git switch main
 git pull --ff-only
-git apply --check sweetcherry-23027be-release-1.7.0-final.patch
-git apply sweetcherry-23027be-release-1.7.0-final.patch
+git apply --check sweetcherry-4efb655-release-1.8.1.patch
+git apply sweetcherry-4efb655-release-1.8.1.patch
 git diff --check
 mvnw.cmd clean package
 ```
 
-Eski hazırlık yamalarını tekrar uygulamayın. `git diff --check` ve derleme başarılı olmalı. Türkçe dilde düğüm içerik düzenleme menüsünde **Zengin Metin**, editör başlığında **Zengin Metin düzenle** göründüğünü kontrol edin. İngilizce karşılıkları değişmez.
+Yerel JavaScript kontrolü için Node.js 24 kuruluysa **Git Bash** üzerinde:
 
-IntelliJ’den **Finalize SweetCherry 1.7.0 release notes and Turkish rich-text label** mesajıyla commit/push yapın. Aşağıdaki etiket **bu yeni son commit’e** konmalı; `23027be` veya eski bir özellik commit’ine konmamalı.
+```bash
+node --test src/test/js/*.test.cjs
+```
 
-## Son commit’ten paket üret
+GitHub görevleri Node.js'i otomatik kurar; npm install gerekmiyor. Yerel testleri başarıyla tamamladıktan sonra IntelliJ'den **Prepare SweetCherry 1.8.1 security release** mesajıyla commit ve push yapın. Bu belge yayını kendi başına oluşturmaz.
 
-Hazır olduğunuzda temiz çalışma ağacında aşağıdakileri kontrol edin. `git status --short` boş olmalı, `git log -1` az önce push edilen son hazırlığı göstermeli. `git tag -l v1.7.0` doluysa aşağıdaki tag oluşturma komutunu çalıştırmayın: mevcut etiketin commit’ini kontrol edin, yayımlanmış etiketi taşımayın.
+GitHub → Actions → **CI** görevinin bu son commit için Windows ve Linux üzerinde başarılı olduğunu doğrulayın. Her iki görevde **Test JavaScript** adımı da başarılı olmalı. Kurulan ruleset normal push'a izin verir; force push veya yayımlanmış etiket taşıma kullanmayın.
+
+Bağımlılıkları daha sonra değiştirirseniz, paketleme sonrası lisans envanterini yenileyip gözden geçirin:
 
 ```bat
-git tag -l v1.7.0
+python packaging/update-jar-notices.py
+python packaging/update-jar-notices.py --check
+```
+
+Bu bakım aracı Python 3.9+ ve Maven'ın yerel bağımlılık önbelleğini kullanır; uygulamayı çalıştırmak için Python gerekmez. Yenileme, gerekli olduğunda Maven Central'dan lisans metaverisi/kaynak notlarını indirir; `--check` ağ bağlantısı veya yazma yapmaz. GitHub Windows runner'ındaki Python ile yayın öncesi kontrol otomatik çalışır.
+
+## 2. Son hazırlık commit'ini etiketle
+
+`git status --short` boş olmalı. `git log -1` son hazırlık commit'ini göstermeli. Önce etiketin varlığını kontrol edin:
+
+```bat
+git status --short
+git log -1 --oneline
+git tag -l v1.8.1
 ```
 
 Etiket henüz yoksa:
 
 ```bat
-git status --short
-git log -1 --oneline
-git tag -a v1.7.0 -m "SweetCherry 1.7.0"
+git tag -a v1.8.1 -m "SweetCherry 1.8.1"
+git push origin v1.8.1
 ```
 
-Etiketi IntelliJ ile veya `git push origin v1.7.0` komutuyla gönderin. GitHub → Actions → **Portable distribution (Windows builder)** → Run workflow → **v1.7.0** seçin. Sadece deneme için main’den çalıştırılabilir; yayın paketi son etiketten üretilmelidir. Eski 1.0.0 notices repack görevini kullanmayın.
+Alternatif: IntelliJ → Git → Tags → v1.8.1 → sağ tık → Push to origin. Etiket bu yeni hazırlık commit'ini göstermeli; `4efb655` üzerinde bırakılmamalı. Etiket varsa yeniden oluşturmayın veya taşımayın; işaret ettiği commit'i kontrol edin.
 
-Workflow’un başarılı bittiğini doğrulayın; yalnız normal CI başarısı paketleme doğrulaması değildir. Workflow Java 17 ile Maven test/paketleme, Java’sız ZIP içerik karşılaştırması ve sistem Java’sı olmadan Windows setup/launcher kontrolü yapar. **sweetcherry-release-assets** artifact’ini indirip dış ZIP’i açın.
+## 3. Etiketten yayın paketlerini üret
 
-## Dört asset
+GitHub → Actions → **Portable distribution (Windows builder)** → **Run workflow** → **v1.8.1** seçin. Eski **Complete 1.0.0 draft license notices** görevini kullanmayın.
+
+Görev sırasıyla JavaScript testlerini, Java 17 Maven test/paketlemesini, güncel JAR/lisans envanterini, Windows Java runtime doğrulamasını, ZIP/setup oluşturmayı ve launcher/kurucu kontrollerini yapar. Tamamı başarılı olmadan yayımlamayın. Görev bu aşamada GitHub Release oluşturmaz.
+
+**sweetcherry-release-assets** artifact'ini indirip dış ZIP'i açın. Şu dört dosya bulunmalı:
 
 | Dosya | Amaç |
 | --- | --- |
-| `sweetcherry_1.7.0_all_os_portable.zip` | Java’sız uygulama, tüm OS scriptleri |
-| `sweetcherry_1.7.0_all_os_portable_with_java_and_setup.exe` | Windows x64 kurucu ve Java |
-| `sweetcherry-1.7.0-third_party_licences.zip` | Her iki pakette de bulunan lisans belgelerinin ek kopyası |
-| `sha256sums.txt` | Yukarıdaki üç dosyanın SHA-256 değerleri |
+| `sweetcherry_1.8.1_all_os_portable.zip` | Java'sız uygulama ve tüm platform scriptleri |
+| `sweetcherry_1.8.1_all_os_portable_with_java_and_setup.exe` | Windows x64 setup ve Java 17 |
+| `sweetcherry-1.8.1-third_party_licences.zip` | Paketlerin içindeki lisans/notices dosyalarının ek kopyası |
+| `sha256sums.txt` | Bu üç ürünün SHA-256 değerleri |
 
-Hepsi artifact içindeki `dist/windows` klasöründedir. Ayrı JSON asset yüklenmez. GitHub’ın otomatik iki Source code bağlantısı ayrıca görünür.
-
-ZIP içinde `runtime/` olmamalı; `build-info.json` içindeki `packageRuntimeIncluded` false olmalı. Setup’ın açtığı uygulama klasöründe runtime vardır ve aynı alan true olur. Her iki manifest’in `applicationVersion` değeri 1.7.0 ve `commit` değeri aşağıdakiyle aynı olmalı:
+ZIP içinde `runtime/` bulunmamalı. `build-info.json` içindeki `applicationVersion` **1.8.1**, `packageRuntimeIncluded` **false** olmalı. Setup'ın açtığı klasörde runtime bulunmalı ve bu alan **true** olmalı. İki paketin commit alanı şu komutun sonucuyla aynı olmalı:
 
 ```bat
-git rev-parse "v1.7.0^{commit}"
+git rev-parse "v1.8.1^{commit}"
 ```
 
-Ürün dosyalarının yanında PowerShell açıp özetleri doğrulayın:
+JAR, README, CHANGELOG, SECURITY.md, lisanslar ve kurulum belgeleri pakette bulunmalı. Java'sız ZIP'te Windows kullanıcısı `run.bat` kullanır; `SweetCherry.exe` Windows runtime'ını ister.
+
+## 4. Checksum ve kısa kullanım kontrolü
+
+Ürünlerin bulunduğu klasörde PowerShell:
 
 ```powershell
 Get-Content .\sha256sums.txt | ForEach-Object {
-    if ($_ -notmatch '^([0-9a-fA-F]{64})\s+(.+)$') { throw "Invalid checksum line: $_" }
-    $expected = $matches[1]
-    $file = $matches[2]
-    if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $expected) {
-        throw "SHA-256 mismatch: $file"
+    if ($_ -match '^([0-9a-fA-F]{64})\s+(.+)$') {
+        $expected = $matches[1]
+        $file = $matches[2]
+        if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $expected) {
+            throw "SHA-256 mismatch: $file"
+        }
+        Write-Host "OK: $file"
+    } else {
+        throw "Invalid checksum line: $_"
     }
-    Write-Host "OK: $file"
 }
 ```
 
-Java’sız ZIP’i temiz klasöre çıkarıp uygun Java 17+ ile Windows’ta `run.bat`, Linux/Raspberry Pi’de `sh ./run.sh` veya `sh ./launcher.sh` deneyin. ZIP’teki `SweetCherry.exe` runtime ister; Java’sız pakette run.bat kullanılır. Kurucuyu Windows x64 üzerinde ayrıca deneyin. Giriş, demo seçimi ve kapatma yeterli bir başlangıç kontrolüdür; yeni özellikleri önceki kontrollerin üstüne değişiklik yapıldıysa yeniden kontrol edin. macOS ve 32 bit/i386 için denenmedi bilgisini koruyun.
+İki paketi ayrı, temiz ve yazılabilir klasörlerde deneyin. Gerçek notlar yerine kopya/demo CTB kullanın:
 
-`LICENSE`, `THIRD-PARTY-NOTICES.md`, `licenses/`, örnek CTB/tenant dosyaları ve scriptler pakette olmalı. Kullanılmış uygulama klasörünüzü, özel CTB/parola/ayarlarınızı paketlemeyin.
+- Launcher açma, giriş, veritabanı seçme ve normal kapatma.
+- Dil değiştirme; başka CTB seçildiğinde eski sekmenin uyarısı.
+- Boş CTB oluşturma; düğüm özellikleri ve durum ikonları.
+- Zengin metne web içeriği yapıştırma ve halka açık bir web sayfasını içe aktarma; Markdown/HTML düzenleme.
+- Kayıtlı filtreler, yedek oluşturma/listeleme/ayrı kopyaya geri yükleme.
+- CTB/ZIP/MM içe aktarma ve dışa aktarma, oluşturulan dosyaları indirme/silme.
 
-## Taslak kaydet ve son kontrol
+Kullanıyorsanız gerçek MariaDB/MySQL/PostgreSQL bağlantılarınızı ve HTTPS/proxy kurulumunuzu da deneyin. Windows Java'sız paketi uygun sistem Java 17+ ile, setup'ı kendi Java'sıyla çalıştırın. Linux'ta `sh ./run.sh` veya `sh ./launcher.sh` kullanılabilir. macOS ve 32 bit için test edilmiş destek iddiası eklemeyin.
 
-GitHub → Releases → Draft a new release. Mevcut son etiketi ve **SweetCherry 1.7.0** başlığını seçin. Açıklamaya ayrıca verilen kısa Markdown metnini yapıştırın; uzun [v1.7.0.md](../releases/v1.7.0.md) dosyasının tamamını yapıştırmayın. Dört asset’i ekleyip **Save draft** kullanın. Yayına kadar tarih, son değişiklikler, test bilgisi ve bağlantıların son etikete ait olduğunu tekrar kontrol edin.
+## 5. Release'i oluştur ve yayımla
 
-Henüz etiket oluşturmak istemiyorsanız şimdilik açıklamayı hazırlayıp yerel saklayın veya GitHub’ın hedef commit/new tag alanlarını taslakta bırakın; yayın öncesi etiketi son commit’e sabitleyin. Taslaktayken main’de gelişen kod, önceden yüklenmiş paketleri kendiliğinden güncellemez. Yeni commit eklendiyse son etiketten yeniden derleyip tüm dört asset’i ve açıklamayı birlikte yenileyin. Yayımlanmış etiketi veya paketleri sessizce değiştirmeyin.
+GitHub → Releases → **Draft a new release**:
 
-## Yayımla
+- **Tag:** `v1.8.1`
+- **Title:** `SweetCherry 1.8.1`
+- **Description:** hazırlık arşivindeki `sweetcherry-1.8.1-release-body.md` içeriği.
+- **Assets:** yukarıdaki dört dosya. GitHub'ın otomatik Source code bağlantıları ayrıca oluşur.
 
-Son paketler ve taslak kontrol edildikten sonra GitHub Release ekranında:
+Ayrı JSON dosyası, hazırlık yaması veya workflow'un dış artifact ZIP'ini asset olarak yüklemeyin. Kontroller tamamlanınca **Set as a pre-release** kapalı, **Set as the latest release** açık olacak biçimde **Publish release** seçin.
 
-1. Tag **v1.7.0**, başlık **SweetCherry 1.7.0** olmalı; kısa açıklamanın tarihini fiili yayın gününe göre güncelleyin.
-2. Dört yüklenen asset doğru sürüm/commit’e ait olmalı. Ayrı `build-info.json` veya workflow’un dış artifact ZIP’ini yüklemeyin.
-3. **Set as a pre-release** işaretli olmasın. Kararlı yayın olarak **Set as the latest release** seçin.
-4. Hazır olduğunuzda **Publish release** seçin. Yayın sayfasındaki kılavuz ve ayrıntılı sürüm notu bağlantılarını açıp kontrol edin.
-
-Bu hazırlık kendi başına tag veya release oluşturmaz. Yayımlanan etiketi taşımayın; sonraki değişiklikleri yeni sürümde yayımlayın.
+Yayımdan sonra sayfadaki dosya adlarını, indirme bağlantılarını ve v1.8.1 etiketine giden kurulum/sürüm notu bağlantılarını kontrol edin. Son indirilen dosyaların checksum değerlerini de karşılaştırın. Önceki 1.8.0 etiketini veya paketlerini sessizce değiştirmeyin; güvenlik düzeltmeleri 1.8.1 paketleriyle dağıtılır.

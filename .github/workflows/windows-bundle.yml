@@ -9,6 +9,14 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Node.js for JavaScript tests
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Test JavaScript before packaging
+        shell: bash
+        run: node --test src/test/js/*.test.cjs
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -19,6 +27,8 @@ jobs:
         run: |
           .\mvnw.cmd --batch-mode clean package
           if ($LASTEXITCODE -ne 0) { throw 'Maven package failed.' }
+      - name: Verify packaged dependency notice inventory
+        run: python packaging/update-jar-notices.py --check
       - name: Download and verify Java 17 JRE
         shell: pwsh
         run: |

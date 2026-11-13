@@ -22,6 +22,16 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Set up Node.js for JavaScript tests
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Test JavaScript
+        shell: bash
+        run: node --test src/test/js/*.test.cjs
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -47,6 +57,7 @@ jobs:
           test -f release/SweetCherry/LICENSE
           test -f release/SweetCherry/README.md
           test -f release/SweetCherry/CHANGELOG.md
+          test -f release/SweetCherry/SECURITY.md
           test -f release/SweetCherry/documentation/tr/setup-and-run.md
           test -f release/SweetCherry/CTBDATA/demo.ctb
           test -f release/SweetCherry/allTenants/demo.txt

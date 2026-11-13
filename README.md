@@ -26,6 +26,8 @@ On Linux desktop, use `launcher.sh` and optionally create shortcuts with `instal
 
 Open the browser from the launcher, sign in using the generated credentials, then select the included demo or quick-start data source. The [English practice workbook](https://github.com/turkerozturk/SweetCherry/releases/download/v1.7.0/sweetcherry-quickstart-en.ctb) provides hundreds of tasks and small examples. For the separately updated workbook, stop the application, preserve any existing exercises, and replace `CTBDATA/sweetcherry-quickstart-en.ctb` before starting again.
 
+**Security reports:** please use the private reporting channel described in [SECURITY.md](SECURITY.md).
+
 **Keep your notes safe:** start with a copy or a read-only connection. Manual CTB backups and optional scheduled backups are available; scheduling is off until configured. Keep important backups on another device, and do not write to the same CTB simultaneously from SweetCherry and CherryTree.
 
 ## What you can do
@@ -39,7 +41,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | **Back up and recover** | Verified CTB snapshots, optional schedules and retention, backup downloads, reviewed deletion and recovery into a separate working copy. |
 | **Connect and configure** | Data-source wizard with [empty CTB creation](documentation/en/empty-ctb.md); SQLite, MariaDB/MySQL and PostgreSQL connections; application settings editors; local use or explicitly configured network access. |
 
-**New in 1.8.0:** import Freeplane/FreeMind maps and ZIP folder trees, edit HTML source with live preview, and create empty CTB databases from the data-source wizard. [Release details](documentation/releases/v1.8.0.md).
+**New in 1.8.1:** security dependency updates with Java 17 retained, stronger import/export and clipboard safeguards, CherryTree-compatible search-exclusion properties and node status icons. [Release details](documentation/releases/v1.8.1.md).
 
 ## Documentation
 
@@ -48,7 +50,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | [English installation and usage](documentation/en/setup-and-run.md) | [First-start help / İlk çalıştırma](documentation/tr/first-start.md) |
 | [Türkçe kurulum ve kullanım](documentation/tr/installation.md) | [English feature guides](documentation/en) · [Türkçe özellik kılavuzları](documentation/tr) |
 | [Import folders and files from ZIP](documentation/en/zip-import.md) | [ZIP içe aktarım kılavuzu](documentation/tr/zip-import.md) |
-| [Changes and upgrade notes](CHANGELOG.md) | [1.8.0 release notes](documentation/releases/v1.8.0.md) · [All release notes](documentation/releases) |
+| [Changes and upgrade notes](CHANGELOG.md) | [1.8.1 release notes](documentation/releases/v1.8.1.md) · [All release notes](documentation/releases) |
 
 **Automatically generated documentation is also available on [DeepWiki](https://deepwiki.com/turkerozturk/SweetCherry).** Use it to explore the repository and codebase. DeepWiki is an external, automatically generated resource; check the version-matched project guides for installation instructions, supported behavior and limits.
 

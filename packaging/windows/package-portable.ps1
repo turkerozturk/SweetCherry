@@ -17,7 +17,7 @@ try {
     $info = Get-Content "$portable/build-info.json" -Raw | ConvertFrom-Json
     $info.packageRuntimeIncluded = $false
     $info | ConvertTo-Json | Set-Content "$portable/build-info.json" -Encoding utf8
-    foreach ($name in @('SweetCherry.jar','SweetCherry.exe','run.bat','run.sh','run.command','launcher.sh','install-desktop.sh','LICENSE','THIRD-PARTY-NOTICES.md','licenses','CTBDATA/demo.ctb','allTenants/demo.txt')) {
+    foreach ($name in @('SweetCherry.jar','SweetCherry.exe','run.bat','run.sh','run.command','launcher.sh','install-desktop.sh','LICENSE','SECURITY.md','THIRD-PARTY-NOTICES.md','licenses','CTBDATA/demo.ctb','allTenants/demo.txt')) {
         if (!(Test-Path (Join-Path $portable $name))) { throw "Missing portable file: $name" }
     }
     if (Test-Path "$portable/runtime") { throw 'The all-OS ZIP must not include Java.' }
