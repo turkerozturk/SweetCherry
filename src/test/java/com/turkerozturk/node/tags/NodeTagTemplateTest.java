@@ -25,10 +25,15 @@ class NodeTagTemplateTest {
  }
  @Test void viewEscapesTagsAndUsesSharedIdForNavigationButMasterForProperties()throws Exception{
   var options=new NodeTagService.Options(List.of("C++","one,two"),"any",1,1);
-  var row=new NodeTagService.Row(11,2,"<Name>","ct_code",true,"#3584E4",true,true,"Parent [1] / <Name> [11]",List.of("C++","one,two","<tag>"));
+  var row=new NodeTagService.Row(11,2,"<Name>","ct_code",true,"#3584E4",true,true,"Parent [1] / <Name> [11]",List.of("C++","one,two","<tag>"),3,"<Parent>",true,1000,2000);
   var model=new ExtendedModelMap();model.addAttribute("tagView",new NodeTagService.View(List.of("C++","one,two"),List.of(row),1,2,2,options));model.addAttribute("tagChoices",List.of("C++","one,two","<tag>"));model.addAttribute("canEditTags",true);
   String html=render("node/tags.html",model,Locale.ENGLISH);
   assertThat(html).contains("/nodes/11?_tenantView=v","/nodes/properties/2?_tenantView=v","&lt;Name&gt;","&lt;tag&gt;","Parent [1] / &lt;Name&gt; [11]","Original properties").doesNotContain("<tag>");
+  var document=org.jsoup.Jsoup.parse(html);
+  assertThat(document.selectFirst("a[href='/nodes/3?_tenantView=v']").text()).isEqualTo("<Parent>");
+  assertThat(document.selectFirst("a[href='/nodes/properties/2?_tenantView=v']").attr("target")).isEqualTo("_blank");
+  assertThat(document.selectFirst("button[data-quick-tags]").attr("data-quick-tags")).isEqualTo("11");
+  assertThat(document.select("time")).hasSize(2);
   String href=org.jsoup.Jsoup.parse(html).select("nav a").last().attr("href");
   var selected=java.util.Arrays.stream(java.net.URI.create(href).getRawQuery().split("&")).filter(value->value.startsWith("tag=")).map(value->java.net.URLDecoder.decode(value.substring(4),java.nio.charset.StandardCharsets.UTF_8)).toList();
   assertThat(selected).containsExactly("C++","one,two");
@@ -37,6 +42,16 @@ class NodeTagTemplateTest {
   String unfilteredNext=org.jsoup.Jsoup.parse(render("node/tags.html",model,Locale.ENGLISH)).select("nav a").last().attr("href");
   assertThat(unfilteredNext).doesNotContain("tag=");
   model.addAttribute("canEditTags",false);assertThat(render("node/tags.html",model,Locale.ENGLISH)).doesNotContain("/nodes/properties/2");
+ }
+ @Test void quickTagDialogIsLocalizedAndSortingSurvivesPagination()throws Exception {
+  var model=new ExtendedModelMap();
+  for(var locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))){
+   String html=render("node/quickTags.html",model,locale);assertThat(html).doesNotContain("??tags.","??richtext.");
+   assertThat(org.jsoup.Jsoup.parse(html).select("#quickTagsValue[maxlength=20000]")).hasSize(1);
+   var options=new NodeTagService.Options(List.of("C++","one,two"),"all",1,1,"parent","asc");
+   model.addAttribute("tagView",new NodeTagService.View(List.of(),List.of(),1,2,2,options));model.addAttribute("tagChoices",List.of("C++","one,two"));model.addAttribute("canEditTags",false);
+   var doc=org.jsoup.Jsoup.parse(render("node/tags.html",model,locale));String next=doc.select("nav a").last().attr("href");assertThat(next).contains("sort=parent","direction=asc","mode=all");
+  }
  }
  @Test void languagePickerPreservesNativeSubmissionIconsAndUnsupportedLegacySyntax()throws Exception {
   var service=mock(NodePropertiesService.class);when(service.writable()).thenReturn(true);

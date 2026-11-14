@@ -1,0 +1,9 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="quickTags">
+<dialog id="quickTagsDialog" class="quick-tag-dialog" aria-labelledby="quickTagsTitle" th:attr="data-endpoint=@{/nodes/tags/quick/},data-token=${tenantViewToken},data-loading=#{tags.loading},data-error=#{tags.quick.error},data-changed=#{tags.quick.changed},data-readonly=#{tags.quick.readonly},data-saving=#{tags.quick.saving},data-saved=#{tags.quick.saved},data-master=#{tags.quick.master},data-too-long=#{tags.tooLong}">
+<h2 id="quickTagsTitle" class="h5" th:text="#{tags.quick.title}"></h2><p id="quickTagsNode"></p><p id="quickTagsMaster" class="alert alert-info p-2" hidden></p>
+<form id="quickTagsForm" method="post" th:action="@{/nodes/tags/quick/0}">
+<label for="quickTagsValue" th:text="#{tags.label}"></label><input id="quickTagsValue" name="tags" class="form-control" type="text" maxlength="20000" autocomplete="off"><small class="form-text" th:text="#{tags.quick.help}"></small>
+<label for="quickTagsSearch" class="mt-2" th:text="#{tags.filter}"></label><input id="quickTagsSearch" type="search" class="form-control form-control-sm" autocomplete="off"><div id="quickTagsChoices" class="quick-tag-choices"></div><div id="quickTagsSummary" class="quick-tag-summary"></div>
+<p id="quickTagsStatus" role="status" aria-live="polite"></p><div class="d-flex flex-wrap gap-2 justify-content-end"><button id="quickTagsCancel" type="button" class="btn btn-secondary" th:text="#{richtext.edit.cancel}"></button><button id="quickTagsSave" type="submit" class="btn btn-primary" disabled th:text="#{richtext.edit.save}"></button></div></form>
+</dialog><p id="quickTagsNotice" role="status" aria-live="polite" class="quick-tag-notice" hidden></p>
+</th:block></body></html>

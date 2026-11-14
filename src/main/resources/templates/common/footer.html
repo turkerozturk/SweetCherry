@@ -16,6 +16,8 @@
 
 <!-- javascript kutuphaneleri icin diger bir fragment -->
 <div th:fragment="footerJsLibraries" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+<th:block th:replace="~{node/quickTags :: quickTags}"></th:block>
+<script defer th:src="@{/js/node/quickTags.js}"></script>
 
     <script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/highlight.min.js}"></script>
     <script th:if="${syntaxHighlightingEnabled}" th:src="@{/js/thirdparty/highlightjs/cherry-highlight.js}"></script>

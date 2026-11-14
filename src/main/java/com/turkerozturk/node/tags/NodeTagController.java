@@ -25,7 +25,7 @@ public class NodeTagController {
     }
     public String view(List<String> selected,String mode,String limit,String page,HttpServletRequest request,Model model) {
         NodeTagService.Options options;
-        try{options=new NodeTagService.Options(selected==null?List.of():selected,mode,Integer.parseInt(limit),Integer.parseInt(page));}
+        try{options=new NodeTagService.Options(selected==null?List.of():selected,mode,Integer.parseInt(limit),Integer.parseInt(page),java.util.Objects.requireNonNullElse(request.getParameter("sort"),"created"),java.util.Objects.requireNonNullElse(request.getParameter("direction"),"desc"));}
         catch(IllegalArgumentException invalid){options=new NodeTagService.Options(List.of(),"any",50,1);model.addAttribute("invalidOptions",true);}
         var view=tags.inspect(options);model.addAttribute("tagView",view);
         var choices=new java.util.TreeSet<String>(NodeTags.ORDER);choices.addAll(view.catalogue());choices.addAll(options.tags());

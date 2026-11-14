@@ -14,6 +14,10 @@ class NodeTagControllerTest {
   verify(service).inspect(new NodeTagService.Options(java.util.List.of("foo","bar"),"all",25,2));assertThat(model.get("canEditTags")).isEqualTo(false);
   controller.view(java.util.List.of("bad tag"),"any","50","1",request,model);assertThat(model.get("invalidOptions")).isEqualTo(true);
  }
+ @Test void appliesValidatedColumnSortingToTheWholeResult(){
+  var service=mock(NodeTagService.class);var controller=new NodeTagController(service,mock(NodePropertiesService.class));when(service.inspect(any())).thenAnswer(call->new NodeTagService.View(java.util.List.of(),java.util.List.of(),0,0,0,call.getArgument(0)));
+  var request=new MockHttpServletRequest();request.addParameter("sort","parent");request.addParameter("direction","asc");controller.show("any","50","2",request,new ExtendedModelMap());verify(service).inspect(new NodeTagService.Options(java.util.List.of(),"any",50,2,"parent","asc"));
+ }
  @Test void httpParametersPreserveCommaAndPlusInsideSingleTags(){
   var service=mock(NodeTagService.class);var controller=new NodeTagController(service,mock(NodePropertiesService.class));
   when(service.inspect(any())).thenAnswer(call->new NodeTagService.View(java.util.List.of(),java.util.List.of(),0,0,0,call.getArgument(0)));

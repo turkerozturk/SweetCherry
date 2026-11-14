@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add parent names, created/modified dates and server-validated full-result sorting to Tags, defaulting to newest created first. Hide extra columns on mobile and preserve filters during sorting/pagination.
+- Add a reusable quick tag editor to Tags rows and the reader toolbar, with explicit shared-master feedback, current-source/CSRF/admin/writable checks, stale-revision protection and tag-only atomic updates. Open advanced Properties/parent links in new tabs.
+
 ## [1.9.0] - 2026-11-13
 
 - Remove browser-side XML reparsing from wiki-link preflight; pass serialized XML directly to the hardened server reader and retain encoded-markup regression coverage.
