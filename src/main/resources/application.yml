@@ -196,6 +196,8 @@ myapp:
     day-max-entries: 300 # Day cards, 1..2000, also bounded by max-entries.
     day-preview-max-characters: 600 # Unicode code points including ellipsis, 1..20000.
     day-preview-max-lines: 8 # Source lines and visual line clamp, 1..100. Restart after changing.
+  trash:
+    enabled: false # Reversible Delete: move occurrences to TRASH BIN, preserving IDs and shared links.
   tree:
     # Desktop /tree only. Saved browser width takes precedence; other splitters are unaffected.
     default-width: 600 # Pixels, clamped to 20..1900 and the available viewport width.

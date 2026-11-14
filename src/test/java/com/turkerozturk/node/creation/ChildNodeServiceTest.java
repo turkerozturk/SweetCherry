@@ -20,6 +20,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class ChildNodeServiceTest {
+    private EntityManager manager(){var manager=mock(EntityManager.class);when(manager.unwrap(org.hibernate.Session.class)).thenReturn(mock(org.hibernate.Session.class));return manager;}
+
     @AfterEach void clearTenant() { TenantContext.clear(); }
 
     @Test void insertsAfterLastSiblingWithAliasSafeIdAndTenantDefaults() {
@@ -28,7 +30,7 @@ class ChildNodeServiceTest {
         settings.addCustomProperties("demo", Map.of("custom.newNodeName", "", "custom.newNodeTags", "work"));
         NodePropertiesService properties = mock(NodePropertiesService.class);
         when(properties.writable()).thenReturn(true);
-        EntityManager manager = mock(EntityManager.class);
+        EntityManager manager = manager();
         Query parent = mock(Query.class), ids = mock(Query.class), sequence = mock(Query.class), nodeInsert = mock(Query.class), childInsert = mock(Query.class), touch = mock(Query.class);
         when(manager.createNativeQuery(anyString())).thenReturn(parent, ids, sequence, nodeInsert, childInsert, touch);
         for (Query query : new Query[]{parent, ids, sequence, nodeInsert, childInsert, touch}) {
@@ -61,7 +63,7 @@ class ChildNodeServiceTest {
 
     @Test void refusesReadOnlyTenantAndMissingParentBeforeAnyWrite() {
         NodePropertiesService properties = mock(NodePropertiesService.class);
-        var manager = mock(EntityManager.class);
+        var manager = manager();
         ChildNodeService service = new ChildNodeService(properties, new CustomPropertiesHolder());
         ReflectionTestUtils.setField(service, "entityManager", manager);
         assertThatThrownBy(() -> service.create(10L)).isInstanceOf(AccessDeniedException.class);
@@ -81,7 +83,7 @@ class ChildNodeServiceTest {
         CustomPropertiesHolder settings = new CustomPropertiesHolder();
         NodePropertiesService properties = mock(NodePropertiesService.class);
         when(properties.writable()).thenReturn(true);
-        EntityManager manager = mock(EntityManager.class);
+        EntityManager manager = manager();
         Query ids = mock(Query.class), sequence = mock(Query.class), nodeInsert = mock(Query.class), childInsert = mock(Query.class);
         when(manager.createNativeQuery(anyString())).thenReturn(ids, sequence, nodeInsert, childInsert);
         for (Query query : new Query[]{ids, sequence, nodeInsert, childInsert}) {
@@ -105,7 +107,7 @@ class ChildNodeServiceTest {
     @Test void createsSiblingImmediatelyAfterSharedOccurrence() {
         NodePropertiesService properties = mock(NodePropertiesService.class);
         when(properties.writable()).thenReturn(true);
-        EntityManager manager = mock(EntityManager.class);
+        EntityManager manager = manager();
         Query occurrence = mock(Query.class), ids = mock(Query.class), sequence = mock(Query.class),
                 insert = mock(Query.class), child = mock(Query.class), shift = mock(Query.class), place = mock(Query.class), touch = mock(Query.class);
         when(manager.createNativeQuery(anyString())).thenReturn(occurrence, ids, sequence, insert, child, shift, place, touch);
@@ -127,7 +129,7 @@ class ChildNodeServiceTest {
 
     @Test void siblingCreationRejectsMissingOccurrenceAndReadOnlyTenant() {
         var properties = mock(NodePropertiesService.class);
-        var manager = mock(EntityManager.class);
+        var manager = manager();
         var service = new ChildNodeService(properties, new CustomPropertiesHolder());
         ReflectionTestUtils.setField(service, "entityManager", manager);
         assertThatThrownBy(() -> service.createSibling(72L)).isInstanceOf(AccessDeniedException.class);

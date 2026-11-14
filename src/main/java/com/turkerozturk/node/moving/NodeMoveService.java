@@ -118,6 +118,7 @@ public class NodeMoveService {
     /** Renumbers only affected sibling groups, preserving subtree and master references. */
     static void move(Connection connection, long id, Direction direction, String expected) throws SQLException {
         var rows = read(connection); var state = state(rows,id);
+        com.turkerozturk.node.TrashSql.guardMove(connection,List.of(id),0);
         if (!state.revision.equals(expected)) throw conflict();
         boolean allowed = switch (direction) { case UP -> state.up; case DOWN -> state.down; case LEFT -> state.left; case RIGHT -> state.right; };
         if (!allowed) throw new ResponseStatusException(HttpStatus.CONFLICT, "This move has no valid destination.");
@@ -137,6 +138,7 @@ public class NodeMoveService {
                 target = siblings(rows,targetParent); insertAt = target.indexOf(parent)+1;
             }
             // A shared parent has no node row of its own; validate its master content.
+            com.turkerozturk.node.TrashSql.guardMove(connection,List.of(id),targetParent);
             requireParentContent(connection,rows,targetParent);
             source.remove(at); target.add(insertAt,node);
             write(connection,source,node.parent); write(connection,target,targetParent);
@@ -149,6 +151,7 @@ public class NodeMoveService {
     static void moveTo(Connection connection, long id, long parentId, String expected) throws SQLException {
         if (id <= 0 || parentId < 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid node ID");
         var rows = read(connection);
+        com.turkerozturk.node.TrashSql.guardMove(connection,List.of(id),parentId);
         if (!revision(rows).equals(expected)) throw conflict();
         var node = selected(rows,id);
         var index = new HashMap<Long,Row>();

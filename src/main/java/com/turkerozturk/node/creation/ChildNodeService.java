@@ -60,6 +60,7 @@ public class ChildNodeService {
         if (!properties.writable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
+        if (!topLevel) entityManager.unwrap(org.hibernate.Session.class).doWork(c->com.turkerozturk.node.TrashSql.guardMove(c,java.util.List.of(),parentId));
         if (!topLevel) {
             // Parent is a tree occurrence; a shared occurrence can own its own children.
             long count = ((Number) entityManager.createNativeQuery(

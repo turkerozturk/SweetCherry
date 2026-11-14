@@ -119,6 +119,7 @@ public class NodePropertiesService {
         if(tags!=null)try{normalizedTags=com.turkerozturk.node.tags.NodeTags.normalize(tags);}
         catch(IllegalArgumentException invalid){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid tags",invalid);}
         Node node = realNode(nodeId);
+        entityManager.unwrap(org.hibernate.Session.class).doWork(c->com.turkerozturk.node.TrashSql.guardHelper(c,nodeId));
         String oldSyntax = node.getSyntax();
         String newSyntax = requestedSyntax(node, nodeType, codeSyntax);
         boolean syntaxChanged = !Objects.equals(oldSyntax, newSyntax);

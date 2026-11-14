@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add an optional, reversible TRASH BIN that preserves occurrence IDs, content, attachments, bookmarks and shared links without changing the CTB schema.
+- Add reviewed restore and separately confirmed permanent deletion, with source/revision checks, streamed content fingerprints for permanent deletion and transactional rollback.
+
+
 - Make desktop tree rows more compact, with configurable label font size and vertical padding.
 - Add parent metadata and database-side sorting to created/modified timelines and parent sorting to advanced search.
 - Add reviewed, atomic batch moves and additive single-tag updates for explicit advanced-search selections.

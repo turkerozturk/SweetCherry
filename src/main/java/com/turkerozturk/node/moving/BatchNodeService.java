@@ -67,6 +67,7 @@ public class BatchNodeService {
   if(parent!=0&&!index.containsKey(parent))throw error(HttpStatus.NOT_FOUND,"missing");
   for(long p=parent;p!=0;p=index.get(p).parent())if(s.ids.contains(p))throw error(HttpStatus.UNPROCESSABLE_ENTITY,"cycle");
   if(parent!=0){var n=index.get(parent);try(var q=c.prepareStatement("SELECT node_id FROM node WHERE node_id=?")){q.setLong(1,n.master()==0?parent:n.master());try(var rs=q.executeQuery()){if(!rs.next())throw error(HttpStatus.NOT_FOUND,"missing");}}}
+  com.turkerozturk.node.TrashSql.guardMove(c,s.ids,parent);
   var moving=roots(s).stream().filter(n->n.parent()!=parent).toList();if(moving.isEmpty())return new Result(0);
   var groups=new LinkedHashMap<Long,List<NodeMoveService.Row>>();for(var n:s.tree)groups.computeIfAbsent(n.parent(),p->new ArrayList<>()).add(n);
   groups.values().forEach(list->list.sort(Comparator.comparingLong(NodeMoveService.Row::sequence).thenComparingLong(NodeMoveService.Row::id)));
@@ -77,10 +78,10 @@ public class BatchNodeService {
   long now=NodeTimestamps.now();for(var n:moving)NodeTimestamps.touchOccurrence(c,n.id(),now);return new Result(moving.size());
  }
  private static Result tag(Connection c,Snapshot s,String tag)throws SQLException{
-  if(tag==null||tag.isBlank()||tag.length()>200||tag.chars().anyMatch(ch->Character.isWhitespace(ch)||Character.isISOControl(ch)||Character.isSpaceChar(ch)))throw error(HttpStatus.BAD_REQUEST,"invalid");
+  if(tag==null||tag.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)||tag.isBlank()||tag.length()>200||tag.chars().anyMatch(ch->Character.isWhitespace(ch)||Character.isISOControl(ch)||Character.isSpaceChar(ch)))throw error(HttpStatus.BAD_REQUEST,"invalid");
   var updates=new LinkedHashMap<Long,String>();
   // Validate every resulting value before making the first write.
-  for(var n:s.content.values()){var tags=new LinkedHashSet<>(NodeTags.split(n.tags));if(tags.add(tag)){String value=String.join(" ",tags);try{NodeTags.normalize(value);}catch(IllegalArgumentException e){throw error(HttpStatus.BAD_REQUEST,"invalid");}updates.put(n.id,value);}}
+  for(var n:s.content.values()){com.turkerozturk.node.TrashSql.guardHelper(c,n.id);var tags=new LinkedHashSet<>(NodeTags.split(n.tags));if(tags.add(tag)){String value=String.join(" ",tags);try{NodeTags.normalize(value);}catch(IllegalArgumentException e){throw error(HttpStatus.BAD_REQUEST,"invalid");}updates.put(n.id,value);}}
   try(var q=c.prepareStatement("UPDATE node SET tags=?,ts_lastsave=? WHERE node_id=?")){long now=NodeTimestamps.now();for(var entry:updates.entrySet()){q.setString(1,entry.getValue());q.setLong(2,now);q.setLong(3,entry.getKey());if(q.executeUpdate()!=1)throw error(HttpStatus.CONFLICT,"changed");}}
   return new Result(updates.size());
  }

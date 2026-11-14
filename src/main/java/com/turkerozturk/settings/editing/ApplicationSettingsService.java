@@ -23,6 +23,7 @@ public class ApplicationSettingsService {
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.trash.enabled","boolean","false",0),
         new Setting("myapp.appearance.theme","theme","light",0),
         new Setting("myapp.default-language","language","",0),
         new Setting("myapp.home.open-latest-modified","boolean","true",0),

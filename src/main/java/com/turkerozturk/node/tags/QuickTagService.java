@@ -27,6 +27,7 @@ public class QuickTagService {
         return entityManager.unwrap(Session.class).doReturningWork(c->save(c,id,normalized,revision));
     }
     Snapshot save(Connection c,long id,String normalized,String revision)throws SQLException{
+        com.turkerozturk.node.TrashSql.guardHelper(c,id);
         var old=read(c,id,true);if(!hash(old).equals(revision))throw new ResponseStatusException(HttpStatus.CONFLICT,"changed");
         if(!NodeTags.normalize(Objects.requireNonNullElse(old.raw(),"")).equals(normalized)){
             try(var q=c.prepareStatement("UPDATE node SET tags=?,ts_lastsave=? WHERE node_id=?"+(old.modified()==null?" AND ts_lastsave IS NULL":" AND ts_lastsave=?")+(old.raw()==null?" AND tags IS NULL":" AND tags=?"))){

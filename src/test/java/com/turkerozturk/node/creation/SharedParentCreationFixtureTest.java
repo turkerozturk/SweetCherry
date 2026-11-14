@@ -72,6 +72,8 @@ class SharedParentCreationFixtureTest {
         var properties = mock(NodePropertiesService.class);
         when(properties.writable()).thenReturn(true);
         var manager = mock(EntityManager.class);
+        var session=mock(org.hibernate.Session.class);when(manager.unwrap(org.hibernate.Session.class)).thenReturn(session);
+        doAnswer(call->{((org.hibernate.jdbc.Work)call.getArgument(0)).execute(connection);return null;}).when(session).doWork(any());
         when(manager.createNativeQuery(anyString())).thenAnswer(call -> query(connection, call.getArgument(0)));
         var service = new ChildNodeService(properties, new CustomPropertiesHolder());
         ReflectionTestUtils.setField(service, "entityManager", manager);

@@ -22,6 +22,7 @@ class NodeMoveServiceTest {
             statement.execute("INSERT INTO children VALUES(1,0,10,0),(2,0,20,0),(3,0,30,0),(4,1,5,0),(9,0,40,1)");
             statement.execute("INSERT INTO bookmark VALUES(2),(9)");
             statement.execute("ALTER TABLE node ADD COLUMN ts_lastsave INTEGER DEFAULT 100");
+            statement.execute("ALTER TABLE node ADD COLUMN tags TEXT");
         }
         connection.setAutoCommit(false);
     }

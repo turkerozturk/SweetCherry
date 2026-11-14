@@ -65,7 +65,7 @@ public class NodeDeletionService {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
         long nextSelected=entityManager.unwrap(org.hibernate.Session.class)
-                .doReturningWork(connection -> NodeDeletionSql.delete(connection, nodeId));
+                .doReturningWork(connection -> {TrashSql.guardDelete(connection,nodeId);return NodeDeletionSql.delete(connection, nodeId);});
         entityManager.clear();
         logger.info("Deleted tree occurrence {} and its descendants; surviving shared groups preserved.", nodeId);
         return nextSelected;

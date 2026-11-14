@@ -52,6 +52,8 @@ public class NodeDeletionController {
     @Autowired
     private ChildrenRepository childrenRepository;
 
+    @Autowired private TrashService trashService;
+
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -72,6 +74,8 @@ public class NodeDeletionController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         model.addAttribute("node", node);
+        model.addAttribute("trashMode",trashService.enabled());
+        if(trashService.enabled())model.addAttribute("trashPreview",trashService.preview(nodeId));
         model.addAttribute("selectedNodeId", nodeId);
         model.addAttribute("sharedNode", shared);
         model.addAttribute("deleteView", "reader".equals(view) ? "reader" : "tree");
@@ -81,17 +85,25 @@ public class NodeDeletionController {
     @PreAuthorize("hasRole('ADMIN')")
     @RequiresTenant
     @PostMapping("/nodes/delete/{nodeId}")
-    public String deleteNode(@PathVariable long nodeId, @RequestParam(defaultValue="tree") String view) {
+    public String deleteNode(@PathVariable long nodeId, @RequestParam(defaultValue="tree") String view,
+            @RequestParam(defaultValue="false") boolean trashMode,@RequestParam(defaultValue="") String revision) {
         if (!nodeDeletionService.isCurrentTenantWritable()) {
             throw new AccessDeniedException("The selected CTB is read-only.");
         }
         if (childrenRepository.findByNodeId(nodeId) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        long nextSelected=nodeDeletionService.deleteNodeWithSubNodes(nodeId);
+        if(trashMode!=trashService.enabled())throw new ResponseStatusException(HttpStatus.CONFLICT,"trash.changed");
+        long nextSelected=trashMode?trashService.trash(nodeId,revision):nodeDeletionService.deleteNodeWithSubNodes(nodeId);
         if (!"reader".equals(view)) return "redirect:/tree?nodeId="+nextSelected;
         return nextSelected==0 ? "redirect:/" : "redirect:/nodes/"+nextSelected;
     }
 
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ResponseStatusException.class)
+    public String trashProblem(ResponseStatusException error,Model model,jakarta.servlet.http.HttpServletResponse response){
+        String key=error.getReason();if(key==null||!key.startsWith("trash."))throw error;
+        response.setStatus(error.getStatusCode().value());response.setHeader("Cache-Control","no-store");model.addAttribute("trashError",key);return "node/trashError";
+    }
 
 }

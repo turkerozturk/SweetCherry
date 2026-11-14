@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"><body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <div th:fragment="viewModeFragment">
     <li><a class="dropdown-item" th:href="@{/changeView(mode='tree')}"><i class="fas fa-desktop"></i> <span th:text="#{view.desktop}">Desktop</span> <i th:if="${viewMode == 'tree'}" class="fas fa-check"></i></a></li>
     <li><a class="dropdown-item" th:href="@{/changeView(mode='reader')}"><i class="fas fa-mobile-alt"></i> <span th:text="#{view.mobile}">Mobile</span> <i th:if="${viewMode == 'reader'}" class="fas fa-check"></i></a></li>
@@ -18,6 +18,7 @@
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/calendar/day(_tenantView=${tenantViewToken})}"><i class="fas fa-calendar-day"></i> <span th:text="#{calendar.day}">Daily calendar</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/calendar/week(_tenantView=${tenantViewToken})}"><i class="fas fa-calendar-week"></i> <span th:text="#{calendar.week}">Weekly calendar</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/calendar/month(_tenantView=${tenantViewToken})}"><i class="fas fa-calendar-alt"></i> <span th:text="#{calendar.month}">Monthly calendar</span></a></li>
+    <li th:if="${currentTenantName}" sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}"><i class="fas fa-trash-alt"></i> <span th:text="#{trash.title}"></span></a></li>
     <li><hr class="dropdown-divider"></li>
     <li class="node-zoom-controls" role="group" th:aria-label="#{view.contentZoom}">
         <button type="button" class="btn btn-sm btn-outline-secondary" data-node-zoom="out" th:title="#{view.zoomOut}" th:aria-label="#{view.zoomOut}"><i class="fas fa-search-minus" aria-hidden="true"></i></button>

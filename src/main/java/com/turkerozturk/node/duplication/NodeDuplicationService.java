@@ -50,6 +50,7 @@ public class NodeDuplicationService {
 
     /** Inserts one alias row and normalizes sibling positions only after validating the supplied tree revision. */
     static long createShared(Connection connection,long id,String expected) throws SQLException {
+        com.turkerozturk.node.TrashSql.guardMove(connection,List.of(id),0);
         var snapshot=read(connection); var root=selected(snapshot,id);
         validateAncestors(snapshot,root); branch(snapshot,root,false);
         if (!revision(snapshot).equals(expected)) throw conflict();
@@ -140,6 +141,7 @@ public class NodeDuplicationService {
 
     /** Uses INSERT SELECT to preserve SQL NULL, text, binary data and additional CTB columns verbatim. */
     static long duplicate(Connection connection,long id,boolean withSubnodes,String expected,long timestamp) throws SQLException {
+        com.turkerozturk.node.TrashSql.guardMove(connection,List.of(id),0);
         var snapshot=read(connection);var root=selected(snapshot,id);validateAncestors(snapshot,root);
         if(!revision(snapshot).equals(expected)) throw conflict();
         var branch=branch(snapshot,root,withSubnodes);

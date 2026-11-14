@@ -23,6 +23,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class NodePropertiesServiceTest {
+    private EntityManager manager(){var manager=mock(EntityManager.class);when(manager.unwrap(org.hibernate.Session.class)).thenReturn(mock(org.hibernate.Session.class));return manager;}
+
     @AfterEach void clear() { TenantContext.clear(); }
 
     @Test void savesSelectedBitsAndClearsIconAndReadOnly() {
@@ -38,7 +40,7 @@ class NodePropertiesServiceTest {
         node.setIsRichText(1L | (0x3584E4L << 3));
         node.setIsReadOnly16bit(1L | NodeIcon.CT_HOME.getIconIdIn16bit());
         when(nodes.findById(12L)).thenReturn(node);
-        EntityManager entityManager = mock(EntityManager.class);
+        EntityManager entityManager = manager();
         Query query = mock(Query.class);
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
         when(query.setParameter(anyString(), any())).thenReturn(query);
@@ -83,7 +85,7 @@ class NodePropertiesServiceTest {
         node.setSyntax("custom-colors");
         node.setIsRichText((0x123456L << 3) | 5L);
         when(nodes.findById(12L)).thenReturn(node);
-        EntityManager entityManager = mock(EntityManager.class);
+        EntityManager entityManager = manager();
         Query query = mock(Query.class);
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
         when(query.setParameter(anyString(), any())).thenReturn(query);
@@ -109,7 +111,7 @@ class NodePropertiesServiceTest {
         Node node = new Node();
         node.setIsRichText(4L); // Old no-color marker must not survive the save.
         when(nodes.findById(12L)).thenReturn(node);
-        EntityManager manager = mock(EntityManager.class);
+        EntityManager manager = manager();
         Query query = mock(Query.class);
         when(manager.createNativeQuery(anyString())).thenReturn(query);
         when(query.setParameter(anyString(), any())).thenReturn(query);
@@ -212,7 +214,7 @@ class NodePropertiesServiceTest {
         Children real = mock(Children.class);
         when(real.getMasterId()).thenReturn(0L);
         when(children.findByNodeId(12L)).thenReturn(real);
-        EntityManager manager = mock(EntityManager.class);
+        EntityManager manager = manager();
         when(manager.createNativeQuery(anyString())).thenReturn(query);
         when(query.setParameter(anyString(), any())).thenReturn(query);
         NodePropertiesService service = new NodePropertiesService(nodes, children, settings);
@@ -226,7 +228,7 @@ class NodePropertiesServiceTest {
         var nodes=mock(NodeRepository.class);var children=mock(ChildrenRepository.class);
         var occurrence=mock(Children.class);when(occurrence.getMasterId()).thenReturn(0L);when(children.findByNodeId(12L)).thenReturn(occurrence);
         var node=new Node();node.setName("Same");node.setSyntax("plain-text");when(nodes.findById(12L)).thenReturn(node);
-        var manager=mock(EntityManager.class);var query=mock(Query.class);
+        var manager=manager();var query=mock(Query.class);
         when(manager.createNativeQuery(anyString())).thenReturn(query);when(query.setParameter(anyString(),any())).thenReturn(query);
         var service=new NodePropertiesService(nodes,children,settings);ReflectionTestUtils.setField(service,"entityManager",manager);
         service.update(12L,"Same",false,TitleColor.NONE,NodeIcon.OTHER,false);
