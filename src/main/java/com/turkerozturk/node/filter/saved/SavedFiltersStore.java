@@ -103,7 +103,7 @@ public class SavedFiltersStore {
                 if(value==null||value.length()>8192||value.indexOf('\0')>=0)throw new IllegalArgumentException("Invalid value");
                 if(key.equals("nodeIcons"))NodeIcon.valueOf(value);
                 if(key.equals("nameStartsWith")&&!Set.of("true","false").contains(value))throw new IllegalArgumentException("Invalid checkbox");
-                if(key.equals("matchMode")&&!Set.of("all","any","phrase").contains(value)||key.equals("tagMode")&&!Set.of("all","any","contains").contains(value)||key.equals("sortBy")&&!Set.of("id","name","created","modified","tags","syntax").contains(value)||key.equals("sortDirection")&&!Set.of("asc","desc").contains(value))throw new IllegalArgumentException("Invalid search option");
+                if(key.equals("matchMode")&&!Set.of("all","any","phrase").contains(value)||key.equals("tagMode")&&!Set.of("all","any","contains").contains(value)||key.equals("sortBy")&&!Set.of("id","name","parent","created","modified","tags","syntax").contains(value)||key.equals("sortDirection")&&!Set.of("asc","desc").contains(value))throw new IllegalArgumentException("Invalid search option");
             }
             clean.put(key,List.copyOf(values));
         }

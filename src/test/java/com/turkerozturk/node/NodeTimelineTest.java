@@ -20,38 +20,39 @@ import static org.mockito.Mockito.*;
 
 class NodeTimelineTest {
     @Test void createdTimelineRendersListAndEscapesNodeName() throws Exception {
-        var controller = new NodeController(); var service = mock(NodeService.class);
-        ReflectionTestUtils.setField(controller, "nodeService", service);
+        var controller = new NodeController(); var service = mock(com.turkerozturk.node.filter.AdvancedNodeSearch.class);
+        ReflectionTestUtils.setField(controller, "advancedSearch", service);
         var node = new Node(); node.setNodeId(55); node.setName("<script>unsafe</script>");
         node.setNodeIcon(com.turkerozturk.helpers.NodeIcon.CT_HOME);
+        node.setListParentId(44);node.setListParentName("<Parent>");
         node.setCreationTimestamp(1790624738L); node.setLastSaveTimestamp(1790624738L);
-        when(service.findRecentlyCreatedNodes(50)).thenReturn(List.of(node));
+        when(service.search(any())).thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(node)));
         var model = new ExtendedModelMap(); model.addAttribute("tenantViewToken", "old-token");
-        assertThat(controller.getTimelineCreated(model,"50")).isEqualTo("node/timeline");
-        assertThat(render(model)).contains("&lt;script&gt;unsafe&lt;/script&gt;", "_tenantView=old-token", "/nodes/55/info", "/img/ctbicons/ct_home.png", "max=\"5000\"");
+        assertThat(controller.getTimelineCreated(model,"50","created","desc")).isEqualTo("node/timeline");
+        assertThat(render(model)).contains("&lt;script&gt;unsafe&lt;/script&gt;", "_tenantView=old-token", "/nodes/55/info", "/img/ctbicons/ct_home.png", "max=\"5000\"", "&lt;Parent&gt;", "/nodes/44", "sort=parent", "target=\"_blank\"");
     }
     @Test void modifiedTimelineRendersAnEmptyList() throws Exception {
-        var controller = new NodeController(); var service = mock(NodeService.class);
-        ReflectionTestUtils.setField(controller, "nodeService", service);
-        when(service.findRecentlyModifiedNodes(50)).thenReturn(List.of());
+        var controller = new NodeController(); var service = mock(com.turkerozturk.node.filter.AdvancedNodeSearch.class);
+        ReflectionTestUtils.setField(controller, "advancedSearch", service);
+        when(service.search(any())).thenReturn(org.springframework.data.domain.Page.empty());
         var model = new ExtendedModelMap();
-        assertThat(controller.getTimelineModified(model,"50")).isEqualTo("node/timeline");
+        assertThat(controller.getTimelineModified(model,"50","modified","desc")).isEqualTo("node/timeline");
         assertThat(render(model)).contains("Modified").doesNotContain("getTotalElements");
     }
     @Test void retiredSearchRedirectsToBindingSearch() {
         assertThat(new NodeController().getAllNodesAdvancedAsHtml(new ExtendedModelMap()))
                 .isEqualTo("redirect:/nodesadvancedwithbinding");
     }
-    @Test void rowLimitIsAppliedAndMalformedLimitsSafelyFallBackToFifty() {
-        var controller=new NodeController();var service=mock(NodeService.class);
-        ReflectionTestUtils.setField(controller,"nodeService",service);
-        var model=new ExtendedModelMap();controller.getTimelineCreated(model,"125");
-        verify(service).findRecentlyCreatedNodes(125);assertThat(model.get("timelineLimit")).isEqualTo(125);
-        for(String value:List.of("0","-1","5001","9999999999999999999","abc","")) {
-            model=new ExtendedModelMap();controller.getTimelineModified(model,value);
-            assertThat(model.get("timelineLimit")).isEqualTo(50);assertThat(model.get("timelineLimitError")).isEqualTo(true);
+    @Test void rowLimitAndSortArePassedToTheMetadataQueryAndInvalidValuesFallBack(){
+        var controller=new NodeController();var service=mock(com.turkerozturk.node.filter.AdvancedNodeSearch.class);
+        ReflectionTestUtils.setField(controller,"advancedSearch",service);when(service.search(any())).thenReturn(org.springframework.data.domain.Page.empty());
+        var model=new ExtendedModelMap();controller.getTimelineCreated(model,"125","parent","asc");
+        var captor=org.mockito.ArgumentCaptor.forClass(com.turkerozturk.node.filter.FormSearch.class);verify(service).search(captor.capture());
+        assertThat(captor.getValue().getPageSize()).isEqualTo(125);assertThat(captor.getValue().getSortBy()).isEqualTo("parent");assertThat(captor.getValue().getSortDirection()).isEqualTo("asc");
+        for(String value:List.of("0","-1","5001","9999999999999999999","abc","")){
+            model=new ExtendedModelMap();controller.getTimelineModified(model,value,"name;delete","invalid");
+            assertThat(model.get("timelineLimit")).isEqualTo(50);assertThat(model.get("timelineLimitError")).isEqualTo(true);assertThat(model.get("timelineSort")).isEqualTo("modified");assertThat(model.get("timelineDirection")).isEqualTo("desc");
         }
-        verify(service,times(6)).findRecentlyModifiedNodes(50);
     }
     @Test void servicePassesRequestedPageSizeToRepository() {
         var service=new NodeService();var repository=mock(NodeRepository.class);

@@ -8,14 +8,17 @@
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <label for="timelineLimit" th:text="#{timeline.limit}">Rows</label>
 <input id="timelineLimit" class="form-control form-control-sm" style="width:7rem" type="number" name="limit" min="1" max="5000" required th:value="${timelineLimit}">
+<label for="timelineSort" th:text="#{tags.sortBy}"></label><select id="timelineSort" name="sort" class="form-select form-select-sm" style="width:auto"><option th:each="key:${ {'id','parent','name','created','modified'} }" th:value="${key}" th:selected="${timelineSort==key}" th:text="${#messages.msg('timeline.column.'+key)}"></option></select>
+<label for="timelineDirection" class="visually-hidden" th:text="#{tags.direction}"></label><select id="timelineDirection" name="direction" class="form-select form-select-sm" style="width:auto"><option value="asc" th:selected="${timelineDirection=='asc'}" th:text="#{tags.ascending}"></option><option value="desc" th:selected="${timelineDirection=='desc'}" th:text="#{tags.descending}"></option></select>
 <button class="btn btn-sm btn-primary" type="submit" th:text="#{timeline.apply}">Show</button>
 </form>
 <p th:if="${timelineLimitError == true}" class="alert alert-warning" th:text="#{timeline.invalidLimit}"></p>
 <p th:text="#{timeline.count(${#lists.size(nodes)})}"></p>
 <div class="table-responsive"><table class="table table-sm timeline-table">
-<thead><tr><th>ID</th><th th:text="#{timeline.name}"></th><th th:text="#{timeline.created}"></th><th th:text="#{timeline.modified}"></th></tr></thead>
+<thead><tr><th th:each="key:${ {'id','parent','name','created','modified'} }" th:class="${key == 'parent' ? 'timeline-parent' : ''}" th:attr="aria-sort=${timelineSort==key ? (timelineDirection=='asc' ? 'ascending':'descending'):'none'}"><a th:href="@{${timelinePath}(limit=${timelineLimit},sort=${key},direction=${timelineSort==key and timelineDirection=='asc' ? 'desc':'asc'},_tenantView=${tenantViewToken})}"><span th:text="${#messages.msg('timeline.column.'+key)}"></span><span th:if="${timelineSort==key}" th:text="${timelineDirection=='asc' ? ' ↑':' ↓'}"></span></a></th></tr></thead>
 <tbody><tr th:each="node : ${nodes}">
 <td><a data-node-info-link th:title="#{node.meta.header}" th:href="@{/nodes/{id}/info(id=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="${node.nodeId}"></a></td>
+<td class="timeline-parent"><a th:if="${node.listParentId > 0 and node.listParentName != null}" th:href="@{/nodes/{id}(id=${node.listParentId},_tenantView=${tenantViewToken})}" target="_blank" rel="noopener" th:text="${node.listParentName}"></a><span th:unless="${node.listParentId > 0 and node.listParentName != null}" th:text="${node.listParentId==0 ? #messages.msg('tags.root') : #messages.msg('tags.missingParent')}"></span></td>
 <td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}"><img th:if="${node.nodeIcon != null}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="20" height="20" alt="" loading="lazy"> <span th:text="${node.name}"></span></a></td>
 <td th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>
 <td th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>

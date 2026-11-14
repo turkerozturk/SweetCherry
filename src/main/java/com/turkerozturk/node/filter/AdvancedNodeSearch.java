@@ -16,8 +16,8 @@ import java.util.*;
 @Service @Transactional(readOnly=true)
 public class AdvancedNodeSearch {
  @PersistenceContext private EntityManager entityManager;
- private static final Map<String,String> SORT=Map.of("id","c.node_id","name","LOWER(n.name)","created","n.ts_creation","modified","n.ts_lastsave","tags","LOWER(n.tags)","syntax","n.syntax");
- private static final String FROM=" FROM children c JOIN node n ON n.node_id=CASE WHEN COALESCE(c.master_id,0)=0 THEN c.node_id ELSE c.master_id END";
+ private static final Map<String,String> SORT=Map.of("id","c.node_id","name","LOWER(n.name)","created","n.ts_creation","modified","n.ts_lastsave","tags","LOWER(n.tags)","syntax","n.syntax","parent","LOWER(pn.name)");
+ private static final String FROM=" FROM children c JOIN node n ON n.node_id=CASE WHEN COALESCE(c.master_id,0)=0 THEN c.node_id ELSE c.master_id END LEFT JOIN children pc ON pc.node_id=c.father_id LEFT JOIN node pn ON pn.node_id=CASE WHEN COALESCE(pc.master_id,0)=0 THEN pc.node_id ELSE pc.master_id END";
  public Page<Node> search(FormSearch form){return entityManager.unwrap(Session.class).doReturningWork(c->search(c,form));}
  public List<String> syntaxes(){return entityManager.unwrap(Session.class).doReturningWork(c->{var result=new TreeSet<String>();try(var q=c.createStatement();var rs=q.executeQuery("SELECT DISTINCT syntax FROM node WHERE syntax IS NOT NULL")){while(rs.next())result.add(rs.getString(1));}return List.copyOf(result);});}
  record Plan(String where,List<Object> values,String order){}
@@ -43,7 +43,7 @@ public class AdvancedNodeSearch {
   // SQL identifiers/directions cannot be bound as values: select only literal grammar.
   String column=switch(f.getSortBy()) {
    case "id" -> "c.node_id"; case "name" -> "LOWER(n.name)"; case "created" -> "n.ts_creation";
-   case "modified" -> "n.ts_lastsave"; case "tags" -> "LOWER(n.tags)"; case "syntax" -> "n.syntax";
+   case "parent" -> "LOWER(pn.name)"; case "modified" -> "n.ts_lastsave"; case "tags" -> "LOWER(n.tags)"; case "syntax" -> "n.syntax";
    default -> throw new IllegalArgumentException("Invalid sort column");
   };
   String direction=switch(f.getSortDirection()) {
@@ -66,8 +66,8 @@ public class AdvancedNodeSearch {
   var plan=plan(f,c.getMetaData().getDatabaseProductName());long count;
   try(var q=c.prepareStatement("SELECT COUNT(*)"+FROM+plan.where())){bind(q,plan.values());try(var rs=q.executeQuery()){rs.next();count=rs.getLong(1);}}
   int page=(int)Math.min(f.getPageNumber(),Math.max(0,(count-1)/f.getPageSize()));f.setPageNumber(page);var pageable=PageRequest.of(page,f.getPageSize());if(count==0)return new PageImpl<>(List.of(),pageable,0);
-  var result=new ArrayList<Node>();String sql="SELECT c.node_id,n.name,n.tags,n.syntax,n.is_ro,n.is_richtxt,n.ts_creation,n.ts_lastsave"+FROM+plan.where()+" ORDER BY "+plan.order()+" LIMIT ? OFFSET ?";
-  try(var q=c.prepareStatement(sql)){bind(q,plan.values());q.setInt(plan.values().size()+1,f.getPageSize());q.setLong(plan.values().size()+2,pageable.getOffset());try(var rs=q.executeQuery()){while(rs.next()){var n=new Node();n.setNodeId(rs.getLong(1));n.setName(rs.getString(2));n.setTags(rs.getString(3));n.setSyntax(Objects.requireNonNullElse(rs.getString(4),"plain-text"));n.setIsReadOnly16bit(rs.getLong(5));n.setIsRichText(rs.getLong(6));n.setCreationTimestamp(rs.getLong(7));n.setLastSaveTimestamp(rs.getLong(8));n.parseNodeIconAndReadOnlyFlag();n.parseNodeTitleColorAndBoldnessAndTextType();n.setTitleColorAsHtmlHex(String.format(Locale.ROOT,"#%06X",n.getTitleColor()));result.add(n);}}}
+  var result=new ArrayList<Node>();String sql="SELECT c.node_id,n.name,n.tags,n.syntax,n.is_ro,n.is_richtxt,n.ts_creation,n.ts_lastsave,c.father_id,pn.name"+FROM+plan.where()+" ORDER BY "+plan.order()+" LIMIT ? OFFSET ?";
+  try(var q=c.prepareStatement(sql)){bind(q,plan.values());q.setInt(plan.values().size()+1,f.getPageSize());q.setLong(plan.values().size()+2,pageable.getOffset());try(var rs=q.executeQuery()){while(rs.next()){var n=new Node();n.setNodeId(rs.getLong(1));n.setName(rs.getString(2));n.setTags(rs.getString(3));n.setSyntax(Objects.requireNonNullElse(rs.getString(4),"plain-text"));n.setIsReadOnly16bit(rs.getLong(5));n.setIsRichText(rs.getLong(6));n.setCreationTimestamp(rs.getLong(7));n.setLastSaveTimestamp(rs.getLong(8));n.setListParentId(rs.getLong(9));n.setListParentName(rs.getString(10));n.parseNodeIconAndReadOnlyFlag();n.parseNodeTitleColorAndBoldnessAndTextType();n.setTitleColorAsHtmlHex(String.format(Locale.ROOT,"#%06X",n.getTitleColor()));result.add(n);}}}
   breadcrumbs(c,result);return new PageImpl<>(result,pageable,count);
  }
  private static void bind(PreparedStatement query,List<Object> values)throws SQLException{for(int i=0;i<values.size();i++)query.setObject(i+1,values.get(i));}

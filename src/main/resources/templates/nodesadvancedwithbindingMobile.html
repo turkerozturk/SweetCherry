@@ -3,5 +3,5 @@
 <head><title th:text="#{search.title}"></title></head><body>
 <section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/advancedSearch.css}"></section>
 <section layout:fragment="content"><div th:replace="~{node/advancedSearch :: page}"></div></section>
-<section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/icon-picker.js}"></script><script defer th:src="@{/js/node/advancedSearch.js}"></script></section>
+<section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/icon-picker.js}"></script><script defer th:src="@{/js/node/advancedSearch.js}"></script><script defer th:src="@{/js/node/batchNodes.js}"></script></section>
 </body></html>

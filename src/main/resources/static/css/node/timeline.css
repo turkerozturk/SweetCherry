@@ -5,3 +5,5 @@
 #timelineInfo {width:min(95vw,36rem);overflow-wrap:anywhere;}
 #timelineInfo a {text-decoration:none;}
 #timelineInfo .iconcss {width:25px;height:25px;object-fit:contain;}
+
+.timeline-parent{max-width:18rem;overflow-wrap:anywhere}@media(max-width:767px){.timeline-parent{display:none}}

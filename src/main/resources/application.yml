@@ -199,6 +199,8 @@ myapp:
   tree:
     # Desktop /tree only. Saved browser width takes precedence; other splitters are unaffected.
     default-width: 600 # Pixels, clamped to 20..1900 and the available viewport width.
+    font-size: 16 # Tree labels in pixels: 10..32.
+    vertical-padding: 1 # Pixels above/below the row AND label: 0..12; 1 halves the previous spacing.
   ctb-import:
     # Server-side CTB file AND decoded field bytes; not an HTTP upload limit. Restart after editing.
     max-bytes: 67108864 # 64 MiB; raise only with enough Java heap and physical RAM.

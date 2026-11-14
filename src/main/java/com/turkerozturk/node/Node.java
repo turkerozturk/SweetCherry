@@ -129,6 +129,12 @@ public class Node {
 
     @Transient
     private Node fatherNode;
+    @Transient private long listParentId;
+    @Transient private String listParentName;
+    public long getListParentId(){return listParentId;}
+    public void setListParentId(long id){listParentId=id;}
+    public String getListParentName(){return listParentName;}
+    public void setListParentName(String name){listParentName=name;}
 
     /**
      * dikkat: eger txtAsHtml nin parsellenmesi isteniyorsa diger boolean constructur true olarak cagrilmali veya bu

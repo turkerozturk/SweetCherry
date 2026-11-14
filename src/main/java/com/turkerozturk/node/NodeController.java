@@ -150,6 +150,7 @@ public class NodeController {
         model.addAttribute("pageNumber", nodes.getNumber());
         model.addAttribute("nodes", nodes);
         model.addAttribute("searchTags", searchTagService.catalogue());
+        model.addAttribute("batchWritable",nodeDeletionService != null && nodeDeletionService.isCurrentTenantWritable());
         model.addAttribute("searchSyntaxes", advancedSearch.syntaxes());
         model.addAttribute("viewMode", viewMode);
         if ("mobile".equals(viewMode)) {
@@ -673,25 +674,21 @@ public class NodeController {
         return ResponseEntity.ok(nodeIds);
     }
 
-    /** Lists recently created nodes with a bounded, user-selected row limit. */
-    @GetMapping("/nodes/timeline/created")
-    @RequiresTenant
-    public String getTimelineCreated(Model model, @RequestParam(defaultValue="50") String limit) {
-        int rows = timelineLimit(limit,model);
-        model.addAttribute("nodes", nodeService.findRecentlyCreatedNodes(rows));
-        model.addAttribute("timelinePath", "/nodes/timeline/created");
-        model.addAttribute("timelineTitleKey", "timeline.recentCreated");
-        return "node/timeline";
-    }
-
-    /** Lists recently modified nodes using the same configurable timeline view. */
-    @GetMapping("/nodes/timeline/modified")
-    @RequiresTenant
-    public String getTimelineModified(Model model, @RequestParam(defaultValue="50") String limit) {
-        int rows = timelineLimit(limit,model);
-        model.addAttribute("nodes", nodeService.findRecentlyModifiedNodes(rows));
-        model.addAttribute("timelinePath", "/nodes/timeline/modified");
-        model.addAttribute("timelineTitleKey", "timeline.recentModified");
+    @GetMapping("/nodes/timeline/created") @RequiresTenant
+    public String getTimelineCreated(Model model,@RequestParam(defaultValue="50") String limit,
+            @RequestParam(defaultValue="created") String sort,@RequestParam(defaultValue="desc") String direction){return timeline(model,limit,sort,direction,false);}
+    @GetMapping("/nodes/timeline/modified") @RequiresTenant
+    public String getTimelineModified(Model model,@RequestParam(defaultValue="50") String limit,
+            @RequestParam(defaultValue="modified") String sort,@RequestParam(defaultValue="desc") String direction){return timeline(model,limit,sort,direction,true);}
+    private String timeline(Model model,String limit,String sort,String direction,boolean modified){
+        int rows=timelineLimit(limit,model);
+        if(!java.util.Set.of("id","parent","name","created","modified").contains(sort))sort=modified?"modified":"created";
+        if(!java.util.Set.of("asc","desc").contains(direction))direction="desc";
+        var form=new FormSearch();form.setPageSize(rows);form.setSortBy(sort);form.setSortDirection(direction);
+        model.addAttribute("nodes",advancedSearch.search(form).getContent());
+        model.addAttribute("timelineSort",sort);model.addAttribute("timelineDirection",direction);
+        model.addAttribute("timelinePath",modified?"/nodes/timeline/modified":"/nodes/timeline/created");
+        model.addAttribute("timelineTitleKey",modified?"timeline.recentModified":"timeline.recentCreated");
         return "node/timeline";
     }
 

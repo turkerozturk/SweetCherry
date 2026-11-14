@@ -25,6 +25,13 @@ class AppearanceSettingsTest {
         var bad=Map.of("myapp.appearance.theme","auto<script>","myapp.default-language","fr","myapp.tree.default-width","19","myapp.home.created-minimum","-1","myapp.calendar.day-max-entries","2001","myapp.calendar.day-preview-max-lines","0","myapp.calendar.time-zone","bad/zone","myapp.calendar.first-day-of-week","8","myapp.custom-lists.views.date-time-format","invalid[","myapp.custom-lists.views.max-design-characters","1048577");
         bad.forEach((key,value)->{var values=defaults();values.put(key,value);assertThatThrownBy(()->ApplicationSettingsService.update("myapp: {}\n",values)).as(key).isInstanceOf(RuntimeException.class);});
     }
+    @Test void treeDensityDefaultsAndBoundsAreSafe(){
+        var normal=new TreeAppearanceAdvice("16","1");assertThat(normal.fontSize()).isEqualTo(16);assertThat(normal.verticalPadding()).isEqualTo(1);
+        var invalid=new TreeAppearanceAdvice("1;display:none","-2");assertThat(invalid.fontSize()).isEqualTo(16);assertThat(invalid.verticalPadding()).isEqualTo(1);
+        assertThat(new TreeAppearanceAdvice("32","0").verticalPadding()).isZero();
+        for(var entry:Map.of("myapp.tree.font-size","9","myapp.tree.vertical-padding","13").entrySet()){var values=defaults();values.put(entry.getKey(),entry.getValue());assertThatThrownBy(()->ApplicationSettingsService.update("myapp: {}\n",values)).isInstanceOf(IllegalArgumentException.class);}
+        var values=defaults();values.put("myapp.tree.vertical-padding","0");values.put("myapp.tree.font-size","10");assertThat(ApplicationSettingsService.update("myapp: {}\n",values)).contains("myapp.tree.vertical-padding: 0","myapp.tree.font-size: 10");
+    }
     @Test void settingsRenderAllFieldsWithLocalizedChoicesInBothLanguages(){
         for(var locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))){
             var engine=new SpringTemplateEngine();var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setTemplateMode("HTML");engine.setTemplateResolver(resolver);

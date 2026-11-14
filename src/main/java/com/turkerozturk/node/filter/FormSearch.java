@@ -41,7 +41,7 @@ public class FormSearch {
  private boolean nameStartsWith;
  @NotNull @Pattern(regexp="all|any|phrase") private String matchMode="all";
  @NotNull @Pattern(regexp="all|any|contains") private String tagMode="all";
- @NotNull @Pattern(regexp="id|name|created|modified|tags|syntax") private String sortBy="modified";
+ @NotNull @Pattern(regexp="id|name|parent|created|modified|tags|syntax") private String sortBy="modified";
  @NotNull @Pattern(regexp="asc|desc") private String sortDirection="desc";
  public int[] getPAGE_SIZE_OPTIONS(){return PAGE_SIZE_OPTIONS;}
  public LinkedHashSet<NodeIcon> getAllIcons(){var icons=new ArrayList<>(List.of(NodeIcon.values()));icons.sort(Comparator.comparing((NodeIcon icon)->icon!=NodeIcon.OTHER).thenComparing(NodeIcon::getIconNameForHuman,String.CASE_INSENSITIVE_ORDER));return new LinkedHashSet<>(icons);}

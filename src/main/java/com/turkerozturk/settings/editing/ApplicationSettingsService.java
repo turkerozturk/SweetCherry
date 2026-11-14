@@ -29,6 +29,8 @@ public class ApplicationSettingsService {
         new Setting("myapp.home.modified-minimum","nonnegative","5",1000),
         new Setting("myapp.home.created-minimum","nonnegative","5",1000),
         new Setting("myapp.tree.default-width","width","600",1900),
+        new Setting("myapp.tree.font-size","treefont","16",32),
+        new Setting("myapp.tree.vertical-padding","nonnegative","1",12),
         new Setting("myapp.calendar.first-day-of-week","weekday","MONDAY",0),
         new Setting("myapp.calendar.time-zone","systemzone","system",0),
         new Setting("myapp.calendar.max-entries","number","10000",50000),
@@ -117,14 +119,14 @@ public class ApplicationSettingsService {
         if(!extra.isEmpty())result.append("\n# Settings added by SweetCherry\n").append(extra);
         nodes(result.toString());return result.toString();
     }
-    public static boolean numeric(Setting setting){return Set.of("number","nonnegative","width").contains(setting.type());}
-    public static long minimum(Setting setting){return setting.type().equals("nonnegative")?0:setting.type().equals("width")?20:1;}
+    public static boolean numeric(Setting setting){return Set.of("number","nonnegative","width","treefont").contains(setting.type());}
+    public static long minimum(Setting setting){return setting.type().equals("nonnegative")?0:setting.type().equals("width")?20:setting.type().equals("treefont")?10:1;}
     public static List<String> choices(Setting setting){return switch(setting.type()){case "theme" -> List.of("light","dark");case "language" -> List.of("","en","tr");case "weekday" -> List.of("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY");default -> List.of();};}
     private static void validate(Setting setting,String value){
         if(value==null||value.length()>160||value.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("invalid");
         switch(setting.type()) {
             case "boolean" -> {if(!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("invalid");}
-            case "number","nonnegative","width" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
+            case "number","nonnegative","width","treefont" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
             case "theme","language" -> {if(!choices(setting).contains(value))throw new IllegalArgumentException("invalid");}
             case "weekday" -> {if(!value.matches("[1-7]"))java.time.DayOfWeek.valueOf(value.toUpperCase(Locale.ROOT));}
             case "systemzone" -> {if(!value.equalsIgnoreCase("system"))zone(value);}

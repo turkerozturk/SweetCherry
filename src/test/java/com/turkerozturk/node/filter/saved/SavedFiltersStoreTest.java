@@ -21,4 +21,9 @@ class SavedFiltersStoreTest {
   var read=store.read(scope);assertThat(read.presets().get(0).fields().get("matchMode")).containsExactly("phrase");assertThat(Files.readAllBytes(file)).isEqualTo(bytes);
   var updated=store.save(scope,read.revision(),id,"Updated",read.presets().get(0).fields());assertThat(store.read(scope)).isEqualTo(updated);assertThat(updated.revision()).isNotEqualTo(read.revision());
  }
+ @Test void parentSortingCanBeSavedAndRestored()throws Exception{
+  var values=fields();values.put("sortBy",List.of("parent"));values.put("sortDirection",List.of("asc"));
+  var saved=store.save(scope,store.read(scope).revision(),"","By parent",values);assertThat(store.read(scope)).isEqualTo(saved);assertThat(saved.presets().get(0).fields().get("sortBy")).containsExactly("parent");
+ }
+
 }

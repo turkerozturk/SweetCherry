@@ -38,6 +38,12 @@ class AdvancedNodeSearchTest {
   f.setPageNumber(999);assertThat(AdvancedNodeSearch.search(connection,f).getNumber()).isEqualTo(2);
   f.setPageSize(100);f.setPageNumber(0);f.setSortBy("name");f.setSortDirection("asc");assertThat(ids(f)).containsExactly(2L,5L,3L,1L,10L,4L);
  }
+ @Test void parentSortUsesSharedOccurrenceLocationBeforePagination()throws Exception{
+  var f=new FormSearch();f.setSortBy("parent");f.setSortDirection("asc");f.setPageSize(3);
+  var page=AdvancedNodeSearch.search(connection,f);assertThat(page.stream().map(n->n.getNodeId())).containsExactly(4L,5L,10L);
+  var alias=page.getContent().get(2);assertThat(alias.getListParentId()).isEqualTo(2);assertThat(alias.getListParentName()).isEqualTo("Backup plans");
+  f.setSortDirection("desc");assertThat(ids(f)).containsExactly(1L,2L,3L);
+ }
  @Test void emptyDateFiltersIncludeFutureAndInvalidRangesNeverBuildQueries()throws Exception{
   var f=new FormSearch();f.setPageSize(100000);assertThat(ids(f)).contains(5L);f.setTsCreationEndFilter(java.sql.Date.valueOf("2026-10-31"));assertThat(ids(f)).doesNotContain(5L);
   f.setSortBy("name; DROP TABLE node");assertThatThrownBy(()->AdvancedNodeSearch.plan(f,"SQLite")).isInstanceOf(IllegalArgumentException.class);
