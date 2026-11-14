@@ -61,7 +61,7 @@ public class CalendarService {
         try(var query=c.prepareStatement("SELECT node_id,name,tags,is_ro,is_richtxt,syntax,ts_creation,ts_lastsave FROM node WHERE ts_creation>=? AND ts_creation<? ORDER BY ts_creation,node_id")) {
             query.setLong(1,from);query.setLong(2,to);
             try(var rows=query.executeQuery()){while(rows.next()){
-                var tags=NodeTags.split(rows.getString(3));if(!selected.isEmpty()&&!(match.equals("all")?tags.containsAll(selected):selected.stream().anyMatch(tags::contains)))continue;
+                if(com.turkerozturk.node.audit.AuditSql.TAG.equals(rows.getString(3)))continue;var tags=NodeTags.split(rows.getString(3));if(!selected.isEmpty()&&!(match.equals("all")?tags.containsAll(selected):selected.stream().anyMatch(tags::contains)))continue;
                 for(var place:places.getOrDefault(rows.getLong(1),List.of())){result.add(entry(rows,place,tags));if(result.size()>=limit)return result;}
             }}
         }

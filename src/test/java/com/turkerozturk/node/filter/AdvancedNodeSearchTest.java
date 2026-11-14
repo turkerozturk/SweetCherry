@@ -65,4 +65,9 @@ class AdvancedNodeSearchTest {
    assertThatThrownBy(()->AdvancedNodeSearch.plan(f,"SQLite")).isInstanceOf(IllegalArgumentException.class);
   }
  }
+ @Test void auditSourceNotesAreExcludedFromSearchAndTimelineResults()throws Exception{
+  try(var q=connection.prepareStatement("UPDATE node SET tags=? WHERE node_id=1")){q.setString(1,com.turkerozturk.node.audit.AuditSql.TAG);q.executeUpdate();}
+  assertThat(ids(new FormSearch())).doesNotContain(1L,10L).contains(2L,3L,4L,5L);
+ }
+
 }

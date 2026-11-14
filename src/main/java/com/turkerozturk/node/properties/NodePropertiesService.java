@@ -59,6 +59,8 @@ public class NodePropertiesService {
         if (node == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Real node not found");
         }
+        if(com.turkerozturk.node.audit.AuditSql.TAG.equals(node.getTags()))throw new ResponseStatusException(HttpStatus.CONFLICT,"audit.protected");
+        if(com.turkerozturk.node.TrashSql.TAG.equals(node.getTags()))throw new ResponseStatusException(HttpStatus.CONFLICT,"trash.usePage");
         return node;
     }
 

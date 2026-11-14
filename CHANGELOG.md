@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add optional CTBLOGS history for maintained content/property/tag/move/bookmark writes, with daily rotating ledgers, lossless chunked before/after text and embedded-object manifests.
+- Add source-guarded history inspection and complete text/source/JSON downloads; audit failures roll back the covered edit. Managed history is protected and excluded from normal recent/search/calendar lists.
+
+
 - Allow multiple PNG/JPEG files to be selected together in the rich-text editor, inserted vertically at the caret as one undoable edit while retaining upload limits and protected-object checks.
 
 

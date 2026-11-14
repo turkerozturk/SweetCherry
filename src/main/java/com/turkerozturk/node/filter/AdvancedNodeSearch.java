@@ -23,7 +23,7 @@ public class AdvancedNodeSearch {
  record Plan(String where,List<Object> values,String order){}
  static Plan plan(FormSearch f,String product){
   if(!SORT.containsKey(f.getSortBy())||!Set.of("asc","desc").contains(f.getSortDirection())||!Set.of("all","any","phrase").contains(f.getMatchMode())||!Set.of("all","any","contains").contains(f.getTagMode())||f.getPageNumber()<0||f.getPageNumber()>1000000||f.getPageSize()<1||f.getPageSize()>100000)throw new IllegalArgumentException("Invalid search options");
-  var predicates=new ArrayList<String>();var values=new ArrayList<Object>();
+  var predicates=new ArrayList<String>();predicates.add("COALESCE(n.tags,'') <> '__sweetcherry_audit_v1__'");var values=new ArrayList<Object>();
   text(predicates,values,List.of("n.name","n.txt"),f.getQuery(),f.getMatchMode(),false);
   text(predicates,values,List.of("n.name"),f.getNameFilter(),f.isNameStartsWith()?"phrase":f.getMatchMode(),f.isNameStartsWith());
   text(predicates,values,List.of("n.txt"),f.getTextFilter(),f.getMatchMode(),false);

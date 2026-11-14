@@ -32,7 +32,7 @@ public class HomeActivityService {
     /** Explicit source: selection may still have an EntityManager bound to the previous tenant. */
     public OptionalLong latest(DataSource source) throws SQLException {
         try (var c = source.getConnection(); var q = c.prepareStatement("SELECT c.node_id" + FROM
-                + " ORDER BY COALESCE(n.ts_lastsave,0) DESC, CASE WHEN COALESCE(c.master_id,0)=0 THEN 0 ELSE 1 END, c.node_id ASC LIMIT 1");
+                + " WHERE COALESCE(n.tags,'') <> '__sweetcherry_audit_v1__' ORDER BY COALESCE(n.ts_lastsave,0) DESC, CASE WHEN COALESCE(c.master_id,0)=0 THEN 0 ELSE 1 END, c.node_id ASC LIMIT 1");
              var r = q.executeQuery()) {
             return r.next() ? OptionalLong.of(r.getLong(1)) : OptionalLong.empty();
         }
@@ -80,12 +80,12 @@ public class HomeActivityService {
     private List<Long> ids(Connection c, String column, int minimum, long start, long end) throws SQLException {
         if (minimum == 0) return List.of();
         long count;
-        try (var q = c.prepareStatement("SELECT COUNT(*)" + FROM + " WHERE n." + column + " >= ? AND n." + column + " < ?")) {
+        try (var q = c.prepareStatement("SELECT COUNT(*)" + FROM + " WHERE COALESCE(n.tags,'') <> '__sweetcherry_audit_v1__' AND n." + column + " >= ? AND n." + column + " < ?")) {
             q.setLong(1, start); q.setLong(2, end);
             try (var r = q.executeQuery()) { r.next(); count = r.getLong(1); }
         }
         var ids = new ArrayList<Long>();
-        try (var q = c.prepareStatement("SELECT c.node_id" + FROM + " WHERE n." + column + " < ? ORDER BY n." + column + " DESC,c.node_id ASC LIMIT ?")) {
+        try (var q = c.prepareStatement("SELECT c.node_id" + FROM + " WHERE COALESCE(n.tags,'') <> '__sweetcherry_audit_v1__' AND n." + column + " < ? ORDER BY n." + column + " DESC,c.node_id ASC LIMIT ?")) {
             q.setLong(1, end); q.setLong(2, Math.max(count, minimum));
             try (var r = q.executeQuery()) { while (r.next()) ids.add(r.getLong(1)); }
         }

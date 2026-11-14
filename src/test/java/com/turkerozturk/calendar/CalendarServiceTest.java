@@ -105,4 +105,9 @@ class CalendarServiceTest {
         }
     }
     long value(String column,int id)throws Exception{try(var q=connection.createStatement();var r=q.executeQuery("SELECT "+column+" FROM node WHERE node_id="+id)){r.next();return r.getLong(1);}}
+    @Test void auditHelpersDoNotCreateCalendarEntries()throws Exception{
+        try(var q=connection.prepareStatement("UPDATE node SET tags=? WHERE node_id=1")){q.setString(1,com.turkerozturk.node.audit.AuditSql.TAG);q.executeUpdate();}
+        var view=service.view("day",LocalDate.of(2026,10,28),List.of(),"any",Locale.ENGLISH);assertThat(view.count()).isEqualTo(1);
+    }
+
 }

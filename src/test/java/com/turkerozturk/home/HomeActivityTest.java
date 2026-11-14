@@ -30,14 +30,14 @@ class HomeActivityTest {
         try (var c=source.getConnection(); var s=c.createStatement()) {
             s.execute("CREATE TABLE children(node_id INTEGER, father_id INTEGER, master_id INTEGER)");
             // Deliberately no txt/BLOB columns: home must not load note contents.
-            s.execute("CREATE TABLE node(node_id INTEGER,name TEXT,syntax TEXT,is_ro INTEGER,is_richtxt INTEGER,ts_creation INTEGER,ts_lastsave INTEGER)");
+            s.execute("CREATE TABLE node(node_id INTEGER,name TEXT,syntax TEXT,is_ro INTEGER,is_richtxt INTEGER,ts_creation INTEGER,ts_lastsave INTEGER,tags TEXT)");
         }
         return source;
     }
     private void node(DataSource source,long id,long parent,long created,long modified) throws Exception {
         try(var c=source.getConnection();var s=c.createStatement()) {
             s.execute("INSERT INTO children VALUES("+id+","+parent+",0)");
-            s.execute("INSERT INTO node VALUES("+id+",'Node "+id+"','plain-text',0,0,"+created+","+modified+")");
+            s.execute("INSERT INTO node(node_id,name,syntax,is_ro,is_richtxt,ts_creation,ts_lastsave) VALUES("+id+",'Node "+id+"','plain-text',0,0,"+created+","+modified+")");
         }
     }
     @Test void todayIsUncappedAndOlderNodesFillOnlyToTheMinimum() throws Exception {
@@ -101,4 +101,10 @@ class HomeActivityTest {
         assertThat(model.get("homeActivityUnavailable")).isEqualTo(true);
         assertThat(model.get("homeModified")).isEqualTo(List.of());
     }
+    @Test void auditHelpersCannotReplaceTheLatestNoteOrPolluteHomeActivity()throws Exception{
+        var db=database("audit");node(db,1,0,today,today);node(db,2,0,today,today+100);
+        try(var c=db.getConnection();var q=c.prepareStatement("UPDATE node SET tags=? WHERE node_id=2")){q.setString(1,com.turkerozturk.node.audit.AuditSql.TAG);q.executeUpdate();}
+        assertThat(service.latest(db)).hasValue(1);assertThat(service.read(db,clock).created()).extracting(HomeActivityService.Entry::id).containsExactly(1L);assertThat(service.read(db,clock).modified()).extracting(HomeActivityService.Entry::id).containsExactly(1L);
+    }
+
 }

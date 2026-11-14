@@ -45,7 +45,7 @@ public class NodeTagService {
         try(var query=connection.createStatement();var rows=query.executeQuery("SELECT tags FROM node WHERE tags IS NOT NULL AND tags<>''")) {
             while(rows.next())tags.addAll(NodeTags.split(rows.getString(1)));
         }
-        tags.remove(com.turkerozturk.node.TrashSql.TAG);
+        tags.remove(com.turkerozturk.node.TrashSql.TAG);tags.remove(com.turkerozturk.node.audit.AuditSql.TAG);
         return List.copyOf(tags);
     }
     public View inspect(Options options){return entityManager.unwrap(Session.class).doReturningWork(connection->inspect(connection,options));}
@@ -55,7 +55,7 @@ public class NodeTagService {
             while(rows.next()) {
                 var display=new Node();display.setIsReadOnly16bit(rows.getLong(4));display.setIsRichText(rows.getLong(5));display.setSyntax(Objects.requireNonNullElse(rows.getString(6),"plain-text"));
                 display.parseNodeIconAndReadOnlyFlag();display.parseNodeTitleColorAndBoldnessAndTextType();
-                var tags=NodeTags.split(rows.getString(3)).stream().filter(tag->!tag.equals(com.turkerozturk.node.TrashSql.TAG)).toList();if(!tags.isEmpty())taggedContents++;catalogue.addAll(tags);
+                var tags=NodeTags.split(rows.getString(3)).stream().filter(tag->!tag.equals(com.turkerozturk.node.TrashSql.TAG)&&!tag.equals(com.turkerozturk.node.audit.AuditSql.TAG)).toList();if(!tags.isEmpty())taggedContents++;catalogue.addAll(tags);
                 nodes.put(rows.getLong(1),new Meta(Objects.requireNonNullElse(rows.getString(2),""),display.getNodeIcon().getIconName(),display.isBoldnessBit(),String.format(Locale.ROOT,"#%06X",display.getTitleColor()),tags,rows.getLong(7),rows.getLong(8)));
             }
         }

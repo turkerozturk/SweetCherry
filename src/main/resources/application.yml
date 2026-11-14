@@ -196,6 +196,9 @@ myapp:
     day-max-entries: 300 # Day cards, 1..2000, also bounded by max-entries.
     day-preview-max-characters: 600 # Unicode code points including ellipsis, 1..20000.
     day-preview-max-lines: 8 # Source lines and visual line clamp, 1..100. Restart after changing.
+  audit:
+    enabled: false # CTBLOGS history for documented content/properties/tags/moves/bookmark writes.
+    max-event-characters: 16777216 # Fail the whole edit if its audit record cannot be stored (1,000,000..67,108,864).
   trash:
     enabled: false # Reversible Delete: move occurrences to TRASH BIN, preserving IDs and shared links.
   tree:

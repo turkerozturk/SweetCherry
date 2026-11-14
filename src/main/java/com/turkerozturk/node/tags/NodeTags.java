@@ -15,7 +15,7 @@ public final class NodeTags {
     }
     public static String normalize(String raw) {
         if(raw==null||raw.length()>MAX_INPUT_CHARACTERS||raw.indexOf('\0')>=0)throw new IllegalArgumentException("Invalid tags");
-        if(split(raw).stream().anyMatch(tag->tag.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)))throw new IllegalArgumentException("Reserved system tag");
+        if(split(raw).stream().anyMatch(tag->tag.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)||tag.equalsIgnoreCase(com.turkerozturk.node.audit.AuditSql.TAG)))throw new IllegalArgumentException("Reserved system tag");
         return String.join(" ",split(raw));
     }
 }

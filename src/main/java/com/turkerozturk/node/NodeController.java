@@ -481,6 +481,7 @@ public class NodeController {
 
 
             Node node = nodeService.findById(nodeId);
+            if(node!=null && com.turkerozturk.node.audit.AuditSql.TAG.equals(node.getTags())){model.addAttribute("auditHelper",true);model.addAttribute("canDeleteNode",false);}
             if(node!=null && TrashSql.TAG.equals(node.getTags())){model.addAttribute("trashHelper",true);model.addAttribute("canDeleteNode",false);}
             model.addAttribute("canEditNodeContent", node != null && node.getSyntax() != null
                     && !"custom-colors".equals(node.getSyntax())

@@ -23,6 +23,8 @@ public class ApplicationSettingsService {
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.audit.enabled","boolean","false",0),
+        new Setting("myapp.audit.max-event-characters","auditlimit","16777216",67108864),
         new Setting("myapp.trash.enabled","boolean","false",0),
         new Setting("myapp.appearance.theme","theme","light",0),
         new Setting("myapp.default-language","language","",0),
@@ -120,14 +122,14 @@ public class ApplicationSettingsService {
         if(!extra.isEmpty())result.append("\n# Settings added by SweetCherry\n").append(extra);
         nodes(result.toString());return result.toString();
     }
-    public static boolean numeric(Setting setting){return Set.of("number","nonnegative","width","treefont").contains(setting.type());}
-    public static long minimum(Setting setting){return setting.type().equals("nonnegative")?0:setting.type().equals("width")?20:setting.type().equals("treefont")?10:1;}
+    public static boolean numeric(Setting setting){return Set.of("number","nonnegative","width","treefont","auditlimit").contains(setting.type());}
+    public static long minimum(Setting setting){return setting.type().equals("nonnegative")?0:setting.type().equals("width")?20:setting.type().equals("treefont")?10:setting.type().equals("auditlimit")?1000000:1;}
     public static List<String> choices(Setting setting){return switch(setting.type()){case "theme" -> List.of("light","dark");case "language" -> List.of("","en","tr");case "weekday" -> List.of("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY");default -> List.of();};}
     private static void validate(Setting setting,String value){
         if(value==null||value.length()>160||value.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("invalid");
         switch(setting.type()) {
             case "boolean" -> {if(!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("invalid");}
-            case "number","nonnegative","width","treefont" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
+            case "number","nonnegative","width","treefont","auditlimit" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
             case "theme","language" -> {if(!choices(setting).contains(value))throw new IllegalArgumentException("invalid");}
             case "weekday" -> {if(!value.matches("[1-7]"))java.time.DayOfWeek.valueOf(value.toUpperCase(Locale.ROOT));}
             case "systemzone" -> {if(!value.equalsIgnoreCase("system"))zone(value);}

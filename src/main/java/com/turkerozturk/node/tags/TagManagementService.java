@@ -25,7 +25,7 @@ public class TagManagementService {
             if(action==Action.REMOVE)to=null;
             else if(!valid(to)||to.codePoints().anyMatch(Character::isISOControl)||from.equals(to))throw new TagManagementProblem("invalid");
         }
-        private static boolean valid(String tag){return tag!=null&&!tag.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)&&!tag.isEmpty()&&tag.indexOf(' ')<0&&tag.indexOf('\0')<0&&tag.length()<=NodeTags.MAX_INPUT_CHARACTERS;}
+        private static boolean valid(String tag){return tag!=null&&!tag.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)&&!tag.equalsIgnoreCase(com.turkerozturk.node.audit.AuditSql.TAG)&&!tag.isEmpty()&&tag.indexOf(' ')<0&&tag.indexOf('\0')<0&&tag.length()<=NodeTags.MAX_INPUT_CHARACTERS;}
     }
     public record Row(long id,String name,String before,String after) {}
     public record Preview(Operation operation,int count,String revision,List<Row> rows) {}

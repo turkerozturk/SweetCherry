@@ -74,9 +74,11 @@ public final class TrashSql {
     }
     private static boolean uuid(String value){try{return value!=null&&UUID.fromString(value).toString().equals(value);}catch(IllegalArgumentException e){return false;}}
     static Preview preview(Connection c,long id)throws SQLException{
+        com.turkerozturk.node.audit.AuditSql.guardMove(c,List.of(id),0);
         var s=read(c,false);normal(s,id);var subtree=subtree(s,id);return new Preview(revision(s),name(s,id),id,subtree.size()-1,external(s,subtree));
     }
     static long trash(Connection c,long id,String expected,String actor)throws SQLException{
+        com.turkerozturk.node.audit.AuditSql.guardMove(c,List.of(id),0);
         var s=read(c,true);normal(s,id);requireRevision(s,expected);
         if(s.entries.size()>=MAX_ENTRIES)throw problem(HttpStatus.CONFLICT,"trash.limit");
         var selected=s.tree.get(id);var siblings=siblings(s,selected.parent);int at=siblings.indexOf(selected);
@@ -129,16 +131,19 @@ public final class TrashSql {
         return new PurgePreview(entry(s,h,base),purgeRevision(c,s,h,base,false));
     }
     static void purge(Connection c,long entryId,String expected)throws SQLException{
+        com.turkerozturk.node.audit.AuditSql.guardMove(c,List.of(entryId),0);
         var s=read(c,true);var h=helper(s,entryId);if(!purgeRevision(c,s,h,revision(s),true).equals(expected))throw changed();
         // The existing permanent-delete engine preserves shared content with surviving locations.
         NodeDeletionSql.delete(c,h.id);NodeTimestamps.touchContent(c,s.root.id,NodeTimestamps.now());
     }
     /** Ordinary moves/deletes cannot bypass restore/purge or move active nodes into helper containers. */
     public static void guardMove(Connection c,Collection<Long> ids,long destination)throws SQLException{
+        com.turkerozturk.node.audit.AuditSql.guardMove(c,ids,destination);
         if(!exists(c))return;var s=read(c,false);for(long id:ids)normal(s,id);if(destination!=0)normal(s,destination);
     }
-    public static void guardDelete(Connection c,long id)throws SQLException{if(exists(c))normal(read(c,false),id);}
+    public static void guardDelete(Connection c,long id)throws SQLException{com.turkerozturk.node.audit.AuditSql.guardMove(c,List.of(id),0);if(exists(c))normal(read(c,false),id);}
     public static void guardHelper(Connection c,long id)throws SQLException{
+        com.turkerozturk.node.audit.AuditSql.guardHelper(c,id);
         try(var q=c.prepareStatement("SELECT tags FROM node WHERE node_id=? AND tags=?")){q.setLong(1,id);q.setString(2,TAG);try(var rs=q.executeQuery()){if(rs.next()&&TAG.equals(rs.getString(1)))throw problem(HttpStatus.CONFLICT,"trash.usePage");}}
     }
     private static boolean exists(Connection c)throws SQLException{try(var q=c.prepareStatement("SELECT tags FROM node WHERE tags=?")){q.setString(1,TAG);try(var rs=q.executeQuery()){while(rs.next())if(TAG.equals(rs.getString(1)))return true;return false;}}}

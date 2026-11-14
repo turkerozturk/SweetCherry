@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <div th:fragment="controls(view)" class="workspace-toolbar">
+<a th:if="${auditEnabled == true or auditHelper == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/audit(nodeId=${auditHelper == true ? 0 : requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{audit.title}"></a>
 <a th:if="${trashHelper == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}" th:text="#{trash.title}"></a>
 <button class="btn btn-sm btn-outline-secondary" type="button" th:attr="data-bs-toggle=${view == 'reader' ? 'collapse' : 'offcanvas'}" data-bs-target="#offcanvasScrolling" th:title="#{node.meta.header}"><i class="fas fa-info-circle"></i> <span th:text="#{tree.info}"></span></button>
 <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
@@ -13,7 +14,7 @@
 <th:block th:replace="~{node/nodeDuplicateFragment :: duplicateItems(${view},false)}"></th:block>
 </div></div>
 <th:block th:replace="~{node/nodeMoveFragment :: moveControls(${view})}"></th:block>
-<div class="dropdown" data-node-export-menu th:if="${trashHelper != true}">
+<div class="dropdown" data-node-export-menu th:if="${trashHelper != true and auditHelper != true}">
 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" th:title="#{tree.exportTitle}"><i class="fas fa-file-export" aria-hidden="true"></i> <span th:text="#{toolbar.export}">Export</span></button>
 <div class="dropdown-menu p-1">
 <h6 class="dropdown-header">PDF</h6>

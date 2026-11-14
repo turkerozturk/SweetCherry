@@ -78,7 +78,7 @@ public class BatchNodeService {
   long now=NodeTimestamps.now();for(var n:moving)NodeTimestamps.touchOccurrence(c,n.id(),now);return new Result(moving.size());
  }
  private static Result tag(Connection c,Snapshot s,String tag)throws SQLException{
-  if(tag==null||tag.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)||tag.isBlank()||tag.length()>200||tag.chars().anyMatch(ch->Character.isWhitespace(ch)||Character.isISOControl(ch)||Character.isSpaceChar(ch)))throw error(HttpStatus.BAD_REQUEST,"invalid");
+  if(tag==null||tag.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)||tag.equalsIgnoreCase(com.turkerozturk.node.audit.AuditSql.TAG)||tag.isBlank()||tag.length()>200||tag.chars().anyMatch(ch->Character.isWhitespace(ch)||Character.isISOControl(ch)||Character.isSpaceChar(ch)))throw error(HttpStatus.BAD_REQUEST,"invalid");
   var updates=new LinkedHashMap<Long,String>();
   // Validate every resulting value before making the first write.
   for(var n:s.content.values()){com.turkerozturk.node.TrashSql.guardHelper(c,n.id);var tags=new LinkedHashSet<>(NodeTags.split(n.tags));if(tags.add(tag)){String value=String.join(" ",tags);try{NodeTags.normalize(value);}catch(IllegalArgumentException e){throw error(HttpStatus.BAD_REQUEST,"invalid");}updates.put(n.id,value);}}
