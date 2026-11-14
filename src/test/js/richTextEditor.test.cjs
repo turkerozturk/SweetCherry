@@ -45,7 +45,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
         crypto:options.crypto||{randomUUID:()=> uuid++===0?'test-uuid':'test-uuid-'+uuid},
         navigator:{clipboard:options.clipboardReader},
-        FileReader:class {readAsDataURL(file){this.result=file.data;this.onload();}},
+        FileReader:options.FileReader||class {readAsDataURL(file){this.result=file.data;this.onload();}},
         XMLSerializer:class {serializeToString(xml) {saved = JSON.parse(JSON.stringify(xml.documentElement.childNodes)); return '<node/>';}}});
     function fire(id, type, event = {}) {return handlers.get(id + ':' + type)(event);}
     function select(start, end) {ids.richText.selectionStart = start; ids.richText.selectionEnd = end; fire('richText','select');}
@@ -61,7 +61,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         ids.richText.selectionStart = ids.richText.selectionEnd = value.length;
         fire('richText','input');
     }
-    return {ids, align, fire, select, runs, key, type, symbol, recovery:()=>recovery,dirty:()=>dirty(), internal:()=>windowObject.RichTextInternalLinkBridge, bridge:()=>windowObject.RichTextImportBridge};
+    return {ids, align, fire, select, runs, key, type, symbol, recovery:()=>recovery,dirty:()=>dirty(), internal:()=>windowObject.RichTextInternalLinkBridge, bridge:()=>windowObject.RichTextImportBridge,busy:()=>recovery?.busy()};
 }
 
 function text(runs) {return runs.map(run => run.text).join('');}
@@ -450,4 +450,58 @@ test('pasted trailing links do not capture subsequent typing',()=>{
  e.type('Start Last link then normal');
  assert.equal(e.runs().find(run=>run.text==='Last link').attributes.link,'webs https://example.org');
  assert.equal(e.runs().at(-1).attributes.link,undefined);
+});
+
+const pickedImage=(name,data='AQID')=>({name,type:'image/png',size:3,data:'data:image/png;base64,'+data});
+test('multiple picked images retain picker order at a Unicode selection with one undo and redo',async()=>{
+ for(const visual of [false,true]){
+  const e=editor(undefined,undefined,undefined,undefined,visual);e.select(1,3);e.fire('richAddImage','click');
+  e.ids.richImageFile.files=[pickedImage('second.png','Ag=='),pickedImage('first.png','AQ==')];await e.fire('richImageFile','change');
+  assert.equal(text(e.runs()),'A\uFFFC\n\uFFFC\nB\nC');
+  const runs=e.runs(),keys=runs.filter(r=>r.attributes.__sweet_object).map(r=>r.attributes.__sweet_object),images=JSON.parse(e.ids.richImages.value);
+  assert.equal(keys.length,2);assert.equal(images[keys[0]],'data:image/png;base64,Ag==');assert.equal(images[keys[1]],'data:image/png;base64,AQ==');
+  assert.equal(e.ids.richText.selectionStart,5);assert.equal(e.ids.richImageFile.value,'');
+  e.key('z');assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});
+  e.key('y');assert.equal(text(e.runs()),'A\uFFFC\n\uFFFC\nB\nC');assert.equal(Object.keys(JSON.parse(e.ids.richImages.value)).length,2);
+ }
+});
+test('a bad or oversized file in a group adds no images and preserves undo and selection',async()=>{
+ for(const bad of [pickedImage('large.png'),{name:'bad.txt',type:'text/plain',size:1,slice(){return {arrayBuffer:async()=>new Uint8Array([65]).buffer};}}]){
+  const e=editor(undefined,bad.type==='image/png'?2:9000000);e.select(1,3);
+  e.ids.richImageFile.files=[{...pickedImage('good.png'),size:1},bad];await e.fire('richImageFile','change');
+  assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(e.ids.richUndo.disabled,true);assert.equal(e.ids.richAddImage.disabled,false);
+ }
+});
+test('a later read failure cannot leave the first image or orphan payload behind',async()=>{
+ const e=editor(undefined,undefined,undefined,undefined,false,{FileReader:class{readAsDataURL(file){if(file.name==='bad.png')this.onerror();else{this.result=file.data;this.onload();}}}});
+ e.ids.richImageFile.files=[pickedImage('good.png'),pickedImage('bad.png')];await e.fire('richImageFile','change');
+ assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(e.ids.richUndo.disabled,true);assert.equal(e.dirty(),false);
+});
+test('new object count includes staged attachments and rejects an entire over-limit group',async()=>{
+ const e=editor();e.select(0,0);e.ids.richFilePicker.files=[{name:'keep.bin',type:'application/octet-stream',size:1,data:'data:application/octet-stream;base64,AQ=='}];await e.fire('richFilePicker','change');
+ await new Promise(resolve=>setImmediate(resolve));const before=text(e.runs());
+ e.ids.richImageFile.files=Array.from({length:10},(_,i)=>pickedImage(i+'.png'));await e.fire('richImageFile','change');
+ assert.equal(text(e.runs()),before);assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(Object.keys(JSON.parse(e.ids.richFiles.value)).length,1);
+ e.ids.richImageFile.files=Array.from({length:9},(_,i)=>pickedImage(i+'.png'));await e.fire('richImageFile','change');e.runs();assert.equal(Object.keys(JSON.parse(e.ids.richImages.value)).length,9);
+});
+test('total encoded budget rejects the whole group before reading',async()=>{
+ let reads=0;const e=editor(undefined,20000000,undefined,undefined,false,{FileReader:class{readAsDataURL(){reads++;}}});
+ e.ids.richImageFile.files=[{...pickedImage('a.png'),size:12000000},{...pickedImage('b.png'),size:12000000}];await e.fire('richImageFile','change');
+ assert.equal(reads,0);assert.equal(e.dirty(),false);e.runs();assert.deepEqual(JSON.parse(e.ids.richImages.value),{});
+});
+test('loading is busy, blocks save and discards a group if text changes during reading',async()=>{
+ let finish;const e=editor(undefined,undefined,undefined,undefined,false,{recovery:true,FileReader:class{readAsDataURL(file){finish=()=>{this.result=file.data;this.onload();};}}});
+ e.select(1,1);e.ids.richImageFile.files=[pickedImage('a.png'),pickedImage('b.png')];const pending=e.fire('richImageFile','change');await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(e.ids.richAddImage.disabled,true);assert.equal(e.busy(),true);let prevented=false;e.fire('richEditForm','submit',{preventDefault(){prevented=true;}});assert.equal(prevented,true);
+ e.type('Changed');finish();await pending;assert.equal(text(e.runs()),'Changed');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(e.busy(),false);assert.equal(e.ids.richAddImage.disabled,false);
+});
+test('protected selections cannot be replaced by a partial or complete image group',async()=>{
+ const e=editor(objectRuns());e.select(0,3);e.ids.richImageFile.files=[pickedImage('a.png'),pickedImage('b.png')];await e.fire('richImageFile','change');
+ assert.equal(text(e.runs()),'A\uFFFCB');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(e.ids.richUndo.disabled,true);
+});
+test('content changed while the picker was open cannot receive images at an obsolete position',async()=>{
+ const e=editor();e.select(1,1);e.fire('richAddImage','click');e.type('Different');e.ids.richImageFile.files=[pickedImage('a.png'),pickedImage('b.png')];await e.fire('richImageFile','change');assert.equal(text(e.runs()),'Different');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});
+});
+test('cancel or empty selection leaves content and history unchanged',async()=>{
+ const e=editor();e.select(1,1);e.fire('richAddImage','click');e.fire('richImageFile','cancel');e.ids.richImageFile.files=[];await e.fire('richImageFile','change');assert.equal(e.dirty(),false);assert.equal(e.ids.richUndo.disabled,true);
 });

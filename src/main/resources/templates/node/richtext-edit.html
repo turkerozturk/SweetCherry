@@ -43,7 +43,7 @@
 <select data-choice="scale" th:aria-label="#{richtext.edit.size}"><option value="" th:text="#{richtext.edit.normal}"></option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="h4">H4</option><option value="h5">H5</option><option value="h6">H6</option><option value="small">Small</option><option value="sub">Sub</option><option value="sup">Sup</option></select>
 <select data-choice="justification" th:aria-label="#{richtext.edit.align}"><option value="left" th:text="#{richtext.edit.left}"></option><option value="center" th:text="#{richtext.edit.center}"></option><option value="right" th:text="#{richtext.edit.right}"></option><option value="fill" th:text="#{richtext.edit.justify}"></option></select>
 <div class="tool-group" role="group" th:aria-label="#{editor.objectTools}">
-<button type="button" id="richAddImage" th:text="#{richtext.edit.addImage}"></button>
+<button type="button" id="richAddImage" th:text="#{richtext.edit.addImage}" th:title="#{richtext.edit.imagesHelp}" aria-describedby="richImageHelp"></button>
 <button type="button" id="richPasteImage" th:title="#{richtext.clipboardPaste}" th:aria-label="#{richtext.clipboardPaste}">📋</button>
 <button type="button" id="richWebImport" th:title="#{richtext.webImport}" th:aria-label="#{richtext.webImport}">🌐</button>
 <button type="button" id="richAddFile" th:text="#{richtext.edit.addFile}"></button>
@@ -65,10 +65,11 @@
 <button type="button" id="richAutoLink" th:text="#{editor.linkSelection}" th:title="#{editor.linkSelectionHelp}"></button>
 <button type="button" id="clearFormat" th:text="#{richtext.edit.clear}"></button>
 <label><input type="checkbox" id="richAllowDeletion" name="allowObjectDeletion" value="true"><span id="richDeletionIcon">🔒</span><span th:text="#{richtext.edit.allowDeletion}"></span></label>
-<input type="file" id="richImageFile" accept="image/png,image/jpeg" hidden>
+<input type="file" id="richImageFile" accept="image/png,image/jpeg" multiple hidden>
 <input type="file" id="richFilePicker" hidden>
+<span id="richImageHelp" class="note" th:text="#{richtext.edit.imagesHelp}"></span>
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
-<span id="richImageStatus" role="status" th:attr="data-error=#{richtext.edit.imageError},data-error-size=#{richtext.file.size},data-error-type=#{richtext.file.type},data-error-read=#{richtext.file.read},data-error-name=#{richtext.file.name},data-error-changed=#{richtext.file.changed},data-error-objects=#{richtext.file.objects},data-error-unsupported=#{richtext.file.unsupported}"></span>
+<span id="richImageStatus" role="status" th:attr="data-loading=#{richtext.file.loading},data-error=#{richtext.edit.imageError},data-error-size=#{richtext.file.size},data-error-type=#{richtext.file.type},data-error-read=#{richtext.file.read},data-error-name=#{richtext.file.name},data-error-changed=#{richtext.file.changed},data-error-objects=#{richtext.file.objects},data-error-unsupported=#{richtext.file.unsupported}"></span>
 </div>
 <p id="richClipboardHint" class="note" role="alert" hidden th:attr="data-empty=#{richtext.clipboardUnavailable},data-http=#{richtext.clipboardHttp},data-plain=#{richtext.clipboardPlain},data-changed=#{richtext.file.changed}"></p>
 <p id="richAutoLinkError" role="alert" hidden th:text="#{editor.linkSelectionError}"></p>

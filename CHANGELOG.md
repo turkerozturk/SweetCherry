@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Allow multiple PNG/JPEG files to be selected together in the rich-text editor, inserted vertically at the caret as one undoable edit while retaining upload limits and protected-object checks.
+
+
 - Add an optional, reversible TRASH BIN that preserves occurrence IDs, content, attachments, bookmarks and shared links without changing the CTB schema.
 - Add reviewed restore and separately confirmed permanent deletion, with source/revision checks, streamed content fingerprints for permanent deletion and transactional rollback.
 

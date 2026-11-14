@@ -601,51 +601,71 @@
     function fileError(status,code) {
         if(status)status.textContent=status.dataset['error'+code.charAt(0).toUpperCase()+code.slice(1)]||status.dataset.error;
     }
-    async function addObject(file, attachment) {
+    const addObject = (file, attachment) => addObjects(file ? [file] : [], attachment, false);
+    /** Stage the whole selection before touching the document or its undo history. */
+    async function addObjects(files, attachment, stacked, ticket) {
         const status = document.getElementById('richImageStatus');
-        if (readingImage) return;
-        if (!file) return;
-        if (file.size > uploadLimit) { fileError(status,'size');return; }
-        if (attachment && (!file.name || file.name.length > 255)) { fileError(status,'name');return; }
-        const at = [...selection], source = JSON.stringify(runs);
-        readingImage = true;
+        if (readingImage || !files.length) return;
+        const at = ticket ? [...ticket.selection] : [...selection], source = ticket ? ticket.source : JSON.stringify(runs);
+        const buttons = ['richAddImage','richAddFile'].map(id=>document.getElementById(id)).filter(Boolean);
+        const previousDisabled = buttons.map(button=>button.disabled);
+        readingImage = true; buttons.forEach(button=>button.disabled=true);
+        if(status){status.textContent=status.dataset.loading || '';status.setAttribute('aria-busy','true');}
         try {
-            const mime=attachment?null:await window.RichTextEditorSupport.imageMime(file);
-            let data = await new Promise((resolve,reject)=>{
-                const reader = new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reader.onabort=()=>reject(new Error('read')); reader.readAsDataURL(file);
-            });
-            if(!attachment)data='data:'+mime+';base64,'+data.slice(data.indexOf(',')+1);
-            // An asynchronous read must not replace text entered while the file was loading.
             if (source !== JSON.stringify(runs)) throw new Error('changed');
             const activeKeys = runs.map(run=>run.attributes.__sweet_object);
             const activeImages = Object.entries(pendingImages).filter(([key])=>activeKeys.includes(key));
             const activeFiles = Object.entries(pendingFiles).filter(([key])=>activeKeys.includes(key));
-            if (runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length >= 10 || activeImages.reduce((n,[,value])=>n+value.length,0)
-                + activeFiles.reduce((n,[,value])=>n+value.data.length,0)+data.length > 29000000) throw new Error('objects');
-            const key = (attachment ? 'new-file:' : 'new-image:') + window.RichTextEditorSupport.objectId(crypto);
-            if (!replace(at[0],at[1],'\uFFFC')) return;
-            let offset = 0;
-            for (const run of runs) {
-                if (offset === at[0] && run.text === '\uFFFC' && !run.attributes.__sweet_object) {
-                    run.attributes = {__sweet_object:key}; break;
-                }
-                offset += count(run.text);
+            if (runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length + files.length > 10) throw new Error('objects');
+            for(const file of files){
+                if(file.size > uploadLimit) throw new Error('size');
+                if(attachment && (!file.name || file.name.length > 255)) throw new Error('name');
             }
-            if (attachment) pendingFiles[key] = {name:file.name,data:data.slice(data.indexOf(',')+1)};
-            else pendingImages[key] = data;
-            window.richEditorObjects = window.richEditorObjects || {};
-            window.richEditorObjects[key] = attachment ? {label:'📎 ' + file.name} : {label:file.name || 'Image',imageUrl:data};
-            previous = runs.map(run=>run.text).join(''); input.value=previous;
-            selection=[at[0]+1,at[0]+1]; render(); focusEditor(); restoreSelection(); commitHistory();
-            if (status) status.textContent='';
-        } catch (error) { fileError(status,['type','size','read','name','changed','objects','unsupported'].includes(error.message)?error.message:'read'); }
-        finally { readingImage=false; }
+            let total = activeImages.reduce((n,[,value])=>n+value.length,0) + activeFiles.reduce((n,[,value])=>n+value.data.length,0);
+            // Reject a clearly oversized group before reading its data URLs into memory.
+            if(total + files.reduce((n,file)=>n+Math.ceil(file.size/3)*4,0) > 29000000) throw new Error('objects');
+            const prepared=[];
+            for(const file of files){
+                const mime=attachment?null:await window.RichTextEditorSupport.imageMime(file);
+                let data=await new Promise((resolve,reject)=>{
+                    const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reader.onabort=()=>reject(new Error('read'));reader.readAsDataURL(file);
+                });
+                if(!attachment)data='data:'+mime+';base64,'+data.slice(data.indexOf(',')+1);
+                if(source !== JSON.stringify(runs)) throw new Error('changed');
+                total+=data.length;if(total>29000000)throw new Error('objects');
+                prepared.push({file,data,key:(attachment?'new-file:':'new-image:')+window.RichTextEditorSupport.objectId(crypto)});
+            }
+            const incoming=[];
+            for(const item of prepared){
+                incoming.push({text:'\uFFFC',attributes:{__sweet_object:item.key}});
+                if(stacked)incoming.push({text:'\n',attributes:{}});
+            }
+            const text=incoming.map(run=>run.text).join('');
+            if(!replace(at[0],at[1],text))return;
+            let offset=0;
+            for(let index=0;index<runs.length;index++){
+                if(offset===at[0] && runs[index].text===text && !runs[index].attributes.__sweet_object){runs.splice(index,1,...incoming);break;}
+                offset+=count(runs[index].text);
+            }
+            window.richEditorObjects=window.richEditorObjects || {};
+            for(const {file,data,key} of prepared){
+                if(attachment)pendingFiles[key]={name:file.name,data:data.slice(data.indexOf(',')+1)};
+                else pendingImages[key]=data;
+                window.richEditorObjects[key]=attachment?{label:'📎 '+file.name}:{label:file.name || 'Image',imageUrl:data};
+            }
+            previous=runs.map(run=>run.text).join('');input.value=previous;
+            selection=[at[0]+count(text),at[0]+count(text)];render();focusEditor();restoreSelection();commitHistory();
+            if(status)status.textContent='';
+        } catch(error) { fileError(status,['type','size','read','name','changed','objects','unsupported'].includes(error.message)?error.message:'read'); }
+        finally {readingImage=false;buttons.forEach((button,index)=>button.disabled=previousDisabled[index]);if(status)status.setAttribute('aria-busy','false');}
     }
     const imageButton=document.getElementById('richAddImage'),imageFile=document.getElementById('richImageFile');
+    let imageTicket;
     if (imageButton && imageFile) {
         imageButton.addEventListener('pointerdown',event=>event.preventDefault());
-        imageButton.addEventListener('click',()=>{captureSelection();imageFile.click();});
-        imageFile.addEventListener('change',()=>{if(imageFile.files[0])addImage(imageFile.files[0]);imageFile.value='';});
+        imageButton.addEventListener('click',()=>{if(readingImage)return;captureSelection();imageTicket={selection:[...selection],source:JSON.stringify(runs)};imageFile.click();});
+        imageFile.addEventListener('change',()=>{const files=Array.from(imageFile.files || []),ticket=imageTicket;imageTicket=null;imageFile.value='';return addObjects(files,false,files.length>1,ticket);});
+        imageFile.addEventListener('cancel',()=>{imageTicket=null;imageFile.value='';});
     }
     const fileButton=document.getElementById('richAddFile'),filePicker=document.getElementById('richFilePicker');
     if (fileButton && filePicker) {
