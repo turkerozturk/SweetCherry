@@ -19,6 +19,7 @@
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/calendar/week(_tenantView=${tenantViewToken})}"><i class="fas fa-calendar-week"></i> <span th:text="#{calendar.week}">Weekly calendar</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/nodes/calendar/month(_tenantView=${tenantViewToken})}"><i class="fas fa-calendar-alt"></i> <span th:text="#{calendar.month}">Monthly calendar</span></a></li>
     <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/image-gallery(_tenantView=${tenantViewToken})}"><i class="fas fa-images"></i> <span th:text="#{gallery.title}"></span></a></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" th:href="@{/table-gallery(_tenantView=${tenantViewToken})}"><i class="fas fa-table"></i> <span th:text="#{tables.title}"></span></a></li>
     <li th:if="${currentTenantName}" sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/nodes/audit(_tenantView=${tenantViewToken})}"><i class="fas fa-history"></i> <span th:text="#{audit.title}"></span></a></li>
     <li th:if="${currentTenantName}" sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}"><i class="fas fa-trash-alt"></i> <span th:text="#{trash.title}"></span></a></li>
     <li><hr class="dropdown-divider"></li>

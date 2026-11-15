@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{tables.title}"></title><section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/tableGallery.css}"></section></head>
+<body><main layout:fragment="content" class="container-fluid py-3" id="table-gallery"
+ th:attr="data-error=#{tables.error},data-stale=#{gallery.stale},data-loading=#{gallery.loading},data-position=#{gallery.position},data-summary=#{tables.summary},data-limited=#{tables.limited},data-empty=#{tables.emptyTable},data-cell-width=${tableSettings.cellWidth}"
+ th:style="|--tg-width:${tableSettings.cellWidth}px;--tg-padding:${tableSettings.cellPadding}px;--tg-font:${tableSettings.fontSize}px;--tg-cell-height:${tableSettings.cellMaxHeight}px;--tg-preview-height:${tableSettings.previewHeight}px|">
+ <div class="d-flex flex-wrap align-items-center gap-3 mb-2"><h1 class="h3 mb-0" th:text="#{tables.title}"></h1><span th:text="#{tables.count(${gallery.total})}"></span>
+ <label class="ms-auto"><input id="table-details" type="checkbox" checked> <span th:text="#{tables.details}"></span></label></div>
+ <p class="small text-body-secondary" th:text="#{tables.help}"></p>
+ <form method="get" th:action="@{/table-gallery}" class="d-flex flex-wrap align-items-end gap-2 mb-3">
+ <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+ <div class="flex-grow-1"><label for="table-search" class="form-label" th:text="#{tables.search}"></label><input id="table-search" class="form-control" type="search" name="q" maxlength="200" th:value="${gallery.options.search}"></div>
+ <div><label for="table-sort" class="form-label" th:text="#{gallery.sort}"></label><select id="table-sort" class="form-select" name="sort"><option th:each="order:${ {'newest','oldest','node','id'} }" th:value="${order}" th:selected="${order==gallery.options.sort}" th:text="${#messages.msg('tables.sort.'+order)}"></option></select></div>
+ <button class="btn btn-primary" th:text="#{gallery.apply}"></button></form>
+ <p th:if="${gallery.items.empty}" class="alert alert-info" th:text="#{tables.empty}"></p>
+ <div class="table-gallery-grid">
+ <article th:each="item:${gallery.items}" class="table-card border rounded p-2">
+ <div class="table-scroll table-preview" tabindex="0" th:aria-label="#{tables.preview}" th:attr="data-preview=@{/table-gallery/{node}/{offset}/data(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}"><p class="p-2 small" th:text="#{gallery.loading}"></p></div>
+ <p class="table-summary small text-body-secondary my-1" aria-live="polite"></p>
+ <div class="d-flex flex-wrap gap-2 align-items-start my-2"><button class="btn btn-sm btn-primary" type="button" data-table-open th:attr="data-full=@{/table-gallery/{node}/{offset}/data(node=${item.nodeId},offset=${item.offset},full=true,_tenantView=${tenantViewToken})}" th:text="#{tables.open}"></button>
+ <a th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}" class="fw-semibold"></a></div>
+ <div class="tg-info small">
+ <dl><dt th:text="#{tables.id}"></dt><dd th:text="${item.id}"></dd><dt th:text="#{gallery.created}"></dt><dd th:text="${item.createdText}"></dd><dt th:text="#{tables.storedWidths}"></dt><dd th:text="|${item.colMin} / ${item.colMax}|"></dd></dl>
+ <a class="table-source" th:href="@{/table-gallery/{node}/{offset}/source(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{tables.download}"></a></div>
+ </article></div>
+ <nav class="d-flex justify-content-center align-items-center gap-3 my-3" th:aria-label="#{gallery.pages}">
+ <a th:if="${gallery.options.page>1}" class="btn btn-outline-secondary" th:href="@{/table-gallery(page=${gallery.options.page - 1},q=${gallery.options.search},sort=${gallery.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.previousPage}"></a>
+ <span th:text="#{gallery.page(${gallery.options.page},${gallery.pages})}"></span>
+ <a th:if="${gallery.options.page<gallery.pages}" class="btn btn-outline-secondary" th:href="@{/table-gallery(page=${gallery.options.page + 1},q=${gallery.options.search},sort=${gallery.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.nextPage}"></a></nav>
+ <dialog id="table-viewer" th:aria-label="#{tables.viewer}">
+ <div class="d-flex align-items-center flex-wrap gap-2 mb-2"><button type="button" class="btn btn-outline-secondary" data-table-prev th:text="#{tables.previous}"></button><span data-table-position></span><button type="button" class="btn btn-outline-secondary" data-table-next th:text="#{tables.next}"></button><button type="button" class="btn btn-outline-secondary" data-table-details aria-pressed="true" th:text="#{tables.details}"></button><button class="btn btn-outline-secondary ms-auto" type="button" data-table-close th:text="#{gallery.close}"></button></div>
+ <div data-table-node class="mb-2"></div><p data-table-status role="status" class="small"></p><div class="table-scroll table-full" tabindex="0" th:aria-label="#{tables.viewer}" data-table-full></div>
+ <div class="tg-info small mt-2" data-table-info></div><p class="small text-body-secondary mt-2 mb-0" th:text="#{tables.keys}"></p>
+ </dialog>
+</main><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/tableGallery.js}"></script></section></body></html>

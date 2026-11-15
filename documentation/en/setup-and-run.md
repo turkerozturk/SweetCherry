@@ -217,3 +217,8 @@ Initial coverage includes maintained rich/plain/code/Markdown/HTML content saves
 ## Image gallery
 
 After selecting a database, open **View Mode → Image gallery** to browse stored pictures independently of the node tree. The read-only view includes thumbnails, a larger viewer, search/sorting and optional node/file information. See [image gallery](image-gallery.md) for supported formats and limits.
+
+
+## Table gallery
+
+Use **View Mode → Table gallery** to browse stored grid tables with fixed-width cells, permanent 1 px borders and a larger scrollable viewer. Display settings are available under `myapp.table-gallery` and **System → Settings**. See [table gallery](table-gallery.md).

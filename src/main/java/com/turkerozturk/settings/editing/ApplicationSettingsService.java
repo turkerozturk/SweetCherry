@@ -23,6 +23,15 @@ public class ApplicationSettingsService {
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.table-gallery.cell-width","width","160",480),
+        new Setting("myapp.table-gallery.cell-padding","nonnegative","6",20),
+        new Setting("myapp.table-gallery.font-size","treefont","14",32),
+        new Setting("myapp.table-gallery.cell-max-height","width","160",800),
+        new Setting("myapp.table-gallery.preview-height","width","260",800),
+        new Setting("myapp.table-gallery.preview-rows","number","5",20),
+        new Setting("myapp.table-gallery.preview-columns","number","5",12),
+        new Setting("myapp.table-gallery.viewer-rows","number","200",1000),
+        new Setting("myapp.table-gallery.page-size","number","12",36),
         new Setting("myapp.audit.enabled","boolean","false",0),
         new Setting("myapp.audit.max-event-characters","auditlimit","16777216",67108864),
         new Setting("myapp.trash.enabled","boolean","false",0),

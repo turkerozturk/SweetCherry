@@ -161,6 +161,17 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  # Read-only table gallery: fixed pixel sizes, never stretch columns to fill the screen.
+  table-gallery:
+    cell-width: 160
+    cell-padding: 6
+    font-size: 14
+    cell-max-height: 160
+    preview-height: 260
+    preview-rows: 5
+    preview-columns: 5
+    viewer-rows: 200
+    page-size: 12
   appearance:
     theme: light # light (existing appearance) or dark; restart after changing.
   custom-lists:

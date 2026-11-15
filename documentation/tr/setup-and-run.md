@@ -429,3 +429,8 @@ Mevcut `myapp` bölümünde `myapp.audit.enabled: true` ayarını açıp yeniden
 ## Resim galerisi
 
 Veritabanını seçtikten sonra **Görünüm Modu → Resim galerisi** ile resimleri düğüm ağacından bağımsız gezebilirsiniz. Salt okunur görünümde küçük önizlemeler, büyük görüntüleyici, arama/sıralama ve açılıp kapatılabilen düğüm/dosya bilgileri bulunur. Desteklenen biçimler ve sınırlar için [İngilizce galeri belgesine](../en/image-gallery.md) bakın.
+
+
+## Tablo galerisi
+
+**Görünüm Modu → Tablo galerisi** ile grid tablolarını sabit genişlikli hücreler, sürekli 1 px kenarlık ve büyük kaydırılabilir görüntüleyiciyle gezebilirsiniz. Görsel ayarlar `myapp.table-gallery` altında ve **Sistem → Ayarlar** sayfasındadır. [İngilizce tablo galerisi belgesi](../en/table-gallery.md).
