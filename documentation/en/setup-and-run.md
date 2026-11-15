@@ -213,3 +213,7 @@ The editor stages the whole selection locally before insertion. If a file cannot
 Enable `myapp.audit.enabled: true` in the existing `myapp` section (or **System → Settings**) and restart. It defaults to false. **View Mode → CTBLOGS history** shows successful covered changes grouped by UTC day, with node filtering, before/after text and metadata, and complete text/source/JSON downloads. Large sources are split into ordered helper notes without truncation. The default per-operation snapshot/record budget is `myapp.audit.max-event-characters: 16777216` (allowed 1,000,000–67,108,864).
 
 Initial coverage includes maintained rich/plain/code/Markdown/HTML content saves, node properties/type conversion, quick/batch/global tags, single/batch moves and bookmark updates. Creation, duplication, imports, calendar writes, trash/permanent deletion and external writes are not yet covered. Binary payloads are fingerprinted, not backed up; earlier text is retained in ordinary CTB log nodes. The history is not a complete or tamper-proof audit trail and does not replace backups. Covered edits and their history commit or roll back together. See [Audit history](audit-history.md) for coverage, recovery and storage details.
+
+## Image gallery
+
+After selecting a database, open **View Mode → Image gallery** to browse stored pictures independently of the node tree. The read-only view includes thumbnails, a larger viewer, search/sorting and optional node/file information. See [image gallery](image-gallery.md) for supported formats and limits.

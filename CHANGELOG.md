@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add a read-only image gallery with paginated metadata search, bounded lazy thumbnails, a responsive keyboard-operated viewer, optional metadata and original downloads guarded against stale database selections.
+
 - Add optional CTBLOGS history for maintained content/property/tag/move/bookmark writes, with daily rotating ledgers, lossless chunked before/after text and embedded-object manifests.
 - Add source-guarded history inspection and complete text/source/JSON downloads; audit failures roll back the covered edit. Managed history is protected and excluded from normal recent/search/calendar lists.
 

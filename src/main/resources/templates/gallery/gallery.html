@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head>
+  <title th:text="#{gallery.title}"></title>
+  <section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/imageGallery.css}"></section>
+</head>
+<body><main layout:fragment="content" class="container-fluid py-3" id="image-gallery"
+    th:attr="data-error=#{gallery.unavailable},data-loading=#{gallery.loading},data-position=#{gallery.position},data-stale=#{gallery.stale}">
+  <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+    <h1 class="h3 mb-0" th:text="#{gallery.title}"></h1>
+    <span class="text-body-secondary" th:text="#{gallery.count(${gallery.total})}"></span>
+    <label class="ms-auto"><input id="gallery-details" type="checkbox" checked> <span th:text="#{gallery.details}"></span></label>
+  </div>
+  <p class="small text-body-secondary" th:text="#{gallery.help}"></p>
+  <form method="get" th:action="@{/image-gallery}" class="d-flex flex-wrap gap-2 align-items-end mb-3">
+    <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+    <div class="flex-grow-1"><label for="gallery-search" class="form-label" th:text="#{gallery.search}"></label>
+      <input id="gallery-search" type="search" name="q" class="form-control" maxlength="200" th:value="${gallery.options.search}"></div>
+    <div><label for="gallery-sort" class="form-label" th:text="#{gallery.sort}"></label>
+      <select id="gallery-sort" name="sort" class="form-select">
+        <option th:each="order:${ {'newest','oldest','node','id'} }" th:value="${order}" th:selected="${order==gallery.options.sort}" th:text="${#messages.msg('gallery.sort.'+order)}"></option>
+      </select></div>
+    <button class="btn btn-primary" th:text="#{gallery.apply}"></button>
+  </form>
+  <p th:if="${gallery.items.empty}" class="alert alert-info" th:text="#{gallery.empty}"></p>
+  <div class="gallery-grid">
+    <article th:each="item:${gallery.items}" class="gallery-card border rounded">
+      <button type="button" class="gallery-open" th:attr="aria-label=#{gallery.open(${item.id})},data-large=@{/image-gallery/{node}/{offset}/preview(node=${item.nodeId},offset=${item.offset},large=true,_tenantView=${tenantViewToken})}">
+        <img width="320" height="220" alt="" class="gallery-thumbnail" th:attr="data-thumbnail=@{/image-gallery/{node}/{offset}/preview(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}">
+        <span class="gallery-image-message small" th:text="#{gallery.loading}"></span>
+      </button>
+      <div class="gallery-info p-2">
+        <a class="fw-semibold" th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a>
+        <dl class="small mb-0 mt-1">
+          <dt th:text="#{gallery.identity}"></dt><dd th:text="${item.id}"></dd>
+          <dt th:text="#{gallery.created}"></dt><dd th:text="${item.createdText}"></dd>
+          <dt th:text="#{gallery.bytes}"></dt><dd th:text="${item.bytes}"></dd>
+          <th:block th:if="${!item.filename.empty}"><dt th:text="#{gallery.filename}"></dt><dd th:text="${item.filename}"></dd></th:block>
+          <th:block th:if="${!item.link.empty}"><dt th:text="#{gallery.link}"></dt><dd th:text="${item.link}"></dd></th:block>
+          <th:block th:if="${item.imageTime > 0}"><dt th:text="#{gallery.imageTime}"></dt><dd th:text="${item.imageTimeText}"></dd></th:block>
+        </dl>
+        <a class="gallery-download small" th:href="@{/image-gallery/{node}/{offset}/original(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{gallery.download}"></a>
+      </div>
+    </article>
+  </div>
+  <nav class="d-flex align-items-center justify-content-center gap-3 my-3" th:aria-label="#{gallery.pages}">
+    <a class="btn btn-outline-secondary" th:if="${gallery.options.page > 1}" th:href="@{/image-gallery(page=${gallery.options.page - 1},q=${gallery.options.search},sort=${gallery.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.previousPage}"></a>
+    <span th:text="#{gallery.page(${gallery.options.page},${gallery.pages})}"></span>
+    <a class="btn btn-outline-secondary" th:if="${gallery.options.page < gallery.pages}" th:href="@{/image-gallery(page=${gallery.options.page + 1},q=${gallery.options.search},sort=${gallery.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.nextPage}"></a>
+  </nav>
+  <dialog id="gallery-viewer" th:aria-label="#{gallery.viewer}">
+    <div class="gallery-viewer-toolbar">
+      <button type="button" class="btn btn-outline-secondary" data-gallery-prev th:title="#{gallery.previous}"><i class="fas fa-chevron-left" aria-hidden="true"></i><span class="visually-hidden" th:text="#{gallery.previous}"></span></button>
+      <span data-gallery-position></span>
+      <button type="button" class="btn btn-outline-secondary" data-gallery-next th:title="#{gallery.next}"><i class="fas fa-chevron-right" aria-hidden="true"></i><span class="visually-hidden" th:text="#{gallery.next}"></span></button>
+      <button type="button" class="btn btn-outline-secondary" data-gallery-zoom aria-pressed="false" th:text="#{gallery.zoom}"></button>
+      <button type="button" class="btn btn-outline-secondary" data-gallery-details aria-pressed="true" th:text="#{gallery.details}"></button>
+      <button type="button" class="btn btn-outline-secondary ms-auto" data-gallery-close th:text="#{gallery.close}"></button>
+    </div>
+    <div class="gallery-viewer-body"><div class="gallery-stage"><p data-gallery-status role="status"></p><img data-gallery-image alt="" hidden></div><aside data-gallery-info class="gallery-info p-3"></aside></div>
+    <p class="small px-2 mb-1 text-body-secondary" th:text="#{gallery.keys}"></p>
+  </dialog>
+</main>
+<section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/imageGallery.js}"></script></section>
+</body></html>
