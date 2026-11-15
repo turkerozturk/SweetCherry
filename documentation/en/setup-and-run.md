@@ -222,3 +222,8 @@ After selecting a database, open **View Mode → Image gallery** to browse store
 ## Table gallery
 
 Use **View Mode → Table gallery** to browse stored grid tables with fixed-width cells, permanent 1 px borders and a larger scrollable viewer. Display settings are available under `myapp.table-gallery` and **System → Settings**. See [table gallery](table-gallery.md).
+
+
+## Codeboxes and attachments
+
+**View Mode → Codebox gallery** provides previews and a larger source viewer. The existing **Attachments** page now supports filename filtering and name/size sorting without loading every file into memory. See [codeboxes and attachments](codebox-gallery-and-attachments.md) for settings and limits.

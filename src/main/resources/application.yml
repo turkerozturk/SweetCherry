@@ -161,6 +161,12 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  codebox-gallery:
+    font-size: 14
+    preview-max-characters: 2400
+    preview-max-lines: 20
+    viewer-max-characters: 200000
+    page-size: 12
   # Read-only table gallery: fixed pixel sizes, never stretch columns to fill the screen.
   table-gallery:
     cell-width: 160

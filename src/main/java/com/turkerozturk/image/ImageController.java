@@ -31,7 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -60,25 +59,6 @@ public class ImageController {
             model.addAttribute("images", images);
             model.addAttribute("imgUtil", new ImageUtil());
             return "image";
-    }
-
-    @GetMapping("/attachments")
-    @RequiresTenant
-    public String getAllAttachments(Model model,
-                                    @CookieValue(value = "viewMode", defaultValue = "tree") String viewMode) {
-        List<Image> images = imageService.getAttachedFiles();
-        if(!images.isEmpty()) {
-            model.addAttribute("images", images);
-        }
-
-        model.addAttribute("viewMode", viewMode);
-
-        if ("mobile".equals(viewMode)) {
-            return "attachmentsMobile";
-        } else {
-            return "attachments";
-        }
-
     }
 
     @GetMapping("/download/{node_id}/{offset}")

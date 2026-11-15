@@ -65,7 +65,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="/attachments"
+                                <a class="dropdown-item" th:href="@{/attachments(_tenantView=${tenantViewToken})}"
                                    th:title="#{root.attachments.description}"
                                 >
                                     <i class=" fas fa-download"></i>

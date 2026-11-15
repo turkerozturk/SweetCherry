@@ -434,3 +434,8 @@ Veritabanını seçtikten sonra **Görünüm Modu → Resim galerisi** ile resim
 ## Tablo galerisi
 
 **Görünüm Modu → Tablo galerisi** ile grid tablolarını sabit genişlikli hücreler, sürekli 1 px kenarlık ve büyük kaydırılabilir görüntüleyiciyle gezebilirsiniz. Görsel ayarlar `myapp.table-gallery` altında ve **Sistem → Ayarlar** sayfasındadır. [İngilizce tablo galerisi belgesi](../en/table-gallery.md).
+
+
+## Codebox ve ek dosyalar
+
+**Görünüm Modu → Codebox galerisi** ile önizlemeler ve büyük kaynak görüntüleyici açılır. Mevcut **Ek dosyalar** sayfasında tüm dosyaları belleğe yüklemeden dosya adı filtresi ve ad/boyut sıralaması kullanılabilir. Ayarlar ve sınırlar için [İngilizce belgeye](../en/codebox-gallery-and-attachments.md) bakın.

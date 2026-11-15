@@ -1,0 +1,3 @@
+.attachment-browser .attachment-name{overflow-wrap:anywhere;max-width:45vw;min-width:10rem}
+.attachment-browser .attachment-table{width:100%;margin-bottom:0}
+@media(max-width:767px){.attachment-browser .attachment-name{max-width:65vw}.attachment-browser .table{font-size:.9rem}}

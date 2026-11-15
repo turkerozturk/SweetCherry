@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add a read-only codebox gallery with bounded previews, syntax filtering/highlighting, wrapping, copying and complete source downloads.
+- Replace attachment BLOB-loaded lists with paginated metadata queries, filename filtering, name/byte-size sorting and source-guarded single-file downloads in desktop/mobile layouts.
+
 - Add a read-only table gallery with lazy previews, a larger source-guarded viewer, plain-text cells, fixed column widths and permanent 1 px borders; expose bounded display settings in YAML and System settings.
 
 - Add a read-only image gallery with paginated metadata search, bounded lazy thumbnails, a responsive keyboard-operated viewer, optional metadata and original downloads guarded against stale database selections.

@@ -1,0 +1,23 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="container-fluid py-3 attachment-browser">
+ <div class="d-flex align-items-center flex-wrap gap-3 mb-2"><h1 class="h3 mb-0" th:text="#{files.title}"></h1><span th:text="#{files.count(${attachments.total})}"></span></div>
+ <p class="small text-body-secondary" th:text="#{files.help}"></p>
+ <form method="get" th:action="@{/attachments}" class="d-flex flex-wrap align-items-end gap-2 mb-3">
+ <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+ <div class="flex-grow-1"><label for="attachment-search" class="form-label" th:text="#{files.search}"></label><input id="attachment-search" name="q" type="search" maxlength="200" class="form-control" th:value="${attachments.options.search}"></div>
+ <div><label for="attachment-sort" class="form-label" th:text="#{gallery.sort}"></label><select id="attachment-sort" name="sort" class="form-select"><option th:each="sort:${ {'newest','name-asc','name-desc','size-asc','size-desc'} }" th:value="${sort}" th:selected="${sort==attachments.options.sort}" th:text="${#messages.msg('files.sort.'+sort)}"></option></select></div>
+ <button class="btn btn-primary" th:text="#{gallery.apply}"></button><a class="btn btn-outline-secondary" th:href="@{/attachments(_tenantView=${tenantViewToken})}" th:text="#{files.reset}"></a></form>
+ <p th:if="${attachments.items.empty}" class="alert alert-info" th:text="#{files.empty}"></p>
+ <div class="table-responsive" th:unless="${attachments.items.empty}"><table class="table table-bordered align-middle attachment-table"><thead><tr>
+ <th scope="col"><a th:href="@{/attachments(q=${attachments.options.search},sort=${attachments.options.sort=='name-asc'?'name-desc':'name-asc'},_tenantView=${tenantViewToken})}" th:text="#{files.name}"></a></th>
+ <th scope="col"><a th:href="@{/attachments(q=${attachments.options.search},sort=${attachments.options.sort=='size-desc'?'size-asc':'size-desc'},_tenantView=${tenantViewToken})}" th:text="#{files.size}"></a></th>
+ <th scope="col" class="d-none d-md-table-cell" th:text="#{files.node}"></th><th scope="col" class="d-none d-md-table-cell" th:text="#{files.date}"></th>
+ </tr></thead><tbody><tr th:each="item:${attachments.items}">
+ <td class="attachment-name"><a th:href="@{/attachments/{node}/{offset}/download(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="${item.filename}"></a>
+ <div class="d-md-none small mt-1"><a th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a> · <span th:text="${item.identity}"></span></div></td>
+ <td class="text-nowrap" th:title="#{files.bytes(${item.bytes})}" th:text="${item.sizeText}"></td>
+ <td class="d-none d-md-table-cell"><a th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a><div class="small text-body-secondary" th:text="${item.identity}"></div></td>
+ <td class="d-none d-md-table-cell text-nowrap" th:text="${item.timeText}"></td>
+ </tr></tbody></table></div>
+ <nav class="d-flex align-items-center justify-content-center gap-3 my-3" th:aria-label="#{gallery.pages}"><a th:if="${attachments.options.page>1}" class="btn btn-outline-secondary" th:href="@{/attachments(page=${attachments.options.page - 1},q=${attachments.options.search},sort=${attachments.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.previousPage}"></a><span th:text="#{gallery.page(${attachments.options.page},${attachments.pages})}"></span><a th:if="${attachments.options.page<attachments.pages}" class="btn btn-outline-secondary" th:href="@{/attachments(page=${attachments.options.page + 1},q=${attachments.options.search},sort=${attachments.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.nextPage}"></a></nav>
+</section></body></html>
