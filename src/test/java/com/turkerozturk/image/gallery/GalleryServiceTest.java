@@ -9,9 +9,9 @@ class GalleryServiceTest {
     @BeforeEach void setup() throws Exception {
         c = DriverManager.getConnection("jdbc:sqlite::memory:");
         try (var s = c.createStatement()) {
-            s.execute("CREATE TABLE node(node_id INTEGER PRIMARY KEY,name TEXT,ts_creation INTEGER)");
+            s.execute("CREATE TABLE node(node_id INTEGER PRIMARY KEY,name TEXT,ts_creation INTEGER,tags TEXT)");
             s.execute("CREATE TABLE image(node_id INTEGER,offset INTEGER,anchor TEXT,png BLOB,filename TEXT,link TEXT,time INTEGER)");
-            s.execute("INSERT INTO node VALUES(1,'A <node>',100),(2,'B 100%_!',200)");
+            s.execute("INSERT INTO node VALUES(1,'A <node>',100,''),(2,'B 100%_!',200,'')");
         }
     }
     @AfterEach void close() throws Exception { c.close(); }

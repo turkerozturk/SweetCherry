@@ -6,6 +6,7 @@ No notes, image rows, timestamps or audit records are changed.
 
 - Browse 36 image records per page, sorted by node creation date, node title or image identity.
 - Search node titles, stored filenames and stored links. Search text is treated literally.
+- Choose one exact node tag to filter images by their owning content node. Case, Unicode and punctuation are preserved; `work` does not match `workshop` or `Work`. The tag filter combines with text search and survives sorting/pagination. Tags are offered from image-owning nodes; shared occurrences use their content master’s tags without duplicating images.
 - Open a thumbnail to inspect a larger preview. Use the previous/next buttons or Left/Right keys within the current page; Escape closes the viewer.
 - Use **Fit / zoom** to switch between fitting the preview and its natural pixel size. The preview has a maximum edge of 2560 pixels; download for the original resolution.
 - Show or hide image information in the gallery or viewer. This display preference is remembered in the browser.

@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-11-15
+
+- Add exact, case-sensitive node-tag filtering to the image gallery, combined with text search and preserved across sorting/pagination.
+
 - Add a read-only codebox gallery with bounded previews, syntax filtering/highlighting, wrapping, copying and complete source downloads.
 - Replace attachment BLOB-loaded lists with paginated metadata queries, filename filtering, name/byte-size sorting and source-guarded single-file downloads in desktop/mobile layouts.
 

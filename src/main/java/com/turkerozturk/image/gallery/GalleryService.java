@@ -21,10 +21,13 @@ public class GalleryService {
     static final int MAX_BYTES = 64 * 1024 * 1024;
     @PersistenceContext private EntityManager manager;
 
-    public record Options(int page, String search, String sort) {
+    public record Options(int page, String search, String sort, String tag) {
+        public Options(int page,String search,String sort){this(page,search,sort,"");}
         public Options {
             search = search == null ? "" : search.strip();
+            tag = tag == null ? "" : tag;
             if (page < 1 || page > 1000000 || search.length() > 200
+                    || tag.length() > com.turkerozturk.node.tags.NodeTags.MAX_INPUT_CHARACTERS || tag.indexOf(' ')>=0 || tag.indexOf('\0')>=0
                     || !Set.of("newest", "oldest", "node", "id").contains(sort))
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -41,7 +44,8 @@ public class GalleryService {
             catch (DateTimeException invalid) { return "—"; }
         }
     }
-    public record Page(List<Item> items, long total, Options options) {
+    public record Page(List<Item> items, long total, Options options, List<String> tags) {
+        public Page(List<Item> items,long total,Options options){this(items,total,options,List.of());}
         public long pages() { return Math.max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE); }
     }
     public record Payload(byte[] bytes, String filename) { }
@@ -71,6 +75,7 @@ public class GalleryService {
         boolean search = !options.search().isEmpty();
         if (search) from += " AND (LOWER(n.name) LIKE ? ESCAPE '!' OR LOWER(COALESCE(i.filename,'')) LIKE ? ESCAPE '!'"
                 + " OR LOWER(COALESCE(i.link,'')) LIKE ? ESCAPE '!')";
+        if (!options.tag().isEmpty()) from += " AND " + tagPredicate(c);
         long total;
         try (var q = c.prepareStatement("SELECT COUNT(*)" + from)) {
             bindSearch(q, options, search);
@@ -93,17 +98,38 @@ public class GalleryService {
                         text(rs, 5), text(rs, 6), rs.getLong(7), rs.getLong(8)));
             }
         }
-        return new Page(List.copyOf(items), total, options);
+        return new Page(List.copyOf(items), total, options, catalogue(c,options.tag()));
+    }
+    /** Tag identity is literal and case-sensitive, even under a case-insensitive server collation. */
+    static String tagPredicate(Connection c)throws SQLException{
+        String product=c.getMetaData().getDatabaseProductName();
+        if(product.equalsIgnoreCase("PostgreSQL"))return "STRPOS((' ' || COALESCE(n.tags,'') || ' ') COLLATE \"C\", ?) > 0";
+        if(product.equalsIgnoreCase("MySQL")||product.equalsIgnoreCase("MariaDB"))return "LOCATE(CAST(? AS BINARY), CAST(CONCAT(' ', COALESCE(n.tags,''), ' ') AS BINARY)) > 0";
+        return "INSTR(' ' || COALESCE(n.tags,'') || ' ', ?) > 0";
+    }
+    private static List<String> catalogue(Connection c,String selected)throws SQLException{
+        var tags=new TreeSet<String>(com.turkerozturk.node.tags.NodeTags.ORDER);
+        // Deduplicate numeric owner IDs, never tag strings under a server collation.
+        try(var q=c.prepareStatement("SELECT n.tags FROM node n JOIN (SELECT DISTINCT i.node_id FROM image i WHERE "+candidates()+") owners ON owners.node_id=n.node_id WHERE LENGTH(n.tags)<=?")){
+            q.setInt(1,com.turkerozturk.node.tags.NodeTags.MAX_INPUT_CHARACTERS);
+            try(var rs=q.executeQuery()){while(rs.next())tags.addAll(com.turkerozturk.node.tags.NodeTags.split(rs.getString(1)));}
+        }
+        tags.removeIf(t->t.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)||t.equalsIgnoreCase(com.turkerozturk.node.audit.AuditSql.TAG));
+        if(!selected.isEmpty())tags.add(selected);
+        return List.copyOf(tags);
     }
     private static String quote(Connection c) throws SQLException {
         return com.turkerozturk.jdbc.JdbcIdentifiers.quote(c, "offset");
     }
     private static int bindSearch(PreparedStatement q, Options options, boolean search) throws SQLException {
-        if (!search) return 1;
-        String value = "%" + options.search().toLowerCase(Locale.ROOT).replace("!", "!!")
-                .replace("%", "!%").replace("_", "!_") + "%";
-        for (int i = 1; i <= 3; i++) q.setString(i, value);
-        return 4;
+        int next=1;
+        if(search){
+            String value = "%" + options.search().toLowerCase(Locale.ROOT).replace("!", "!!")
+                    .replace("%", "!%").replace("_", "!_") + "%";
+            for(int i=0;i<3;i++)q.setString(next++,value);
+        }
+        if(!options.tag().isEmpty())q.setString(next++," "+options.tag()+" ");
+        return next;
     }
     private static String text(ResultSet rs, int col) throws SQLException {
         return Objects.requireNonNullElse(rs.getString(col), "");

@@ -23,3 +23,5 @@
 .gallery-stage.zoomed{display:block}.gallery-stage.zoomed img{max-width:none;max-height:none}
 .gallery-viewer-body aside{width:290px;max-height:72dvh;overflow:auto}
 @media(max-width:767px){.gallery-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem}.gallery-open{height:170px}.gallery-card .gallery-info dl{display:block}.gallery-viewer-body{flex-direction:column}.gallery-stage{flex:none;height:55dvh}.gallery-viewer-body aside{width:100%;max-height:22dvh}.gallery-viewer-toolbar{gap:.25rem}.gallery-viewer-toolbar .btn{padding:.3rem .5rem}}
+
+#image-gallery #gallery-tag{max-width:min(22rem,80vw)}

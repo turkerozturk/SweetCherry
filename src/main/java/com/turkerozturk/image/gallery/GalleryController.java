@@ -21,9 +21,10 @@ public class GalleryController {
     public String gallery(@RequestParam(defaultValue = "1") int page,
                           @RequestParam(defaultValue = "") String q,
                           @RequestParam(defaultValue = "newest") String sort,
+                          @RequestParam(defaultValue = "") String tag,
                           Model model, HttpServletResponse response) {
         response.setHeader("Cache-Control", "no-store");
-        model.addAttribute("gallery", service.list(new GalleryService.Options(page, q, sort)));
+        model.addAttribute("gallery", service.list(new GalleryService.Options(page, q, sort,tag)));
         return "gallery/gallery";
     }
 

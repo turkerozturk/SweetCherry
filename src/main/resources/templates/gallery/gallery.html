@@ -16,6 +16,8 @@
     <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
     <div class="flex-grow-1"><label for="gallery-search" class="form-label" th:text="#{gallery.search}"></label>
       <input id="gallery-search" type="search" name="q" class="form-control" maxlength="200" th:value="${gallery.options.search}"></div>
+    <div><label for="gallery-tag" class="form-label" th:text="#{gallery.tag}"></label>
+      <select id="gallery-tag" name="tag" class="form-select"><option value="" th:text="#{gallery.allTags}"></option><option th:each="tag:${gallery.tags}" th:value="${tag}" th:selected="${tag==gallery.options.tag}" th:text="${tag}"></option></select></div>
     <div><label for="gallery-sort" class="form-label" th:text="#{gallery.sort}"></label>
       <select id="gallery-sort" name="sort" class="form-select">
         <option th:each="order:${ {'newest','oldest','node','id'} }" th:value="${order}" th:selected="${order==gallery.options.sort}" th:text="${#messages.msg('gallery.sort.'+order)}"></option>
@@ -44,9 +46,9 @@
     </article>
   </div>
   <nav class="d-flex align-items-center justify-content-center gap-3 my-3" th:aria-label="#{gallery.pages}">
-    <a class="btn btn-outline-secondary" th:if="${gallery.options.page > 1}" th:href="@{/image-gallery(page=${gallery.options.page - 1},q=${gallery.options.search},sort=${gallery.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.previousPage}"></a>
+    <a class="btn btn-outline-secondary" th:if="${gallery.options.page > 1}" th:href="@{/image-gallery(page=${gallery.options.page - 1},q=${gallery.options.search},sort=${gallery.options.sort},tag=${gallery.options.tag},_tenantView=${tenantViewToken})}" th:text="#{gallery.previousPage}"></a>
     <span th:text="#{gallery.page(${gallery.options.page},${gallery.pages})}"></span>
-    <a class="btn btn-outline-secondary" th:if="${gallery.options.page < gallery.pages}" th:href="@{/image-gallery(page=${gallery.options.page + 1},q=${gallery.options.search},sort=${gallery.options.sort},_tenantView=${tenantViewToken})}" th:text="#{gallery.nextPage}"></a>
+    <a class="btn btn-outline-secondary" th:if="${gallery.options.page < gallery.pages}" th:href="@{/image-gallery(page=${gallery.options.page + 1},q=${gallery.options.search},sort=${gallery.options.sort},tag=${gallery.options.tag},_tenantView=${tenantViewToken})}" th:text="#{gallery.nextPage}"></a>
   </nav>
   <dialog id="gallery-viewer" th:aria-label="#{gallery.viewer}">
     <div class="gallery-viewer-toolbar">
