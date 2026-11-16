@@ -1,0 +1,26 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="runs(runs)"><span th:each="run:${runs}" th:classappend="${(run.bold?' wp-bold':'')+(run.italic?' wp-italic':'')+(run.underline?' wp-underline':'')}" th:text="${run.text}"></span></th:block>
+<section th:fragment="content" class="container-fluid py-3 word-preview">
+ <h1 class="h3" th:text="#{word.title}"></h1>
+ <div class="d-flex flex-wrap gap-2 mb-3">
+ <a class="btn btn-outline-primary" th:href="@{/attachments/{node}/{offset}/download(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})}" th:text="#{excel.download}"></a>
+ <a class="btn btn-outline-secondary" th:href="@{/tree(nodeId=${nodeId},_tenantView=${tenantViewToken})}" th:text="#{excel.node}"></a>
+ <a class="btn btn-outline-secondary" th:href="@{/attachments(_tenantView=${tenantViewToken})}" th:text="#{files.title}"></a>
+ </div>
+ <p th:if="${wordError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg('word.error.'+wordError)}"></p>
+ <th:block th:if="${word != null}">
+ <h2 class="h5 text-break" th:text="${word.filename}"></h2>
+ <p><span th:text="${word.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span></p>
+ <p class="small text-body-secondary" th:text="#{word.summary}"></p>
+ <details class="small mb-3"><summary th:text="#{word.details}"></summary><p class="mt-2" th:text="#{word.help}"></p><p th:if="${word.legacy}" th:text="#{word.legacy}"></p></details>
+ <p th:if="${word.clipped}" class="alert alert-info" th:text="#{word.clipped}"></p>
+ <p th:if="${word.blocks.empty}" class="alert alert-info" th:text="#{word.empty}"></p>
+ <article th:unless="${word.blocks.empty}" class="word-paper" th:aria-label="#{word.document}">
+ <th:block th:each="block:${word.blocks}">
+ <div th:if="${block.kind=='table'}" class="word-table-scroll" tabindex="0" role="region" th:aria-label="#{word.table}"><table class="word-table"><tbody><tr th:each="row:${block.rows}"><td th:each="cell:${row}" th:text="${cell}"></td></tr></tbody></table></div>
+ <h3 th:if="${block.kind=='heading'}" class="word-paragraph" th:classappend="${'wp-align-'+block.alignment}"><th:block th:replace="~{attachment/wordContent :: runs(${block.runs})}"></th:block></h3>
+ <p th:if="${block.kind=='paragraph'}" class="word-paragraph" th:classappend="${'wp-align-'+block.alignment}"><th:block th:replace="~{attachment/wordContent :: runs(${block.runs})}"></th:block></p>
+ </th:block>
+ </article>
+ </th:block>
+</section></body></html>

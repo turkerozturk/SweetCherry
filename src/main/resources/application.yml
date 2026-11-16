@@ -161,6 +161,15 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  # Read-only Word attachment preview: DOCX and legacy DOC. No document is saved.
+  word-preview:
+    max-file-bytes: 5242880 # 5 MiB; allowed 1024..20971520.
+    max-expanded-bytes: 16777216 # Aggregate DOCX ZIP data; allowed 1024..67108864.
+    max-characters: 200000 # Displayed Unicode code points, 1..1000000.
+    max-blocks: 1000 # Paragraphs/tables, 1..2000.
+    max-table-rows: 100 # Per table, 1..200.
+    max-table-columns: 20 # Per table, 1..50.
+
   # Read-only Excel attachment preview. Limits apply before rendering; no workbook is saved.
   excel-preview:
     max-file-bytes: 5242880 # 5 MiB; allowed 1024..20971520.

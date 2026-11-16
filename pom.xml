@@ -300,6 +300,13 @@
 			<version>${poi.version}</version>
 		</dependency>
 
+        <!-- Legacy Word (.doc) read-only previews; aligned with existing POI modules. -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
 		<!-- https://www.webjars.org/ -->
 
 		<!-- https://mvnrepository.com/artifact/org.webjars/webjars-locator -->

@@ -3301,6 +3301,32 @@
     "sha256": "e6e37adeb6d6ee8b40ec491ad955d934d8f99827ab050f105b18286e59b1d9e7"
   },
   {
+    "jar": "poi-scratchpad-5.5.1.jar",
+    "coordinates": [
+      "org.apache.poi",
+      "poi-scratchpad",
+      "5.5.1"
+    ],
+    "sha256": "24c3f407eff517432d5cfd5628b6b8a091f94c1dbb7481384599b5a0fbeedeb9",
+    "maven_pom_url": "https://repo.maven.apache.org/maven2/org/apache/poi/poi-scratchpad/5.5.1/poi-scratchpad-5.5.1.pom",
+    "source_archive_url": "https://repo.maven.apache.org/maven2/org/apache/poi/poi-scratchpad/5.5.1/poi-scratchpad-5.5.1-sources.jar",
+    "embedded_notices": [
+      "META-INF/LICENSE",
+      "META-INF/NOTICE"
+    ],
+    "source_notice_files": [],
+    "source_archive_verified": false,
+    "resolved_licenses": [
+      {
+        "name": "Apache License, Version 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+        "distribution": "repo"
+      }
+    ],
+    "license_metadata_source": "https://repo.maven.apache.org/maven2/org/apache/poi/poi-scratchpad/5.5.1/poi-scratchpad-5.5.1.pom",
+    "scm_url": null
+  },
+  {
     "jar": "popper.js-2.11.7.jar",
     "licenses": [
       {

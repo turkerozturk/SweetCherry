@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Added read-only Word attachment previews for DOCX and legacy DOC, including text and tables.
+
 - Added read-only Excel attachment previews with worksheet selection, paged grids and original-file downloads.
 
 - Group the icon catalogue with editable NodeIcon categories, localized category/name filtering and sortable category/name/original-index columns, while retaining existing icon IDs and assets.

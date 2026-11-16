@@ -92,11 +92,12 @@ public final class RichTextObjectHtmlRenderer {
                 String url = "/download/" + ref.nodeId() + "/" + ref.bufferOffset() + "?_tenantView="
                         + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
                 String preview = "";
-                if (!pdfHeadings && com.turkerozturk.image.attachments.excel.ExcelPreviewService.supports(attachment.filename())) {
+                boolean wordPreview = com.turkerozturk.image.attachments.word.WordPreviewService.supports(attachment.filename());
+                if (!pdfHeadings && (wordPreview || com.turkerozturk.image.attachments.excel.ExcelPreviewService.supports(attachment.filename()))) {
                     String previewUrl = "/attachments/" + ref.nodeId() + "/" + ref.bufferOffset()
-                            + "/excel?_tenantView=" + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
+                            + (wordPreview ? "/word?_tenantView=" : "/excel?_tenantView=") + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
                     preview = " <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(previewUrl)
-                            + "\">[" + escape(com.turkerozturk.image.attachments.excel.ExcelAttachmentLinks.label()) + "]</a>";
+                            + "\">[" + escape(wordPreview ? com.turkerozturk.image.attachments.word.WordAttachmentLinks.label() : com.turkerozturk.image.attachments.excel.ExcelAttachmentLinks.label()) + "]</a>";
                 }
                 yield "<a class=\"rich-text-attachment\" target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(url) + "\">" + label + "</a>" + preview;
             }

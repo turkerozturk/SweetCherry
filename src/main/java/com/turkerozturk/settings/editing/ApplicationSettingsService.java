@@ -23,6 +23,10 @@ public class ApplicationSettingsService {
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.word-preview.max-characters","number","200000",1000000),
+        new Setting("myapp.word-preview.max-blocks","number","1000",2000),
+        new Setting("myapp.word-preview.max-table-rows","number","100",200),
+        new Setting("myapp.word-preview.max-table-columns","number","20",50),
         new Setting("myapp.excel-preview.rows-per-page","number","100",200),
         new Setting("myapp.excel-preview.max-columns","number","50",100),
         new Setting("myapp.excel-preview.max-cell-characters","number","2000",4000),

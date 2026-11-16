@@ -31,6 +31,16 @@ class RichTextObjectHtmlRendererTest {
         assertThat(new RichTextObjectHtmlRenderer(true).render(layout(ref), payload, "token")).doesNotContain("/excel");
     }
 
+    @Test void wordAttachmentKeepsDownloadAndAddsPreviewOnlyForWeb() {
+        var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 2);
+        for (String name : List.of("<file>.DOCX", "legacy.doc")) {
+            var payload = Map.<EmbeddedObject, EmbeddedContent>of(ref, new EmbeddedContent.Attachment(name));
+            assertThat(renderer.render(layout(ref), payload, "token&value")).contains("/download/53/2?", "/attachments/53/2/word?_tenantView=token%26value").doesNotContain("<file>");
+            assertThat(renderer.render(layout(ref), payload, null)).doesNotContain("/word");
+            assertThat(new RichTextObjectHtmlRenderer(true).render(layout(ref), payload, "token")).doesNotContain("/word");
+        }
+    }
+
     @Test void guardsDownloadLinksAndEscapesFilenames() {
         var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 2);
         var payload = Map.<EmbeddedObject, EmbeddedContent>of(ref, new EmbeddedContent.Attachment("<file>.txt"));
