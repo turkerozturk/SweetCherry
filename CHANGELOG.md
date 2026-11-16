@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Group the icon catalogue with editable NodeIcon categories, localized category/name filtering and sortable category/name/original-index columns, while retaining existing icon IDs and assets.
+
 ## [1.10.0] - 2026-11-15
 
 - Add exact, case-sensitive node-tag filtering to the image gallery, combined with text search and preserved across sorting/pagination.
