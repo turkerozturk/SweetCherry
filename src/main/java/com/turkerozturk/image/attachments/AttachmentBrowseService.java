@@ -23,6 +23,7 @@ public class AttachmentBrowseService {
         public Options{search=search==null?"":search.strip();if(page<1||page>1000000||search.length()>200||!Set.of("newest","name-asc","name-desc","size-asc","size-desc").contains(sort))throw problem(HttpStatus.BAD_REQUEST);}
     }
     public record Item(long nodeId,int offset,String name,String filename,long time,long bytes){
+        public boolean excel(){return com.turkerozturk.image.attachments.excel.ExcelPreviewService.supports(filename);}
         public String identity(){return nodeId+":"+offset;}
         public String sizeText(){if(bytes<1024)return bytes+" B";if(bytes<1048576)return String.format(Locale.ROOT,"%.2f KiB",bytes/1024d);if(bytes<1073741824)return String.format(Locale.ROOT,"%.2f MiB",bytes/1048576d);return String.format(Locale.ROOT,"%.2f GiB",bytes/1073741824d);}
         public String timeText(){if(time<=0)return "—";try{return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(time));}catch(DateTimeException invalid){return "—";}}

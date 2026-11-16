@@ -23,6 +23,9 @@ public class ApplicationSettingsService {
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.excel-preview.rows-per-page","number","100",200),
+        new Setting("myapp.excel-preview.max-columns","number","50",100),
+        new Setting("myapp.excel-preview.max-cell-characters","number","2000",4000),
         new Setting("myapp.codebox-gallery.font-size","treefont","14",32),
         new Setting("myapp.codebox-gallery.preview-max-characters","number","2400",10000),
         new Setting("myapp.codebox-gallery.preview-max-lines","number","20",100),

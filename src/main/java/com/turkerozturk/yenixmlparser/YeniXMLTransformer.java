@@ -269,6 +269,17 @@ public class YeniXMLTransformer {
                     toElement.setAttribute(DATA_TYPE_ATTR, "cherryattachment");
                     toElement.setAttribute(HREF_ATTR, String.format("/download/%s/%s", nodeId, dataOffset));
                     toElement.setTextContent("\uD83D\uDCCE" + attachment.getFileName()); // 📎
+                    if (com.turkerozturk.image.attachments.excel.ExcelPreviewService.supports(attachment.getFileName())) {
+                        Element wrapper = newDocument.createElement("span");
+                        wrapper.appendChild(toElement);
+                        wrapper.appendChild(newDocument.createTextNode(" "));
+                        Element preview = newDocument.createElement(A_TAG);
+                        preview.setAttribute(HREF_ATTR, "/attachments/" + nodeId + "/" + dataOffset + "/excel");
+                        preview.setAttribute("target", "_blank"); preview.setAttribute("rel", "noopener noreferrer");
+                        preview.setTextContent("[" + com.turkerozturk.image.attachments.excel.ExcelAttachmentLinks.label() + "]");
+                        wrapper.appendChild(preview); toElement = wrapper;
+                    }
+
                 }
 
         }

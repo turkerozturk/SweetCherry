@@ -1,0 +1,32 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="container-fluid py-3 excel-preview">
+ <h1 class="h3" th:text="#{excel.title}"></h1>
+ <div class="d-flex flex-wrap gap-2 mb-3">
+ <a class="btn btn-outline-primary" th:href="@{/attachments/{node}/{offset}/download(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})}" th:text="#{excel.download}"></a>
+ <a class="btn btn-outline-secondary" th:href="@{/tree(nodeId=${nodeId},_tenantView=${tenantViewToken})}" th:text="#{excel.node}"></a>
+ <a class="btn btn-outline-secondary" th:href="@{/attachments(_tenantView=${tenantViewToken})}" th:text="#{files.title}"></a>
+ </div>
+ <p th:if="${excelError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg('excel.error.'+excelError)}"></p>
+ <th:block th:if="${excel != null}">
+ <h2 class="h5 text-break" th:text="${excel.filename}"></h2>
+ <p><span th:text="${excel.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span></p>
+ <p class="small text-body-secondary" th:text="#{excel.help}"></p>
+ <form method="get" th:action="@{/attachments/{node}/{offset}/excel(node=${nodeId},offset=${offset})}" class="d-flex flex-wrap gap-2 align-items-end mb-3">
+ <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+ <div><label for="excel-sheet" class="form-label" th:text="#{excel.sheet}"></label><select id="excel-sheet" name="sheet" class="form-select"><option th:each="item:${excel.sheets}" th:value="${item.index}" th:selected="${item.index==excel.sheet}" th:text="${item.name+(item.hidden?' ('+#messages.msg('excel.hidden')+')':'')}"></option></select></div>
+ <button class="btn btn-primary" th:text="#{excel.show}"></button>
+ </form>
+ <p th:if="${excel.clippedColumns or excel.clippedText}" class="alert alert-info" th:text="#{excel.clipped}"></p>
+ <p th:if="${excel.totalRows==0}" class="alert alert-info" th:text="#{excel.empty}"></p>
+ <div th:unless="${excel.totalRows==0}" class="excel-scroll" tabindex="0" role="region" th:aria-label="#{excel.grid}">
+ <table class="excel-grid"><thead><tr><th scope="col">#</th><th scope="col" th:each="column:${excel.columns}" th:text="${column}"></th></tr></thead>
+ <tbody><tr th:each="row:${excel.rows}"><th scope="row" th:text="${row.number}"></th>
+ <td th:each="cell:${row.cells}" th:classappend="${'align-'+cell.alignment+(cell.bold?' cell-bold':'')+(cell.italic?' cell-italic':'')}" th:title="${cell.formula}"><div class="excel-cell" th:text="${cell.text}"></div><details th:if="${!cell.formula.empty}" class="small"><summary th:text="#{excel.formula}"></summary><code th:text="${cell.formula}"></code></details></td>
+ </tr></tbody></table></div>
+ <nav class="d-flex flex-wrap align-items-center justify-content-center gap-3 my-3" th:aria-label="#{gallery.pages}">
+ <a th:if="${excel.page>1}" class="btn btn-outline-secondary" th:href="@{/attachments/{node}/{offset}/excel(node=${nodeId},offset=${offset},sheet=${excel.sheet},page=${excel.page - 1},_tenantView=${tenantViewToken})}" th:text="#{gallery.previousPage}"></a>
+ <span th:text="#{gallery.page(${excel.page},${excel.pages})}"></span> <span th:text="#{excel.rows(${excel.totalRows})}"></span>
+ <a th:if="${excel.page<excel.pages}" class="btn btn-outline-secondary" th:href="@{/attachments/{node}/{offset}/excel(node=${nodeId},offset=${offset},sheet=${excel.sheet},page=${excel.page + 1},_tenantView=${tenantViewToken})}" th:text="#{gallery.nextPage}"></a>
+ </nav>
+ </th:block>
+</section></body></html>

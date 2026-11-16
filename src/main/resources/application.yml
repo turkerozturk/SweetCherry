@@ -161,6 +161,14 @@ logging:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My custom variables
 myapp:
+  # Read-only Excel attachment preview. Limits apply before rendering; no workbook is saved.
+  excel-preview:
+    max-file-bytes: 5242880 # 5 MiB; allowed 1024..20971520.
+    max-expanded-bytes: 16777216 # Aggregate XLSX ZIP data; allowed 1024..67108864.
+    rows-per-page: 100 # 1..200.
+    max-columns: 50 # 1..100; first columns only.
+    max-cell-characters: 2000 # 1..4000 Unicode code points.
+
   codebox-gallery:
     font-size: 14
     preview-max-characters: 2400

@@ -22,6 +22,15 @@ class RichTextObjectHtmlRendererTest {
         assertThat(html.indexOf("<img")).isLessThan(html.indexOf(">B</span>"));
     }
 
+    @Test void excelAttachmentKeepsDownloadAndAddsEscapedTokenPreviewOnlyForWeb() {
+        var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 2);
+        var payload = Map.<EmbeddedObject, EmbeddedContent>of(ref, new EmbeddedContent.Attachment("<file>.XLSX"));
+        String html = renderer.render(layout(ref), payload, "token&value");
+        assertThat(html).contains("/download/53/2?", "/attachments/53/2/excel?_tenantView=token%26value").doesNotContain("<file>");
+        assertThat(renderer.render(layout(ref), payload, null)).doesNotContain("/excel");
+        assertThat(new RichTextObjectHtmlRenderer(true).render(layout(ref), payload, "token")).doesNotContain("/excel");
+    }
+
     @Test void guardsDownloadLinksAndEscapesFilenames() {
         var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 2);
         var payload = Map.<EmbeddedObject, EmbeddedContent>of(ref, new EmbeddedContent.Attachment("<file>.txt"));

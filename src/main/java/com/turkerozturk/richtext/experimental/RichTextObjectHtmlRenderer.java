@@ -91,7 +91,14 @@ public final class RichTextObjectHtmlRenderer {
                 if (tenantView == null || tenantView.isBlank()) yield "<span class=\"rich-text-attachment\">" + label + "</span>";
                 String url = "/download/" + ref.nodeId() + "/" + ref.bufferOffset() + "?_tenantView="
                         + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
-                yield "<a class=\"rich-text-attachment\" target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(url) + "\">" + label + "</a>";
+                String preview = "";
+                if (!pdfHeadings && com.turkerozturk.image.attachments.excel.ExcelPreviewService.supports(attachment.filename())) {
+                    String previewUrl = "/attachments/" + ref.nodeId() + "/" + ref.bufferOffset()
+                            + "/excel?_tenantView=" + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
+                    preview = " <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(previewUrl)
+                            + "\">[" + escape(com.turkerozturk.image.attachments.excel.ExcelAttachmentLinks.label()) + "]</a>";
+                }
+                yield "<a class=\"rich-text-attachment\" target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(url) + "\">" + label + "</a>" + preview;
             }
             case ANCHOR -> {
                 if (!(payload instanceof EmbeddedContent.Anchor anchor)) throw mismatch(ref);

@@ -14,6 +14,7 @@
  <th scope="col" class="d-none d-md-table-cell" th:text="#{files.node}"></th><th scope="col" class="d-none d-md-table-cell" th:text="#{files.date}"></th>
  </tr></thead><tbody><tr th:each="item:${attachments.items}">
  <td class="attachment-name"><a th:href="@{/attachments/{node}/{offset}/download(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="${item.filename}"></a>
+ <a th:if="${item.excel}" class="btn btn-sm btn-outline-secondary ms-2" target="_blank" rel="noopener noreferrer" th:href="@{/attachments/{node}/{offset}/excel(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{excel.open}"></a>
  <div class="d-md-none small mt-1"><a th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a> · <span th:text="${item.identity}"></span></div></td>
  <td class="text-nowrap" th:title="#{files.bytes(${item.bytes})}" th:text="${item.sizeText}"></td>
  <td class="d-none d-md-table-cell"><a th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a><div class="small text-body-secondary" th:text="${item.identity}"></div></td>

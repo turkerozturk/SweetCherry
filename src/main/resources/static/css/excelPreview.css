@@ -1,0 +1,9 @@
+.excel-preview{min-width:0}.excel-preview select{max-width:min(30rem,85vw)}
+.excel-scroll{max-height:70vh;overflow:auto;border:1px solid var(--bs-border-color,#888)}
+.excel-grid{border-collapse:separate;border-spacing:0;table-layout:fixed;width:max-content;background:var(--bs-body-bg,#fff);color:var(--bs-body-color,#222)}
+.excel-grid th,.excel-grid td{border-right:1px solid var(--bs-border-color,#888);border-bottom:1px solid var(--bs-border-color,#888);padding:5px 8px;vertical-align:top;min-width:160px;max-width:260px;overflow-wrap:anywhere}
+.excel-grid thead th{position:sticky;top:0;z-index:2;background:var(--bs-tertiary-bg,#eee);text-align:center}
+.excel-grid tr>th:first-child{position:sticky;left:0;z-index:1;min-width:55px;max-width:75px;background:var(--bs-tertiary-bg,#eee);text-align:right}
+.excel-grid thead th:first-child{z-index:3}.excel-cell{white-space:pre-wrap;max-width:240px;max-height:15rem;overflow:auto}
+.excel-grid .align-right{text-align:right}.excel-grid .align-center{text-align:center}.excel-grid .cell-bold .excel-cell{font-weight:bold}.excel-grid .cell-italic .excel-cell{font-style:italic}
+.excel-grid details{max-width:240px}.excel-grid code{white-space:pre-wrap}
