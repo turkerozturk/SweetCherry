@@ -1,4 +1,4 @@
-# Tasks (TODO): first stage
+# Tasks (TODO)
 
 Open **View Mode → Tasks (TODO)** or `/nodes/todo`. Add the exact lowercase tag
 `todo` to an existing node using Properties or the quick tag editor.
@@ -22,6 +22,6 @@ Only tags and modification time change; note content, objects and creation time
 are preserved. When CTBLOGS is enabled, changes are audited transactionally as
 `todo.update`.
 
-This stage has no due dates, recurrence or alarms. The next stage is node-linked
-reminder records and upcoming/overdue lists, followed by yearly recurrence,
-calendar views and visual/audio alerts.
+Tasks use tags for their open/completed status. For independent dates, annual
+recurrence and in-page visual/audio alerts, use [node-linked reminders](reminders.md).
+Completing a task and completing its reminder are separate actions.

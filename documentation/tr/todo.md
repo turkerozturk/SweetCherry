@@ -1,4 +1,4 @@
-# Görevler (TODO): ilk aşama
+# Görevler (TODO)
 
 **View Mode → Görevler (TODO)** veya `/nodes/todo` adresini açın.
 
@@ -30,9 +30,9 @@ günceller; içerik, nesneler ve oluşturulma tarihi korunur. Etiket alanı mevc
 etiket düzenleyicisiyle aynı kurallarla normalleştirilir. CTBLOGS etkinse görev
 durumu değişiklikleri `todo.update` olarak aynı işlem içinde kaydedilir.
 
-Bu ilk aşamada son tarih, öncelik, tekrar veya alarm alanı oluşturulmaz.
-Sonraki aşama: düğüme bağlı hatırlatıcı formu ve yaklaşan/geciken kayıtlar;
-ardından yıllık tekrar, ortak takvim ve görsel/sesli alarm.
+Görev durumu etiketlerde tutulur. Tarih, yıllık tekrar ve sayfa içi görsel/sesli
+uyarılar için [düğüme bağlı hatırlatıcıları](reminders.md) kullanın. TODO
+tamamlamak ile hatırlatıcı tamamlamak ayrı işlemlerdir.
 
 ## Kontrol
 

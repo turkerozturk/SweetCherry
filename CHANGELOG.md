@@ -4,11 +4,17 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
-- Added read-only Word attachment previews for DOCX and legacy DOC, including text and tables.
+## [1.11.0] - 2026-11-17
 
-- Added read-only Excel attachment previews with worksheet selection, paged grids and original-file downloads.
-
-- Group the icon catalogue with editable NodeIcon categories, localized category/name filtering and sortable category/name/original-index columns, while retaining existing icon IDs and assets.
+- Add read-only Word (.docx/.doc) and Excel (.xlsx/.xls) attachment previews with bounded text/table/grid rendering and original-file downloads; Excel formulas show saved results without evaluation.
+- Group and filter the icon catalogue by editable categories and readable names, preserving CherryTree icon IDs.
+- Add Datasources → Database info with metadata statistics and a read-only broken internal-link report for missing targets/anchors and invalid links.
+- Show a configurable tag indicator in the node tree, actual tags on hover and selected-node tags in the workspace status bar, including shared nodes.
+- Add tag-based Tasks (TODO), open/completed/all filters and guarded completion/reopening through exact `todo`/`done` tags.
+- Add node-linked reminders with date/time-zone/note forms, upcoming/overdue lists, search, pagination and guarded completion/cancellation/reopening. Preserve source note content and store records in a protected REMINDERS helper node.
+- Add annual recurrence with explicit February 29 handling, occurrence completion and an in-page visual/audio alarm panel with dismissal, ten-minute snooze and browser receipt de-duplication.
+- Add reminder, alarm-panel and sound enable/disable settings, all enabled by default, and persist browser mute/stop preferences across navigation. Hide disabled feature controls and preserve stored records.
+- Add a text filter to System settings, searching descriptions, YAML keys and values while retaining hidden fields in saved submissions.
 
 ## [1.10.0] - 2026-11-15
 

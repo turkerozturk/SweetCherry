@@ -39,9 +39,10 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | **Explore the tree** | Markmap and Mermaid views; quick child creation in Markmap; balanced two-sided layout and a page-filling canvas; node movement, duplication and shared nodes. |
 | **Export and exchange** | PDF with hierarchical navigation; CTB export/import with remapped internal IDs; Freeplane/FreeMind export and [MM import](documentation/en/freeplane-import.md); folder-tree text ZIP export and [ZIP import](documentation/en/zip-import.md); custom record reports and HTML/PDF layouts. |
 | **Back up and recover** | Verified CTB snapshots, optional schedules and retention, backup downloads, reviewed deletion and recovery into a separate working copy. |
+| **Tasks and reminders** | [TODO tasks](documentation/en/todo.md) using `todo`/`done` tags; [node-linked reminders](documentation/en/reminders.md), annual recurrence and in-page visual/audio alarms. |
 | **Connect and configure** | Data-source wizard with [empty CTB creation](documentation/en/empty-ctb.md); SQLite, MariaDB/MySQL and PostgreSQL connections; application settings editors; local use or explicitly configured network access. |
 
-**New in 1.10.0:** image/table/codebox galleries, image tag filtering, improved attachment browsing, quick and batch organization, an optional reversible Trash Bin, optional CTBLOGS history and multiple-image insertion. [Release details](documentation/releases/v1.10.0.md).
+**New in 1.11.0:** Word/Excel attachment previews, database statistics and broken internal-link reports, tree tag details, tag-based TODO tasks, node-linked reminders with annual recurrence and visual/audio alarms, and a searchable System settings page. [Release details](documentation/releases/v1.11.0.md).
 
 ## Documentation
 
@@ -50,7 +51,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | [English installation and usage](documentation/en/setup-and-run.md) | [First-start help / İlk çalıştırma](documentation/tr/first-start.md) |
 | [Türkçe kurulum ve kullanım](documentation/tr/installation.md) | [English feature guides](documentation/en) · [Türkçe özellik kılavuzları](documentation/tr) |
 | [Import folders and files from ZIP](documentation/en/zip-import.md) | [ZIP içe aktarım kılavuzu](documentation/tr/zip-import.md) |
-| [Changes and upgrade notes](CHANGELOG.md) | [1.10.0 release notes](documentation/releases/v1.10.0.md) · [All release notes](documentation/releases) |
+| [Changes and upgrade notes](CHANGELOG.md) | [1.11.0 release notes](documentation/releases/v1.11.0.md) · [All release notes](documentation/releases) |
 
 **Automatically generated documentation is also available on [DeepWiki](https://deepwiki.com/turkerozturk/SweetCherry).** Use it to explore the repository and codebase. DeepWiki is an external, automatically generated resource; check the version-matched project guides for installation instructions, supported behavior and limits.
 
