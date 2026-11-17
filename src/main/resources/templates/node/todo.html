@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{todo.title}"></title><section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/tags.css}"></section></head>
+<body><section layout:fragment="content" class="container-fluid tags-page p-3">
+<h1 th:text="#{todo.title}"></h1>
+<p th:text="#{todo.help}"></p>
+<p><a th:href="@{/nodes/tags(_tenantView=${tenantViewToken})}" th:text="#{todo.tagsPage}"></a></p>
+<p th:if="${todoSaved == true}" class="alert alert-success" role="status" th:text="#{todo.saved}"></p>
+<p th:text="#{todo.counts(${tasks.total()},${tasks.open},${tasks.done})}"></p>
+<form method="get" th:action="@{/nodes/todo}" class="d-flex flex-wrap align-items-end gap-2 mb-3">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div><label for="todoSearch" th:text="#{todo.search}"></label><input id="todoSearch" name="q" type="search" class="form-control" maxlength="500" th:value="${tasks.options.q}"></div>
+<div><label for="todoStatus" th:text="#{todo.status}"></label><select id="todoStatus" name="status" class="form-select"><option th:each="key : ${ {'open','done','all'} }" th:value="${key}" th:selected="${tasks.options.status == key}" th:text="${#messages.msg('todo.'+key)}"></option></select></div>
+<div><label for="todoLimit" th:text="#{tags.perPage}"></label><input id="todoLimit" type="number" name="limit" min="1" max="200" class="form-control" style="width:7rem" required th:value="${tasks.options.limit}"></div>
+<button type="submit" class="btn btn-primary" th:text="#{tags.show}"></button>
+</form>
+<p th:if="${invalidOptions == true}" class="alert alert-warning" th:text="#{tags.invalidOptions}"></p>
+<p th:if="${canEditTasks != true}" class="text-muted" th:text="#{todo.readonly}"></p>
+<p th:text="#{tags.range(${tasks.first()},${tasks.last()},${tasks.matched})}"></p>
+<p th:if="${tasks.matched == 0}" class="alert alert-info" th:text="#{todo.empty}"></p>
+<p th:if="${tasks.options.page > tasks.pages()}" class="alert alert-warning"><span th:text="#{tags.outsidePage}"></span> <a th:href="@{/nodes/todo(q=${tasks.options.q},status=${tasks.options.status},limit=${tasks.options.limit},_tenantView=${tenantViewToken})}" th:text="#{tags.firstPage}"></a></p>
+<div th:if="${!tasks.rows.isEmpty()}" class="table-responsive"><table class="table table-sm align-middle">
+<thead><tr><th th:text="#{tags.column.node}"></th><th th:text="#{tags.column.tags}"></th><th th:text="#{todo.locations}"></th><th th:text="#{todo.status}"></th><th th:if="${canEditTasks}" th:text="#{todo.action}"></th></tr></thead>
+<tbody><tr th:each="task : ${tasks.rows}">
+<td><a th:href="@{/nodes/{id}(id=${task.id},_tenantView=${tenantViewToken})}" th:title="${task.breadcrumb}"><img th:src="@{/img/ctbicons/{name}.png(name=${task.icon})}" width="20" height="20" alt="" loading="lazy"> <span th:style="|font-weight:${task.bold ? 'bold' : 'normal'};color:${task.color}|" th:text="${task.name.isEmpty() ? #messages.msg('tags.unnamed') : task.name}"></span> <span th:text="|[${task.contentId}]|"></span></a></td>
+<td><span th:each="tag : ${task.tags}" class="badge tag-badge" th:text="${tag}"></span></td>
+<td th:text="${task.locations}"></td>
+<td><span class="badge" th:classappend="${task.done ? 'text-bg-success' : 'text-bg-secondary'}" th:text="${#messages.msg(task.done ? 'todo.done' : 'todo.open')}"></span></td>
+<td th:if="${canEditTasks}"><form method="post" th:action="@{/nodes/todo/{id}/state(id=${task.id})}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="revision" th:value="${task.revision}"><input type="hidden" name="state" th:value="${task.done ? 'open' : 'done'}">
+<input type="hidden" name="q" th:value="${tasks.options.q}"><input type="hidden" name="status" th:value="${tasks.options.status}"><input type="hidden" name="limit" th:value="${tasks.options.limit}"><input type="hidden" name="page" th:value="${tasks.options.page}">
+<button type="submit" class="btn btn-sm btn-outline-primary" th:text="${#messages.msg(task.done ? 'todo.reopen' : 'todo.complete')}"></button>
+</form></td></tr></tbody></table></div>
+<nav class="d-flex flex-wrap align-items-center gap-2" th:aria-label="#{tags.pages}">
+<a th:if="${tasks.options.page > 1 && tasks.options.page <= tasks.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/todo(q=${tasks.options.q},status=${tasks.options.status},limit=${tasks.options.limit},page=${tasks.options.page - 1},_tenantView=${tenantViewToken})}" th:text="#{tags.previous}"></a>
+<span th:text="#{tags.page(${tasks.options.page},${tasks.pages()})}"></span>
+<a th:if="${tasks.options.page < tasks.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/todo(q=${tasks.options.q},status=${tasks.options.status},limit=${tasks.options.limit},page=${tasks.options.page + 1},_tenantView=${tenantViewToken})}" th:text="#{tags.next}"></a>
+</nav></section></body></html>

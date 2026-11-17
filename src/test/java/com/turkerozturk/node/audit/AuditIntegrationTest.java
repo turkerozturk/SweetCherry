@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(properties={"myapp.openWebBrowserOnStartup=false","myapp.desktop.enabled=false","myapp.command-line-runner.enabled=false","myapp.audit.enabled=true","myapp.trash.enabled=true","myapp.audit.max-event-characters=1000000"})
 class AuditIntegrationTest {
+ @Autowired com.turkerozturk.node.todo.TodoService todo;
  @Autowired NodeContentEditingService content;@Autowired AuditReadService history;
  @Autowired com.turkerozturk.node.properties.NodePropertiesService properties;
  @Autowired com.turkerozturk.node.tags.QuickTagService tags;
@@ -37,6 +38,25 @@ class AuditIntegrationTest {
  String text(String sql)throws Exception{try(var c=source.getConnection();var q=c.createStatement();var rs=q.executeQuery(sql)){rs.next();return rs.getString(1);}}
  List<AuditSql.Index> events(){return history.history(LocalDate.now(ZoneOffset.UTC).toString(),0,0).events();}
  AuditSql.Event event(){return history.event(events().get(0).id());}
+ @Test void completingAndReopeningTasksAreAuditedWithExactTagChanges()throws Exception {
+  sql("UPDATE node SET tags='todo project' WHERE node_id=2");
+  var task=todo.inspect(new com.turkerozturk.node.todo.TodoService.Options("","all",50,1)).rows().stream().filter(t->t.contentId()==2).findFirst().orElseThrow();
+  todo.update(task.id(),true,task.revision());
+  assertThat(events()).hasSize(1);assertThat(event().action()).isEqualTo("todo.update");
+  assertThat(event().nodes()).anyMatch(change->change.id()==2&&"todo project".equals(change.before().get("tags"))&&"todo project done".equals(change.after().get("tags")));
+  var completed=todo.inspect(new com.turkerozturk.node.todo.TodoService.Options("","done",50,1)).rows().stream().filter(t->t.contentId()==2).findFirst().orElseThrow();
+  todo.update(completed.id(),false,completed.revision());assertThat(events()).hasSize(2);assertThat(text("SELECT tags FROM node WHERE node_id=2")).isEqualTo("todo project");
+ }
+ @Test void staleTaskActionsCannotEditATrashedLocationButLiveSharedLocationsRemainUsable()throws Exception {
+  sql("UPDATE node SET tags='todo project' WHERE node_id=2");
+  var task=todo.inspect(new com.turkerozturk.node.todo.TodoService.Options("","all",50,1)).rows().stream().filter(t->t.contentId()==2).findFirst().orElseThrow();
+  trash.trash(task.id(),trash.preview(task.id()).revision());
+  assertThatThrownBy(()->todo.update(task.id(),true,task.revision())).hasMessageContaining("changed");
+  assertThat(text("SELECT tags FROM node WHERE node_id=2")).isEqualTo("todo project");
+  var shared=todo.inspect(new com.turkerozturk.node.todo.TodoService.Options("","all",50,1)).rows().stream().filter(t->t.contentId()==2).findFirst().orElseThrow();
+  assertThat(shared.id()).isEqualTo(11);assertThat(shared.locations()).isEqualTo(1);
+  todo.update(shared.id(),true,shared.revision());assertThat(text("SELECT tags FROM node WHERE node_id=2")).isEqualTo("todo project done");
+ }
  @Test void advisedContentSaveRetainsExactBeforeAfterTextAndActorAndDoesNotAuditItself()throws Exception{
   String before=text("SELECT txt FROM node WHERE node_id=2");content.update(2,"New 😀 text");assertThat(events()).hasSize(1);var event=event();assertThat(event.action()).isEqualTo("content.edit");assertThat(event.actor()).isEqualTo("audit-admin");assertThat(history.source(event,2,"before",true)).isEqualTo(before);assertThat(history.source(event,2,"after",false)).isEqualTo("New 😀 text");assertThat(history.history(event.time().substring(0,10),2,0).total()).isEqualTo(1);assertThat(history.history(event.time().substring(0,10),11,0).total()).isEqualTo(1);assertThat(text("SELECT txt FROM node WHERE node_id=2")).isEqualTo("New 😀 text");
   content.update(2,"New 😀 text");assertThat(events()).hasSize(1);

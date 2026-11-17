@@ -1,0 +1,5 @@
+<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{todo.title}"></title></head><body><section layout:fragment="content" class="container p-3">
+<h1 th:text="#{todo.title}"></h1><p class="alert alert-warning" th:text="${#messages.msg('todo.error.'+todoError)}"></p>
+<a class="btn btn-primary" th:href="@{/nodes/todo(_tenantView=${tenantViewToken})}" th:text="#{todo.back}"></a>
+</section></body></html>
