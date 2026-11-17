@@ -1,6 +1,7 @@
 package com.turkerozturk.node.links;
 
 import org.junit.jupiter.api.Test;
+import com.turkerozturk.multipledatabases.info.DatabaseInfoService;
 import org.springframework.context.support.StaticMessageSource;
 import org.springframework.mock.web.*;
 import org.thymeleaf.context.WebContext;
@@ -27,13 +28,30 @@ class InternalLinkReportTemplateTest {
   var report=new InternalLinkReportService.Report(List.of(),0,0,0,0,0,0,0,0,List.of(),new InternalLinkReportService.Options("","all",50,3));
   assertThat(render(report,Locale.ENGLISH)).contains("No internal links match", "Return to first page");
  }
+ @Test void databaseInfoEmbedsReportAndKeepsFiltersAndPagingOnSamePage()throws Exception {
+  var source=new InternalLinkReportService.Place(1,"<Source>","ct_home",false,"#000000",false,true,"<Source> [1]");
+  var row=new InternalLinkReportService.Row(source,"text",0,"<label>","node 99","99",null,"","","missingNode");
+  var report=new InternalLinkReportService.Report(List.of(row),2,1,1,2,0,0,2,0,List.of(),new InternalLinkReportService.Options("","broken",1,1));
+  for(Locale locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))) {
+   String html=render(report,locale,true);
+   assertThat(html).contains("&lt;Database&gt;","&lt;Source&gt;","&lt;label&gt;","action=\"/database-info\"","/database-info?q=", "_tenantView=v", "value=\"broken\" selected=\"selected\"")
+     .doesNotContain("??databaseInfo", "??internalReport", "<Database>","/nodes/99?", "action=\"/nodes/internal-links\"");
+  }
+ }
  private static String render(InternalLinkReportService.Report report,Locale locale)throws Exception {
+  return render(report,locale,false);
+ }
+ private static String render(InternalLinkReportService.Report report,Locale locale,boolean info)throws Exception {
   var engine=new SpringTemplateEngine();var fragments=new ClassLoaderTemplateResolver();fragments.setPrefix("templates/");fragments.setSuffix(".html");fragments.setResolvablePatterns(Set.of("node/*"));fragments.setOrder(1);fragments.setCheckExistence(true);engine.addTemplateResolver(fragments);
   var strings=new StringTemplateResolver();strings.setOrder(2);strings.setTemplateMode("HTML");engine.addTemplateResolver(strings);
   var messages=new StaticMessageSource();var properties=new Properties();try(var in=Files.newBufferedReader(Path.of("src/main/resources/messages_"+locale.getLanguage()+".properties"))){properties.load(in);}
   properties.forEach((key,value)->messages.addMessage(key.toString(),locale,value.toString()));engine.setTemplateEngineMessageSource(messages);
   var servlet=new MockServletContext();var request=new MockHttpServletRequest(servlet);request.setRequestURI("/nodes/internal-links");var response=new MockHttpServletResponse();
   var context=new WebContext(JakartaServletWebApplication.buildApplication(servlet).buildExchange(request,response),locale);context.setVariable("report",report);context.setVariable("tenantViewToken","v");
-  return engine.process(Files.readString(Path.of("src/main/resources/templates/node/internal-links.html")),context);
+  if(info) {
+   context.setVariable("currentTenantName","<Database>");context.setVariable("reportPath","/database-info");
+   context.setVariable("databaseInfo",new DatabaseInfoService.Info("SQLite",1,2,1,1,0,0,0,0,List.of(new DatabaseInfoService.SyntaxCount("plain-text",1))));
+  }
+  return engine.process(Files.readString(Path.of("src/main/resources/templates/"+(info?"database-info.html":"node/internal-links.html"))),context);
  }
 }

@@ -5,6 +5,7 @@
 <body><section layout:fragment="content" class="internal-report container-fluid">
 <h1 th:text="#{internalReport.title}"></h1>
 <p class="text-muted" th:text="#{internalReport.help}"></p>
+<div th:fragment="reportBody" th:with="reportPath=${reportPath ?: '/nodes/internal-links'}">
 <div class="internal-report-stats">
 <div><strong th:text="${report.links}"></strong><span th:text="#{internalReport.links}"></span></div>
 <div><strong th:text="${report.sourceContents}"></strong><span th:text="#{internalReport.contents}"></span></div>
@@ -12,7 +13,7 @@
 <div><strong th:text="${report.broken()}"></strong><span th:text="#{internalReport.broken}"></span></div>
 </div>
 <p class="small" th:text="#{internalReport.breakdown(${report.missingNodes},${report.missingAnchors},${report.invalidLinks})}"></p>
-<form method="get" th:action="@{/nodes/internal-links}" class="internal-report-filters">
+<form method="get" th:action="@{${reportPath}}" class="internal-report-filters">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <div><label for="internalReportSearch" th:text="#{internalReport.search}"></label><input id="internalReportSearch" class="form-control" type="search" name="q" maxlength="500" th:value="${report.options.query}"></div>
 <div><label for="internalReportStatus" th:text="#{internalReport.status}"></label><select id="internalReportStatus" class="form-select" name="status">
@@ -30,7 +31,7 @@
 </details>
 <p th:text="#{internalReport.range(${report.first()},${report.last()},${report.matched})}"></p>
 <p th:if="${report.matched == 0}" class="alert alert-info" th:text="#{internalReport.empty}"></p>
-<p th:if="${report.options.page > report.pages()}" class="alert alert-warning"><span th:text="#{internalReport.outsidePage}"></span> <a th:href="@{/nodes/internal-links(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},_tenantView=${tenantViewToken})}" th:text="#{internalReport.firstPage}"></a></p>
+<p th:if="${report.options.page > report.pages()}" class="alert alert-warning"><span th:text="#{internalReport.outsidePage}"></span> <a th:href="@{${reportPath}(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},_tenantView=${tenantViewToken})}" th:text="#{internalReport.firstPage}"></a></p>
 <div th:if="${!report.rows.isEmpty()}" class="table-responsive"><table class="table table-sm internal-report-table">
 <thead><tr><th th:text="#{internalReport.source}"></th><th th:text="#{internalReport.linkText}"></th><th th:text="#{internalReport.target}"></th><th th:text="#{internalReport.status}"></th></tr></thead>
 <tbody><tr th:each="row : ${report.rows}">
@@ -43,8 +44,9 @@
 <td th:attr="data-label=#{internalReport.status}"><span class="badge" th:classappend="${row.status == 'ok' ? 'text-bg-success' : 'text-bg-warning'}" th:text="${#messages.msg('internalReport.' + row.status)}"></span></td>
 </tr></tbody></table></div>
 <nav class="internal-report-pagination" th:aria-label="#{internalReport.pages}">
-<a th:if="${report.options.page > 1 && report.options.page <= report.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/internal-links(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},page=${report.options.page - 1},_tenantView=${tenantViewToken})}" th:text="#{internalReport.previous}"></a>
+<a th:if="${report.options.page > 1 && report.options.page <= report.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{${reportPath}(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},page=${report.options.page - 1},_tenantView=${tenantViewToken})}" th:text="#{internalReport.previous}"></a>
 <span th:text="#{internalReport.page(${report.options.page},${report.pages()})}"></span>
-<a th:if="${report.options.page < report.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/internal-links(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},page=${report.options.page + 1},_tenantView=${tenantViewToken})}" th:text="#{internalReport.next}"></a>
+<a th:if="${report.options.page < report.pages()}" class="btn btn-sm btn-outline-primary" th:href="@{${reportPath}(q=${report.options.query},status=${report.options.status},limit=${report.options.limit},page=${report.options.page + 1},_tenantView=${tenantViewToken})}" th:text="#{internalReport.next}"></a>
 </nav>
+</div>
 </section></body></html>

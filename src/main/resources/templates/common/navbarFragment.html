@@ -190,6 +190,12 @@
 
                             </th:block>
 
+                            <li th:if="${currentTenantName != null}">
+                                <a class="dropdown-item" th:href="@{/database-info(_tenantView=${tenantViewToken})}">
+                                    <i class="fas fa-circle-info"></i> <span th:text="#{databaseInfo.title}">Database info</span>
+                                </a>
+                            </li>
+
                             <div class="dropdown-divider"></div>
 
 

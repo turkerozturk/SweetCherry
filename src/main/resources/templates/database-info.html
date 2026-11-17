@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{databaseInfo.title}"></title>
+<section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/node/internalLinks.css}"></section></head>
+<body><section layout:fragment="content" class="internal-report container-fluid">
+<h1 th:text="#{databaseInfo.title}"></h1>
+<p><strong th:text="${currentTenantName}"></strong> · <span th:text="${databaseInfo.engine}"></span></p>
+<p class="text-muted" th:text="#{databaseInfo.help}"></p>
+<div class="table-responsive"><table class="table table-sm w-auto">
+<tbody>
+<tr><th scope="row" th:text="#{databaseInfo.contents}"></th><td th:text="${databaseInfo.contents}"></td></tr>
+<tr><th scope="row" th:text="#{databaseInfo.places}"></th><td th:text="${databaseInfo.places}"></td></tr>
+<tr><th scope="row" th:text="#{databaseInfo.shared}"></th><td th:text="${databaseInfo.sharedPlaces}"></td></tr>
+<tr><th scope="row" th:text="#{databaseInfo.roots}"></th><td th:text="${databaseInfo.roots}"></td></tr>
+<tr><th scope="row" th:text="#{databaseInfo.bookmarks}"></th><td th:text="${databaseInfo.bookmarks}"></td></tr>
+<tr><th scope="row" th:text="#{databaseInfo.objects}"></th><td th:text="${databaseInfo.objects}"></td></tr>
+<tr><th scope="row" th:text="#{databaseInfo.codeBoxes}"></th><td th:text="${databaseInfo.codeBoxes}"></td></tr>
+<tr><th scope="row" th:text="#{databaseInfo.tables}"></th><td th:text="${databaseInfo.tables}"></td></tr>
+</tbody></table></div>
+<details class="mb-3"><summary th:text="#{databaseInfo.syntaxes}"></summary>
+<table class="table table-sm w-auto"><thead><tr><th th:text="#{databaseInfo.syntax}"></th><th th:text="#{databaseInfo.count}"></th></tr></thead>
+<tbody><tr th:each="item : ${databaseInfo.syntaxes}"><td th:text="${item.syntax.isEmpty() ? #messages.msg('databaseInfo.unspecified') : item.syntax}"></td><td th:text="${item.count}"></td></tr></tbody></table>
+</details>
+<h2 th:text="#{internalReport.title}"></h2>
+<p class="text-muted" th:text="#{databaseInfo.linksHelp}"></p>
+<th:block th:replace="~{node/internal-links :: reportBody}"></th:block>
+</section></body></html>
