@@ -17,8 +17,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
             return true;
         }
         boolean protectedPost = "POST".equalsIgnoreCase(request.getMethod())
-                && (request.getRequestURI().startsWith(request.getContextPath() + "/nodes/reminders/")
-                || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/todo/")
+                && (request.getRequestURI().startsWith(request.getContextPath() + "/nodes/todo/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/delete/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/trash/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/properties/")

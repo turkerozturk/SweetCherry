@@ -14,7 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(properties={"myapp.openWebBrowserOnStartup=false","myapp.desktop.enabled=false","myapp.command-line-runner.enabled=false","myapp.audit.enabled=true","myapp.trash.enabled=true","myapp.audit.max-event-characters=1000000"})
 class AuditIntegrationTest {
- @Autowired com.turkerozturk.node.reminders.ReminderService reminders;
  @Autowired com.turkerozturk.node.todo.TodoService todo;
  @Autowired NodeContentEditingService content;@Autowired AuditReadService history;
  @Autowired com.turkerozturk.node.properties.NodePropertiesService properties;
@@ -39,21 +38,6 @@ class AuditIntegrationTest {
  String text(String sql)throws Exception{try(var c=source.getConnection();var q=c.createStatement();var rs=q.executeQuery(sql)){rs.next();return rs.getString(1);}}
  List<AuditSql.Index> events(){return history.history(LocalDate.now(ZoneOffset.UTC).toString(),0,0).events();}
  AuditSql.Event event(){return history.event(events().get(0).id());}
- @Test void reminderStoreIsPortableProtectedAndDoesNotPolluteContentHistory()throws Exception {
-  var form=reminders.editor("",11);reminders.save("",form.nodeId(),form.contentId(),"2026-11-18T16:00","Europe/Istanbul","Call",form.revision());
-  long root=Long.parseLong(text("SELECT node_id FROM node WHERE tags='"+com.turkerozturk.node.reminders.ReminderStore.TAG+"'"));
-  assertThatThrownBy(()->properties.realNode(root)).hasMessageContaining("reminder.protected");
-  assertThatThrownBy(()->content.update(root,"corrupt")).hasMessageContaining("reminder.protected");
-  content.update(2,"Ordinary edit");assertThat(events()).hasSize(1);assertThat(event().nodes()).noneMatch(change->change.id()==root);
-  assertThat(reminders.inspect(new com.turkerozturk.node.reminders.ReminderService.Options("","all",50,1)).rows()).hasSize(1);
- }
- @Test void reminderCreationRollsBackBothNodeAndTreeWhenInsertionFails()throws Exception {
-  var form=reminders.editor("",2);
-  sql("CREATE TRIGGER refuse_reminder BEFORE INSERT ON children WHEN NEW.node_id IN (SELECT node_id FROM node WHERE tags='"+com.turkerozturk.node.reminders.ReminderStore.TAG+"') BEGIN SELECT RAISE(ABORT,'reminder test failure'); END");
-  assertThatThrownBy(()->reminders.save("",2,2,"2026-11-18T16:00","Europe/Istanbul","Atomic",form.revision())).isInstanceOf(RuntimeException.class);
-  assertThat(text("SELECT COUNT(*) FROM node WHERE tags='"+com.turkerozturk.node.reminders.ReminderStore.TAG+"'")).isEqualTo("0");
-  assertThat(text("SELECT COUNT(*) FROM children WHERE node_id NOT IN (SELECT node_id FROM node) AND COALESCE(master_id,0)=0")).isEqualTo("0");
- }
  @Test void completingAndReopeningTasksAreAuditedWithExactTagChanges()throws Exception {
   sql("UPDATE node SET tags='todo project' WHERE node_id=2");
   var task=todo.inspect(new com.turkerozturk.node.todo.TodoService.Options("","all",50,1)).rows().stream().filter(t->t.contentId()==2).findFirst().orElseThrow();

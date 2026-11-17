@@ -1,6 +1,0 @@
-<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
-<form th:fragment="button(row,state,label)" method="post" class="d-inline-block m-1" th:action="@{/nodes/reminders/{id}/state(id=${row.id})}">
-<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="revision" th:value="${reminders.revision}"><input type="hidden" name="state" th:value="${state}">
-<input type="hidden" name="q" th:value="${reminders.options.q}"><input type="hidden" name="status" th:value="${reminders.options.status}"><input type="hidden" name="limit" th:value="${reminders.options.limit}"><input type="hidden" name="page" th:value="${reminders.options.page}">
-<button type="submit" class="btn btn-sm btn-outline-secondary" th:text="${#messages.msg('reminder.'+label)}"></button>
-</form></body></html>

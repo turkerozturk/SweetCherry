@@ -143,9 +143,8 @@ public final class AuditSql {
   try(var q=c.prepareStatement("INSERT INTO node(node_id,name,txt,syntax,tags,is_ro,is_richtxt,has_codebox,has_table,has_image,level,ts_creation,ts_lastsave) VALUES(?,?,?,'plain-text',?,1,0,0,0,0,3,?,?)")){q.setLong(1,id);q.setString(2,title);q.setString(3,encode(h,content));q.setString(4,TAG);q.setLong(5,now);q.setLong(6,now);q.executeUpdate();}
   try(var q=c.prepareStatement("INSERT INTO children(node_id,father_id,sequence,master_id) VALUES(?,?,?,0)")){q.setLong(1,id);q.setLong(2,parent);q.setLong(3,sequence);q.executeUpdate();}return id;
  }
- public static void guardHelper(Connection c,long id)throws SQLException{com.turkerozturk.node.reminders.ReminderStore.guardHelper(c,id);try(var q=c.prepareStatement("SELECT tags FROM node WHERE node_id=?")){q.setLong(1,id);try(var rs=q.executeQuery()){if(rs.next()&&TAG.equals(rs.getString(1)))throw new ResponseStatusException(HttpStatus.CONFLICT,"audit.protected");}}}
+ public static void guardHelper(Connection c,long id)throws SQLException{try(var q=c.prepareStatement("SELECT tags FROM node WHERE node_id=?")){q.setLong(1,id);try(var rs=q.executeQuery()){if(rs.next()&&TAG.equals(rs.getString(1)))throw new ResponseStatusException(HttpStatus.CONFLICT,"audit.protected");}}}
  public static void guardMove(Connection c,Collection<Long> ids,long parent)throws SQLException{
-  com.turkerozturk.node.reminders.ReminderStore.guardMove(c,ids,parent);
   if(parent>0)guardHelper(c,parent);for(long id:ids)guardHelper(c,id);
   // Also protect an externally relocated log container from subtree deletion/copy/move.
   var helperIds=new HashSet<Long>();try(var q=c.prepareStatement("SELECT node_id,tags FROM node WHERE tags=?")){q.setString(1,TAG);try(var rs=q.executeQuery()){while(rs.next())if(TAG.equals(rs.getString(2)))helperIds.add(rs.getLong(1));}}
