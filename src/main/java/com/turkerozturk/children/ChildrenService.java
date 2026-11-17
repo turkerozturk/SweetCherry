@@ -89,7 +89,7 @@ public class ChildrenService {
             result.add(new NaviNode(row.getNodeId(), display.getName(), display.getNodeIcon(),
                     !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
                     display.getTitleColorAsHtmlHex(), display.isReadOnly(), display.isBoldnessBit(),
-                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId())));
+                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId()), !com.turkerozturk.node.tags.NodeTags.split(display.getTags()).isEmpty()));
         }
         return result;
     }

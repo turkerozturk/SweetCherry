@@ -26,7 +26,11 @@ class AppearanceSettingsTest {
         bad.forEach((key,value)->{var values=defaults();values.put(key,value);assertThatThrownBy(()->ApplicationSettingsService.update("myapp: {}\n",values)).as(key).isInstanceOf(RuntimeException.class);});
     }
     @Test void treeDensityDefaultsAndBoundsAreSafe(){
-        var normal=new TreeAppearanceAdvice("16","1");assertThat(normal.fontSize()).isEqualTo(16);assertThat(normal.verticalPadding()).isEqualTo(1);
+        var normal=new TreeAppearanceAdvice("16","1");
+        assertThat(normal.showTagIndicator()).isTrue();
+        org.springframework.test.util.ReflectionTestUtils.setField(normal,"showTagIndicator",false);
+        assertThat(normal.showTagIndicator()).isFalse();
+        assertThat(normal.fontSize()).isEqualTo(16);assertThat(normal.verticalPadding()).isEqualTo(1);
         var invalid=new TreeAppearanceAdvice("1;display:none","-2");assertThat(invalid.fontSize()).isEqualTo(16);assertThat(invalid.verticalPadding()).isEqualTo(1);
         assertThat(new TreeAppearanceAdvice("32","0").verticalPadding()).isZero();
         for(var entry:Map.of("myapp.tree.font-size","9","myapp.tree.vertical-padding","13").entrySet()){var values=defaults();values.put(entry.getKey(),entry.getValue());assertThatThrownBy(()->ApplicationSettingsService.update("myapp: {}\n",values)).isInstanceOf(IllegalArgumentException.class);}

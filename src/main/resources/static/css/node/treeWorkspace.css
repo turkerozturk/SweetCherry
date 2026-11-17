@@ -84,3 +84,7 @@
 .workspace-root-content { flex: 1; min-height: 0; overflow: auto; padding: 1rem; overflow-wrap: anywhere; }
 
 [data-node-export-menu]>.dropdown-menu{width:22rem;max-width:calc(100vw - 1rem);max-height:70dvh;overflow-y:auto}[data-node-export-menu] .dropdown-item{white-space:normal;overflow-wrap:anywhere}
+
+/* Keep the tag marker compact without increasing the row's line height. */
+.workspace-tree-row .workspace-tag-indicator {color:#7c3aed;font-size:.65em;font-weight:700;line-height:0;margin-left:.2em;vertical-align:super;position:static}
+html[data-bs-theme="dark"] .workspace-tree-row .workspace-tag-indicator {color:#c4b5fd}

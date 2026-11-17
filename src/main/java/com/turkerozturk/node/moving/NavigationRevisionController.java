@@ -27,7 +27,7 @@ public class NavigationRevisionController {
         try {
             var digest=MessageDigest.getInstance("SHA-256");
             for(String sql:new String[]{"SELECT node_id,father_id,sequence,master_id FROM children ORDER BY node_id",
-                    "SELECT node_id,name,syntax,is_ro,is_richtxt FROM node ORDER BY node_id"}) {
+                    "SELECT node_id,name,syntax,is_ro,is_richtxt,tags FROM node ORDER BY node_id"}) {
                 digest.update(sql.getBytes(StandardCharsets.UTF_8));
                 try(var statement=connection.prepareStatement(sql);var rows=statement.executeQuery()) {
                     int count=rows.getMetaData().getColumnCount();

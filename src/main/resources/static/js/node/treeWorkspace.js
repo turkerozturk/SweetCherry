@@ -126,6 +126,14 @@
         if (/^#[0-9a-fA-F]{1,6}$/.test(child.titleColor)) name.style.color = '#' + child.titleColor.slice(1).padStart(6, '0');
         if (child.bold) name.style.fontWeight = 'bold';
         link.append(name);
+        if (workspace.dataset.showTagIndicator === 'true' && child.hasTags === true) {
+            const marker = document.createElement('sup');
+            marker.className = 'workspace-tag-indicator';
+            marker.textContent = '#';
+            marker.title = workspace.dataset.hasTags;
+            marker.setAttribute('aria-label', workspace.dataset.hasTags);
+            link.append(marker);
+        }
         line.append(fold, link);
         li.append(line);
         return li;

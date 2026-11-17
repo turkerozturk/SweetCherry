@@ -396,12 +396,13 @@ public class NodeController {
         return childrenService.getNaviNodesByFatherId(fatherId).stream()
                 .map(child -> new NavigationChild(child.nodeId(), child.name(),
                         child.nodeIcon().getIconName(), child.hasChildren(),
-                        child.titleColorAsHtmlHex(), child.isReadOnly(), child.boldnessBit(),child.excludedFromSearch(),child.bookmarked()))
+                        child.titleColorAsHtmlHex(), child.isReadOnly(), child.boldnessBit(),child.excludedFromSearch(),child.bookmarked(),child.hasTags()))
                 .toList();
     }
 
     public record NavigationChild(long nodeId, String name, String iconName,
-                                  boolean hasChildren, String titleColor, boolean readOnly, boolean bold,boolean excludedFromSearch,boolean bookmarked) {
+                                  boolean hasChildren, String titleColor, boolean readOnly, boolean bold,boolean excludedFromSearch,boolean bookmarked,boolean hasTags) {
+        public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold,boolean excludedFromSearch,boolean bookmarked){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,excludedFromSearch,bookmarked,false);}
         public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,false,false);}
     }
 

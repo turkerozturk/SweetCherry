@@ -15,7 +15,12 @@ class NavigationRevisionTest {
             statement.execute("UPDATE children SET father_id=2 WHERE node_id=1");
             var moved=NavigationRevisionController.fingerprint(connection);assertThat(moved).isNotEqualTo(initial);
             statement.execute("UPDATE node SET name='Changed' WHERE node_id=1");
-            assertThat(NavigationRevisionController.fingerprint(connection)).isNotEqualTo(moved);
+            var renamed=NavigationRevisionController.fingerprint(connection);
+            assertThat(renamed).isNotEqualTo(moved);
+            statement.execute("UPDATE node SET tags='project' WHERE node_id=1");
+            assertThat(NavigationRevisionController.fingerprint(connection)).isNotEqualTo(renamed);
+            statement.execute("UPDATE node SET tags=NULL WHERE node_id=1");
+            assertThat(NavigationRevisionController.fingerprint(connection)).isEqualTo(renamed);
         }
     }
 }

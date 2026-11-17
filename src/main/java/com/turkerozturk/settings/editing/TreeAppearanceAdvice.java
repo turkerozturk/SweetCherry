@@ -5,8 +5,10 @@ import org.springframework.web.bind.annotation.*;
 @ControllerAdvice
 public class TreeAppearanceAdvice {
  private final int font,padding;
+ @Value("${myapp.tree.show-tag-indicator:true}") private boolean showTagIndicator=true;
  public TreeAppearanceAdvice(@Value("${myapp.tree.font-size:16}") String font,@Value("${myapp.tree.vertical-padding:1}") String padding){this.font=bounded(font,16,10,32);this.padding=bounded(padding,1,0,12);}
  static int bounded(String text,int fallback,int min,int max){try{int n=Integer.parseInt(text);return n>=min&&n<=max?n:fallback;}catch(RuntimeException e){return fallback;}}
+ @ModelAttribute("treeShowTagIndicator") public boolean showTagIndicator(){return showTagIndicator;}
  @ModelAttribute("treeFontSize") public int fontSize(){return font;}
  @ModelAttribute("treeVerticalPadding") public int verticalPadding(){return padding;}
 }

@@ -392,6 +392,14 @@ Yazılabilir veri kaynağında yönetici için liste satırlarında ve okuyucu a
 
 `myapp.tree.font-size`, masaüstü ağacında düğüm adı yazı boyutunu piksel olarak belirler (10–32, varsayılan 16). `myapp.tree.vertical-padding`, hem satırın hem düğüm adı alanının üst ve alt boşluğunu belirler (0–12 piksel, varsayılan 1; önceki boşluğun yarısı). İkisi de **System → Settings** sayfasından düzenlenebilir ve uygulama yeniden başlatılınca geçerli olur. Ağaç genişliği ayrı ayarı kullanmaya devam eder.
 
+`myapp.tree.show-tag-indicator` varsayılan olarak `true` değerindedir. `/tree`
+ağacında en az bir etiketi olan düğümün adının sağında küçük, mor ve kalın bir
+üst simge `#` gösterir. Paylaşılan düğümler kullandıkları içeriğin etiket durumunu
+gösterir. İşareti kapatmak için mevcut `myapp.tree` bölümüne
+`show-tag-indicator: false` ekleyin veya **System → Settings** sayfasından kapatın.
+Uygulamayı yeniden başlatın. Etiket ekleme/silme sonrası bir sonraki gezinmede
+ağaç yenilenir; gerekirse sayfayı yeniden yükleyin.
+
 Oluşturulma ve değiştirilme zaman çizelgelerinde üst düğüm adları ile ID, üst düğüm, ad, oluşturulma ve değiştirilme sütunlarına göre sıralama bulunur. Sıralama veritabanında, satır limiti uygulanmadan önce yapılır. Üst düğüm bağlantıları yeni sekmede açılır. Gelişmiş aramada da sıralanabilir üst düğüm sütunu bulunur; üst düğüm bilgisi her satır için ayrı sorguyla değil sonuç sorgusuna katılarak alınır. Küçük ekranlarda üst düğüm sütunları gizlenir; sıralama seçimleri kullanılabilir.
 
 Yazılabilir veritabanında ADMIN kullanıcıları **Gelişmiş arama** sayfasında **Toplu işlem için düğüm seç** düğmesini açabilir. Açık sonuç sayfasından en fazla 200 ağaç konumu seçilir; arama, sıralama veya sayfa değişince seçim temizlenir. **Toplu taşı** veya **Toplu etiket ekle** diyaloğunda güncel seçim incelenip kaydedilir. Kayıttan sonra mevcut arama ve sayfa korunarak sonuçlar yenilenir.

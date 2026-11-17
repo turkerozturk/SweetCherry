@@ -180,6 +180,13 @@ For administrators with a writable data source, **Tags** opens a quick-edit dial
 
 `myapp.tree.font-size` sets desktop tree label size in pixels (10–32, default 16). `myapp.tree.vertical-padding` sets padding above/below both the row and its label (0–12 pixels, default 1, half the previous padding). Both settings are available under **System → Settings** and take effect after restarting the application. Tree width continues to use its separate setting.
 
+`myapp.tree.show-tag-indicator` defaults to `true`. In the `/tree` pane, a small,
+bold purple superscript `#` appears after a node name when its content has at
+least one tag. Shared nodes use their content's tag state. Set
+`show-tag-indicator: false` in the existing `myapp.tree` section, or disable it
+under **System → Settings**, then restart the application. Tag changes refresh
+the tree on the next navigation; reload the page if needed.
+
 The created and modified timelines remain focused lists, with parent names and sortable ID, parent, name, creation and modification columns. Sorting is applied in the database before the row limit. Parent links open in a new tab. Advanced search also has a sortable parent column; parent metadata is joined in the results query rather than fetched per row. Parent columns are hidden on small screens; the sort selectors remain available.
 
 In **Advanced search**, administrators using a writable database can enable **Select nodes for batch actions**. Select up to 200 tree locations from the current result page; changing search, sort or page clears the selection. Review the current selection in **Batch move to** or **Batch add tag** before saving. Results refresh using the current search and page after saving.

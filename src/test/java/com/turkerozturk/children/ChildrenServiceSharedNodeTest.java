@@ -28,6 +28,7 @@ class ChildrenServiceSharedNodeTest {
         Node master = new Node();
         master.setNodeId(10);
         master.setName("Original");
+        master.setTags("project önemli");
         master.setSyntax("plain-text");
         master.setLevel(3);
         master.setIsReadOnly16bit(1);
@@ -41,8 +42,16 @@ class ChildrenServiceSharedNodeTest {
         assertThat(result).extracting(NaviNode::hasChildren).containsExactly(true, false);
         assertThat(result).extracting(NaviNode::bookmarked).containsExactly(false,true);
         assertThat(result).allMatch(NaviNode::excludedFromSearch).allMatch(NaviNode::isReadOnly);
-        verify(bookmarks).findExistingIds(List.of(55L,56L));
+        assertThat(result).allMatch(NaviNode::hasTags);
+        var controller = new com.turkerozturk.node.NodeController();
+        ReflectionTestUtils.setField(controller,"childrenService",service);
+        assertThat(controller.navigationChildren(0)).allMatch(com.turkerozturk.node.NodeController.NavigationChild::hasTags);
+        verify(bookmarks,times(2)).findExistingIds(List.of(55L,56L));
         verifyNoMoreInteractions(bookmarks);
         verify(children, never()).findByFatherId(10L);
+        for (String empty : new String[]{null,"","   "}) {
+            master.setTags(empty);
+            assertThat(service.getNaviNodesByFatherId(0)).noneMatch(NaviNode::hasTags);
+        }
     }
 }
