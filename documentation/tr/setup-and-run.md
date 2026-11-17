@@ -399,6 +399,9 @@ gösterir. İşareti kapatmak için mevcut `myapp.tree` bölümüne
 `show-tag-indicator: false` ekleyin veya **System → Settings** sayfasından kapatın.
 Uygulamayı yeniden başlatın. Etiket ekleme/silme sonrası bir sonraki gezinmede
 ağaç yenilenir; gerekirse sayfayı yeniden yükleyin.
+İşaretin üzerine gelindiğinde düğümün etiketleri listelenir. Seçili düğümün
+etiketleri, varsa alt durum çubuğunun en sağında da gösterilir; bu alan
+`show-tag-indicator` ayarından bağımsızdır.
 
 Oluşturulma ve değiştirilme zaman çizelgelerinde üst düğüm adları ile ID, üst düğüm, ad, oluşturulma ve değiştirilme sütunlarına göre sıralama bulunur. Sıralama veritabanında, satır limiti uygulanmadan önce yapılır. Üst düğüm bağlantıları yeni sekmede açılır. Gelişmiş aramada da sıralanabilir üst düğüm sütunu bulunur; üst düğüm bilgisi her satır için ayrı sorguyla değil sonuç sorgusuna katılarak alınır. Küçük ekranlarda üst düğüm sütunları gizlenir; sıralama seçimleri kullanılabilir.
 

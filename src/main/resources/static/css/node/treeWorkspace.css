@@ -88,3 +88,5 @@
 /* Keep the tag marker compact without increasing the row's line height. */
 .workspace-tree-row .workspace-tag-indicator {color:#7c3aed;font-size:.65em;font-weight:700;line-height:0;margin-left:.2em;vertical-align:super;position:static}
 html[data-bs-theme="dark"] .workspace-tree-row .workspace-tag-indicator {color:#c4b5fd}
+
+#workspace-status .workspace-status-tags {margin-left:auto;flex-shrink:0}

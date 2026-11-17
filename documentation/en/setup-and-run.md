@@ -186,6 +186,9 @@ least one tag. Shared nodes use their content's tag state. Set
 `show-tag-indicator: false` in the existing `myapp.tree` section, or disable it
 under **System → Settings**, then restart the application. Tag changes refresh
 the tree on the next navigation; reload the page if needed.
+Hover over the marker to see the node's tags. The selected node's tags also
+appear at the far right of the status bar when present; the status bar is
+independent of the `show-tag-indicator` setting.
 
 The created and modified timelines remain focused lists, with parent names and sortable ID, parent, name, creation and modification columns. Sorting is applied in the database before the row limit. Parent links open in a new tab. Advanced search also has a sortable parent column; parent metadata is joined in the results query rather than fetched per row. Parent columns are hidden on small screens; the sort selectors remain available.
 

@@ -50,8 +50,14 @@ public record NaviNode(long nodeId,
                        Long nextSiblingNodeId,
                        boolean excludedFromSearch,
                        boolean bookmarked,
-                       boolean hasTags
+                       boolean hasTags,
+                       String tags
                        ) {
+    public NaviNode(long nodeId,String name,NodeIcon nodeIcon,boolean hasChildren,String titleColorAsHtmlHex,
+            boolean isReadOnly,boolean boldnessBit,int sequence,Long prevSiblingNodeId,Long nextSiblingNodeId,
+            boolean excludedFromSearch,boolean bookmarked,boolean hasTags) {
+        this(nodeId,name,nodeIcon,hasChildren,titleColorAsHtmlHex,isReadOnly,boldnessBit,sequence,prevSiblingNodeId,nextSiblingNodeId,excludedFromSearch,bookmarked,hasTags,"");
+    }
     public NaviNode(long nodeId,String name,NodeIcon nodeIcon,boolean hasChildren,String titleColorAsHtmlHex,
             boolean isReadOnly,boolean boldnessBit,int sequence,Long prevSiblingNodeId,Long nextSiblingNodeId,
             boolean excludedFromSearch,boolean bookmarked) {

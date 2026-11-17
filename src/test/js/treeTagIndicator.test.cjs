@@ -13,12 +13,12 @@ function element(tagName) {
         setAttribute(key, value) { this.attributes[key] = value; },
         addEventListener() {}};
 }
-function render(enabled, hasTags) {
+function render(enabled, hasTags, tags) {
     const context = {document: {createElement: element}, workspace: {dataset: {showTagIndicator: enabled, hasTags: 'Node has tags'}},
         image: () => element('img'), statusIcons: () => null, url: () => '/tree?nodeId=55'};
     vm.createContext(context);
     vm.runInContext(renderer, context);
-    return context.row({nodeId: 55, name: '<Tagged name>', iconName: 'ct_code', titleColor: '#3584E4', bold: true, hasTags})
+    return context.row({nodeId: 55, name: '<Tagged name>', iconName: 'ct_code', titleColor: '#3584E4', bold: true, hasTags, tags})
         .children[0].children[1];
 }
 test('tagged rows have a small accessible marker after the unchanged literal title', () => {
@@ -35,4 +35,12 @@ test('tagged rows have a small accessible marker after the unchanged literal tit
 test('disabled setting and untagged or older navigation responses never show a marker', () => {
     for (const [enabled, tags] of [['false',true], ['true',false], ['true',undefined], [undefined,true]])
         assert.equal(render(enabled,tags).children.length, 2);
+});
+
+test('hover and accessible descriptions list literal Unicode tags without interpreting markup', () => {
+    const marker = render('true', true, 'todo önemli <script>alert(1)</script>').children[2];
+    assert.equal(marker.title, 'Node has tags: todo önemli <script>alert(1)</script>');
+    assert.equal(marker.attributes['aria-label'], marker.title);
+    assert.equal(marker.children.length, 0);
+    assert.equal(marker.textContent, '#');
 });

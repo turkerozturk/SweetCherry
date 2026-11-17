@@ -130,8 +130,10 @@
             const marker = document.createElement('sup');
             marker.className = 'workspace-tag-indicator';
             marker.textContent = '#';
-            marker.title = workspace.dataset.hasTags;
-            marker.setAttribute('aria-label', workspace.dataset.hasTags);
+            const tags = typeof child.tags === 'string' ? child.tags.trim() : '';
+            const description = workspace.dataset.hasTags + (tags ? ': ' + tags : '');
+            marker.title = description;
+            marker.setAttribute('aria-label', description);
             link.append(marker);
         }
         line.append(fold, link);

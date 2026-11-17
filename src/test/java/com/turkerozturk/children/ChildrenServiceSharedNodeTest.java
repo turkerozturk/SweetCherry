@@ -43,9 +43,12 @@ class ChildrenServiceSharedNodeTest {
         assertThat(result).extracting(NaviNode::bookmarked).containsExactly(false,true);
         assertThat(result).allMatch(NaviNode::excludedFromSearch).allMatch(NaviNode::isReadOnly);
         assertThat(result).allMatch(NaviNode::hasTags);
+        assertThat(result).extracting(NaviNode::tags).containsExactly("project önemli", "project önemli");
         var controller = new com.turkerozturk.node.NodeController();
         ReflectionTestUtils.setField(controller,"childrenService",service);
-        assertThat(controller.navigationChildren(0)).allMatch(com.turkerozturk.node.NodeController.NavigationChild::hasTags);
+        var navigation = controller.navigationChildren(0);
+        assertThat(navigation).allMatch(com.turkerozturk.node.NodeController.NavigationChild::hasTags);
+        assertThat(navigation).extracting(com.turkerozturk.node.NodeController.NavigationChild::tags).containsExactly("project önemli", "project önemli");
         verify(bookmarks,times(2)).findExistingIds(List.of(55L,56L));
         verifyNoMoreInteractions(bookmarks);
         verify(children, never()).findByFatherId(10L);

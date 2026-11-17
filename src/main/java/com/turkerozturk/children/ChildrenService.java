@@ -84,12 +84,13 @@ public class ChildrenService {
             if (display == null) {
                 continue; // A broken reference must not prevent the rest of the tree from rendering.
             }
+            var tags = com.turkerozturk.node.tags.NodeTags.split(display.getTags());
             Long previous = i > 0 ? rows.get(i - 1).getNodeId() : null;
             Long next = i + 1 < rows.size() ? rows.get(i + 1).getNodeId() : null;
             result.add(new NaviNode(row.getNodeId(), display.getName(), display.getNodeIcon(),
                     !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
                     display.getTitleColorAsHtmlHex(), display.isReadOnly(), display.isBoldnessBit(),
-                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId()), !com.turkerozturk.node.tags.NodeTags.split(display.getTags()).isEmpty()));
+                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId()), !tags.isEmpty(), String.join(" ", tags)));
         }
         return result;
     }
