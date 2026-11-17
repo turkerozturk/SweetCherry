@@ -9,7 +9,8 @@
 
 
 
-    <div th:if="${node}" th:with="emptyContent=${node.contentEmpty}">
+    <p th:if="${reminderHelper == true}" class="alert alert-info" th:text="#{reminder.managed}"></p>
+    <div th:if="${node != null and reminderHelper != true}" th:with="emptyContent=${node.contentEmpty}">
 
         <div id="content">
 

@@ -114,7 +114,7 @@ public class GalleryService {
             q.setInt(1,com.turkerozturk.node.tags.NodeTags.MAX_INPUT_CHARACTERS);
             try(var rs=q.executeQuery()){while(rs.next())tags.addAll(com.turkerozturk.node.tags.NodeTags.split(rs.getString(1)));}
         }
-        tags.removeIf(t->t.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)||t.equalsIgnoreCase(com.turkerozturk.node.audit.AuditSql.TAG));
+        tags.removeIf(t->t.equalsIgnoreCase(com.turkerozturk.node.TrashSql.TAG)||t.equalsIgnoreCase(com.turkerozturk.node.audit.AuditSql.TAG)||t.equalsIgnoreCase(com.turkerozturk.node.reminders.ReminderStore.TAG));
         if(!selected.isEmpty())tags.add(selected);
         return List.copyOf(tags);
     }

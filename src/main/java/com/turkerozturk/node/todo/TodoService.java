@@ -93,7 +93,7 @@ public class TodoService {
             if (cache.containsKey(id)) { result = cache.get(id); break; }
             if (!path.add(id)) { result = false; break; }
             var b = tree.get(id); var meta = b == null ? null : nodes.get(b.content());
-            if (meta == null || !tree.containsKey(b.content()) || tree.get(b.content()).content() != b.content() || meta.tags().contains(TrashSql.TAG) || meta.tags().contains(AuditSql.TAG)) { result = false; break; }
+            if (meta == null || !tree.containsKey(b.content()) || tree.get(b.content()).content() != b.content() || meta.tags().contains(TrashSql.TAG) || meta.tags().contains(AuditSql.TAG) || meta.tags().contains(com.turkerozturk.node.reminders.ReminderStore.TAG)) { result = false; break; }
             id = b.parent();
         }
         for (long seen : path) cache.put(seen, result);
@@ -134,7 +134,7 @@ public class TodoService {
                 long content = rs.getLong(1); String raw = rs.getString(2); long stamp = rs.getLong(3); Long modified = rs.wasNull() ? null : stamp;
                 if (!revision(id, content, raw, modified).equals(expected)) throw problem(HttpStatus.CONFLICT, "changed");
                 var tags = new LinkedHashSet<>(NodeTags.split(raw));
-                if (!tags.contains("todo") || tags.contains(TrashSql.TAG) || tags.contains(AuditSql.TAG)) throw problem(HttpStatus.CONFLICT, "changed");
+                if (!tags.contains("todo") || tags.contains(TrashSql.TAG) || tags.contains(AuditSql.TAG) || tags.contains(com.turkerozturk.node.reminders.ReminderStore.TAG)) throw problem(HttpStatus.CONFLICT, "changed");
                 if (completed == tags.contains("done")) return;
                 if (completed) tags.add("done"); else tags.remove("done");
                 final String updated;
@@ -158,7 +158,7 @@ public class TodoService {
                 try (var rs = q.executeQuery()) {
                     if (!rs.next()) throw problem(HttpStatus.NOT_FOUND,"missing");
                     var tags = NodeTags.split(rs.getString(2));
-                    if (tags.contains(TrashSql.TAG) || tags.contains(AuditSql.TAG)) throw problem(HttpStatus.CONFLICT,"changed");
+                    if (tags.contains(TrashSql.TAG) || tags.contains(AuditSql.TAG) || tags.contains(com.turkerozturk.node.reminders.ReminderStore.TAG)) throw problem(HttpStatus.CONFLICT,"changed");
                     id = rs.getLong(1);
                 }
             }

@@ -1,0 +1,4 @@
+<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{reminder.title}"></title></head><body><section layout:fragment="content" class="container p-3">
+<h1 th:text="#{reminder.title}"></h1><p class="alert alert-warning" th:text="${#messages.msg('reminder.error.'+reminderError)}"></p><a class="btn btn-primary" th:href="@{/nodes/reminders(_tenantView=${tenantViewToken})}" th:text="#{reminder.back}"></a>
+</section></body></html>
