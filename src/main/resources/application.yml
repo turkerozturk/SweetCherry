@@ -162,6 +162,13 @@ logging:
 # My custom variables
 myapp:
   # Read-only Word attachment preview: DOCX and legacy DOC. No document is saved.
+  file-preview:
+    max-text-bytes: 262144 # First text bytes only; 1024..1048576.
+    max-characters: 200000 # Unicode code points; 1..1000000.
+    hex-bytes-per-page: 512 # 128..4096, a multiple of 16.
+    max-archive-bytes: 5242880 # Complete archive input; 1024..20971520.
+    max-expanded-bytes: 33554432 # TAR.GZ decompression cap; 1024..67108864.
+    max-entries: 1000 # Visible archive rows; 1..2000.
   word-preview:
     max-file-bytes: 5242880 # 5 MiB; allowed 1024..20971520.
     max-expanded-bytes: 16777216 # Aggregate DOCX ZIP data; allowed 1024..67108864.

@@ -1,0 +1,47 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="container-fluid py-3 file-preview">
+<h1 class="h3" th:text="#{filepreview.title}"></h1>
+<div class="d-flex flex-wrap gap-2 mb-3">
+<a class="btn btn-outline-primary" th:href="@{/attachments/{node}/{offset}/download(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})}" th:text="#{excel.download}"></a>
+<a class="btn btn-outline-secondary" th:href="@{/tree(nodeId=${nodeId},_tenantView=${tenantViewToken})}" th:text="#{excel.node}"></a>
+<a class="btn btn-outline-secondary" th:href="@{/attachments(_tenantView=${tenantViewToken})}" th:text="#{files.title}"></a>
+</div>
+<p th:if="${fileError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg('filepreview.error.'+fileError)}"></p>
+<div th:if="${fileError != null}" class="d-flex gap-2 mb-3">
+<a class="btn btn-outline-secondary" th:href="@{/attachments/{node}/{offset}/preview(node=${nodeId},offset=${offset},mode='text',_tenantView=${tenantViewToken})}" th:text="#{filepreview.mode.text}"></a>
+<a class="btn btn-outline-secondary" th:href="@{/attachments/{node}/{offset}/preview(node=${nodeId},offset=${offset},mode='hex',_tenantView=${tenantViewToken})}" th:text="#{filepreview.mode.hex}"></a>
+</div>
+<th:block th:if="${file != null}">
+<h2 class="h5 text-break" th:text="${file.filename}"></h2>
+<p class="text-break"><span th:text="${file.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span> · <span th:text="${file.bytes+' B'}"></span></p>
+<form method="get" th:action="@{/attachments/{node}/{offset}/preview(node=${nodeId},offset=${offset})}" class="d-flex flex-wrap gap-2 align-items-end mb-3">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+<div><label for="fileMode" th:text="#{filepreview.mode}"></label><select id="fileMode" name="mode" class="form-select"><option th:each="key:${ {'text','hex','archive'} }" th:value="${key}" th:selected="${key==file.mode}" th:text="${#messages.msg('filepreview.mode.'+key)}"></option></select></div>
+<div><label for="fileEncoding" th:text="#{filepreview.encoding}"></label><select id="fileEncoding" name="encoding" class="form-select"><option th:each="charset:${encodings}" th:value="${charset}" th:selected="${charset==file.encoding}" th:text="${charset}"></option></select></div>
+<button class="btn btn-primary" type="submit" th:text="#{filepreview.show}"></button>
+</form>
+<p class="small text-body-secondary" th:text="#{filepreview.help}"></p>
+<p th:if="${file.clipped}" class="alert alert-info" th:text="#{filepreview.clipped}"></p>
+<p th:if="${file.replaced or file.binary}" class="alert alert-warning" th:text="#{filepreview.decoding}"></p>
+<th:block th:if="${file.mode=='text'}">
+<p th:if="${file.text.isEmpty()}" th:text="#{filepreview.empty}"></p>
+<pre class="file-text" tabindex="0"><code th:class="${file.language.isEmpty() ? '' : 'cherry-highlight language-'+file.language}" th:attr="data-language=${file.language.isEmpty()?null:file.language}" th:text="${file.text}"></code></pre>
+</th:block>
+<th:block th:if="${file.mode=='hex'}">
+<p th:text="#{filepreview.hexRange(${file.start},${file.shown},${file.bytes})}"></p>
+<div class="table-responsive" tabindex="0" role="region" th:aria-label="#{filepreview.mode.hex}"><table class="table table-sm file-hex"><thead><tr><th scope="col" th:text="#{filepreview.offset}"></th><th scope="col">00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</th><th scope="col">ASCII</th></tr></thead><tbody><tr th:each="row:${file.hex}"><th scope="row" th:text="${row.offset}"></th><td th:text="${row.hex}"></td><td th:text="${row.ascii}"></td></tr></tbody></table></div>
+<p th:if="${file.hex.isEmpty()}" th:text="#{filepreview.empty}"></p>
+<nav class="d-flex flex-wrap gap-2 align-items-center" th:aria-label="#{tags.pages}">
+<a th:if="${file.page>1}" class="btn btn-outline-secondary" th:href="@{/attachments/{node}/{offset}/preview(node=${nodeId},offset=${offset},mode='hex',encoding=${file.encoding},page=${file.page - 1},_tenantView=${tenantViewToken})}" th:text="#{gallery.previousPage}"></a>
+<span th:text="#{tags.page(${file.page},${file.pages})}"></span>
+<a th:if="${file.page<file.pages}" class="btn btn-outline-secondary" th:href="@{/attachments/{node}/{offset}/preview(node=${nodeId},offset=${offset},mode='hex',encoding=${file.encoding},page=${file.page + 1},_tenantView=${tenantViewToken})}" th:text="#{gallery.nextPage}"></a>
+</nav>
+</th:block>
+<th:block th:if="${file.mode=='archive'}">
+<p th:text="#{filepreview.archiveHelp}"></p>
+<p th:if="${file.entries.isEmpty()}" th:text="#{filepreview.empty}"></p>
+<div class="table-responsive" tabindex="0" role="region" th:aria-label="#{filepreview.mode.archive}"><table class="table table-sm file-archive"><thead><tr><th scope="col" th:text="#{filepreview.name}"></th><th scope="col" th:text="#{filepreview.kind}"></th><th scope="col" th:text="#{filepreview.bytes}"></th><th scope="col" th:text="#{filepreview.compressed}"></th><th scope="col" th:text="#{filepreview.modified}"></th><th scope="col">CRC32</th><th scope="col" th:text="#{filepreview.method}"></th><th scope="col" th:text="#{filepreview.encrypted}"></th><th scope="col" th:text="#{filepreview.comment}"></th></tr></thead><tbody>
+<tr th:each="entry:${file.entries}"><td><span th:text="${entry.name}"></span><small class="d-block" th:if="${!entry.target.isEmpty()}" th:text="${entry.target}"></small></td><td th:text="${#messages.msg('filepreview.kind.'+entry.kind)}"></td><td th:text="${entry.bytes<0?'—':entry.bytes}"></td><td th:text="${entry.compressed<0?'—':entry.compressed}"></td><td th:text="${entry.modified}"></td><td th:text="${entry.crc}"></td><td th:text="${entry.method}"></td><td th:text="${#messages.msg(entry.encrypted?'appsettings.on':'appsettings.off')}"></td><td th:text="${entry.comment}"></td></tr>
+</tbody></table></div>
+</th:block>
+</th:block></section></body></html>

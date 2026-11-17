@@ -280,6 +280,13 @@ public class YeniXMLTransformer {
                         preview.setTextContent("[" + (wordPreview ? com.turkerozturk.image.attachments.word.WordAttachmentLinks.label() : com.turkerozturk.image.attachments.excel.ExcelAttachmentLinks.label()) + "]");
                         wrapper.appendChild(preview); toElement = wrapper;
                     }
+                    Element fileWrapper = newDocument.createElement("span");
+                    fileWrapper.appendChild(toElement); fileWrapper.appendChild(newDocument.createTextNode(" "));
+                    Element inspect = newDocument.createElement(A_TAG);
+                    inspect.setAttribute(HREF_ATTR, "/attachments/" + nodeId + "/" + dataOffset + "/preview");
+                    inspect.setAttribute("target", "_blank"); inspect.setAttribute("rel", "noopener noreferrer");
+                    inspect.setTextContent("[" + com.turkerozturk.image.attachments.preview.FileAttachmentLinks.label() + "]");
+                    fileWrapper.appendChild(inspect); toElement = fileWrapper;
 
                 }
 

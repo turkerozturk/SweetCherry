@@ -58,6 +58,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 <details>
 <summary>Guides for specific tasks</summary>
 
+- [Text, hex and archive attachment previews](documentation/en/attachment-file-preview.md) · [Metin, hex ve arşiv önizleme](documentation/tr/attachment-file-preview.md)
 - [Daily calendar and preview settings](documentation/en/daily-calendar.md) · [Günlük takvim](documentation/tr/daily-calendar.md)
 - [CTB backups and recovery](documentation/en/ctb-backups.md)
 - [Advanced search](documentation/en/advanced-search.md) · [Saved filters and backlinks](documentation/en/saved-filters-backlinks.md)

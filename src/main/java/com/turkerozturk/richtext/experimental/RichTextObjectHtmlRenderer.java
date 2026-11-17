@@ -99,6 +99,11 @@ public final class RichTextObjectHtmlRenderer {
                     preview = " <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(previewUrl)
                             + "\">[" + escape(wordPreview ? com.turkerozturk.image.attachments.word.WordAttachmentLinks.label() : com.turkerozturk.image.attachments.excel.ExcelAttachmentLinks.label()) + "]</a>";
                 }
+                if (!pdfHeadings) {
+                    String inspectUrl = "/attachments/" + ref.nodeId() + "/" + ref.bufferOffset() + "/preview?_tenantView=" + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
+                    preview += " <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(inspectUrl)
+                            + "\">[" + escape(com.turkerozturk.image.attachments.preview.FileAttachmentLinks.label()) + "]</a>";
+                }
                 yield "<a class=\"rich-text-attachment\" target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(url) + "\">" + label + "</a>" + preview;
             }
             case ANCHOR -> {

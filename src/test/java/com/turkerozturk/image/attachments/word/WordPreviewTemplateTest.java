@@ -28,6 +28,7 @@ class WordPreviewTemplateTest {
             for(String template:List.of("attachments","attachmentsMobile")) {
                 var list=org.jsoup.Jsoup.parse(engine.process(template,context));
                 assertThat(list.select("a[href*='/attachments/1/3/word']")).hasSize(1);
+                assertThat(list.select("a[href*='/attachments/1/3/preview']")).hasSize(1);
                 assertThat(list.select("a[href*='/attachments/1/3/download']")).hasSize(1);
             }
         }
@@ -39,7 +40,7 @@ class WordPreviewTemplateTest {
                 var image=new com.turkerozturk.image.Image();image.setNodeId(53L);image.setOffset(2);image.setPng(new byte[1]);image.setFileName("<file>.docx");
                 var map=new com.turkerozturk.yenixmlparser.ExampleMap<Object>();map.put(2L,new com.turkerozturk.image.Attachment(image));
                 String html=com.turkerozturk.yenixmlparser.YeniXMLTransformer.parse(map,53L);
-                assertThat(html).contains("/download/53/2","/attachments/53/2/word","&lt;file&gt;.docx",WordAttachmentLinks.label()).doesNotContain("<file>");
+                assertThat(html).contains("/download/53/2","/attachments/53/2/word","/attachments/53/2/preview","&lt;file&gt;.docx",WordAttachmentLinks.label()).doesNotContain("<file>");
             }
         } finally { org.springframework.context.i18n.LocaleContextHolder.resetLocaleContext(); }
     }

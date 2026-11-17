@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add bounded, read-only attachment text previews with encoding selection and local syntax highlighting, paged offset/hex/ASCII views for any file, and ZIP/TAR/TAR.GZ metadata listings from both the attachment browser and rich-text notes.
+
 ## [1.11.0] - 2026-11-17
 
 - Add read-only Word (.docx/.doc) and Excel (.xlsx/.xls) attachment previews with bounded text/table/grid rendering and original-file downloads; Excel formulas show saved results without evaluation.

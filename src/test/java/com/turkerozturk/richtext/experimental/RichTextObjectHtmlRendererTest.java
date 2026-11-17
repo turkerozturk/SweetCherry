@@ -35,9 +35,9 @@ class RichTextObjectHtmlRendererTest {
         var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 2);
         for (String name : List.of("<file>.DOCX", "legacy.doc")) {
             var payload = Map.<EmbeddedObject, EmbeddedContent>of(ref, new EmbeddedContent.Attachment(name));
-            assertThat(renderer.render(layout(ref), payload, "token&value")).contains("/download/53/2?", "/attachments/53/2/word?_tenantView=token%26value").doesNotContain("<file>");
-            assertThat(renderer.render(layout(ref), payload, null)).doesNotContain("/word");
-            assertThat(new RichTextObjectHtmlRenderer(true).render(layout(ref), payload, "token")).doesNotContain("/word");
+            assertThat(renderer.render(layout(ref), payload, "token&value")).contains("/download/53/2?", "/attachments/53/2/word?_tenantView=token%26value", "/attachments/53/2/preview?_tenantView=token%26value").doesNotContain("<file>");
+            assertThat(renderer.render(layout(ref), payload, null)).doesNotContain("/word", "/preview");
+            assertThat(new RichTextObjectHtmlRenderer(true).render(layout(ref), payload, "token")).doesNotContain("/word", "/preview");
         }
     }
 
