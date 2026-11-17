@@ -9,7 +9,7 @@
 
 
 
-    <p th:if="${reminderHelper == true}" class="alert alert-info" th:text="#{reminder.managed}"></p>
+    <p th:if="${reminderHelper == true}" class="alert alert-info" th:text="${#messages.msg(remindersEnabled == true ? 'reminder.managed' : 'reminder.managedDisabled')}"></p>
     <div th:if="${node != null and reminderHelper != true}" th:with="emptyContent=${node.contentEmpty}">
 
         <div id="content">

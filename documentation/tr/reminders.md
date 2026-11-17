@@ -93,11 +93,12 @@ oluşur. Geçmiş tüm yıllar ayrı ayrı birikmez; son tamamlanan oluşum sakl
 Salt okuma bu geçişi hesaplar, CTB'ye yazmaz. Eski yıllık satırın düğmesi yeni
 yıldönümünü yanlışlıkla tamamlayamaz; oluşum kimliği kontrol edilir.
 
-Seçili CTB'nin sayfalarında sağ alttaki **Alarmlar → Alarmları aç** düğmesini
-kullanın. Seçim bu tarayıcıda kaynak adına göre saklanır. **Sesi aç / dene**
-düğmesi iki kısa deneme sesi üretir ve o sayfada sesi etkinleştirir. Sayfa
-navigasyonu/yeniden yükleme sonrası ses yeniden düğmeye basılarak açılır; `/tree`
-içinde düğümden düğüme geçiş sayfayı yenilemediği için ses açık kalır.
+Seçili CTB'nin sayfalarında sağ alttaki **Alarmlar** paneli ve ses varsayılan
+olarak açıktır. Alarmı durdurma ve sesi kapatma tercihleri kaynak adına göre
+bu tarayıcıda saklanır; sayfa geçişlerinde/yeniden yüklemede korunur. Tarayıcı
+izin verirse ses otomatik etkinleşir. Otomatik ses engellenirse sayfayla
+etkileşin veya **Sesi aç / dene** düğmesini kullanın. Bu düğme iki kısa deneme
+sesi üretir; sayfa açılışında otomatik deneme sesi çalınmaz.
 
 Alarm kontrolü sayfa açıkken yaklaşık 20 saniyede bir yapılır. Tarayıcı kapalı,
 bilgisayar uykuda veya sayfa arka plandaysa zamanında çalma garantisi yoktur.
@@ -137,3 +138,30 @@ Manuel: yakın bir geleceğe (1–2 dakika) kayıt ekleyin; paneli ve sesi açı
 deneme sesini dinleyin, uyarıyı bekleyin. Aynı kaynağı iki sekmede açıp ses
 tekrarını, kapatma ve ertelemeyi, sayfayı yeniden açınca kalıcılığı deneyin.
 29 Şubat temelli yıllık kaydı tamamlayarak sonraki tarihin doğru olduğunu görün.
+
+## Özellik ayarları ve ayar filtresi
+
+Üç ayar da varsayılan olarak `true` değerindedir. `/system/settings` sayfasından
+veya YAML dosyasından değiştirip SweetCherry'yi yeniden başlatın:
+
+```yaml
+myapp:
+  reminders:
+    enabled: true
+    alarms-enabled: true
+    sound-enabled: true
+```
+
+- `enabled: false`: hatırlatıcı bağlantıları, formlar ve bağımsız alarm paneli
+  gizlenir; hatırlatıcı/alarm okuma ve yazma istekleri reddedilir.
+- `alarms-enabled: false`: hatırlatıcı listesi/formları kullanılabilir; bağımsız
+  alarm paneli gizlenir, alarm kontrolü ve işlemleri kapanır.
+- `sound-enabled: false`: görsel alarmlar çalışır; ses düğmesi ve ses kapanır.
+
+Üst ayar alt ayarları da kapatır. Mevcut kayıtlar ve yardımcı düğüm korumaları
+saklanır. Önceden tarayıcıda kapatılmış ses/alarm tercihi dikkate alınır;
+tekrar açmak için paneldeki düğmeyi kullanın.
+
+Ayar sayfasındaki metin filtresi açıklamalarda, YAML anahtarlarında ve değerlerde
+arar. Bütün sözcüklerin eşleşmesi gerekir; Türkçe harfler sade yazımla da bulunur.
+Gizlenen ayarlar da kaydetmeye dahildir. **Temizle** veya Escape filtreyi kaldırır.

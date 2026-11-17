@@ -54,7 +54,7 @@ public class ReminderController {
     @ExceptionHandler(ResponseStatusException.class)
     public ModelAndView problem(ResponseStatusException error,HttpServletResponse response){
         response.setHeader("Cache-Control","no-store");String reason=error.getReason();
-        if(reason==null||!Set.of("storeInvalid","changed","readonly","missing","targetMissing","invalidInput","invalidTime","limit").contains(reason))reason="changed";
+        if(reason==null||!Set.of("disabled","storeInvalid","changed","readonly","missing","targetMissing","invalidInput","invalidTime","limit").contains(reason))reason="changed";
         var result=new ModelAndView("node/reminder-error");result.setStatus(error.getStatusCode());result.addObject("reminderError",reason);return result;
     }
 }

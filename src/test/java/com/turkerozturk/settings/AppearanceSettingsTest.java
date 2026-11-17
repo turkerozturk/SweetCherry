@@ -13,6 +13,13 @@ import static org.assertj.core.api.Assertions.*;
 
 class AppearanceSettingsTest {
     Map<String,String> defaults(){var values=new LinkedHashMap<String,String>();ApplicationSettingsService.SETTINGS.forEach(s->values.put(s.key(),s.fallback()));return values;}
+    @Test void reminderSettingsDefaultOnAndSerializeDisabledBooleans(){
+        var values=defaults();
+        for(String key:List.of("myapp.reminders.enabled","myapp.reminders.alarms-enabled","myapp.reminders.sound-enabled")){
+            assertThat(values.get(key)).isEqualTo("true");values.put(key,"false");
+        }
+        assertThat(ApplicationSettingsService.update("myapp: {}\n",values)).contains("myapp.reminders.enabled: false","myapp.reminders.alarms-enabled: false","myapp.reminders.sound-enabled: false");
+    }
     @Test void themeUsesLightUnlessDarkIsExplicitlyConfigured(){
         assertThat(new UiThemeAdvice("light").theme()).isEqualTo("light");
         assertThat(new UiThemeAdvice(" DARK ").theme()).isEqualTo("dark");

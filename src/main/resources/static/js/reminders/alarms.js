@@ -5,10 +5,13 @@
     const enable = widget.querySelector('[data-alarm-enable]'), sound = widget.querySelector('[data-alarm-sound]');
     const cards = widget.querySelector('[data-alarm-cards]'), status = widget.querySelector('[data-alarm-status]');
     const csrf = widget.querySelector('form'), prefs = 'sweetcherry-reminder-enabled:' + widget.dataset.scope;
-    let enabled = false, stopped = false, running = false, soundOn = false, audio, controller, currentFeed, signature = '';
+    const soundPrefs = 'sweetcherry-reminder-sound:' + widget.dataset.scope;
+    const soundAllowed = widget.dataset.soundAllowed !== 'false';
+    let soundWanted = soundAllowed && widget.dataset.defaultSound !== 'false';
+    let enabled = widget.dataset.defaultEnabled !== 'false', stopped = false, running = false, soundOn = false, pageActive = true, audio, controller, currentFeed, signature = '';
     let memory = Object.create(null), generation = 0, actions = 0; const tones = new Set();
     const text = name => widget.dataset[name] || '';
-    try { enabled = localStorage.getItem(prefs) === 'true'; } catch (_) { }
+    try { enabled = localStorage.getItem(prefs) !== 'false'; soundWanted = soundWanted && localStorage.getItem(soundPrefs) !== 'false'; } catch (_) { }
     function load(store) {
         try { return state.merge(memory[store], JSON.parse(localStorage.getItem('sweetcherry-reminder-ledger:' + store) || '{}')); }
         catch (_) { return state.ledger(memory[store]); }
@@ -17,7 +20,7 @@
         memory[store] = receipts;
         try { localStorage.setItem('sweetcherry-reminder-ledger:' + store, JSON.stringify(receipts)); } catch (_) { }
     }
-    function labels() { enable.textContent = text(enabled ? 'stop' : 'start'); sound.disabled = !enabled; sound.textContent = text(soundOn ? 'soundOff' : 'soundOn'); }
+    function labels() { enable.textContent = text(enabled ? 'stop' : 'start'); sound.disabled = !enabled || !soundAllowed; sound.textContent = text(soundOn ? 'soundOff' : 'soundOn'); }
     function silence() { soundOn = false; for (const tone of tones) { try { tone.stop(); } catch (_) { } } tones.clear(); if (audio) audio.suspend().catch(() => {}); labels(); }
     function stop(message) { generation++; stopped = true; controller?.abort(); silence(); cards.replaceChildren(); status.textContent = message; clearInterval(timer); enable.disabled = true; sound.disabled = true; }
     async function request(method, item, action) {
@@ -31,6 +34,7 @@
             if (!(response.headers.get('Content-Type') || '').includes('application/json')) throw Error('error');
             const data = await response.json();
             if (!response.ok) {
+                if (response.status === 404 && data.error === 'disabled') { stop(text('disabled')); throw Error('disabled'); }
                 if (response.status === 401 || response.status === 409 && data.error === 'stale-source') { stop(text('stale')); throw Error('stale'); }
                 throw Error(response.status === 403 ? 'readonly' : 'error');
             }
@@ -97,7 +101,7 @@
         await lock('sweetcherry-reminder-receipts:' + feed.storeId, () => { if (current === generation && enabled && !stopped) render(feed); });
     }
     async function poll() {
-        if (!enabled || stopped || running || actions) return;
+        if (!pageActive || !enabled || stopped || running || actions) return;
         if (!widget.isConnected) { stop(''); return; }
         running = true;
         try { await lock('sweetcherry-reminder-poll:' + widget.dataset.token, refresh); }
@@ -107,19 +111,45 @@
     function activate(value, persist) {
         if (stopped) return;
         generation++; enabled = value; if (persist) { try { localStorage.setItem(prefs,String(enabled)); } catch (_) { } }
-        labels(); signature = ''; if (enabled) { widget.open = true; poll(); }
+        labels(); signature = ''; if (enabled) { widget.open = true; armSound(); poll(); }
         else { controller?.abort(); cards.replaceChildren(); silence(); status.textContent = text('disabled'); }
     }
     enable.addEventListener('click', () => activate(!enabled,true));
-    window.addEventListener('storage', event => { if (event.key === prefs || event.key === null) activate(event.newValue === 'true',false); });
-    sound.addEventListener('click', async () => {
-        if (soundOn) { silence(); return; }
+    function rememberSound(value) {
+        soundWanted = value && soundAllowed;
+        try { localStorage.setItem(soundPrefs,String(soundWanted)); } catch (_) { }
+    }
+    async function armSound(test = false) {
+        if (!pageActive || !enabled || stopped || !soundWanted || !soundAllowed) return;
         try {
             const Context = window.AudioContext || window.webkitAudioContext; if (!Context) throw Error();
-            audio ||= new Context(); await audio.resume(); if (!enabled || stopped) { silence(); return; } soundOn = audio.state === 'running'; labels(); if (soundOn) beep(); else throw Error();
-        } catch (_) { soundOn = false; labels(); status.textContent = text('soundBlocked'); }
+            audio ||= new Context(); await audio.resume();
+            if (!pageActive || !enabled || stopped || !soundWanted) return;
+            soundOn = audio.state === 'running'; labels();
+            if (!soundOn) throw Error();
+            if (test) beep();
+            poll();
+        } catch (_) { if (enabled && !stopped && soundWanted) { soundOn = false; labels(); status.textContent = text('soundBlocked'); } }
+    }
+    window.addEventListener('storage', event => {
+        if (event.key === prefs || event.key === null) activate(event.newValue !== 'false',false);
+        if (event.key === soundPrefs || event.key === null) {
+            soundWanted = soundAllowed && event.newValue !== 'false';
+            if (soundWanted) armSound(); else silence();
+        }
     });
-    window.addEventListener('pagehide', () => { generation++; controller?.abort(); silence(); });
-    window.addEventListener('pageshow', poll); document.addEventListener('visibilitychange', poll); window.addEventListener('focus', poll);
-    labels(); const timer = setInterval(poll,20000); if (enabled) poll(); else status.textContent = text('disabled');
+    sound.addEventListener('click', () => {
+        if (!enabled || stopped || !soundAllowed) return;
+        if (soundOn) { rememberSound(false); silence(); return; }
+        rememberSound(true); return armSound(true);
+    });
+    function unlock(event) {
+        if (event.isTrusted === false || event.target === sound || event.target === enable) return;
+        if (!soundOn) armSound();
+    }
+    document.addEventListener('pointerdown', unlock);
+    document.addEventListener('keydown', unlock);
+    window.addEventListener('pagehide', () => { pageActive = false; generation++; controller?.abort(); silence(); });
+    window.addEventListener('pageshow', () => { pageActive = true; armSound(); poll(); }); document.addEventListener('visibilitychange', poll); window.addEventListener('focus', poll);
+    labels(); const timer = setInterval(poll,20000); if (enabled) { armSound(); poll(); } else status.textContent = text('disabled');
 })();

@@ -19,9 +19,12 @@ public class ReminderService {
     private final NodePropertiesService properties;
     private final CalendarSettings calendar;
     private final Clock clock;
+    private final ReminderSettings settings;
     @org.springframework.beans.factory.annotation.Autowired
-    public ReminderService(NodePropertiesService properties,CalendarSettings calendar){this(properties,calendar,Clock.systemUTC());}
-    ReminderService(NodePropertiesService properties,CalendarSettings calendar,Clock clock){this.properties=properties;this.calendar=calendar;this.clock=clock;}
+    public ReminderService(NodePropertiesService properties,CalendarSettings calendar,ReminderSettings settings){this(properties,calendar,Clock.systemUTC(),settings);}
+    public ReminderService(NodePropertiesService properties,CalendarSettings calendar){this(properties,calendar,Clock.systemUTC(),new ReminderSettings(true,true,true));}
+    ReminderService(NodePropertiesService properties,CalendarSettings calendar,Clock clock){this(properties,calendar,clock,new ReminderSettings(true,true,true));}
+    ReminderService(NodePropertiesService properties,CalendarSettings calendar,Clock clock,ReminderSettings settings){this.properties=properties;this.calendar=calendar;this.clock=clock;this.settings=settings;}
     public record Options(String q,String status,int limit,int page){
         public Options {if(q==null||q.length()>500||!Set.of("pending","upcoming","overdue","done","cancelled","all").contains(status)||limit<1||limit>200||page<1||page>1_000_000)throw new IllegalArgumentException();}
     }
@@ -48,7 +51,7 @@ public class ReminderService {
     public record Alarm(String id,String key,String nodeId,String name,String message,String dueText,String repeat) { }
     public record Alarms(String storeId,List<Alarm> items,long total) { }
     @Transactional(readOnly=true)
-    public View inspect(Options options){return manager.unwrap(Session.class).doReturningWork(c->inspect(c,options,clock.instant()));}
+    public View inspect(Options options){settings.requireReminders();return manager.unwrap(Session.class).doReturningWork(c->inspect(c,options,clock.instant()));}
     static View inspect(Connection c,Options options,Instant now)throws SQLException{
         var store=ReminderStore.read(c,false);var targets=ReminderTargets.read(c);var rows=new ArrayList<Row>();
         long upcoming=0,overdue=0,done=0,cancelled=0;String query=fold(options.q());
@@ -119,6 +122,7 @@ public class ReminderService {
             var allocation=ReminderStore.lockForWrite(c);var store=ReminderStore.read(c,true);ReminderStore.expected(store,revision);Instant now=clock.instant();var old=effective(find(store,id),now);
             if(occurrence!=null&&old.repeat().equals("yearly")&&!old.alarmId().equals(occurrence))throw ReminderStore.problem("changed");
             if(state.equals("pending")&&ReminderTargets.read(c).content(old.contentId(),old.occurrence())==null)throw ReminderStore.problem("targetMissing");
+            if(state.equals("pending")&&old.status().equals("pending"))settings.requireAlarms();
             if(old.status().equals(state)&&!(state.equals("pending")&&(!old.acknowledgedAt().isEmpty()||!old.snoozedUntil().isEmpty())))return null;
             String due=old.due(),completed=old.lastCompleted();
             if(state.equals("done")){
@@ -142,7 +146,7 @@ public class ReminderService {
     private static List<ReminderStore.Item> replace(ReminderStore.Snapshot store,ReminderStore.Item item){var items=new ArrayList<>(store.data().items());items.removeIf(value->value.id().equals(item.id()));items.add(item);return items;}
     static String alarmKey(ReminderStore.Item item){return ReminderStore.legacyAlarmId(item.alarmId(),item.snoozedUntil());}
     @Transactional(readOnly=true)
-    public Alarms alarms(){return manager.unwrap(Session.class).doReturningWork(c->{
+    public Alarms alarms(){settings.requireAlarms();return manager.unwrap(Session.class).doReturningWork(c->{
         var store=ReminderStore.read(c,false);if(store.id()==0)return new Alarms("",List.of(),0);
         var targets=ReminderTargets.read(c);Instant now=clock.instant();var due=new ArrayList<ReminderStore.Item>();
         for(var stored:store.data().items()){
@@ -156,7 +160,7 @@ public class ReminderService {
     });}
     @Transactional
     public void alarmAction(String id,String key,String action){
-        writable();if(!Set.of("dismiss","snooze").contains(action))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidInput");
+        settings.requireAlarms();writable();if(!Set.of("dismiss","snooze").contains(action))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidInput");
         write(c->{
             var allocation=ReminderStore.lockForWrite(c);var store=ReminderStore.read(c,true);Instant now=clock.instant();var old=effective(find(store,id),now);
             if(!old.status().equals("pending")||!alarmKey(old).equals(key))throw ReminderStore.problem("changed");
@@ -171,7 +175,7 @@ public class ReminderService {
         if(!ReminderStore.uuid(id))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidInput");
         return store.data().items().stream().filter(item->item.id().equals(id)).findFirst().orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"missing"));
     }
-    private void writable(){if(!properties.writable())throw new ResponseStatusException(HttpStatus.FORBIDDEN,"readonly");}
+    private void writable(){settings.requireReminders();if(!properties.writable())throw new ResponseStatusException(HttpStatus.FORBIDDEN,"readonly");}
     @FunctionalInterface private interface Write<T>{T apply(Connection c)throws SQLException;}
     private <T>T write(Write<T> work){return manager.unwrap(Session.class).doReturningWork(c->{
         try{return work.apply(c);}catch(SQLException failure){

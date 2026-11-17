@@ -15,7 +15,7 @@ class ReminderTemplateTest {
  private String render(String template,Locale locale,Map<String,Object> variables){
   var engine=new SpringTemplateEngine();var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setCharacterEncoding("UTF-8");engine.setTemplateResolver(resolver);
   var messages=new ResourceBundleMessageSource();messages.setBasename("messages");messages.setDefaultEncoding("UTF-8");engine.setTemplateEngineMessageSource(messages);
-  var servlet=new MockServletContext();var request=new MockHttpServletRequest(servlet);var model=new HashMap<String,Object>(variables);model.put("tenantViewToken","token");
+  var servlet=new MockServletContext();var request=new MockHttpServletRequest(servlet);var model=new HashMap<String,Object>(variables);model.put("tenantViewToken","token");model.putIfAbsent("remindersEnabled",true);model.putIfAbsent("reminderAlarmsEnabled",true);model.putIfAbsent("reminderSoundEnabled",true);
   var context=new WebContext(JakartaServletWebApplication.buildApplication(servlet).buildExchange(request,new MockHttpServletResponse()),locale,model);return engine.process(template,context);
  }
  @Test void listEscapesNotesAndTargetNamesAndHidesWriteFormsForReaders(){
@@ -57,4 +57,23 @@ class ReminderTemplateTest {
   }
  }
 
+ @Test void disabledAlarmsHideReactivationButKeepReminderActions(){
+  var row=new ReminderService.Row(ID,1,11,"Node",true,"Message","2026-11-17T10:00:00Z","UTC","overdue","none","","2026-11-17T11:00:00Z","",ID);
+  var view=new ReminderService.View(List.of(row),0,1,0,0,1,"revision","now",new ReminderService.Options("","pending",50,1));
+  for(boolean alarms:List.of(true,false)){
+   var doc=org.jsoup.Jsoup.parse(render("node/reminders",Locale.ENGLISH,Map.of("reminders",view,"canEditReminders",true,"reminderAlarmsEnabled",alarms)));
+   assertThat(doc.select("form[method=post] input[name=state][value=pending]")).hasSize(alarms?1:0);
+   assertThat(doc.select("form[method=post] input[name=state][value=done]")).hasSize(1);
+  }
+ }
+ @Test void settingsHideWidgetOrOnlyItsSoundControl(){
+  for(String flag:List.of("reminderAlarmsEnabled","remindersEnabled")){
+   // The controller advice supplies the effective alarm flag when the parent is disabled.
+   var model=new HashMap<String,Object>();model.put("currentTenantName","Notes");model.put(flag,false);model.put("reminderAlarmsEnabled",false);
+   assertThat(render("node/reminder-alarms",Locale.ENGLISH,model)).doesNotContain("id=\"reminderAlarms\"");
+  }
+  var doc=org.jsoup.Jsoup.parse(render("node/reminder-alarms",Locale.ENGLISH,Map.of("currentTenantName","Notes","reminderSoundEnabled",false)));
+  assertThat(doc.selectFirst("#reminderAlarms").attr("data-sound-allowed")).isEqualTo("false");
+  assertThat(doc.selectFirst("[data-alarm-sound]").hasAttr("hidden")).isTrue();
+ }
 }

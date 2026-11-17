@@ -57,9 +57,11 @@ rollover without writing; occurrence IDs reject stale annual action buttons.
 Annual DST gaps move forward and overlaps select the earlier offset. Manual
 ambiguous/nonexistent times still require correction or an explicit offset.
 
-Enable the **Alarms** panel on a page for the selected CTB. **Enable / test sound**
-plays two short tones and enables sound for that page. Sound must be enabled
-again after navigation/reload; `/tree` content navigation keeps the same page.
+The **Alarms** panel and sound are enabled by default for a selected CTB.
+Browser preferences for alarms and mute persist across navigation/reload.
+Sound is resumed automatically when permitted; if the browser blocks autoplay,
+interact with the page or use **Enable / test sound** (two short test tones).
+A new page does not emit a test tone automatically.
 Open pages poll roughly every 20 seconds, subject to browser throttling. Closed browsers, sleeping machines
 and background tabs cannot guarantee timely alarms. These are in-page visual
 alerts, not an OS service or desktop notification. Up to 20 recent due alerts
@@ -81,3 +83,28 @@ mutation, including dismissal/snooze. GET requests do not migrate. The protected
 tag and CTB schema stay unchanged. Version 2 adds recurrence, anchor/leap policy,
 last completion, occurrence identity and acknowledgement/snooze timestamps.
 Older SweetCherry versions reject version 2 rather than overwriting it.
+
+## Feature settings
+
+All three switches default to `true`. Edit them in `/system/settings` or YAML,
+then restart SweetCherry for the changes to take effect:
+
+```yaml
+myapp:
+  reminders:
+    enabled: true
+    alarms-enabled: true
+    sound-enabled: true
+```
+
+`enabled: false` hides reminder links, forms and the floating alarm panel, and
+rejects reminder/alarm reads and writes. `alarms-enabled: false` keeps the reminder
+list/forms and hides the floating panel, disabling its polling/actions.
+`sound-enabled: false` keeps visual alarms and hides/disables sound controls.
+Parent switches override child switches. Existing records and metadata protections
+remain intact. An explicit browser mute/stop preference is respected even when
+the defaults are enabled; use the panel buttons to re-enable it.
+
+The settings page filter searches descriptions, YAML keys and values. All words
+must match; Turkish letters are matched without accents. Hidden rows are still
+saved. Clear the filter with the Clear button or Escape.

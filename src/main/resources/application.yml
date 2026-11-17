@@ -235,6 +235,10 @@ myapp:
     max-event-characters: 16777216 # Fail the whole edit if its audit record cannot be stored (1,000,000..67,108,864).
   trash:
     enabled: false # Reversible Delete: move occurrences to TRASH BIN, preserving IDs and shared links.
+  reminders:
+    enabled: true # Forms, list and reminder APIs. Existing records are preserved when disabled.
+    alarms-enabled: true # In-page visual alarm panel and polling; requires enabled.
+    sound-enabled: true # Default-on sound preference; browser user activation may still be required.
   tree:
     # Desktop /tree only. Saved browser width takes precedence; other splitters are unaffected.
     default-width: 600 # Pixels, clamped to 20..1900 and the available viewport width.

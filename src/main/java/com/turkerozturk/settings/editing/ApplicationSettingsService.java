@@ -23,6 +23,9 @@ public class ApplicationSettingsService {
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.reminders.enabled","boolean","true",0),
+        new Setting("myapp.reminders.alarms-enabled","boolean","true",0),
+        new Setting("myapp.reminders.sound-enabled","boolean","true",0),
         new Setting("myapp.word-preview.max-characters","number","200000",1000000),
         new Setting("myapp.word-preview.max-blocks","number","1000",2000),
         new Setting("myapp.word-preview.max-table-rows","number","100",200),
