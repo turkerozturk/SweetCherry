@@ -648,6 +648,11 @@ public class NodeController {
 
 
 
+        Node reminderNode = (Node) model.getAttribute("node");
+        if (reminderNode != null && com.turkerozturk.node.reminders.ReminderStore.isTag(reminderNode.getTags())) {
+            model.addAttribute("reminderHelper",true);model.addAttribute("canDeleteNode",false);model.addAttribute("canEditNodeContent",false);
+        }
+
         if ("reader".equals(viewMode) || Boolean.TRUE.equals(request.getAttribute("newRichTextView"))) {
             Node contentNode = (Node) model.getAttribute("node");
             if (contentNode != null && "custom-colors".equals(contentNode.getSyntax())) {

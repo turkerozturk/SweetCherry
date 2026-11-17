@@ -42,7 +42,7 @@ public record AuditSnapshot(Map<Long,Map<String,String>> nodes,Map<Long,Map<Stri
  private static Map<Long,Map<String,String>> rows(Connection c,String sql,String[] fields)throws SQLException{
   var result=new TreeMap<Long,Map<String,String>>();try(var q=c.prepareStatement(sql);var rs=q.executeQuery()){while(rs.next()){var values=new LinkedHashMap<String,String>();for(int n=0;n<fields.length;n++)values.put(fields[n],rs.getString(n+1));result.put(rs.getLong(1),Collections.unmodifiableMap(values));}}return result;
  }
- static boolean managed(Map<String,String> node){return node!=null&&(AuditSql.TAG.equals(node.get("tags"))||com.turkerozturk.node.TrashSql.TAG.equals(node.get("tags")));}
+ static boolean managed(Map<String,String> node){return node!=null&&(AuditSql.TAG.equals(node.get("tags"))||com.turkerozturk.node.TrashSql.TAG.equals(node.get("tags"))||com.turkerozturk.node.reminders.ReminderStore.isTag(node.get("tags")));}
  static long number(String value){return value==null?0:Long.parseLong(value);}
  static String plain(String syntax,String raw){
   if(raw==null)return "";
