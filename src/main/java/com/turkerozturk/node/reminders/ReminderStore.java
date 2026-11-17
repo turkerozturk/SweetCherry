@@ -13,12 +13,21 @@ import tools.jackson.databind.json.JsonMapper;
 public final class ReminderStore {
     private ReminderStore() { }
     public static final String TAG = "__sweetcherry_reminders_v1__";
-    static final String PREFIX = "SweetCherry reminders v1\n\n";
+    static final String OLD_PREFIX = "SweetCherry reminders v1\n\n";
+    static final String PREFIX = "SweetCherry reminders v2\n\n";
     static final int MAX_ITEMS = 5000, MAX_CHARACTERS = 2_097_152;
     static final JsonMapper JSON = JsonMapper.builder().enable(tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).build();
     public record Item(String id, long contentId, long occurrence, String targetName, String message,
-            String due, String zone, String status, String created, String updated) { }
+            String due, String zone, String status, String created, String updated,
+            String repeat,String leapDay,String anchor,String lastCompleted,String alarmId,String acknowledgedAt,String snoozedUntil) {
+        public Item(String id,long contentId,long occurrence,String targetName,String message,String due,String zone,String status,String created,String updated){
+            this(id,contentId,occurrence,targetName,message,due,zone,status,created,updated,"none","feb28","","",legacyAlarmId(id,due),"","");
+        }
+    }
+    static String legacyAlarmId(String id,String due){return UUID.nameUUIDFromBytes((id+"\n"+due).getBytes(StandardCharsets.UTF_8)).toString();}
     public record Data(int version, String kind, String storeId, List<Item> items) { }
+    public record LegacyItem(String id,long contentId,long occurrence,String targetName,String message,String due,String zone,String status,String created,String updated) { }
+    public record LegacyData(int version,String kind,String storeId,List<LegacyItem> items) { }
     record Snapshot(long id, String raw, Data data, String revision) { }
     record Allocation(long id, long sequence) { }
     static String suffix(Connection c, boolean lock) throws SQLException {
@@ -38,7 +47,7 @@ public final class ReminderStore {
                 }
             }
         }
-        if (found == null) return new Snapshot(0,"",new Data(1,"reminders","",List.of()),hash(0,""));
+        if (found == null) return new Snapshot(0,"",new Data(2,"reminders","",List.of()),hash(0,""));
         try (var q = c.prepareStatement("SELECT father_id,COALESCE(master_id,0) FROM children WHERE node_id=?" + suffix(c,lock))) {
             q.setLong(1,found.id());
             try (var rs = q.executeQuery()) { if (!rs.next() || rs.getLong(1)!=0 || rs.getLong(2)!=0 || rs.next()) throw problem("storeInvalid"); }
@@ -50,10 +59,20 @@ public final class ReminderStore {
     }
     static Data decode(String raw) {
         try {
-            if (raw == null || raw.length() > MAX_CHARACTERS || !raw.startsWith(PREFIX)) throw new IllegalArgumentException();
-            var data = JSON.readValue(raw.substring(PREFIX.length()),Data.class);
-            if (data.version()!=1 || !"reminders".equals(data.kind()) || !uuid(data.storeId()) || data.items()==null || data.items().size()>MAX_ITEMS) throw new IllegalArgumentException();
-            var seen = new HashSet<String>();
+            if (raw == null || raw.length() > MAX_CHARACTERS) throw new IllegalArgumentException();
+            int version;String json;
+            if(raw.startsWith(PREFIX)){version=2;json=raw.substring(PREFIX.length());}
+            else if(raw.startsWith(OLD_PREFIX)){version=1;json=raw.substring(OLD_PREFIX.length());}
+            else throw new IllegalArgumentException();
+            Data data;
+            if(version==1){
+                var legacy=JSON.readValue(json,LegacyData.class);
+                if(legacy.version()!=1||legacy.items()==null||legacy.items().size()>MAX_ITEMS)throw new IllegalArgumentException();
+                var items=new ArrayList<Item>();for(var item:legacy.items())items.add(new Item(item.id(),item.contentId(),item.occurrence(),item.targetName(),item.message(),item.due(),item.zone(),item.status(),item.created(),item.updated()));
+                data=new Data(2,legacy.kind(),legacy.storeId(),items);
+            }else data=JSON.readValue(json,Data.class);
+            if (data.version()!=2 || !"reminders".equals(data.kind()) || !uuid(data.storeId()) || data.items()==null || data.items().size()>MAX_ITEMS) throw new IllegalArgumentException();
+            var seen = new HashSet<String>();var normalized=new ArrayList<Item>();
             for (var item : data.items()) {
                 if (item==null || !uuid(item.id()) || !seen.add(item.id()) || item.contentId()<=0 || item.occurrence()<=0
                         || item.targetName()==null || item.targetName().length()>1000 || item.message()==null || item.message().length()>2000
@@ -61,8 +80,18 @@ public final class ReminderStore {
                 var due=Instant.parse(item.due());if(due.atZone(ZoneId.of(item.zone())).getSecond()!=0||due.getNano()!=0)throw new IllegalArgumentException(); Instant.parse(item.created()); Instant.parse(item.updated());
                 String local = ReminderTime.local(item.due(),item.zone());
                 if (local.length()!=16) throw new IllegalArgumentException();
+                Item value=item;
+                if(!Set.of("none","yearly").contains(value.repeat())||!Set.of("feb28","mar1").contains(value.leapDay())||!uuid(value.alarmId())||value.anchor()==null||value.lastCompleted()==null||value.acknowledgedAt()==null||value.snoozedUntil()==null)throw new IllegalArgumentException();
+                if(value.repeat().equals("yearly")){
+                    var anchor=LocalDateTime.parse(value.anchor());if(value.anchor().length()!=16||anchor.getYear()<1||anchor.getYear()>9999)throw new IllegalArgumentException();
+                }else if(!value.anchor().isEmpty())throw new IllegalArgumentException();
+                if(!value.lastCompleted().isEmpty())Instant.parse(value.lastCompleted());
+                if(!value.acknowledgedAt().isEmpty())Instant.parse(value.acknowledgedAt());
+                if(!value.snoozedUntil().isEmpty())Instant.parse(value.snoozedUntil());
+                if(!value.acknowledgedAt().isEmpty()&&!value.snoozedUntil().isEmpty())throw new IllegalArgumentException();
+                normalized.add(value);
             }
-            return new Data(data.version(),data.kind(),data.storeId(),List.copyOf(data.items()));
+            return new Data(2,data.kind(),data.storeId(),List.copyOf(normalized));
         } catch (RuntimeException invalid) { throw problem("storeInvalid"); }
     }
     static boolean uuid(String value) { try { return value!=null && UUID.fromString(value).toString().equals(value); } catch (IllegalArgumentException invalid) { return false; } }
@@ -80,7 +109,7 @@ public final class ReminderStore {
     }
     static void write(Connection c, Snapshot old, List<Item> items, Allocation allocation, Instant now) throws SQLException {
         if(items.size()>MAX_ITEMS)throw problem("limit");
-        var data=new Data(1,"reminders",old.id()==0?UUID.randomUUID().toString():old.data().storeId(),List.copyOf(items));
+        var data=new Data(2,"reminders",old.id()==0?UUID.randomUUID().toString():old.data().storeId(),List.copyOf(items));
         String raw=PREFIX+JSON.writeValueAsString(data);if(raw.length()>MAX_CHARACTERS)throw problem("limit");
         decode(raw);
         if(old.id()==0) {

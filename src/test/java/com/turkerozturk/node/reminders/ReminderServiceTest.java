@@ -108,4 +108,62 @@ class ReminderServiceTest {
   assertThatThrownBy(()->service.save("",1,1,e.localTime(),e.zone(),"x".repeat(2001),e.revision())).hasMessageContaining("invalidInput");
   assertThat(ReminderStore.read(c,false).id()).isZero();
  }
+ ReminderService at(String instant){var value=new ReminderService(properties,new CalendarSettings("MONDAY","Europe/Istanbul",1000),Clock.fixed(Instant.parse(instant),ZoneOffset.UTC));ReflectionTestUtils.setField(value,"manager",manager);return value;}
+ ReminderService.View all(ReminderService value){return value.inspect(new ReminderService.Options("","all",50,1));}
+ String annual(ReminderService value,String policy){var form=value.editor("",1);return value.save("",1,1,"2024-02-29T10:00","UTC","Birthday","yearly",policy,form.revision());}
+ @Test void annualCompletionAdvancesAndPreservesFebruary29AcrossNonLeapYears()throws Exception{
+  var value=at("2024-02-29T10:00:00Z");String id=annual(value,"feb28");
+  for(String expected:List.of("2025-02-28T10:00:00Z","2026-02-28T10:00:00Z","2027-02-28T10:00:00Z","2028-02-29T10:00:00Z")){
+   var current=all(value);value.changeState(id,"done",current.revision(),current.rows().get(0).alarmId());
+   assertThat(all(value).rows().get(0).due()).isEqualTo(expected);assertThat(all(value).rows().get(0).status()).isEqualTo("upcoming");
+  }
+  assertThat(ReminderStore.read(c,false).data().items().get(0).anchor()).isEqualTo("2024-02-29T10:00");
+  assertThat(text("SELECT ts_creation||':'||ts_lastsave FROM node WHERE node_id=1")).isEqualTo("100:200");
+ }
+ @Test void yearlyNoteAndZoneEditsKeepLeapAnchorAndMarchPolicyWorks()throws Exception{
+  var value=at("2026-11-17T10:00:00Z");String id=annual(value,"feb28");var edit=value.editor(id,0);
+  value.save(id,edit.nodeId(),edit.contentId(),edit.localTime(),"Europe/Istanbul","Updated","yearly","feb28",edit.revision());
+  assertThat(ReminderStore.read(c,false).data().items().get(0).anchor()).isEqualTo("2024-02-29T10:00");
+  var current=all(value);value.changeState(id,"done",current.revision(),current.rows().get(0).alarmId());
+  assertThat(all(value).rows().get(0).dueText()).contains("2027-02-28 10:00");
+  var next=at("2028-02-29T10:00:00Z");assertThat(all(next).rows().get(0).dueText()).contains("2028-02-29");
+ }
+ @Test void newAnniversaryRearmsDismissedPriorYearWithoutWritingOnReads()throws Exception{
+  var first=at("2024-02-29T10:00:00Z");String id=annual(first,"mar1");var original=first.alarms().items().get(0);String occurrence=all(first).rows().get(0).alarmId();first.alarmAction(id,original.key(),"dismiss");
+  assertThat(first.alarms().items()).isEmpty();String raw=ReminderStore.read(c,false).raw();
+  var next=at("2025-03-01T10:00:00Z");var alarm=next.alarms().items().get(0);assertThat(alarm.key()).isNotEqualTo(original.key());assertThat(next.alarms().items().get(0).key()).isEqualTo(alarm.key());
+  assertThat(ReminderStore.read(c,false).raw()).isEqualTo(raw);
+  assertThatThrownBy(()->next.changeState(id,"done",all(next).revision(),occurrence)).hasMessageContaining("changed");
+  next.alarmAction(id,alarm.key(),"dismiss");assertThat(next.alarms().items()).isEmpty();
+ }
+ @Test void snoozeAndDismissPersistAndOldAlarmButtonsCannotChangeNewSchedule(){
+  String id=save(1,"2026-11-17T12:00","Alarm");var original=service.alarms().items().get(0);service.alarmAction(id,original.key(),"snooze");assertThat(service.alarms().items()).isEmpty();
+  assertThat(at("2026-11-17T10:09:59Z").alarms().items()).isEmpty();var later=at("2026-11-17T10:10:00Z");var again=later.alarms().items().get(0);assertThat(again.key()).isNotEqualTo(original.key());
+  assertThatThrownBy(()->later.alarmAction(id,original.key(),"snooze")).hasMessageContaining("changed");later.alarmAction(id,again.key(),"dismiss");assertThat(at("2026-11-18T10:00:00Z").alarms().items()).isEmpty();
+  var view=all(later);assertThat(view.rows().get(0).alarmMuted()).isTrue();later.changeState(id,"pending",view.revision(),view.rows().get(0).alarmId());var rearmed=later.alarms().items().get(0);assertThat(rearmed.key()).isNotEqualTo(original.key());
+  var edit=later.editor(id,0);later.save(id,1,1,"2026-11-19T16:00",edit.zone(),"Rescheduled","none","feb28",edit.revision());assertThatThrownBy(()->later.alarmAction(id,rearmed.key(),"dismiss")).hasMessageContaining("changed");
+ }
+ @Test void oldVersionLoadsWithoutWritesAndMigratesOnlyOnMutation()throws Exception{
+  String id="11111111-1111-4111-8111-111111111111";
+  var item=Map.of("id",id,"contentId",1L,"occurrence",11L,"targetName","Alpha","message","Old","due","2026-11-17T09:00:00Z","zone","UTC","status","pending","created",NOW.toString(),"updated",NOW.toString());
+  String raw=ReminderStore.OLD_PREFIX+ReminderStore.JSON.writeValueAsString(Map.of("version",1,"kind","reminders","storeId",id,"items",List.of(item)));
+  try(var q=c.prepareStatement("INSERT INTO node(node_id,name,txt,tags,syntax,is_ro,level) VALUES(90,'REMINDERS',?,?,'plain-text',1,3)")){q.setString(1,raw);q.setString(2,ReminderStore.TAG);q.executeUpdate();}
+  try(var q=c.createStatement()){q.execute("INSERT INTO children(node_id,father_id,sequence,master_id) VALUES(90,0,4,0)");}
+  assertThat(all(service).rows().get(0).repeat()).isEqualTo("none");String key=service.alarms().items().get(0).key();assertThat(service.alarms().items().get(0).key()).isEqualTo(key);assertThat(text("SELECT txt FROM node WHERE node_id=90")).isEqualTo(raw);
+  var edit=service.editor(id,0);service.save(id,11,1,edit.localTime(),edit.zone(),"Updated",edit.revision());assertThat(text("SELECT txt FROM node WHERE node_id=90")).startsWith(ReminderStore.PREFIX);assertThat(ReminderStore.read(c,false).data().version()).isEqualTo(2);
+ }
+ @Test void alarmFeedIsBoundedIgnoresMissingTargetsAndReadonlyWritesAreRejected()throws Exception{
+  for(int i=0;i<25;i++)save(1,String.format(Locale.ROOT,"2026-11-16T00:%02d",i),"Due "+i);
+  assertThat(service.alarms().total()).isEqualTo(25);assertThat(service.alarms().items()).hasSize(20);assertThat(service.alarms().items().get(0).message()).isEqualTo("Due 24");
+  var alarm=service.alarms().items().get(0);when(properties.writable()).thenReturn(false);assertThatThrownBy(()->service.alarmAction(alarm.id(),alarm.key(),"dismiss")).hasMessageContaining("readonly");when(properties.writable()).thenReturn(true);
+  try(var q=c.createStatement()){q.execute("DELETE FROM children WHERE node_id IN(1,11)");}assertThat(service.alarms().items()).isEmpty();
+ }
+
+ @Test void anOldAnnualEditFormCannotResetTheAnchorAtTheNextAnniversary()throws Exception{
+  var first=at("2024-02-29T10:00:00Z");String id=annual(first,"mar1");var old=first.editor(id,0);String raw=ReminderStore.read(c,false).raw();
+  var next=at("2025-03-01T10:00:00Z");
+  assertThatThrownBy(()->next.save(id,old.nodeId(),old.contentId(),old.localTime(),old.zone(),"Note edit",old.repeat(),old.leapDay(),old.revision(),old.alarmId())).hasMessageContaining("changed");
+  assertThat(ReminderStore.read(c,false).raw()).isEqualTo(raw);
+ }
+
 }

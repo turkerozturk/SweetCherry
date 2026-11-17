@@ -34,19 +34,20 @@ public class ReminderController {
     @PostMapping("/nodes/reminders/save") @PreAuthorize("hasRole('ADMIN')")
     public String save(@RequestParam(defaultValue="")String id,@RequestParam long nodeId,@RequestParam long contentId,
             @RequestParam String localTime,@RequestParam String zone,@RequestParam(defaultValue="")String message,
-            @RequestParam String revision,@RequestParam String _tenantView,HttpServletResponse response,Model model,RedirectAttributes flash){
+            @RequestParam(defaultValue="none")String repeat,@RequestParam(defaultValue="feb28")String leapDay,
+            @RequestParam String revision,@RequestParam(defaultValue="")String occurrence,@RequestParam String _tenantView,HttpServletResponse response,Model model,RedirectAttributes flash){
         response.setHeader("Cache-Control","no-store");
-        try{service.save(id,nodeId,contentId,localTime,zone,message,revision);}catch(ResponseStatusException invalid){
+        try{service.save(id,nodeId,contentId,localTime,zone,message,repeat,leapDay,revision,occurrence);}catch(ResponseStatusException invalid){
             if(invalid.getStatusCode().value()!=400||invalid.getReason()==null||!Set.of("invalidTime","invalidInput").contains(invalid.getReason()))throw invalid;
-            var editor=service.editor(id,nodeId);if(editor.contentId()!=contentId)throw ReminderStore.problem("targetMissing");model.addAttribute("editor",editor.input(localTime,zone,message,revision));model.addAttribute("reminderError",invalid.getReason());response.setStatus(400);return "node/reminder-edit";
+            var editor=service.editor(id,nodeId);if(editor.contentId()!=contentId)throw ReminderStore.problem("targetMissing");model.addAttribute("editor",editor.input(localTime,zone,message,revision,repeat,leapDay,occurrence));model.addAttribute("reminderError",invalid.getReason());response.setStatus(400);return "node/reminder-edit";
         }
         flash.addFlashAttribute("reminderSaved",true);return redirect(_tenantView,new ReminderService.Options("","all",50,1));
     }
     @PostMapping("/nodes/reminders/{id}/state") @PreAuthorize("hasRole('ADMIN')")
     public String state(@PathVariable String id,@RequestParam String state,@RequestParam String revision,@RequestParam String _tenantView,
-            @RequestParam(defaultValue="")String q,@RequestParam(defaultValue="pending")String status,@RequestParam(defaultValue="50")String limit,@RequestParam(defaultValue="1")String page,RedirectAttributes flash){
+            @RequestParam(defaultValue="")String q,@RequestParam(defaultValue="pending")String status,@RequestParam(defaultValue="50")String limit,@RequestParam(defaultValue="1")String page,@RequestParam(defaultValue="")String occurrence,RedirectAttributes flash){
         ReminderService.Options options;try{options=options(q,status,limit,page);}catch(IllegalArgumentException invalid){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidInput");}
-        service.changeState(id,state,revision);flash.addFlashAttribute("reminderSaved",true);return redirect(_tenantView,options);
+        service.changeState(id,state,revision,occurrence);flash.addFlashAttribute("reminderSaved",true);return redirect(_tenantView,options);
     }
     private ReminderService.Options options(String q,String status,String limit,String page){return new ReminderService.Options(q,status,Integer.parseInt(limit),Integer.parseInt(page));}
     private String redirect(String token,ReminderService.Options options){return "redirect:"+UriComponentsBuilder.fromPath("/nodes/reminders").queryParam("q",options.q()).queryParam("status",options.status()).queryParam("limit",options.limit()).queryParam("page",options.page()).queryParam("_tenantView",token).build().encode().toUriString();}

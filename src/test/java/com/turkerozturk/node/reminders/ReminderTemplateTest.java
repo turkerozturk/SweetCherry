@@ -42,4 +42,19 @@ class ReminderTemplateTest {
   var node=new com.turkerozturk.node.Node();node.setSyntax("plain-text");node.setTxt("secret-json");
   assertThat(render("node/nodeContentFragment",Locale.ENGLISH,Map.of("node",node,"reminderHelper",true))).contains("Use the Reminders page").doesNotContain("secret-json");
  }
+ @Test void annualFieldsOccurrenceTokensAndAlarmWidgetRenderInBothLanguages(){
+  for(var locale:List.of(Locale.ENGLISH,Locale.forLanguageTag("tr"))){
+   var editor=new ReminderService.Editor(ID,11,1,"Node",true,"2027-02-28T10:00","UTC","Birthday","pending","revision","yearly","mar1","2024-02-29T10:00",ID);
+   var form=org.jsoup.Jsoup.parse(render("node/reminder-edit",locale,Map.of("editor",editor)));
+   assertThat(form.selectFirst("select[name=repeat] option[selected]").val()).isEqualTo("yearly");assertThat(form.selectFirst("select[name=leapDay] option[selected]").val()).isEqualTo("mar1");
+   var row=new ReminderService.Row(ID,1,11,"Node",true,"Birthday","2027-02-28T10:00:00Z","UTC","upcoming","yearly","2026-02-28T10:00:00Z","","",ID);
+   var view=new ReminderService.View(List.of(row),1,0,0,0,1,"revision","now",new ReminderService.Options("","pending",50,1));
+   String list=render("node/reminders",locale,Map.of("reminders",view,"canEditReminders",true));assertThat(list).contains(locale.getLanguage().equals("tr")?"Bu oluşumu tamamla":"Complete this occurrence").doesNotContain("??");
+   assertThat(org.jsoup.Jsoup.parse(list).select("input[name=occurrence]").eachAttr("value")).containsOnly(ID);
+   var widget=org.jsoup.Jsoup.parse(render("node/reminder-alarms",locale,Map.of("currentTenantName","Notes")));
+   assertThat(widget.selectFirst("#reminderAlarms").attr("data-token")).isEqualTo("token");assertThat(widget.selectFirst("form").attr("action")).isEqualTo("/nodes/reminders/alarms/0");
+   assertThat(render("node/reminder-alarms",locale,Map.of())).doesNotContain("id=\"reminderAlarms\"");
+  }
+ }
+
 }

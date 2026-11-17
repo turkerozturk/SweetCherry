@@ -10,8 +10,8 @@ alınır; `system` ise sunucunun saat dilimi kullanılır. Kayıt saati UTC anı
 tamamlanmış, iptal edilmiş ve tüm kayıtlar filtrelerini sunar. Yaklaşan, kontrol
 anından sonraki bekleyen kayıttır; kontrol anına eşit veya geçmiş tarih gecikendir.
 Durum sayfa isteği sırasında hesaplanır. **Yenile / filtrele** ile tekrar kontrol
-edilir. Bu sürüm otomatik alarm çalmaz, tarayıcı bildirimi göndermez; yıllık
-tekrar ve sesli/görsel uyarı sonraki aşamalardır.
+edilir. Yıllık tekrar ve sayfa içi görsel/sesli alarm için aşağıdaki ikinci aşama
+açıklamasına bakın. İşletim sistemi bildirimi gönderilmez.
 
 - Geçmiş tarih girilebilir. Yaz saati geçişinde mevcut olmayan veya iki anlama
   gelen yerel saat sessizce kaydırılmaz. Başka saat veya açık UTC farkı
@@ -75,3 +75,65 @@ kayıt değiştirdikten sonra eski formu gönderin. Hedef yerleşimi çöp kutus
 etkin paylaşılan yerleşime geçişi, sonra tüm hedefler kaybolduğunda kaydın
 korunmasını kontrol edin. USER/salt okunur erişimi ve CTB yeniden açıldıktan sonra
 kayıtların kalıcılığını doğrulayın.
+
+## Yıllık tekrar ve alarm (ikinci aşama)
+
+Formda **Tekrar → Her yıl** seçilebilir. İlk tarih, tekrarın başlangıç tarihidir;
+doğum yılının girilmesi gerekmez. Ay, gün ve yerel saat ayrı bir temel olarak
+saklanır. 29 Şubat için artık yıl olmayan yıllarda **28 Şubat** (varsayılan) veya
+**1 Mart** seçilir; sonraki artık yılda 29 Şubat korunur. 29 Şubat temeli için
+geçerli bir artık yıl tarihi seçin. Not/saat dilimi düzenlemesi bu temeli bozmaz.
+Yıllık tekrarda yaz saati boşluğu ileri kaydırılır; saat iki kere oluşuyorsa ilk
+UTC farkı seçilir. Elle girilen belirsiz/mevcut olmayan saat hâlâ reddedilir.
+
+**Bu oluşumu tamamla**, tamamlanan tarihi saklayıp şimdi veya mevcut tarihten
+(ilerideyse o tarihten) sonraki ilk tekrarı hazırlar. Önceki yıl tamamlanmamış
+olsa da yeni yıldönümü geldiğinde yeni oluşum görüntülenir ve yeni alarm anahtarı
+oluşur. Geçmiş tüm yıllar ayrı ayrı birikmez; son tamamlanan oluşum saklanır.
+Salt okuma bu geçişi hesaplar, CTB'ye yazmaz. Eski yıllık satırın düğmesi yeni
+yıldönümünü yanlışlıkla tamamlayamaz; oluşum kimliği kontrol edilir.
+
+Seçili CTB'nin sayfalarında sağ alttaki **Alarmlar → Alarmları aç** düğmesini
+kullanın. Seçim bu tarayıcıda kaynak adına göre saklanır. **Sesi aç / dene**
+düğmesi iki kısa deneme sesi üretir ve o sayfada sesi etkinleştirir. Sayfa
+navigasyonu/yeniden yükleme sonrası ses yeniden düğmeye basılarak açılır; `/tree`
+içinde düğümden düğüme geçiş sayfayı yenilemediği için ses açık kalır.
+
+Alarm kontrolü sayfa açıkken yaklaşık 20 saniyede bir yapılır. Tarayıcı kapalı,
+bilgisayar uykuda veya sayfa arka plandaysa zamanında çalma garantisi yoktur.
+İşletim sistemi servisi veya masaüstü bildirim izni kullanılmaz; görsel uyarı
+sayfanın içindedir. En fazla 20 güncel geciken kayıt panelde gösterilir; tümü
+Hatırlatıcılar sayfasındadır. Etkin hedefi olmayan, tamamlanmış veya iptal edilmiş
+kayıt alarm üretmez.
+
+- **Uyarıyı kapat**, sadece o oluşumun alarmını susturur; hatırlatıcıyı tamamlamaz.
+- **10 dakika ertele**, sunucu saatine göre erteleme kaydını CTB'ye yazar. Süre
+  dolunca yeni sunum anahtarı oluşur ve tekrar uyarır. Eski düğmeler ertelenen veya
+  yeniden zamanlanan kaydı sessizce değiştiremez.
+- Yıllık yeni oluşum, kapatma/erteleme bilgisini önceki yıldan devralmaz.
+- Listedeki **Uyarıyı yeniden etkinleştir** kapatma/erteleme bilgisini sıfırlar.
+- Kalıcı işlemler ADMIN, yazılabilir kaynak, CSRF ve güncel tenant gerektirir.
+  USER/salt okunur kaynakta kapatma sadece bu tarayıcıda saklanır; erteleme gizlidir.
+- Aynı tarayıcıdaki sekmeler Web Locks ve ortak yerel kayıtla ses tekrarını
+  önler. Web Locks yoksa yalnız odaktaki sayfa kontrol eder. Son 1000 sunum kaydı
+  tutulur; tarayıcı depolaması yoksa bu kayıtlar sayfa belleğiyle sınırlıdır.
+  Farklı tarayıcı/cihazlar ayrı uyarı üretebilir. Kaynak/oturum değişirse kontrol
+  durur ve ses susturulur.
+
+Depo v1 kayıtları tek seferlik kayıt olarak okunur. İlk değiştirmede (alarm
+kapatma/erteleme dahil) sürümlü içerik v2'ye geçer; GET işlemleri sürüm yükseltmez.
+Sistem etiketi aynı kalır. Eski SweetCherry sürümleri v2 içeriğini okuyamaz ve
+üzerine yazmaz. v2 tekrar temeli, 29 Şubat tercihi, son tamamlanan tarih, oluşum
+kimliği ve kapatma/erteleme zamanlarını saklar. CTB şeması değişmez.
+
+Ek kontroller:
+
+```bat
+mvnw.cmd -Dtest=AnnualReminderTest,ReminderServiceTest,ReminderControllerTest,ReminderSecurityTest,ReminderTemplateTest test
+node --test src/test/js/reminderAlarmState.test.cjs src/test/js/reminderAlarms.test.cjs
+```
+
+Manuel: yakın bir geleceğe (1–2 dakika) kayıt ekleyin; paneli ve sesi açın,
+deneme sesini dinleyin, uyarıyı bekleyin. Aynı kaynağı iki sekmede açıp ses
+tekrarını, kapatma ve ertelemeyi, sayfayı yeniden açınca kalıcılığı deneyin.
+29 Şubat temelli yıllık kaydı tamamlayarak sonraki tarihin doğru olduğunu görün.

@@ -19,14 +19,14 @@ class ReminderControllerTest {
  @Test void invalidDatePreservesTypedValuesAndOriginalRevision(){
   var service=mock(ReminderService.class);var controller=new ReminderController(service,mock(NodePropertiesService.class));
   var editor=new ReminderService.Editor("",11,1,"Node",true,"2026-11-18T10:00","UTC","","pending","fresh");when(service.editor("",11)).thenReturn(editor);
-  when(service.save("",11,1,"bad","bad/zone","typed","old")).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidTime"));
+  when(service.save("",11,1,"bad","bad/zone","typed","none","feb28","old","")).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalidTime"));
   var model=new ExtendedModelMap();var response=new MockHttpServletResponse();
-  assertThat(controller.save("",11,1,"bad","bad/zone","typed","old","token",response,model,new RedirectAttributesModelMap())).isEqualTo("node/reminder-edit");
+  assertThat(controller.save("",11,1,"bad","bad/zone","typed","none","feb28","old","","token",response,model,new RedirectAttributesModelMap())).isEqualTo("node/reminder-edit");
   assertThat(response.getStatus()).isEqualTo(400);var preserved=(ReminderService.Editor)model.get("editor");assertThat(preserved.message()).isEqualTo("typed");assertThat(preserved.revision()).isEqualTo("old");assertThat(preserved.zone()).isEqualTo("bad/zone");
  }
  @Test void successUsesFixedLocalRedirectAndFlashValue(){
   var controller=new ReminderController(mock(ReminderService.class),mock(NodePropertiesService.class));var flash=new RedirectAttributesModelMap();
-  var target=controller.save("",1,1,"2026-11-18T10:00","UTC","note","r","token",new MockHttpServletResponse(),new ExtendedModelMap(),flash);
+  var target=controller.save("",1,1,"2026-11-18T10:00","UTC","note","none","feb28","r","","token",new MockHttpServletResponse(),new ExtendedModelMap(),flash);
   assertThat(target).startsWith("redirect:/nodes/reminders?").contains("status=all","_tenantView=token");assertThat(flash.getFlashAttributes().get("reminderSaved")).isEqualTo(true);
  }
 }

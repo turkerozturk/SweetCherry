@@ -7,8 +7,8 @@ the server zone). The instant is stored in UTC alongside the chosen zone.
 **View Mode → Reminders** (`/nodes/reminders`) provides pending, upcoming, overdue,
 completed, cancelled and all filters, search and pagination. Pending instants at
 or before the check time are overdue. Use **Refresh / filter** to recalculate.
-This stage stores one-time reminders; there are no automatic notifications,
-alarms or recurrence yet. Past dates are allowed. DST gaps and overlaps require
+One-time and annual reminders are supported, along with the in-page alarm panel
+described below. Past dates are allowed. DST gaps and overlaps require
 another time or an explicit UTC offset instead of silently shifting the time.
 
 Multiple reminders may refer to one content node. Real and shared placements
@@ -44,3 +44,40 @@ Focused checks:
 mvnw.cmd -Dtest=ReminderTimeTest,ReminderServiceTest,ReminderControllerTest,ReminderSecurityTest,ReminderTemplateTest,AuditIntegrationTest test
 mvnw.cmd clean package
 ```
+
+## Annual recurrence and page alarms
+
+Choose **Repeat → Every year**. The first reminder date anchors the month/day and
+local time. February 29 uses February 28 (default) or March 1 in non-leap years,
+and returns to February 29 in leap years. Completing an occurrence schedules the
+first future occurrence after now or the selected occurrence if it is later.
+A new anniversary replaces a missed earlier year without accumulating every
+missed year. Only the last completed occurrence is retained. Reads calculate
+rollover without writing; occurrence IDs reject stale annual action buttons.
+Annual DST gaps move forward and overlaps select the earlier offset. Manual
+ambiguous/nonexistent times still require correction or an explicit offset.
+
+Enable the **Alarms** panel on a page for the selected CTB. **Enable / test sound**
+plays two short tones and enables sound for that page. Sound must be enabled
+again after navigation/reload; `/tree` content navigation keeps the same page.
+Open pages poll roughly every 20 seconds, subject to browser throttling. Closed browsers, sleeping machines
+and background tabs cannot guarantee timely alarms. These are in-page visual
+alerts, not an OS service or desktop notification. Up to 20 recent due alerts
+are shown; all reminders remain in the list.
+
+Closing an alert acknowledges only its occurrence. Snooze persists a ten-minute
+server-time delay and creates a new presentation key. The next annual occurrence
+has fresh alarm state. The list can reactivate a closed/snoozed alarm. Persistent
+actions require ADMIN, a writable source, CSRF and the current tenant token.
+Reader/read-only dismissal is local to this browser. Missing/inactive targets do
+not alarm. Web Locks and shared browser receipts suppress repeated sounds across
+tabs; without Web Locks only the focused page checks. The latest 1000 receipts
+are retained; unavailable browser storage limits receipts to page memory.
+Different devices/browsers may alert independently. A changed source/session
+stops polling and mutes sound.
+
+Version 1 stores load as one-time records and migrate to version 2 only on a
+mutation, including dismissal/snooze. GET requests do not migrate. The protected
+tag and CTB schema stay unchanged. Version 2 adds recurrence, anchor/leap policy,
+last completion, occurrence identity and acknowledgement/snooze timestamps.
+Older SweetCherry versions reject version 2 rather than overwriting it.

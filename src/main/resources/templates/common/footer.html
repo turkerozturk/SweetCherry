@@ -16,6 +16,7 @@
 
 <!-- javascript kutuphaneleri icin diger bir fragment -->
 <div th:fragment="footerJsLibraries" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+<th:block th:replace="~{node/reminder-alarms :: widget}"></th:block>
 <th:block th:replace="~{node/quickTags :: quickTags}"></th:block>
 <script defer th:src="@{/js/node/quickTags.js}"></script>
 

@@ -1,0 +1,7 @@
+.reminder-alarms {position:fixed;right:1rem;bottom:6.5rem;max-height:calc(100dvh - 8rem);overflow:auto;z-index:1050;max-width:min(26rem,calc(100vw - 2rem));border:1px solid var(--bs-border-color,#adb5bd);border-radius:.5rem;background:var(--bs-body-bg,#fff);color:var(--bs-body-color,#212529);box-shadow:0 3px 14px #0003;padding:.5rem}
+.reminder-alarms summary {cursor:pointer;font-weight:600}
+.reminder-alarm-controls,.reminder-alarm-actions {display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0}
+.reminder-alarm-cards {max-height:50vh;overflow:auto;overscroll-behavior:contain}
+.reminder-alarm-card {border-top:1px solid var(--bs-border-color,#adb5bd);padding:.5rem 0;overflow-wrap:anywhere}
+.reminder-alarm-note {white-space:pre-wrap;max-height:6rem;overflow:auto;margin:.3rem 0}
+.reminder-alarms p {font-size:.85rem;margin:.35rem 0}
