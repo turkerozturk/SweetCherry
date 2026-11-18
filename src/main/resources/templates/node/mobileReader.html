@@ -41,7 +41,7 @@
 <div id="offcanvasScrolling" class="collapse show"><th:block th:replace="~{node/nodeMetaDataFragment :: nodeMetaDataFragment}"></th:block></div>
 <th:block th:replace="~{node/readerContextNavigation :: breadcrumbs}"></th:block>
 </div>
-<form th:if="${node == null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
+<form th:if="${node == null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" th:action="@{/nodes/top-level}" method="post" data-confirm-kind="creation" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/><button type="submit" class="btn btn-outline-primary" th:text="#{tree.addRoot}"></button>
 </form>
 </div></aside>

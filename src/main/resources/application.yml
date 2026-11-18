@@ -211,6 +211,7 @@ myapp:
     page-size: 12
   appearance:
     theme: light # light (existing appearance) or dark; restart after changing.
+    node-background-color: white # CSS color name or quoted hex (e.g. "#fff8dc"). User menu can override without restart.
   custom-lists:
     views:
       date-time-format: "yyyy-MM-dd HH:mm:ss"

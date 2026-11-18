@@ -52,17 +52,17 @@
 <div class="dropdown" th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')">
 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" th:text="#{toolbar.add}"></button>
 <div class="dropdown-menu">
-<form th:action="@{/nodes/siblings/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
+<form th:action="@{/nodes/siblings/{id}(id=${requestedNodeId})}" method="post" data-confirm-kind="creation" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="dropdown-item" type="submit" th:text="#{toolbar.sibling}"></button>
 </form>
-<form th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" th:attr="data-confirm-message=#{node.confirmAdd}">
+<form th:action="@{/nodes/children/{id}(id=${requestedNodeId})}" method="post" data-confirm-kind="creation" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="dropdown-item" type="submit" th:text="#{toolbar.child}"></button>
 </form>
 <th:block th:replace="~{node/nodeBookmarkFragment :: addBookmark(${view})}"></th:block>
 <hr class="dropdown-divider">
 <th:block th:replace="~{node/nodeDuplicateFragment :: duplicateItems(${view},true)}"></th:block>
 </div></div>
-<a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" th:href="@{/nodes/delete/{id}(id=${requestedNodeId},view=${view})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
+<a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" data-node-delete th:href="@{/nodes/delete/{id}(id=${requestedNodeId},view=${view},_tenantView=${tenantViewToken})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
 <th:block th:replace="~{node/nodeMoveToFragment :: moveTo(${view})}"></th:block>
 <button th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" type="button" class="btn btn-sm btn-outline-primary" th:attr="data-quick-tags=${requestedNodeId},data-quick-tags-token=${tenantViewToken}"><i class="fas fa-tags" aria-hidden="true"></i> <span th:text="#{tags.quick.button}"></span></button>
 </div></body></html>

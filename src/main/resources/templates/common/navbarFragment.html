@@ -365,6 +365,11 @@
                                 <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/dashboardold}"><i class="fas fa-info-circle"></i> <span th:text="#{navbar.legacyDashboard}">Old Dashboard</span></a></li>
                                 <li><a class="dropdown-item" th:href="@{/help/index}"><i class="fas fa-life-ring"></i> <span th:text="#{navbar.legacyHelp}">Old Help</span></a></li>
                                 <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/settings}"><i class="fas fa-info-circle"></i> <span th:text="#{settings.otherInfo}">Other Information</span></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><button type="button" class="dropdown-item" data-confirm-toggle="creation" role="menuitemcheckbox" aria-checked="true"><span data-confirm-mark aria-hidden="true">✓</span> <span th:text="#{preferences.confirm.creation}"></span></button></li>
+                                <li><button type="button" class="dropdown-item" data-confirm-toggle="duplication" role="menuitemcheckbox" aria-checked="true"><span data-confirm-mark aria-hidden="true">✓</span> <span th:text="#{preferences.confirm.duplication}"></span></button></li>
+                                <li><button type="button" class="dropdown-item" data-confirm-toggle="deletion" role="menuitemcheckbox" aria-checked="true"><span data-confirm-mark aria-hidden="true">✓</span> <span th:text="#{preferences.confirm.deletion}"></span></button></li>
+                                <li><button type="button" class="dropdown-item" data-node-background-open th:text="#{preferences.background}"></button></li>
                             </th:block>
                         </ul>
                     </li>
@@ -380,6 +385,7 @@
             </div>
         </div>
     </nav>
+    <th:block th:replace="~{common/readerPreferences :: colorDialog}"></th:block>
     <th:block th:replace="~{node/nodeGoFragment :: dialog}"></th:block>
     <th:block th:replace="~{node/quickNodesFragment :: dialogs}"></th:block>
     <link rel="stylesheet" th:href="@{/css/node/quickNodes.css}">

@@ -29,7 +29,7 @@
         const subtree=button.dataset.duplicate==='subtree';
         const shared=button.dataset.duplicate==='shared';
         const message=shared?form.dataset.confirmShared:subtree?form.dataset.confirmSubtree.replace('%COUNT%',form.dataset.subtreeCount):form.dataset.confirmSingle;
-        if(!window.confirm(message)){event.preventDefault();return;}
+        if(window.SweetCherryPreferences?.confirmationEnabled(shared ? 'creation' : 'duplication') !== false && !window.confirm(message)){event.preventDefault();return;}
         form.elements.createShared.value=String(shared);form.elements.withSubnodes.value=String(subtree);form.dataset.duplicateReady='submitting';
         form.querySelectorAll('[data-duplicate]').forEach(control=>{control.disabled=true;});
     });

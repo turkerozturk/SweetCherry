@@ -1,0 +1,20 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><head>
+<th:block th:fragment="assets">
+<link rel="stylesheet" th:href="@{/css/node/readerPreferences.css}">
+<script defer th:src="@{/js/common/readerPreferencesState.js}"></script>
+<script defer th:src="@{/js/common/readerPreferences.js}"></script>
+</th:block></head><body>
+<dialog th:fragment="colorDialog" data-node-background-dialog aria-labelledby="nodeBackgroundTitle" class="reader-background-dialog">
+<form data-node-background-form>
+<h2 id="nodeBackgroundTitle" class="h5" th:text="#{preferences.background}"></h2>
+<label class="form-label" for="nodeBackgroundValue" th:text="#{preferences.backgroundValue}"></label>
+<input id="nodeBackgroundValue" class="form-control mb-2" name="background" list="nodeBackgroundNames" required maxlength="40" autocomplete="off" data-node-background-value>
+<datalist id="nodeBackgroundNames" data-node-background-names></datalist>
+<label class="form-label" for="nodeBackgroundPicker" th:text="#{preferences.backgroundPicker}"></label>
+<input id="nodeBackgroundPicker" type="color" class="form-control form-control-color mb-2" data-node-background-picker>
+<p class="small" th:text="#{preferences.backgroundHelp}"></p>
+<p class="text-danger" data-node-background-error hidden th:text="#{preferences.backgroundInvalid}"></p>
+<div class="d-flex flex-wrap gap-2"><button type="submit" class="btn btn-primary" th:text="#{preferences.apply}"></button>
+<button type="button" class="btn btn-outline-secondary" data-node-background-reset th:text="#{preferences.backgroundReset}"></button>
+<button type="button" class="btn btn-outline-secondary" data-node-background-close th:text="#{preferences.cancel}"></button></div>
+</form></dialog></body></html>

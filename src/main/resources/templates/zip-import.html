@@ -11,7 +11,8 @@
 <form th:if="${preview == null}" th:action="@{/zip-import/preview}" method="post" enctype="multipart/form-data">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <label class="form-label" for="zip-file" th:text="#{zipImport.file}"></label>
-<input class="form-control mb-3" id="zip-file" type="file" name="file" accept=".zip,application/zip" required>
+<div data-file-picker th:attr="data-empty=#{filePicker.empty}"><input class="form-control mb-3" id="zip-file" data-localized-file type="file" name="file" accept=".zip,application/zip" required>
+<div data-file-controls hidden class="input-group mb-3"><button type="button" class="btn btn-outline-secondary" data-file-browse th:text="#{filePicker.browse}"></button><span class="form-control text-break" data-file-name aria-live="polite" th:text="#{filePicker.empty}"></span></div></div>
 <label class="form-check"><input class="form-check-input" type="checkbox" name="removeExtension" value="true"><span th:text="#{zipImport.removeExtension}"></span></label>
 <label class="form-check"><input class="form-check-input" type="checkbox" name="attachments" value="true" checked><span th:text="#{zipImport.attachments}"></span></label>
 <label class="form-check"><input class="form-check-input" type="checkbox" name="metadata" value="true" checked><span th:text="#{zipImport.metadata}"></span></label>
@@ -32,4 +33,4 @@
 </form>
 <form th:action="@{/zip-import/cancel}" method="post" class="d-inline"><input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="btn btn-secondary" type="submit" th:text="#{zipImport.cancel}"></button></form>
 </th:block>
-</section></body></html>
+</section><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/common/localizedFileInput.js}"></script></section></body></html>

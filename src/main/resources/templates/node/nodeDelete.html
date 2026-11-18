@@ -14,7 +14,7 @@
     <p th:unless="${trashMode == true}" th:text="#{node.delete.survivors}"></p>
     <div th:if="${trashMode == true}"><p th:text="#{trash.deleteWarning}"></p><p class="alert alert-info" th:text="#{trash.liveWarning}"></p><p th:text="#{trash.descendants(${trashPreview.descendants})}"></p><p th:if="${trashPreview.externalSharedLocations>0}" th:text="#{trash.sharedCount(${trashPreview.externalSharedLocations})}"></p></div>
     <p><strong th:text="${node.name}">Node</strong></p>
-    <form th:action="@{/nodes/delete/{nodeId}(nodeId=${selectedNodeId})}" method="post">
+    <form th:action="@{/nodes/delete/{nodeId}(nodeId=${selectedNodeId})}" method="post" data-node-delete-confirm>
         <input type="hidden" name="trashMode" th:value="${trashMode == true}"><input th:if="${trashMode == true}" type="hidden" name="revision" th:value="${trashPreview.revision}">
         <input type="hidden" name="view" th:value="${deleteView}"/>
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>

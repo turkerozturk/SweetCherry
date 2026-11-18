@@ -45,3 +45,12 @@ test('delegated confirmations initialize once and cancelling prevents a POST',()
  handlers[0]({target:{closest:()=>({dataset:{confirmMessage:'Türkçe & title [11]'}})},preventDefault(){prevented++;}});
  assert.equal(confirms,1);assert.equal(prevented,1);
 });
+
+test('creation confirmation can be skipped without disabling unrelated form confirmations',()=>{
+ const source=fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/node/confirmNodeCreation.js'),'utf8');
+ let listener,confirms=0,prevented=0;
+ vm.runInNewContext(source,{window:{SweetCherryPreferences:{confirmationEnabled:kind=>kind!=='creation'},confirm(){confirms++;return false;}},document:{addEventListener:(type,fn)=>listener=fn}});
+ const send=dataset=>listener({target:{closest:()=>({dataset})},preventDefault(){prevented++;}});
+ send({confirmKind:'creation',confirmMessage:'create'});assert.equal(confirms,0);assert.equal(prevented,0);
+ send({confirmMessage:'backup'});assert.equal(confirms,1);assert.equal(prevented,1);
+});

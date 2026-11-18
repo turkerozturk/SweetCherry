@@ -11,7 +11,8 @@
 <form th:if="${preview == null}" th:action="@{/mindmap-import/preview}" method="post" enctype="multipart/form-data">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <label class="form-label" for="mm-file" th:text="#{mmImport.file}"></label>
-<input class="form-control mb-3" id="mm-file" type="file" name="file" accept=".mm,application/x-freemind,text/xml,application/xml" required>
+<div data-file-picker th:attr="data-empty=#{filePicker.empty}"><input class="form-control mb-3" id="mm-file" data-localized-file type="file" name="file" accept=".mm,application/x-freemind,text/xml,application/xml" required>
+<div data-file-controls hidden class="input-group mb-3"><button type="button" class="btn btn-outline-secondary" data-file-browse th:text="#{filePicker.browse}"></button><span class="form-control text-break" data-file-name aria-live="polite" th:text="#{filePicker.empty}"></span></div></div>
 <button class="btn btn-primary" type="submit" th:text="#{mmImport.preview}"></button>
 </form>
 <th:block th:if="${preview != null}">
@@ -30,4 +31,4 @@
 <button class="btn btn-secondary" type="submit" th:text="#{mmImport.cancel}"></button>
 </form>
 </th:block>
-</section></body></html>
+</section><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/common/localizedFileInput.js}"></script></section></body></html>

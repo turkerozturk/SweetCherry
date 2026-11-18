@@ -53,6 +53,7 @@ public class ApplicationSettingsService {
         new Setting("myapp.audit.max-event-characters","auditlimit","16777216",67108864),
         new Setting("myapp.trash.enabled","boolean","false",0),
         new Setting("myapp.appearance.theme","theme","light",0),
+        new Setting("myapp.appearance.node-background-color","color","white",0),
         new Setting("myapp.default-language","language","",0),
         new Setting("myapp.home.open-latest-modified","boolean","true",0),
         new Setting("myapp.home.modified-minimum","nonnegative","5",1000),
@@ -155,6 +156,7 @@ public class ApplicationSettingsService {
     private static void validate(Setting setting,String value){
         if(value==null||value.length()>160||value.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("invalid");
         switch(setting.type()) {
+            case "color" -> {if(!NodeBackgroundAdvice.valid(value))throw new IllegalArgumentException("invalid");}
             case "boolean" -> {if(!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("invalid");}
             case "number","nonnegative","width","treefont","auditlimit" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
             case "theme","language" -> {if(!choices(setting).contains(value))throw new IllegalArgumentException("invalid");}

@@ -2,7 +2,7 @@
 <html lang="en" th:lang="${#locale.language}"
       xmlns:layout="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" th:style="${'--sc-node-background:' + (nodeBackgroundColor != null ? nodeBackgroundColor : 'white')}">
 
     <head>
 
@@ -38,6 +38,7 @@
         </style>
 
     <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <th:block th:replace="~{common/readerPreferences :: assets}"></th:block>
 </head>
 
     <body>

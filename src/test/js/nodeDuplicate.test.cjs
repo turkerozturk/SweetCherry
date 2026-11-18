@@ -1,14 +1,14 @@
 const test=require('node:test');const assert=require('node:assert/strict');
 const fs=require('node:fs');const vm=require('node:vm');const path=require('node:path');
-async function controls(state,confirm=true,ok=true) {
+async function controls(state,confirm=true,ok=true,preferences) {
     const handlers={};let requested,question;
-    const buttons=['single','subtree'].map(kind=>({dataset:{duplicate:kind},disabled:true}));
+    const buttons=['single','subtree','shared'].map(kind=>({dataset:{duplicate:kind},disabled:true}));
     const error={textContent:''};
-    const form={dataset:{stateUrl:'/nodes/duplicate/1/state',error:'Reload',confirmSingle:'Copy?',confirmSubtree:'Copy %COUNT% entries?'},
+    const form={dataset:{stateUrl:'/nodes/duplicate/1/state',error:'Reload',confirmShared:'Create shared?',confirmSingle:'Copy?',confirmSubtree:'Copy %COUNT% entries?'},
         elements:{_tenantView:{value:'tenant'},revision:{value:''},withSubnodes:{value:'false'},createShared:{value:'false'}},
         matches:()=>true,querySelectorAll:()=>buttons,querySelector:()=>error};
     vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/node/nodeDuplicate.js'),'utf8'),{
-        URL,window:{location:{href:'https://example.test/tree'},confirm(message){question=message;return confirm;}},
+        URL,window:{SweetCherryPreferences:preferences,location:{href:'https://example.test/tree'},confirm(message){question=message;return confirm;}},
         document:{body:{},querySelectorAll:()=>[form],addEventListener:(name,fn)=>handlers[name]=fn},
         MutationObserver:class{observe(){}},fetch:async url=>{requested=url;return{ok,redirected:false,json:async()=>state};}});
     await new Promise(resolve=>setImmediate(resolve));
@@ -37,4 +37,13 @@ test('shared roots can copy their descendants; empty subtrees remain disabled',a
 test('failed state leaves duplicate operations disabled',async()=>{
     const c=await controls(state,true,false);assert.equal(c.error.textContent,'Reload');assert.ok(c.buttons.every(button=>button.disabled));
     assert.equal(c.submit('single'),true);
+});
+
+test('duplication and shared creation honor their separate confirmation preferences',async()=>{
+ const noCopy=await controls(state,false,true,{confirmationEnabled:kind=>kind!=='duplication'});
+ assert.equal(noCopy.submit('single'),false);assert.equal(noCopy.question,undefined);
+ const shared=await controls(state,false,true,{confirmationEnabled:kind=>kind!=='creation'});
+ assert.equal(shared.submit('shared'),false);assert.equal(shared.question,undefined);assert.equal(shared.form.elements.createShared.value,'true');
+ const copy=await controls(state,false,true,{confirmationEnabled:kind=>kind!=='creation'});
+ assert.equal(copy.submit('single'),true);assert.equal(copy.question,'Copy?');
 });
