@@ -23,7 +23,8 @@ anchor includes the whole target note, not a substring starting at the anchor.
 Same-node anchor navigation remains a link. Copied anchors are given unique IDs
 so repeated fragments do not interfere with each other or their host.
 
-The feature is a browser reading preference. Editors, PDF generation, CTB/text
+The toggle is a browser reading preference. PDF export has its own independent
+[content and layout settings](pdf-content-options.md). Editors, CTB/text
 exports, mind maps and stored links keep their normal representation. Newly
 included images support the reader's original-image opening controls.
 

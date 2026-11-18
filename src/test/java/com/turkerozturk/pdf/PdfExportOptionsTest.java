@@ -138,13 +138,17 @@ class PdfExportOptionsTest {
         when(service.export(eq(53L), any(), isNull(), any()))
                 .thenReturn(new NodePdfExportService.Export("Root", new byte[]{1}));
         controller.downloadObjects(53, session, "A4", "portrait", true, true, true,
-                false, false, false, false, false, false, true, false, true);
+                false, false, false, false, false, false, true, false, true, true, true);
+        assertThat(NodePdfOptionsController.remembered(session).inlineLinks()).isTrue();
+        assertThat(NodePdfOptionsController.remembered(session).newPagePerNode()).isTrue();
         var expected = new com.turkerozturk.richtext.experimental.PdfObjectSelection(false, true, false, true);
         assertThat(NodePdfOptionsController.rememberedObjects(session)).isEqualTo(expected);
         when(service.export(eq(53L), any(), isNull(), any())).thenThrow(new IllegalStateException("test"));
         assertThatThrownBy(() -> controller.downloadObjects(53, session, "A4", "portrait", true, true, true,
-                false, false, false, false, false, true, true, true, true)).isInstanceOf(IllegalStateException.class);
+                false, false, false, false, false, true, true, true, true, false, false)).isInstanceOf(IllegalStateException.class);
         assertThat(NodePdfOptionsController.rememberedObjects(session)).isEqualTo(expected);
+        assertThat(NodePdfOptionsController.remembered(session).inlineLinks()).isTrue();
+        assertThat(NodePdfOptionsController.remembered(session).newPagePerNode()).isTrue();
     }
     @Test void postSubtreeUsesInjectedMessagesForTheRequestedLocale() {
         var service = mock(NodePdfExportService.class);
@@ -158,7 +162,7 @@ class PdfExportOptionsTest {
         var controller = new NodePdfOptionsController(service, mock(PdfSourceMetadata.class), messages);
         controller.subtreeDownloadObjects(53, new org.springframework.mock.web.MockHttpSession(),
                 "A4", "portrait", true, true, true, false, false, false, false, false,
-                true, true, true, true, true, locale);
+                true, true, true, true, true, false, false, locale);
         verify(messages).getMessage(eq("pdf.options.contents"), isNull(), eq(locale));
         verify(service).exportSubtree(eq(53L), any(), isNull(), eq(true),
                 eq("Configured contents heading"), any(com.turkerozturk.richtext.experimental.PdfObjectSelection.class));

@@ -23,6 +23,18 @@ public class NodePdfExportService {
     @org.springframework.beans.factory.annotation.Autowired
     public void configureLimits(PdfExportLimits limits) { this.limits = limits; }
 
+    private com.turkerozturk.node.fragments.NodeFragmentService fragments;
+    private com.turkerozturk.node.fragments.NodeFragmentSettings fragmentSettings;
+    @org.springframework.beans.factory.annotation.Autowired
+    public void configureFragments(com.turkerozturk.node.fragments.NodeFragmentService fragments,
+            com.turkerozturk.node.fragments.NodeFragmentSettings settings) {
+        this.fragments = fragments; this.fragmentSettings = settings;
+    }
+    private PdfLinkedContents linkedContents(PdfExportOptions options,
+            com.turkerozturk.richtext.experimental.PdfObjectSelection objects) {
+        return options.inlineLinks() ? new PdfLinkedContents(fragments, fragmentSettings, limits, objects) : null;
+    }
+
     public record Export(String title, byte[] bytes) {}
 
     @Transactional(readOnly = true)
@@ -67,6 +79,8 @@ public class NodePdfExportService {
                 fragment.outputSettings().prettyPrint(false);
                 html = fragment.body().html();
             }
+            var linked = linkedContents(options, objects);
+            if (linked != null && "custom-colors".equals(node.getSyntax())) html = linked.expand(html, contentId);
             return new Export(node.getName(), renderer.render(new NodePdfDocument(limits).prepare(node.getName(), html, contentId, options, source, PdfFilename.create(node.getName(), occurrenceId))));
         } finally { permit.release(); }
     }
@@ -98,6 +112,7 @@ public class NodePdfExportService {
             var seen = new java.util.HashSet<Long>();
             var parts = new java.util.ArrayList<SubtreePdfDocument.Part>();
             long total = 0;
+            var linked = linkedContents(options, objects);
             while (!stack.isEmpty()) {
                 var pending = stack.pop(); var occurrence = pending.occurrence();
                 if (!seen.add(occurrence.getNodeId()))
@@ -120,6 +135,7 @@ public class NodePdfExportService {
                     fragment.body().appendElement("div").text(text);
                     html = fragment.body().html();
                 }
+                if (linked != null && "custom-colors".equals(node.getSyntax())) html = linked.expand(html, contentId);
                 total += html.length();
                 if (total > limits.getMaxHtmlCharacters()) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
                 parts.add(new SubtreePdfDocument.Part(occurrence.getNodeId(), contentId,

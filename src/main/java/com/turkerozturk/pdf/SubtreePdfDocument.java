@@ -36,11 +36,11 @@ public final class SubtreePdfDocument {
             body.appendChild(toc);
         }
         var contentOptions = new PdfExportOptions(options.paper(), options.orientation(), options.colors(),
-                false, options.outline(), false, false, false, false, false);
+                false, options.outline(), false, false, false, false, false, options.inlineLinks(), options.newPagePerNode());
         for (int i = 0; i < parts.size(); i++) {
             Part part = parts.get(i);
             Element section = element(document, "div", "");
-            if (i > 0 || contents) section.setAttribute("style", "page-break-before:always");
+            if ((i > 0 && options.newPagePerNode()) || (i == 0 && contents)) section.setAttribute("style", "page-break-before:always");
             Element title = element(document, "h1", options.nodeTitle() ? part.title() : "");
             title.setAttribute("data-pdf-bookmark-name", part.title() == null ? "" : part.title());
             title.setAttribute("id", "sc-node-" + part.occurrenceId());

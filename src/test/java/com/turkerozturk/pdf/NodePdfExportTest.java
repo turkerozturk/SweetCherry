@@ -113,4 +113,35 @@ class NodePdfExportTest {
                         com.turkerozturk.multipledatabases.RequiresTenant.class)).isTrue();
     }
 
+    @Test void linkedContentsSettingReachesSingleAndSubtreeExportsWithObjectSelection() {
+        var children = mock(ChildrenService.class); var nodes = mock(NodeService.class);
+        var rich = mock(RichTextRenderingService.class); var renderer = mock(NodePdfRenderer.class);
+        var fragments = mock(com.turkerozturk.node.fragments.NodeFragmentService.class);
+        var root = new Children().setNodeId(1L).setFatherId(0L).setSequence(1L); root.setMasterId(0L);
+        when(children.findById(1L)).thenReturn(root); when(children.getChildren()).thenReturn(java.util.List.of(root));
+        var node = new Node(); node.setName("Host"); node.setTxt("rich source"); node.setSyntax("custom-colors");
+        when(nodes.findById(1L)).thenReturn(node);
+        var objects = new com.turkerozturk.richtext.experimental.PdfObjectSelection(false, true, false, false);
+        when(rich.renderForPdf(node, "", objects)).thenReturn("<div>Host text<a href='/nodes/2'>original link</a></div>");
+        when(fragments.fragmentForPdf(2L, objects)).thenReturn(new com.turkerozturk.node.fragments.NodeFragmentService.Fragment(
+                "2", "Source", "plain-text", "<div>Included source text</div>"));
+        when(renderer.render(any())).thenReturn(new byte[]{1});
+        var service = new NodePdfExportService(children, nodes, rich, renderer);
+        service.configureFragments(fragments, new com.turkerozturk.node.fragments.NodeFragmentSettings(3, 20, 250000, 1048576, 16777216, 200));
+        for (boolean inline : new boolean[]{false, true}) {
+            var options = new PdfExportOptions("A4", "portrait", true, true, true, false, false, false, false, false, inline, false);
+            service.export(1, options, null, objects);
+            service.exportSubtree(1, options, null, false, "Contents", objects);
+        }
+        var documents = org.mockito.ArgumentCaptor.forClass(org.w3c.dom.Document.class);
+        verify(renderer, times(4)).render(documents.capture());
+        for (int i = 0; i < 4; i++) {
+            var text = documents.getAllValues().get(i).getDocumentElement().getTextContent();
+            assertThat(text).contains("Host text");
+            if (i < 2) assertThat(text).contains("original link").doesNotContain("Included source text");
+            else assertThat(text).contains("Included source text").doesNotContain("original link");
+        }
+        verify(fragments, times(2)).fragmentForPdf(2L, objects);
+    }
+
 }

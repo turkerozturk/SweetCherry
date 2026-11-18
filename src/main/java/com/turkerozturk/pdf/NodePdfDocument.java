@@ -90,6 +90,9 @@ public final class NodePdfDocument {
             }
             element.removeAttr("data-pdf-heading");
         }
+        // Generated fragment boundaries survive sanitization without accepting arbitrary CSS.
+        if (options.newPagePerNode()) for (var fragment : content.select(".pdf-linked-content"))
+            fragment.attr("style", "page-break-before:always;");
         for (var icon : content.select(".rich-text-attachment span"))
             icon.replaceWith(new Element("img").attr("src", PdfAttachmentIcon.URI).attr("alt", "")
                     .attr("style", "width:12px;height:12px"));

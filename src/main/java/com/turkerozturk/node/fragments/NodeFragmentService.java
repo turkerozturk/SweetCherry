@@ -17,15 +17,22 @@ public class NodeFragmentService {
     public static final class Problem extends RuntimeException {private final String code;public Problem(String code){super(code);this.code=code;}public String code(){return code;}}
     public record Fragment(String contentId,String name,String syntax,String html) { }
     public Fragment fragment(long occurrenceId,String token){
+        return fragment(occurrenceId, token, null);
+    }
+    /** Uses embedded PDF objects while retaining the same metadata/managed-node gate. */
+    public Fragment fragmentForPdf(long occurrenceId,com.turkerozturk.richtext.experimental.PdfObjectSelection objects){
+        return fragment(occurrenceId, "", java.util.Objects.requireNonNull(objects));
+    }
+    private Fragment fragment(long occurrenceId,String token,com.turkerozturk.richtext.experimental.PdfObjectSelection objects){
         if(occurrenceId<=0)throw new Problem("missing");
         var source=manager.unwrap(Session.class).doReturningWork(c->NodeFragmentSource.read(c,occurrenceId,settings));
         var node=nodes.findById(source.contentId());if(node==null)throw new Problem("missing");
         String text=node.getTxt()==null?"":node.getTxt();if(text.length()>settings.characters())throw new Problem("large");
         String html;
         try{
-            if("custom-colors".equals(source.syntax()))html=rich.renderLive(node,token);
+            if("custom-colors".equals(source.syntax()))html=objects==null?rich.renderLive(node,token):rich.renderForPdf(node,"",objects);
             else if("plain-text".equals(source.syntax()))html="<div style=\"white-space:pre-wrap;overflow-wrap:anywhere\">"+org.jsoup.nodes.Entities.escape(text)+"</div>";
-            else if(com.turkerozturk.markdown.NodeMarkup.supports(source.syntax()))html=com.turkerozturk.markdown.NodeMarkup.render(source.syntax(),text,token);
+            else if(com.turkerozturk.markdown.NodeMarkup.supports(source.syntax()))html=objects==null?com.turkerozturk.markdown.NodeMarkup.render(source.syntax(),text,token):com.turkerozturk.markdown.NodeMarkup.forPdf(source.syntax(),text);
             else html=CodeHighLighter.mappedhighlightLanguage(source.syntax(),text);
         }catch(IllegalArgumentException invalid){throw new Problem("invalid");}
         if(html.length()>settings.htmlCharacters())throw new Problem("large");

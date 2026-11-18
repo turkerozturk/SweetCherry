@@ -67,4 +67,18 @@ class NodeFragmentServiceTest {
         var doc=org.jsoup.Jsoup.parseBodyFragment(html);assertThat(doc.select("script,iframe,form,input,[onclick],[onerror],a[href^=javascript],img[src^=https]")).isEmpty();assertThat(doc.select("img[src^=/images/]")).hasSize(1);assertThat(doc.selectFirst("p").id()).isEqualTo("a");
         assertThatThrownBy(()->new NodeFragmentSettings(0,20,10,1024,1024,1)).isInstanceOf(IllegalArgumentException.class);
     }
+    @Test void pdfUsesEmbeddedRendererAndTheSameVisibilityGate()throws Exception{
+        try(var c=database()){
+            var nodes=mock(NodeService.class);var rich=mock(RichTextRenderingService.class);
+            var node=new Node();node.setTxt("source");when(nodes.findById(2)).thenReturn(node);
+            var objects=new com.turkerozturk.richtext.experimental.PdfObjectSelection(false,true,false,false);
+            when(rich.renderForPdf(node,"",objects)).thenReturn("<div>PDF codebox</div>");
+            var service=service(c,nodes,rich,settings());
+            assertThatThrownBy(()->service.fragmentForPdf(11,objects)).hasMessage("managed");
+            verifyNoInteractions(nodes,rich);
+            assertThat(service.fragmentForPdf(3,objects).html()).contains("PDF codebox");
+            verify(rich).renderForPdf(node,"",objects);verify(rich,never()).renderLive(any(),anyString());
+        }
+    }
+
 }

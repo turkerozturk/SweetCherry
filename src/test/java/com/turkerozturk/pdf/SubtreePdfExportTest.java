@@ -22,7 +22,7 @@ class SubtreePdfExportTest {
     }
 
     @Test void hierarchyAndContentsLinksPointToOccurrencePages() throws Exception {
-        var document = new SubtreePdfDocument().prepare(parts(), PdfExportOptions.defaults(), null, true, "İçindekiler");
+        var document = new SubtreePdfDocument().prepare(parts(), new PdfExportOptions("A4", "portrait", true, true, true, false, false, false, false, false, false, true), null, true, "İçindekiler");
         try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(document))) {
             assertThat(pdf.getNumberOfPages()).isEqualTo(5);
             var root = pdf.getDocumentCatalog().getDocumentOutline().getFirstChild();
@@ -45,7 +45,7 @@ class SubtreePdfExportTest {
                 false, true, false, false, false);
         try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(
                 new SubtreePdfDocument().prepare(parts(), options, null, false, "İçindekiler")))) {
-            assertThat(pdf.getNumberOfPages()).isEqualTo(4);
+            assertThat(pdf.getNumberOfPages()).isEqualTo(1);
             var outline = pdf.getDocumentCatalog().getDocumentOutline();
             assertThat(outline == null || outline.getFirstChild() == null).isTrue();
             assertThat(new PDFTextStripper().getText(pdf)).doesNotContain("İçindekiler", "Ana Düğüm");
@@ -113,4 +113,18 @@ class SubtreePdfExportTest {
         assertThat(service.exportSubtree(1, PdfExportOptions.defaults(), null, false, "Contents").bytes())
                 .containsExactly((byte)1);
     }
+    @Test void continuousIsDefaultAndContentsKeepTheirOwnPage() throws Exception {
+        assertThat(PdfExportOptions.defaults().inlineLinks()).isFalse();
+        assertThat(PdfExportOptions.defaults().newPagePerNode()).isFalse();
+        for (boolean contents : new boolean[]{false, true}) {
+            try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(new SubtreePdfDocument()
+                    .prepare(parts(), PdfExportOptions.defaults(), null, contents, "Contents")))) {
+                assertThat(pdf.getNumberOfPages()).isEqualTo(contents ? 2 : 1);
+                assertThat(new PDFTextStripper().getText(pdf)).contains("Ana içerik", "Çocuk içerik", "Torun içerik");
+                if (contents) assertThat(pdf.getPage(0).getAnnotations().stream()
+                        .filter(PDAnnotationLink.class::isInstance).count()).isEqualTo(4);
+            }
+        }
+    }
+
 }

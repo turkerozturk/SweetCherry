@@ -74,10 +74,12 @@ public class NodePdfOptionsController {
             @RequestParam(defaultValue="false") boolean pageNumbers, @RequestParam(defaultValue="false") boolean metadata,
             @RequestParam(defaultValue="false") boolean sourceName, @RequestParam(defaultValue="false") boolean sourceAddress,
             @RequestParam(defaultValue="false") boolean images, @RequestParam(defaultValue="false") boolean codeboxes,
-            @RequestParam(defaultValue="false") boolean tables, @RequestParam(defaultValue="false") boolean latex) {
+            @RequestParam(defaultValue="false") boolean tables, @RequestParam(defaultValue="false") boolean latex,
+            @RequestParam(defaultValue="false") boolean inlineLinks,
+            @RequestParam(defaultValue="false") boolean newPagePerNode) {
         var objects = new com.turkerozturk.richtext.experimental.PdfObjectSelection(images, codeboxes, tables, latex);
         var options = new PdfExportOptions(paper, orientation, colors, nodeTitle, outline,
-                filenameHeader, pageNumbers, metadata, sourceName, sourceAddress);
+                filenameHeader, pageNumbers, metadata, sourceName, sourceAddress, inlineLinks, newPagePerNode);
         var exported = service.export(nodeId, options, sources.current(options), objects);
         remember(session, options, objects);
         return PdfFromHtmlController.downloadResponse(exported, nodeId);
@@ -93,10 +95,11 @@ public class NodePdfOptionsController {
             @RequestParam(defaultValue="false") boolean contents,
             @RequestParam(defaultValue="false") boolean images, @RequestParam(defaultValue="false") boolean codeboxes,
             @RequestParam(defaultValue="false") boolean tables, @RequestParam(defaultValue="false") boolean latex,
-            java.util.Locale locale) {
+            @RequestParam(defaultValue="false") boolean inlineLinks,
+            @RequestParam(defaultValue="false") boolean newPagePerNode, java.util.Locale locale) {
         var objects = new com.turkerozturk.richtext.experimental.PdfObjectSelection(images, codeboxes, tables, latex);
         var options = new PdfExportOptions(paper, orientation, colors, nodeTitle, outline,
-                filenameHeader, pageNumbers, metadata, sourceName, sourceAddress);
+                filenameHeader, pageNumbers, metadata, sourceName, sourceAddress, inlineLinks, newPagePerNode);
         var exported = service.exportSubtree(nodeId, options, sources.current(options), contents,
                 contentsTitle(locale), objects);
         remember(session, options, objects);

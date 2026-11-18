@@ -58,8 +58,9 @@ BLOB yüklenmeden önce meta bilgilerden denetlenir. İstek 10 saniyede zaman a�
 
 USER ve salt okunur bağlantılar kullanabilir. Güncel tenant belirteci zorunludur;
 API yalnız GET ve `no-store` kullanır. Veritabanı değişince eski sekmenin isteği
-reddedilir. Bu bir okuma tercihidir; editör, PDF ve diğer export çıktıları,
-mind map ve saklanan bağlantılar normal biçimde kalır.
+reddedilir. Bu düğme bir tarayıcı okuma tercihidir. PDF için bağımsız
+[içerik ve yerleşim ayarları](pdf-content-options.md) vardır. Editör, diğer export
+çıktıları, mind map ve saklanan bağlantılar normal biçimde kalır.
 
 ## Doğrulama
 

@@ -12,6 +12,12 @@
 <select class="form-select" id="paper" name="paper"><option value="A4" th:selected="${options.paper == 'A4'}">A4</option><option value="Letter" th:selected="${options.paper == 'Letter'}">Letter</option></select></div>
 <div class="col-sm-6"><label class="form-label" for="orientation" th:text="#{pdf.options.orientation}"></label>
 <select class="form-select" id="orientation" name="orientation"><option value="portrait" th:selected="${options.orientation == 'portrait'}" th:text="#{pdf.options.portrait}"></option><option value="landscape" th:selected="${options.orientation == 'landscape'}" th:text="#{pdf.options.landscape}"></option></select></div></div>
+<div class="row g-3 mb-3">
+<div class="col-sm-6"><label class="form-label" for="inlineLinks" th:text="#{pdf.options.internalLinks}"></label>
+<select class="form-select" id="inlineLinks" name="inlineLinks"><option value="false" th:selected="${!options.inlineLinks}" th:text="#{pdf.options.links}"></option><option value="true" th:selected="${options.inlineLinks}" th:text="#{pdf.options.linkedContents}"></option></select></div>
+<div class="col-sm-6"><label class="form-label" for="newPagePerNode" th:text="#{pdf.options.nodeFlow}"></label>
+<select class="form-select" id="newPagePerNode" name="newPagePerNode"><option value="false" th:selected="${!options.newPagePerNode}" th:text="#{pdf.options.continuous}"></option><option value="true" th:selected="${options.newPagePerNode}" th:text="#{pdf.options.newPage}"></option></select></div>
+<p class="form-text" th:text="#{pdf.options.linkedHelp}"></p></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="colors" id="colors" value="true" th:checked="${options.colors}"><label class="form-check-label" for="colors" th:text="#{pdf.options.colors}"></label></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="nodeTitle" id="nodeTitle" value="true" th:checked="${options.nodeTitle}"><label class="form-check-label" for="nodeTitle" th:text="#{pdf.options.nodeTitle}"></label></div>
 <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="outline" id="outline" value="true" th:checked="${options.outline}"><label class="form-check-label" for="outline" th:text="#{pdf.options.outline}"></label></div>
