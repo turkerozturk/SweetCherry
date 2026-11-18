@@ -4,21 +4,20 @@
     if(!button||!dialog)return;
     const byId=id=>document.getElementById('richInternal'+id);
     const id=byId('Id'),text=byId('Text'),anchor=byId('Anchor'),targetBox=byId('Target'),matches=byId('Matches'),status=byId('Status');
-    const apply=byId('Apply'),remove=byId('Remove'),lookupButton=byId('Lookup'),search=byId('Search');
-    let ticket,target,epoch=0,lookupController,searchController,applying=false;
+    const apply=byId('Apply'),remove=byId('Remove'),lookupButton=byId('Lookup'),query=byId('Query');
+    let ticket,target,epoch=0,lookupController,applying=false;
     const bridge=()=>window.RichTextInternalLinkBridge;
     const message=code=>{status.textContent=dialog.dataset[code]||dialog.dataset.error;};
     const valid=value=>/^[1-9][0-9]{0,18}$/.test(value)&&BigInt(value)<=9223372036854775807n;
     function clearTarget(){target=null;targetBox.replaceChildren();while(anchor.options.length>1)anchor.remove(1);anchor.value='';}
-    function abort(){lookupController?.abort();searchController?.abort();lookupController=searchController=null;}
+    function abort(){lookupController?.abort();lookupController=null;finder.reset();}
     function close(){epoch++;abort();dialog.close();applying=false;apply.disabled=false;if(ticket)bridge().restore(ticket);}
-    function row(item,selectable){
-        const element=document.createElement(selectable?'button':'div');element.className='rich-internal-target';if(selectable)element.type='button';
+    function row(item){
+        const element=document.createElement('div');element.className='rich-internal-target';
         const image=document.createElement('img');image.width=image.height=20;image.alt='';image.loading='lazy';
         image.src=dialog.dataset.icons+(/^[a-z0-9_-]+$/.test(item.iconName)?item.iconName:'ct_code')+'.png';
         const name=document.createElement('span');name.textContent=item.name;if(item.bold)name.style.fontWeight='bold';if(/^#[a-f0-9]{6}$/i.test(item.color))name.style.color=item.color;
         const number=document.createElement('span');number.textContent='('+item.nodeId+')';element.append(image,name,number);
-        if(selectable)element.addEventListener('click',()=>{id.value=item.nodeId;idChanged();lookup();});
         return element;
     }
     async function request(url,params,signal){
@@ -37,25 +36,18 @@
             const result=await request(dialog.dataset.target,{nodeId:value},controller.signal);
             if(generation!==epoch||lookupController!==controller||id.value.trim()!==value)return null;
             if(result.nodeId!==value||typeof result.name!=='string'||!Array.isArray(result.anchors))throw new Error('error');
-            target=result;targetBox.appendChild(row(result,false));
+            target=result;targetBox.appendChild(row(result));
             for(const name of result.anchors){const option=document.createElement('option');option.value=option.textContent=name;anchor.appendChild(option);}
             if(wantedAnchor){if(!result.anchors.includes(wantedAnchor)){message('anchorMissing');return null;}anchor.value=wantedAnchor;}
             status.textContent='';return result;
         }catch(error){if(error.name!=='AbortError'&&generation===epoch&&lookupController===controller)message(error.message);return null;}
     }
-    async function findMatches(){
-        const value=text.value,generation=epoch;
-        searchController?.abort();const controller=new AbortController();searchController=controller;matches.replaceChildren();
-        if(!value.trim()||value.length>1000){message('empty');return;}
-        message('loading');
-        try{
-            const result=await request(dialog.dataset.matches,{name:value},controller.signal);
-            if(generation!==epoch||searchController!==controller||text.value!==value)return;
-            if(!Array.isArray(result.targets))throw new Error('error');
-            for(const item of result.targets)matches.appendChild(row(item,true));
-            if(result.truncated)message('limit');else if(!result.targets.length)message('empty');else status.textContent='';
-        }catch(error){if(error.name!=='AbortError'&&generation===epoch&&searchController===controller)message('error');}
-    }
+    const finder=window.SweetCherryNodeSearch.create({input:query,list:matches,status:byId('SearchStatus'),dialog,
+        url:dialog.dataset.searchUrl,token:()=>window.richEditorTenant||'',icons:dialog.dataset.icons,
+        available:()=>dialog.open&&!applying,
+        messages:{loading:dialog.dataset.searchLoading,empty:dialog.dataset.searchEmpty,limit:dialog.dataset.searchLimit,error:dialog.dataset.searchError,stale:dialog.dataset.searchStale,long:dialog.dataset.searchLong},
+        onSelect:item=>{id.value=item.id;idChanged();lookup();}
+    });
     function idChanged(){lookupController?.abort();lookupController=null;clearTarget();status.textContent='';}
     button.addEventListener('pointerdown',event=>event.preventDefault());
     button.addEventListener('click',()=>{
@@ -64,12 +56,11 @@
         const previous=/^node ([1-9][0-9]*)(?: (.+))?$/.exec(ticket.link);remove.disabled=!ticket.link;
         dialog.showModal();
         if(previous){id.value=previous[1];apply.disabled=true;const generation=epoch;lookup(previous[2]||'').finally(()=>{if(generation===epoch&&!applying)apply.disabled=false;});}
-        else if(ticket.text.trim())findMatches();
-        id.focus();
+        query.value=ticket.text.trim().slice(0,160);finder.refresh();
+        if(previous)id.focus();else query.focus();
     });
     id.addEventListener('input',idChanged);
-    text.addEventListener('input',()=>{searchController?.abort();searchController=null;matches.replaceChildren();});
-    lookupButton.addEventListener('click',()=>lookup());search.addEventListener('click',findMatches);
+    lookupButton.addEventListener('click',()=>lookup());
     byId('Paste').addEventListener('click',async()=>{
         const generation=epoch,old=id.value;
         try{const value=(await navigator.clipboard.readText()).trim();if(generation!==epoch||!dialog.open||id.value!==old)return;
@@ -77,7 +68,7 @@
         }catch(_){if(generation===epoch&&dialog.open)message('clipboard');}
     });
     apply.addEventListener('click',async()=>{
-        if(applying)return;applying=true;apply.disabled=true;
+        if(applying)return;applying=true;apply.disabled=true;finder.reset();
         const generation=epoch,wantedText=text.value,wantedAnchor=anchor.value,value=id.value;
         const result=await lookup(wantedAnchor);
         try{

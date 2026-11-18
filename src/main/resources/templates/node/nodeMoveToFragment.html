@@ -4,7 +4,7 @@
 <button type="button" class="btn btn-sm btn-outline-primary" data-move-to-open th:attr="aria-controls=|node-move-to-${requestedNodeId}|" aria-haspopup="dialog"><i class="fas fa-folder-open" aria-hidden="true"></i> <span th:text="#{node.moveTo.title}"></span></button>
 <dialog class="node-move-to-dialog" th:id="|node-move-to-${requestedNodeId}|" th:attr="aria-labelledby=|node-move-to-title-${requestedNodeId}|">
 <form method="post" th:action="@{/nodes/move/{id}/to(id=${requestedNodeId})}"
-      th:attr="data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-loading=#{node.moveTo.loading},data-state-error=#{node.move.error},data-invalid=#{node.moveTo.invalid},data-missing=#{node.moveTo.missing},data-cycle=#{node.moveTo.cycle},data-stale=#{node.moveTo.stale},data-denied=#{node.moveTo.denied},data-failed=#{node.moveTo.failed},data-clipboard-error=#{node.moveTo.clipboardError},data-bookmarks-url=@{/nodes/move/{id}/bookmarks(id=${requestedNodeId})},data-icon-base=@{/img/ctbicons/},data-bookmarks-loading=#{node.moveTo.bookmarksLoading},data-bookmarks-empty=#{node.moveTo.bookmarksEmpty},data-bookmarks-error=#{node.moveTo.bookmarksError},data-bookmarks-no-match=#{node.moveTo.bookmarksNoMatch}">
+      th:attr="data-search-url=@{/nodes/quick/search},data-search-loading=#{node.targetSearch.loading},data-search-empty=#{node.targetSearch.empty},data-search-limit=#{node.targetSearch.limit},data-search-error=#{node.targetSearch.error},data-search-stale=#{node.targetSearch.stale},data-search-long=#{node.targetSearch.long},data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-loading=#{node.moveTo.loading},data-state-error=#{node.move.error},data-invalid=#{node.moveTo.invalid},data-missing=#{node.moveTo.missing},data-cycle=#{node.moveTo.cycle},data-stale=#{node.moveTo.stale},data-denied=#{node.moveTo.denied},data-failed=#{node.moveTo.failed},data-clipboard-error=#{node.moveTo.clipboardError},data-bookmarks-url=@{/nodes/move/{id}/bookmarks(id=${requestedNodeId})},data-icon-base=@{/img/ctbicons/},data-bookmarks-loading=#{node.moveTo.bookmarksLoading},data-bookmarks-empty=#{node.moveTo.bookmarksEmpty},data-bookmarks-error=#{node.moveTo.bookmarksError},data-bookmarks-no-match=#{node.moveTo.bookmarksNoMatch}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" value="">
 <input type="hidden" name="view" th:value="${view}">
@@ -22,6 +22,12 @@
 <input type="search" class="form-control form-control-sm" data-move-to-bookmarks-filter autocomplete="off" th:id="|node-move-to-filter-${requestedNodeId}|" th:placeholder="#{node.moveTo.bookmarksFilter}">
 <p data-move-to-bookmarks-status role="status" aria-live="polite" class="small m-2"></p>
 <div data-move-to-bookmarks-list role="group" th:attr="aria-label=#{node.moveTo.bookmarks}"></div>
+</div>
+<div class="mt-3">
+<label class="form-label" th:for="|node-move-to-query-${requestedNodeId}|" th:text="#{node.targetSearch.label}"></label>
+<input type="search" class="form-control node-target-query" data-move-to-search maxlength="160" autocomplete="off" th:id="|node-move-to-query-${requestedNodeId}|" th:placeholder="#{node.targetSearch.placeholder}">
+<p data-move-to-search-status role="status" aria-live="polite" class="small"></p>
+<div data-move-to-search-results class="node-target-results" th:id="|node-move-to-results-${requestedNodeId}|" th:aria-label="#{node.targetSearch.results}"></div>
 </div>
 <p class="small text-body-secondary mt-2" th:id="|node-move-to-help-${requestedNodeId}|" th:text="#{node.moveTo.help}"></p>
 <p data-move-to-message role="status" aria-live="polite" class="small"></p>

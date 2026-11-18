@@ -1,6 +1,24 @@
 /* Delegation also handles tree content fragments loaded after navigation. */
 (() => {
     'use strict';
+    const searches=new WeakMap();
+    function targetSearch(form){
+        if(!form.dataset.searchUrl||!window.SweetCherryNodeSearch)return null;
+        if(!searches.has(form)){
+            const input=form.querySelector('[data-move-to-search]'),dialog=form.closest('dialog');
+            if(!input)return null;
+            const picker=window.SweetCherryNodeSearch.create({input,dialog,
+                list:form.querySelector('[data-move-to-search-results]'),status:form.querySelector('[data-move-to-search-status]'),
+                url:form.dataset.searchUrl,token:()=>form.elements._tenantView.value,icons:form.dataset.iconBase,
+                available:()=>dialog.open&&form.dataset.phase==='ready'&&form.dataset.pasting!=='true',
+                messages:{loading:form.dataset.searchLoading,empty:form.dataset.searchEmpty,limit:form.dataset.searchLimit,error:form.dataset.searchError,stale:form.dataset.searchStale,long:form.dataset.searchLong},
+                onQueryChange:()=>{form.elements.parentId.value='';message(form,'');},
+                onSelect:item=>{fillParent(form,item.id);closeBookmarks(form);}
+            });
+            searches.set(form,{input,picker});
+        }
+        return searches.get(form);
+    }
     function message(form, text, error = false) {
         const area = form.querySelector('[data-move-to-message]');
         area.textContent = text;
@@ -12,6 +30,7 @@
         form.dataset.bookmarkRequest = String(Number(form.dataset.bookmarkRequest || 0) + 1);
     }
     function fillParent(form, value) {
+        targetSearch(form)?.picker.reset();
         form.elements.parentId.value = value;
         form.elements.parentId.dispatchEvent(new Event('input', {bubbles:true}));
         message(form, '');
@@ -50,6 +69,7 @@
         status.classList.remove('text-danger');
         panel.hidden = false;
         button.setAttribute('aria-expanded', 'true');
+        targetSearch(form)?.picker.reset();
         const load = form.dataset.load;
         const request = form.dataset.bookmarkRequest = String(Number(form.dataset.bookmarkRequest || 0) + 1);
         const current = () => dialog.open && !panel.hidden && form.dataset.phase === 'ready'
@@ -101,12 +121,15 @@
         form.querySelector('[type="submit"]').disabled = form.dataset.phase !== 'ready' || form.dataset.pasting === 'true';
         form.querySelector('[data-move-to-paste]').disabled = saving || form.dataset.phase !== 'ready' || form.dataset.pasting === 'true';
         form.querySelector('[data-move-to-bookmarks]').disabled = saving || form.dataset.phase !== 'ready' || form.dataset.pasting === 'true';
+        const finder=targetSearch(form);
+        if(finder){finder.input.disabled=saving||form.dataset.phase!=='ready'||form.dataset.pasting==='true';if(saving)finder.picker.reset();}
         if (saving) closeBookmarks(form);
     }
     async function open(group) {
         const dialog = group.querySelector('dialog'), form = dialog.querySelector('form');
         if (dialog.open) return;
         form.reset();
+        targetSearch(form)?.picker.reset(true);
         closeBookmarks(form);
         form.dataset.phase = 'loading';
         form.dataset.pasting = 'false';
@@ -148,6 +171,7 @@
         const current = () => dialog.open && form.dataset.load === load && form.dataset.phase === 'ready'
             && form.elements.parentId.value === previous;
         closeBookmarks(form);
+        targetSearch(form)?.picker.reset(true);
         form.dataset.pasting = 'true';
         controls(form, false);
         try {

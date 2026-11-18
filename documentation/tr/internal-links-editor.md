@@ -4,7 +4,7 @@
 
 ## Kullanım
 
-- Metin seçip düğmeye basın: bağlantı metni seçiminizle doldurulur. Seçilen metinle **tam aynı adlı** hedefler otomatik aranır. Büyük/küçük harf ve boşluklar aynen karşılaştırılır. Aynı isimli gerçek ve paylaşımlı konumlar ayrı ID'lerle listelenir; ikon, kalınlık ve başlık rengi gösterilir. Bir sonuç seçmek yalnız hedefi doldurur; **Bağlantıyı uygula** ile işlem tamamlanır.
+- Metin seçip düğmeye basın: bağlantı metni seçiminizle doldurulur. **Düğüm adlarında ara** kutusu seçiminizle doldurulur; yazılan parçayı adında içeren hedefler yazarken listelenir. Arama ve bağlantıda görünecek metin ayrı alanlardır; hedef aramak bağlantı etiketini değiştirmez. Büyük/küçük harf ve aksan farkları yok sayılır; Türkçe harfler sade yazımla da bulunur. Aynı isimli gerçek ve paylaşımlı konumlar ayrı ID'lerle listelenir; ikon, başlık biçimi, ID ve yol bilgisi gösterilir. Bir sonuç seçmek yalnız hedefi doldurur; **Bağlantıyı uygula** ile işlem tamamlanır.
 - ID yazın veya pano düğmesiyle yapıştırın. **Hedefi bul** adı ve mevcut anchor'ları gösterir. Panoya erişilemiyorsa elle yapıştırma kullanılabilir.
 - Seçim olmadan imleç konumunda da bağlantı eklenebilir. Bağlantı metni boş/yalnız boşluksa hedef düğümün adı kullanılır; adsız hedef için `[ID]` kullanılır.
 - Mevcut iç bağlantının içine imleci koyup aynı düğmeyi açın. Bitişik, aynı hedefli biçimli metin parçaları birlikte seçilir. Hedef, metin ve mevcut anchor değiştirilebilir. **İç bağlantıyı kaldır**, metni ve diğer biçimlerini korur.
@@ -14,7 +14,7 @@ Nesne içeren seçimler reddedilir; resim/tablo/kod kutusu/LaTeX verisi değişm
 
 Hedef ID/anchor uygulamadan hemen önce yeniden okunur. Ana kayıtta yeni veya hedefi değişmiş iç bağlantılar aynı veri kaynağı işlemi içinde tekrar doğrulanır. Hedef bulunmazsa kayıt yapılmaz. Önceden var olan bozuk/legacy bağlantılar başka düzenlemeleri engellememek için değişmeden korunabilir. Daha sonra hedefin silinmesi bağlantıyı yine geçersiz yapabilir; bu özellik düğüm silme davranışını değiştirmez.
 
-Yetki, salt okunur düğüm/veri kaynağı, revizyon ve sekmeler arası veri kaynağı token kontrolleri korunur. Arama metin/BLOB içeriklerini okumaz. En fazla ilk 200 tam eşleşme gösterilir; daha fazlasında uyarı ve ID ile seçim vardır. Dış bağlantı, paste, nesne yönetimi ve kaydetme akışları korunur.
+Yetki, salt okunur düğüm/veri kaynağı, revizyon ve sekmeler arası veri kaynağı token kontrolleri korunur. Arama metin/BLOB içeriklerini okumaz. Mevcut hızlı düğüm araması kullanılır: en fazla 40 sonuç ve 50.000 konumluk meta bilgi taraması vardır. Sınıra ulaşılırsa aramayı daraltma uyarısı gösterilir. `%` ve `_` gibi işaretler joker karakter değildir. Yazmayı bıraktıktan yaklaşık 250 ms sonra arama yapılır; yeni sorgu veya pencerenin kapanması eski isteği geçersiz kılar. Yukarı/aşağı oklar ve Enter ile seçim yapılabilir; arama kutusundaki Enter bağlantıyı uygulamaz. Dış bağlantı, paste, nesne yönetimi ve kaydetme akışları korunur.
 
 ## Manuel kontrol listesi
 
@@ -28,7 +28,7 @@ Yetki, salt okunur düğüm/veri kaynağı, revizyon ve sekmeler arası veri kay
 
 ## English
 
-**Add / edit internal link** links selected text, or inserts text at the caret, targeting an occurrence ID in the current database. Blank text uses the target name. Selected text automatically finds exact-title matches, including real/shared occurrences separately, with icons, boldness, color and IDs. Choose a result and explicitly apply. Existing links can be edited by placing the caret inside them; removal preserves text/formatting. Changing only the target retains inline formatting; replacing the label uses its starting style.
+**Add / edit internal link** links selected text, or inserts text at the caret, targeting an occurrence ID in the current database. Blank text uses the target name. Selected text seeds a separate title-search field. Typing lists names containing the query, ignoring case and accents, including real/shared occurrences with icons, IDs and breadcrumbs. The link label remains independent of the query. Searches are debounced by 250 ms and bounded to 40 results over 50,000 metadata entries; narrow the query when a limit is reported. Arrow keys and Enter select a target without applying the link. Choose a result and explicitly apply. Existing links can be edited by placing the caret inside them; removal preserves text/formatting. Changing only the target retains inline formatting; replacing the label uses its starting style.
 
 Existing anchors can be selected, including those from a shared target's master content. Creating new anchor objects is deferred. Storage uses CherryTree's `node ID [anchor]` link value, never a session token. Existing broken legacy links can remain unchanged; new/changed target values must resolve when saving. This does not change deletion rules or prevent links becoming broken later.
 

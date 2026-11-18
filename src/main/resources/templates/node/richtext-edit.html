@@ -2,7 +2,7 @@
 <html th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
-<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/theme.css}"></head>
+<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/nodeTargetSearch.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/theme.css}"></head>
 <body>
 <header class="rich-page-header"><h1 th:text="#{richtext.edit.title}"></h1><strong th:text="${editor.node.name}"></strong></header>
 <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>
@@ -120,16 +120,18 @@
 <div class="actions"><button type="button" id="richTableApply" th:text="#{richtext.edit.linkApply}"></button><button type="button" id="richTableCancel" th:text="#{richtext.edit.cancel}"></button></div>
 </dialog>
 <dialog id="richInternalDialog" class="rich-internal-dialog" aria-labelledby="richInternalTitle"
- th:attr="data-target=@{/nodes/richtext/links/target},data-matches=@{/nodes/richtext/links/matches},data-icons=@{/img/ctbicons/},data-error=#{richtext.internal.error},data-invalid=#{richtext.internal.invalid},data-missing=#{richtext.internal.missing},data-empty=#{richtext.internal.empty},data-changed=#{richtext.internal.changed},data-objects=#{richtext.internal.objects},data-loading=#{richtext.internal.loading},data-limit=#{richtext.internal.limit},data-anchor-missing=#{richtext.internal.anchorMissing},data-clipboard=#{richtext.internal.clipboard}">
+ th:attr="data-target=@{/nodes/richtext/links/target},data-search-url=@{/nodes/quick/search},data-search-loading=#{node.targetSearch.loading},data-search-empty=#{node.targetSearch.empty},data-search-limit=#{node.targetSearch.limit},data-search-error=#{node.targetSearch.error},data-search-stale=#{node.targetSearch.stale},data-search-long=#{node.targetSearch.long},data-icons=@{/img/ctbicons/},data-error=#{richtext.internal.error},data-invalid=#{richtext.internal.invalid},data-missing=#{richtext.internal.missing},data-empty=#{richtext.internal.empty},data-changed=#{richtext.internal.changed},data-objects=#{richtext.internal.objects},data-loading=#{richtext.internal.loading},data-limit=#{richtext.internal.limit},data-anchor-missing=#{richtext.internal.anchorMissing},data-clipboard=#{richtext.internal.clipboard}">
 <h2 id="richInternalTitle" th:text="#{richtext.internal.button}"></h2>
 <p class="note" th:text="#{richtext.internal.help}"></p>
 <label for="richInternalId" th:text="#{richtext.internal.id}"></label>
 <div class="rich-internal-id"><input id="richInternalId" type="text" inputmode="numeric" maxlength="19" autocomplete="off"><button type="button" id="richInternalPaste" th:title="#{richtext.internal.paste}" th:aria-label="#{richtext.internal.paste}">📋</button><button type="button" id="richInternalLookup" th:text="#{richtext.internal.lookup}"></button></div>
 <div id="richInternalTarget"></div>
+<label for="richInternalQuery" th:text="#{node.targetSearch.label}"></label>
+<input id="richInternalQuery" class="node-target-query" type="search" maxlength="160" autocomplete="off" th:placeholder="#{node.targetSearch.placeholder}">
+<p id="richInternalSearchStatus" role="status" aria-live="polite" class="note"></p>
+<div id="richInternalMatches" class="node-target-results" th:aria-label="#{node.targetSearch.results}"></div>
 <label for="richInternalText" th:text="#{richtext.internal.text}"></label>
 <input id="richInternalText" type="text" maxlength="10000" autocomplete="off">
-<button type="button" id="richInternalSearch" th:text="#{richtext.internal.search}"></button>
-<div id="richInternalMatches" class="rich-internal-matches"></div>
 <label for="richInternalAnchor" th:text="#{richtext.internal.anchor}"></label>
 <select id="richInternalAnchor"><option value="" th:text="#{richtext.internal.whole}"></option></select>
 <p id="richInternalStatus" role="status" aria-live="polite"></p>
@@ -167,6 +169,7 @@
 <script th:src="@{/js/node/richTextWikiLinks.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
 <script th:src="@{/js/node/richTextWebImport.js}"></script>
+<script th:src="@{/js/common/nodeTargetSearch.js}"></script>
 <script th:src="@{/js/node/richTextInternalLink.js}"></script>
 <script th:src="@{/js/node/richTextEditorLayout.js}"></script>
 </body></html>

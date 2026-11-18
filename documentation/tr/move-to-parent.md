@@ -50,3 +50,31 @@ The bookmark icon beside Paste opens the current bookmarks in bookmark order, wi
 Yer işareti listesinin üstündeki arama kutusu, yalnız düğüm adını büyük/küçük harf ve aksan farklarını yok sayarak filtreler; `[ID]` araması yapmaz. Temizlendiğinde tüm yer işaretleri görünür. Arama alanında Enter taşıma başlatmaz.
 
 The bookmark chooser has an instant title filter (case/accent insensitive). It does not search IDs or query the database on each keystroke. Clearing the filter restores the list; Enter in that field never submits a move.
+
+
+## Düğüm adından hedef seçme
+
+**Düğüm adlarında ara** alanına adın bir bölümünü yazın. Yaklaşık 250 ms sonra
+aktif veritabanındaki eşleşmeler ikon, ID ve yol bilgisiyle listelenir. Büyük/küçük
+harf ve aksan farkları yok sayılır; `%` ve `_` düz karakterdir. Aynı adlı gerçek
+ve paylaşılan konumları kendi ID ve yollarıyla ayırt edebilirsiniz.
+
+Bir sonuç seçmek yalnız üst düğüm ID'sini doldurur; taşıma için yine **Taşı**
+gerekir. Arama metnini değiştirmek önceki hedef ID'sini temizler. ID, pano, yer
+imi seçimi ve kök için `0` girişi kullanılabilir. Yukarı/aşağı oklar ve Enter ile
+sonuç seçilebilir; arama alanındaki Enter taşıma başlatmaz. Kendi/alt düğümüne
+veya korunan hedefe taşıma gibi geçersiz seçimler mevcut sunucu denetimlerinde
+reddedilir. Arama sonuçları bu kuralların yerine geçmez.
+
+Liste en fazla 40 sonuç gösterir; meta bilgi taraması 50.000 konumla sınırlıdır.
+Sınır uyarısında aramayı daraltın. Metin ve BLOB içerikleri okunmaz. Geç gelen
+sonuçlar, kapanan/yeniden açılan pencereye veya yeni sorguya karışmaz. Taşıma
+başladıktan sonra arama alanı devre dışıdır; yeni bir taşıma isteği otomatik
+tekrarlanmaz.
+
+**English:** The separate name search finds titles containing the query and
+shows icons, occurrence IDs and breadcrumbs, with case/accent folding. Choosing
+a result fills the parent ID only; Move still confirms the operation. Editing
+the query clears the previous parent ID. ID entry, clipboard, bookmarks and `0`
+for root remain available. Debounced searches return up to 40 matches from a
+bounded metadata scan; stale/late results cannot overwrite newer choices.

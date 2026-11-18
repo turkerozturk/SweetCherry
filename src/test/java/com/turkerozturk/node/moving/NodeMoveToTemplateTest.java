@@ -39,7 +39,11 @@ class NodeMoveToTemplateTest {
                 assertThat(doc.selectFirst("[data-move-to-bookmarks]").parent().hasClass("input-group")).isTrue();
                 assertThat(doc.selectFirst("form").attr("data-bookmarks-url")).isEqualTo("/app/nodes/move/9/bookmarks");
                 assertThat(doc.selectFirst("form").attr("data-icon-base")).isEqualTo("/app/img/ctbicons/");
-                assertThat(html).doesNotContain("??node.moveTo.");
+                assertThat(doc.selectFirst("form").attr("data-search-url")).isEqualTo("/app/nodes/quick/search");
+                assertThat(doc.selectFirst("[data-move-to-search]").attr("maxlength")).isEqualTo("160");
+                assertThat(doc.selectFirst("[data-move-to-search]").hasAttr("name")).isFalse();
+                assertThat(doc.selectFirst("[data-move-to-search-results]")).isNotNull();
+                assertThat(html).doesNotContain("??node.moveTo.","??node.targetSearch.");
             }
         }
     }

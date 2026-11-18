@@ -4,6 +4,8 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add debounced title-contains search with breadcrumb/ID selection to the internal-link and Move to dialogs, keeping link labels independent and preserving explicit move confirmation.
+
 - Add a remembered reading toggle that replaces rich-text internal node links with bounded source-content fragments, preserving embedded objects and ordinary source links while handling shared aliases, recursive references and copied anchors.
 
 - Add bounded, read-only attachment text previews with encoding selection and local syntax highlighting, paged offset/hex/ASCII views for any file, and ZIP/TAR/TAR.GZ metadata listings from both the attachment browser and rich-text notes.
