@@ -1,0 +1,7 @@
+.node-fragment {display:block;margin:.4rem 0;padding:.25rem 0;max-width:100%;overflow-wrap:anywhere}
+.node-fragment-source {display:block;font-size:.75rem;opacity:.7;text-decoration:none;margin-bottom:.15rem}
+.node-fragment-source:hover,.node-fragment-source:focus {opacity:1;text-decoration:underline}
+.node-fragment-body {max-width:100%}
+.node-fragment-body img {max-width:100%;height:auto;cursor:zoom-in}
+.node-fragment-note {font-size:.75rem;opacity:.75}
+[data-node-fragments-toggle][aria-pressed=true] {font-weight:700;background:var(--bs-secondary-bg,#e9ecef)}

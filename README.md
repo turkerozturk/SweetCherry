@@ -58,6 +58,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 <details>
 <summary>Guides for specific tasks</summary>
 
+- [Linked-node content fragments](documentation/en/linked-node-fragments.md) · [Bağlı düğüm içerikleri](documentation/tr/linked-node-fragments.md)
 - [Text, hex and archive attachment previews](documentation/en/attachment-file-preview.md) · [Metin, hex ve arşiv önizleme](documentation/tr/attachment-file-preview.md)
 - [Daily calendar and preview settings](documentation/en/daily-calendar.md) · [Günlük takvim](documentation/tr/daily-calendar.md)
 - [CTB backups and recovery](documentation/en/ctb-backups.md)

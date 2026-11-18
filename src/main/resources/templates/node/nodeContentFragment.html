@@ -15,7 +15,8 @@
         <div id="content">
 
             <p th:if="${emptyContent}" class="node-empty-content border rounded bg-body-tertiary text-body-secondary small fst-italic p-3" role="status" th:text="#{node.emptyNotice}"></p>
-            <div th:classappend="${node.syntax == 'custom-colors'} ? 'theme-note-paper'" id="nodeContent" th:unless="${emptyContent}">
+            <div th:classappend="${node.syntax == 'custom-colors'} ? 'theme-note-paper'" id="nodeContent" th:unless="${emptyContent}" data-node-fragments
+                 th:attr="data-fragment-content=${node.nodeId},data-fragment-syntax=${node.syntax},data-fragment-token=${tenantViewToken},data-fragment-endpoint=@{/nodes/fragments/},data-fragment-depth=${nodeFragmentDepth},data-fragment-count=${nodeFragmentInclusions},data-fragment-image-title=#{tree.openImage},data-fragment-source-label=#{fragments.source},data-fragment-cycle=#{fragments.cycle},data-fragment-limit=#{fragments.limit},data-fragment-error=#{fragments.error},data-fragment-stale=#{fragments.stale},data-fragment-missing=#{fragments.missing}">
 
 
 

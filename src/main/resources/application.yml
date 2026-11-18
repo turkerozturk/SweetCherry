@@ -162,6 +162,13 @@ logging:
 # My custom variables
 myapp:
   # Read-only Word attachment preview: DOCX and legacy DOC. No document is saved.
+  node-fragments:
+    max-depth: 3 # Nested link levels, 1..5. Reader preference defaults off.
+    max-inclusions: 20 # Per displayed note, 1..50; repeated fragments count separately.
+    max-source-characters: 250000 # Note + codebox/table source budget, 1..1000000.
+    max-html-characters: 1048576 # Per fragment response, 1024..2097152.
+    max-object-bytes: 16777216 # Stored image/attachment payload budget, 1024..33554432.
+    max-objects: 200 # Images/attachments/anchors/codeboxes/tables, 1..500.
   file-preview:
     max-text-bytes: 262144 # First text bytes only; 1024..1048576.
     max-characters: 200000 # Unicode code points; 1..1000000.
