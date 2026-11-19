@@ -22,10 +22,3 @@ test('all named colors and hex forms work, CSS expressions and invalid names do 
  const store=storage(),prefs=core.create(store);prefs.setBackground('#ffeeaa');assert.equal(core.create(store).background(),'#ffeeaa');
  assert.equal(prefs.setBackground('bad'),false);assert.equal(prefs.background(),'#ffeeaa');prefs.resetBackground();assert.equal(core.create(store).background(),null);
 });
-test('only initial empty rendered lines collapse; interior and anchored lines survive',()=>{
- const blank=()=>({tagName:'DIV',id:'',children:[{tagName:'BR'}],firstElementChild:{tagName:'BR'},textContent:''});
- const first=blank(),second=blank(),interior=blank(),text={...blank(),textContent:'Content'};
- assert.deepEqual(core.leadingBlanks({children:[first,second,text,interior]}),[first,second]);
- assert.deepEqual(core.leadingBlanks({children:[{...blank(),id:'anchor'},text]}),[]);
- assert.deepEqual(core.leadingBlanks({children:[{...blank(),firstElementChild:{tagName:'IMG'}},text]}),[]);
-});

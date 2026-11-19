@@ -19,3 +19,5 @@ Change that last string to regroup an icon. Current categories are `actions`, `a
 For a new category, optionally add `icons.category.<value>=<label>` to the default/English/Turkish message bundles. A category without a translation is displayed as written, so adding a translation is not mandatory. Rebuild and restart after editing the enum/resources. No database change is needed.
 
 Categories are browsing metadata: Apple/Tux represent platforms in `technology`, Python/Ruby represent languages in `programming`, while the animal-shaped icons use `animals`. The page's SVG assets, enum constant names, numeric IDs, CTB bit mappings and existing label lookup behavior are unchanged. This change does not regroup the separate node-property icon picker automatically.
+
+Changing the category automatically submits the current filter, preserving search and sorting. The Show button remains available.

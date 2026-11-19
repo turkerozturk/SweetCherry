@@ -13,7 +13,7 @@
 <form method="get" th:action="@{/icons}" class="icon-controls d-flex flex-wrap align-items-end gap-2 mb-3">
 <input type="hidden" name="sort" th:value="${icons.options.sort}"><input type="hidden" name="dir" th:value="${icons.options.dir}">
 <div class="flex-grow-1"><label for="icon-search" class="form-label" th:text="#{icons.search}"></label><input id="icon-search" name="q" type="search" maxlength="200" class="form-control" th:value="${icons.options.q}"></div>
-<div><label for="icon-category" class="form-label" th:text="#{icons.column.category}"></label><select id="icon-category" name="category" class="form-select"><option value="" th:text="#{icons.allCategories}"></option><option th:each="category:${icons.categories}" th:value="${category.key}" th:selected="${category.key==icons.options.category}" th:text="${category.label}"></option></select></div>
+<div><label for="icon-category" class="form-label" th:text="#{icons.column.category}"></label><select id="icon-category" data-icon-category name="category" class="form-select"><option value="" th:text="#{icons.allCategories}"></option><option th:each="category:${icons.categories}" th:value="${category.key}" th:selected="${category.key==icons.options.category}" th:text="${category.label}"></option></select></div>
 <button class="btn btn-primary" th:text="#{icons.show}"></button><a class="btn btn-outline-secondary" th:href="@{/icons}" th:text="#{icons.reset}"></a></form>
 <p th:if="${icons.rows.empty}" class="alert alert-info" th:text="#{icons.empty}"></p>
 <div class="table-responsive"><table class="table table-bordered table-sm" id="icon-table"><thead><tr>
@@ -26,4 +26,4 @@
 <td th:text="${row.index}"></td><td><img class="icon-picture" loading="lazy" th:src="@{/img/icons/{name}.svg(name=${row.icon.iconName})}" th:alt="${row.icon.iconNameForHuman}"></td>
 <td th:text="${row.icon.iconNameForHuman}"></td><td th:text="${row.categoryLabel}" th:title="${row.icon.category}"></td><td class="icon-symbol" th:text="${row.icon.name}"></td><td th:text="${row.icon.iconIdIn16bit}"></td><td th:text="${row.icon.iconId}"></td>
 </tr></tbody></table></div>
-</main></body></html>
+</main><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/icons/iconFilters.js}"></script></section></body></html>

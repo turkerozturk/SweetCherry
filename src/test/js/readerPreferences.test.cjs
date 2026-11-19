@@ -17,7 +17,7 @@ function setup(disabledDelete=false,marker=false){
 test('menu state applies to current and newly visited reading views',()=>{
  const c=setup();assert.equal(c.style.value,'ivory');assert.equal(c.buttons[0]['aria-checked'],'true');
  c.click(c.buttons[0]);assert.equal(c.buttons[0]['aria-checked'],'false');assert.equal(c.buttons[1]['aria-checked'],'true');
- assert.ok(Object.hasOwn(c.attributes,'data-reading-leading-blank'));
+ assert.equal(Object.hasOwn(c.attributes,'data-reading-leading-blank'),false);
  c.values.set('sweetcherry.reader.background','#ffeeaa');c.storage();assert.equal(c.style.value,'#ffeeaa');
  c.values.delete('sweetcherry.reader.background');c.storage();assert.equal(c.style.value,'ivory');
 });
@@ -26,4 +26,9 @@ test('disabled deletion requires an explicit command marker and removes it befor
  const noCommand=setup(true,false);assert.equal(noCommand.submitted,0);assert.equal(new URL(noCommand.link.href).searchParams.get('_skipNodeConfirmation'),'1');
  const fast=setup(true,true);assert.equal(fast.submitted,1);assert.equal(new URL(fast.link.href).searchParams.get('_tenantView'),'tenant');assert.equal(fast.replaced.searchParams.has('_skipNodeConfirmation'),false);
  fast.click(fast.buttons[2]);assert.equal(new URL(fast.link.href).searchParams.has('_skipNodeConfirmation'),false);
+});
+
+test('reading preferences preserve leading blank rich-text lines',()=>{
+ const c=setup();assert.equal(Object.hasOwn(c.attributes,'data-reading-leading-blank'),false);
+ c.click(c.buttons[0]);assert.equal(Object.hasOwn(c.attributes,'data-reading-leading-blank'),false);
 });

@@ -22,8 +22,12 @@ myapp:
 
 Configuration-file changes take effect after restart. Invalid configuration colors fall back to white; the settings editor rejects invalid values. The browser menu applies its override without restarting.
 
-The reader hides only empty rich-text lines at the beginning of a note. These correspond to stored newlines, rather than desktop/mobile alignment elements. Interior empty lines, anchors, editor contents and stored data remain intact.
-
 After **Restart SweetCherry**, the status page polls a small anonymous readiness endpoint without the expired session cookie. It waits for a different application instance to finish startup, then opens the application's home page automatically. Login may be required because restart closes sessions. During a slow or failed startup it keeps waiting and leaves the manual home link available.
 
 Mind-map and ZIP import file fields display Browse/No file selected in the application's selected language. The native file selection dialog itself follows the operating system/browser language. Without JavaScript the original native file input remains available.
+
+## Tree keyboard navigation
+
+Focus a node name in `/tree` with a click or Tab. Up/Down open the previous/next visible node; Home/End open the first/last visible node. Right expands a closed branch, or visits its first child when already open. Left collapses an open branch, or visits its parent. Focus stays in the tree.
+
+Only unmodified keys on tree node-name links are handled. Content scrolling, text selections, buttons, editors, dialogs and browser shortcuts retain their normal behavior. Existing Alt+Shift+arrow move commands are unchanged. Leading blank rich-text lines are displayed as stored.

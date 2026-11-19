@@ -15,9 +15,6 @@
         scan();
     }
     function scan(){
-        document.querySelectorAll('[data-node-reading] .rich-text-preview').forEach(root=>{
-            core.leadingBlanks(root).forEach(line=>line.setAttribute('data-reading-leading-blank',''));
-        });
         // The query marker means that an explicit delete command requested the faster path.
         document.querySelectorAll('a[data-node-delete]').forEach(link=>{
             const url=new URL(link.href,location.href);

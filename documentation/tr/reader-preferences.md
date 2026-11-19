@@ -22,8 +22,12 @@ myapp:
 
 Yapılandırma dosyasındaki değişiklik yeniden başlatmadan sonra uygulanır. Geçersiz yapılandırma rengi beyaza döner; ayar editörü geçersiz değeri reddeder. Tarayıcı menüsündeki renk tercihi yeniden başlatma gerektirmez.
 
-Okuyucu yalnız düğümün başındaki boş rich text satırlarını gizler. Bunlar masaüstü/mobil hizalama elemanı değil, kayıtlı satır sonlarının karşılığıdır. İçerik arasındaki boş satırlar, anchor’lar, editör içeriği ve kayıtlı veri korunur.
-
 **Restart SweetCherry** sonrasında durum sayfası, süresi dolan oturum çerezini göndermeden küçük bir readiness endpoint’ini yoklar. Yeni uygulama örneğinin başlangıcı bitince ana sayfayı otomatik açar. Yeniden başlatma oturumları kapattığı için giriş gerekebilir. Başlangıç uzun sürerse veya başarısız olursa beklemeye devam eder ve elle açılabilecek ana sayfa bağlantısını gösterir.
 
 Mind-map ve ZIP import dosya alanlarının Göz at/Dosya seçilmedi metinleri uygulamanın seçili dilini kullanır. Açılan yerel dosya seçme penceresinin dili işletim sistemi/tarayıcı tarafından belirlenir. JavaScript kapalıyken özgün yerel dosya alanı kullanılabilir.
+
+## Ağaçta klavye ile gezinme
+
+`/tree` üzerinde düğüm adına tıklayın veya Tab ile odaklanın. Yukarı/Aşağı önceki/sonraki görünür düğümü, Home/End ilk/son görünür düğümü açar. Sağ kapalı dalı açar; dal açıksa ilk çocuğa gider. Sol açık dalı kapatır; dal kapalıysa üst düğüme gider. Odak ağaçta kalır.
+
+Yalnız ağaçtaki düğüm adı bağlantılarında basılan değiştiricisiz tuşlar işlenir. İçerik kaydırma, metin seçimi, düğmeler, editörler, pencereler ve tarayıcı kısayolları normal davranışını korur. Mevcut Alt+Shift+ok taşıma komutları değişmez. Rich text başlangıcındaki boş satırlar kayıtlı olduğu gibi gösterilir.

@@ -270,6 +270,8 @@
         const id = match ? match[1] : target.pathname === '/tree' ? target.searchParams.get('nodeId') || '0' : null;
         if (id !== null && /^\d+$/.test(id)) { event.preventDefault(); select(id, true, !pane.contains(link)); }
     });
+    window.SweetCherryTreeKeyboard?.install({tree, select:id=>select(id, true, false), toggle,
+        stopped:()=>stopped, onError:()=>{if(!stopped)status.textContent=workspace.dataset.error;}});
     window.addEventListener('popstate', () => select(new URL(location.href).searchParams.get('nodeId') || '0', false, true));
     pane.addEventListener('scroll', save, {passive: true});
 

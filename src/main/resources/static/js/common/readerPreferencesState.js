@@ -13,7 +13,5 @@
             background:()=>background,setBackground(value){const valid=color(value);if(!valid)return false;background=valid;save('background',valid);return true;},
             resetBackground(){background=null;save('background',null);}};
     }
-    /** Empty leading rendered lines are stored newlines, not layout spacers. Keep interior blank lines. */
-    function leadingBlanks(root){const result=[];for(const child of root.children){if(child.tagName!=='DIV'||child.id||child.children.length!==1||child.firstElementChild.tagName!=='BR'||child.textContent.trim())break;result.push(child);}return result;}
-    return {colors,color,create,leadingBlanks};
+    return {colors,color,create};
 });
