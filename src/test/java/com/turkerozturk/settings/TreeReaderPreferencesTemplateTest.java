@@ -48,6 +48,14 @@ class TreeReaderPreferencesTemplateTest {
                 assertThat(page.select("link[href='" + path + "/css/node/nodeTitle.css']")).hasSize(1);
                 assertThat(page.select("script[src='" + path + "/js/node/treeKeyboard.js']")).hasSize(1);
                 assertThat(page.selectFirst("#workspace-tree").attr("aria-label")).isNotBlank();
+                assertThat(page.select("script[src='"+path+"/js/node/treeSplitState.js']")).hasSize(1);
+                assertThat(page.select("script[src='"+path+"/js/node/treeSplitView.js']")).hasSize(1);
+                assertThat(page.select("#workspace-right[hidden] iframe[data-split-frame='true']")).hasSize(1);
+                assertThat(page.selectFirst("#workspace-right-frame").hasAttr("src")).isFalse();
+                assertThat(page.selectFirst("#workspace-right-frame").attr("title")).isNotBlank();
+                assertThat(page.selectFirst("#tree-workspace").attr("data-split-close-confirm")).isNotBlank();
+                assertThat(page.selectFirst("#workspace-content-splitter").attr("role")).isEqualTo("separator");
+                assertThat(html).doesNotContain("??split.");
                 assertThat(html).doesNotContain("??preferences.");
             }
         }

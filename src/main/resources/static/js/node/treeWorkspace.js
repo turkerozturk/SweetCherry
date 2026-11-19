@@ -45,7 +45,8 @@
         }
     });
     const splitter = document.getElementById('workspace-splitter');
-    const storageKey = 'sweetcherry-tree:' + token;
+    const embedded = window.SweetCherrySplitState?.embedded(window) === true;
+    const storageKey = 'sweetcherry-tree:' + token + (embedded ? ':split-pane' : '');
     const widthKey = 'sweetcherry-tree-width';
     const defaultWidth = Math.max(20, Math.min(1900, Number(workspace.dataset.defaultTreeWidth) || 600));
     const preferred = value => {
@@ -72,6 +73,8 @@
     /** Stops further actions when the session or selected database is no longer valid. */
     function stop(message) {
         stopped = true;
+        split?.stop(message);
+        controller?.abort();
         scrollTopButton.hidden = true;
         workspace.replaceChildren();
         const text = document.createElement('p');
@@ -205,6 +208,7 @@
         controller = active;
         content.setAttribute('aria-busy', 'true');
         status.textContent = workspace.dataset.loading;
+        split?.message(workspace.dataset.loading);
         try {
             const treeChanged = await refreshNavigation(active);
             const response = await request(url('/tree/content/' + id), active.signal);
@@ -241,7 +245,10 @@
                     if (li) await toggle(li, true, active.signal);
                 }
             }
-            if (active === controller) { markSelected(id); save(); }
+            if (active === controller) {
+                markSelected(id); save();
+                split?.loaded(Number(id),fragment.dataset.nodeTitle,content.querySelector('[data-path-ids]')?.dataset.pathIds||'');
+            }
         } catch (error) {
             // A deleted node may still be selected in this tab or in an old URL; keep the session usable.
             if (error.status === 404 && Number(id) !== 0 && !stopped && active === controller) {
@@ -250,10 +257,10 @@
                 save();
                 history.replaceState({nodeId: 0}, '', url('/tree', {nodeId: 0}));
                 await select(0, false, false);
-                if (!stopped) status.textContent = workspace.dataset.missing;
+                if (!stopped) {status.textContent = workspace.dataset.missing;split?.message(workspace.dataset.missing);}
                 return;
             }
-            if (error.name !== 'AbortError'  && !stopped && active === controller) status.textContent = workspace.dataset.error;
+            if (error.name !== 'AbortError'  && !stopped && active === controller) {status.textContent = workspace.dataset.error;split?.message(workspace.dataset.error);}
         } finally { if (active === controller) content.removeAttribute('aria-busy'); }
     }
     workspace.addEventListener('click', event => {
@@ -268,9 +275,9 @@
         if (target.origin !== location.origin) return;
         const match = target.pathname.match(/^\/nodes\/(\d+)$/);
         const id = match ? match[1] : target.pathname === '/tree' ? target.searchParams.get('nodeId') || '0' : null;
-        if (id !== null && /^\d+$/.test(id)) { event.preventDefault(); select(id, true, !pane.contains(link)); }
+        if (id !== null && /^\d+$/.test(id)) { event.preventDefault(); split.navigate(id, true, !pane.contains(link)); }
     });
-    window.SweetCherryTreeKeyboard?.install({tree, select:id=>select(id, true, false), toggle,
+    window.SweetCherryTreeKeyboard?.install({tree, select:id=>split.navigate(id, true, false), toggle,
         stopped:()=>stopped, onError:()=>{if(!stopped)status.textContent=workspace.dataset.error;}});
     document.addEventListener('sweetcherry:node-renamed',event=>{
         if(event.detail?.id===String(state.selected))select(state.selected,false,false);
@@ -279,7 +286,8 @@
     pane.addEventListener('scroll', save, {passive: true});
 
     function setWidth(value) {
-        const maximum = Math.max(20, Math.min(1900, workspace.clientWidth - 28));
+        const reserve=document.getElementById('workspace-readers')?.dataset.splitOpen==='true'?Math.min(600,workspace.clientWidth*.6):28;
+        const maximum = Math.max(20, Math.min(1900, workspace.clientWidth - reserve));
         const requested = Number.isFinite(Number(value)) ? Number(value) : defaultWidth;
         state.width = Math.round(Math.max(20, Math.min(maximum, requested)));
         workspace.style.setProperty('--tree-width', state.width + 'px');
@@ -307,12 +315,34 @@
         }
     });
     window.addEventListener('resize', () => setWidth(preferredWidth));
+    window.addEventListener('sweetcherry:split-layout', () => setWidth(preferredWidth));
     window.addEventListener('storage', event => {
         if (event.key === widthKey || event.key === null) {
             preferredWidth = preferred(event.newValue);
             setWidth(preferredWidth);
         }
     });
+    /** Highlight the active pane's path without replacing either pane's content. */
+    async function revealSelection(id, path) {
+        if(stopped)return;
+        controller?.abort();const active=new AbortController();controller=active;
+        content.removeAttribute('aria-busy');
+        await refreshNavigation(active);
+        for(const ancestor of path.split(',').filter(part=>/^\d+$/.test(part)&&Number(part)!==Number(id))){
+            if(active!==controller)return;const li=find(ancestor);if(li)await toggle(li,true,active.signal);
+        }
+        if(active===controller){markSelected(id);save();}
+    }
+    let resolveReady;const ready=new Promise(resolve=>{resolveReady=resolve;});
+    window.SweetCherryWorkspace={select:id=>ready.then(()=>select(id,true,true)),
+        status:()=>content.querySelector('template[data-workspace-status]')?.content,
+        move:direction=>{
+            if(stopped||!['UP','DOWN','LEFT','RIGHT'].includes(direction))return;
+            const form=content.querySelector('[data-node-move]');
+            const button=form?.querySelector('[data-move="'+direction+'"]');
+            if(form?.dataset.moveReady==='ready'&&button&&!button.disabled)form.requestSubmit(button);
+        }};
+    const split=window.SweetCherrySplitView.install({workspace,token,getSelected:()=>state.selected,selectLocal:select,reveal:revealSelection,stop});
     /** Restores expanded branches only within this browser tab and selected CTB. */
     async function initialize() {
         setWidth(preferredWidth);
@@ -329,8 +359,12 @@
             await select(/^\d+$/.test(String(id)) ? id : 0, false, true);
             pane.scrollTop = top; pane.scrollLeft = left;
             history.replaceState({nodeId: state.selected}, '', url('/tree', {nodeId: state.selected}));
-            if(workspace.dataset.focusNode===String(state.selected))window.SweetCherryTreeKeyboard?.focusNode(tree,workspace.dataset.focusNode);
-        } catch (_) { if (!stopped) status.textContent = workspace.dataset.error; }
+            split.ready();
+            if(workspace.dataset.focusNode===String(state.selected)){
+                if(embedded)split.restoreFocus(state.selected);
+                else window.SweetCherryTreeKeyboard?.focusNode(tree,workspace.dataset.focusNode);
+            }
+        } catch (_) { if (!stopped) {status.textContent = workspace.dataset.error;split?.message(workspace.dataset.error);} }
     }
-    initialize();
+    initialize().finally(resolveReady);
 })();

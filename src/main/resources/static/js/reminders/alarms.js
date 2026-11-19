@@ -2,6 +2,8 @@
     'use strict';
     const widget = document.getElementById('reminderAlarms'), state = window.SweetCherryAlarmState;
     if (!widget || !state) return;
+    // The containing workspace owns polling and sound; an embedded pane must not ring twice.
+    if(window.SweetCherrySplitState?.embedded(window)){widget.hidden=true;return;}
     const enable = widget.querySelector('[data-alarm-enable]'), sound = widget.querySelector('[data-alarm-sound]');
     const cards = widget.querySelector('[data-alarm-cards]'), status = widget.querySelector('[data-alarm-status]');
     const csrf = widget.querySelector('form'), prefs = 'sweetcherry-reminder-enabled:' + widget.dataset.scope;

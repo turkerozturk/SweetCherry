@@ -26,6 +26,7 @@
     <li th:if="${currentTenantName}" sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/nodes/audit(_tenantView=${tenantViewToken})}"><i class="fas fa-history"></i> <span th:text="#{audit.title}"></span></a></li>
     <li th:if="${currentTenantName}" sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}"><i class="fas fa-trash-alt"></i> <span th:text="#{trash.title}"></span></a></li>
     <li><hr class="dropdown-divider"></li>
+    <li th:if="${currentTenantName}"><a class="dropdown-item" data-tree-split-toggle aria-pressed="false" th:href="@{/tree(split=1,_tenantView=${tenantViewToken})}" th:title="#{split.help}"><i class="fas fa-columns" aria-hidden="true"></i> <span th:text="#{split.toggle}">Split view</span></a></li>
     <li><button type="button" class="dropdown-item" data-node-fragments-toggle aria-pressed="false" th:title="#{fragments.help}"><i class="fas fa-puzzle-piece" aria-hidden="true"></i> <span th:text="#{fragments.toggle}"></span></button></li>
     <li><button type="button" class="dropdown-item" data-node-fragments-source-toggle aria-pressed="false" th:title="#{fragments.hideSourceHelp}"><i class="fas fa-eye-slash" aria-hidden="true"></i> <span th:text="#{fragments.hideSource}"></span></button></li>
     <li class="node-zoom-controls" role="group" th:aria-label="#{view.contentZoom}">

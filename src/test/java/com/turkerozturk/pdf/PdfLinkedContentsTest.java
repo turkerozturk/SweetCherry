@@ -73,7 +73,8 @@ class PdfLinkedContentsTest {
         assertThat(Jsoup.parseBodyFragment(html).select(".pdf-linked-content").get(1).select("br")).hasSize(1);
         try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(new NodePdfDocument().prepare("Host", html, 1)))) {
             var text = new PDFTextStripper(); text.setSortByPosition(true);
-            assertThat(text.getText(pdf)).contains("prefixfirst\nsecondsuffix", "after blank");
+            assertThat(text.getText(pdf).replace("\r\n", "\n").replace('\r', '\n'))
+                    .contains("prefixfirst\nsecondsuffix", "after blank");
         }
     }
     @Test void includedHeadingsKeepTheirOutlineDestinationWithoutAddingSourceHeadings() throws Exception {

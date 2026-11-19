@@ -30,7 +30,8 @@ class NodeFragmentSecurityTest {
             mvc.perform(get(url).session(session).param("_tenantView","current").with(anonymous())).andExpect(status().is3xxRedirection());
             mvc.perform(get(url).session(session).with(user("reader").roles("USER"))).andExpect(status().isBadRequest());verifyNoInteractions(service);
 
-            mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"));
+            mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"))
+                    .andExpect(header().string("X-Frame-Options","SAMEORIGIN"));
             mvc.perform(get(url).session(session).param("_tenantView","current").cookie(new jakarta.servlet.http.Cookie("viewMode","mobile")).with(user("reader").roles("USER"))).andExpect(status().isOk());
             when(service.fragment(eq(1L),eq("current"))).thenThrow(new NodeFragmentService.Problem("large"));
             mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isPayloadTooLarge()).andExpect(jsonPath("$.error").value("large"));

@@ -128,6 +128,8 @@ public class SecurityConfig {
 
         return http
                 .headers(headers -> headers
+                        // Independent reader panes may embed this application, never another origin.
+                        .frameOptions(frames -> frames.sameOrigin())
                         .referrerPolicy(referrer -> referrer.policy(
                                 ReferrerPolicyHeaderWriter.ReferrerPolicy.SAME_ORIGIN))
                         .httpStrictTransportSecurity(hsts -> {

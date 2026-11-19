@@ -5,25 +5,45 @@
     <th:block th:replace="~{common/meta :: headerMeta}"></th:block>
     <th:block th:replace="~{common/meta :: headerCssLibraries}"></th:block>
     <link rel="stylesheet" th:href="@{/css/node/treeWorkspace.css}"/>
+    <link rel="stylesheet" th:href="@{/css/node/treeSplitView.css}"/>
+    <script th:src="@{/js/node/treeSplitState.js}"></script>
 <link rel="stylesheet" th:href="@{/css/theme.css}">
     <th:block th:replace="~{common/readerPreferences :: assets}"></th:block>
 <link rel="stylesheet" th:href="@{/css/node/nodeTitle.css}">
 </head>
 <body class="tree-workspace-page">
 <header id="workspace-header"><th:block th:replace="~{common/header :: header}"></th:block></header>
-<main id="tree-workspace" th:style="|--tree-width:${treeDefaultWidth}px;--tree-font-size:${treeFontSize}px;--tree-vertical-padding:${treeVerticalPadding}px|" th:attr="data-focus-node=${treeFocusNode},data-show-tag-indicator=${treeShowTagIndicator},data-has-tags=#{tree.hasTags},data-default-tree-width=${treeDefaultWidth},data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-missing=#{tree.nodeMissing},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse},data-image-title=#{tree.openImage}">
+<main id="tree-workspace" th:style="|--tree-width:${treeDefaultWidth}px;--tree-font-size:${treeFontSize}px;--tree-vertical-padding:${treeVerticalPadding}px|" th:attr="data-split-close-confirm=#{split.confirmClose},data-focus-node=${treeFocusNode},data-show-tag-indicator=${treeShowTagIndicator},data-has-tags=#{tree.hasTags},data-default-tree-width=${treeDefaultWidth},data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-missing=#{tree.nodeMissing},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse},data-image-title=#{tree.openImage}">
     <nav id="workspace-tree-pane" th:attr="aria-label=#{tree.workspace}">
         <a class="workspace-database" th:href="@{/tree(nodeId=0,_tenantView=${tenantViewToken})}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}">Database</span></a>
         <ul id="workspace-tree" th:attr="aria-label=#{tree.keyboardHelp},title=#{tree.keyboardHelp}"></ul>
     </nav>
     <div id="workspace-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-valuemin="20" aria-valuemax="1900" th:attr="aria-valuenow=${treeDefaultWidth},aria-label=#{tree.resize}"></div>
-    <article id="workspace-content" aria-live="polite"></article>
+    <div id="workspace-readers">
+        <section id="workspace-left" class="workspace-reading-pane">
+            <div class="workspace-pane-controls">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-split-activate="left" th:text="#{split.left}"></button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-tree-split-toggle aria-pressed="false" th:title="#{split.help}"><i class="fas fa-columns" aria-hidden="true"></i> <span th:text="#{split.toggle}"></span></button>
+            </div>
+            <article id="workspace-content" aria-live="polite"></article>
+        </section>
+        <div id="workspace-content-splitter" hidden role="separator" tabindex="0" aria-orientation="vertical" aria-valuemin="20" aria-valuemax="80" aria-valuenow="50" th:aria-label="#{split.resize}"></div>
+        <section id="workspace-right" class="workspace-reading-pane" hidden>
+            <div class="workspace-pane-controls">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-split-activate="right" th:text="#{split.right}"></button>
+                <a id="workspace-right-open" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" th:title="#{split.open}" th:aria-label="#{split.open}"><i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-split-close th:title="#{split.close}" th:aria-label="#{split.close}"><i class="fas fa-times" aria-hidden="true"></i></button>
+            </div>
+            <iframe id="workspace-right-frame" data-split-frame="true" th:title="#{split.right}" referrerpolicy="same-origin"></iframe>
+        </section>
+    </div>
 </main>
 <button id="scrollToTopBtn" type="button" hidden th:title="#{tree.scrollTop}" th:attr="aria-label=#{tree.scrollTop}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
 <footer id="workspace-status" role="status"></footer>
 <th:block th:replace="~{common/footer :: footerJsLibraries}"></th:block>
 <script th:src="@{/js/node/navigationRevision.js}"></script>
 <script th:src="@{/js/node/treeKeyboard.js}"></script>
+<script th:src="@{/js/node/treeSplitView.js}"></script>
 <script th:src="@{/js/node/treeWorkspace.js}"></script>
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 <script th:src="@{/js/node/nodeMove.js}"></script>

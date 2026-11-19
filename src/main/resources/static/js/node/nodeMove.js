@@ -39,6 +39,9 @@
         if (event.target.closest('input,textarea,select,[contenteditable="true"],dialog,[role="textbox"]')) return;
         const direction = {ArrowUp:'UP',ArrowDown:'DOWN',ArrowLeft:'LEFT',ArrowRight:'RIGHT'}[event.key];
         if (!direction) return;
+        if(window.SweetCherryTreeSplit?.activeRight()){
+            event.preventDefault();window.SweetCherryTreeSplit.move(direction);return;
+        }
         const form = document.querySelector('#workspace-content [data-node-move]');
         if (!form || form.dataset.moveReady !== 'ready') return;
         event.preventDefault();
