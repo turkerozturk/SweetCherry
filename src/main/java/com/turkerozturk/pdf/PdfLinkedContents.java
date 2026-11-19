@@ -75,9 +75,9 @@ final class PdfLinkedContents {
             }
             var next = new HashSet<>(path); next.add(targetId);
             if ("custom-colors".equals(fragment.syntax())) expand(parsed.body(), targetId, next, depth + 1);
-            var section = new Element("div").addClass("pdf-linked-content");
-            // The source label replaces the original link label without inventing a node heading.
-            section.appendElement("div").appendElement("strong").text(fragment.name() == null ? link.text() : fragment.name());
+            PdfFragmentFlow.inline(parsed.body());
+            var section = new Element("span").addClass("pdf-linked-content");
+            // As in the reader's source-free view, start exactly where the link occurred.
             section.appendChildren(new java.util.ArrayList<>(parsed.body().childNodes()));
             link.replaceWith(section);
         }

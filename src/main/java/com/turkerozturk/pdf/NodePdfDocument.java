@@ -24,6 +24,14 @@ public final class NodePdfDocument {
         div { margin: 0; white-space: pre-wrap; } a { color: #3584e4; text-decoration: underline; }
         pre, code { font-family: 'Liberation Mono'; white-space: pre-wrap; font-size: 9pt; }
         pre { padding: 6pt; background: #f4f4f4; border: 1pt solid #ddd; }
+        .pdf-fragment-line { white-space: pre-wrap; }
+        .pdf-fragment-pre { font-family: 'Liberation Mono'; font-size: 9pt; }
+        .pdf-fragment-h1 { font-size: 2em; font-weight: bold; }
+        .pdf-fragment-h2 { font-size: 1.5em; font-weight: bold; }
+        .pdf-fragment-h3 { font-size: 1.17em; font-weight: bold; }
+        .pdf-fragment-h4 { font-weight: bold; }
+        .pdf-fragment-h5 { font-size: .83em; font-weight: bold; }
+        .pdf-fragment-h6 { font-size: .67em; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; -fs-table-paginate: paginate; }
         td, th { border: .5pt solid #aaa; padding: 4pt; vertical-align: top; }
         th { background: #eee; } thead { display: table-header-group; }
@@ -82,8 +90,8 @@ public final class NodePdfDocument {
             element.attr("style", cleaned);
             String heading = element.attr("data-pdf-heading");
             if (options.outline() && heading.matches("h[1-6]")) {
-                var line = element.closest("div");
-                if (line != null && line.tagName().equals("div") && !line.hasAttr("data-pdf-bookmark")) {
+                var line = element.closest("div, .pdf-fragment-line");
+                if (line != null && !line.hasAttr("data-pdf-bookmark")) {
                     line.attr("data-pdf-bookmark", Integer.toString(Integer.parseInt(heading.substring(1)) + (options.nodeTitle() ? 1 : 0)));
                     line.attr("style", line.attr("style") + "page-break-inside:avoid;");
                 }
@@ -92,7 +100,7 @@ public final class NodePdfDocument {
         }
         // Generated fragment boundaries survive sanitization without accepting arbitrary CSS.
         if (options.newPagePerNode()) for (var fragment : content.select(".pdf-linked-content"))
-            fragment.attr("style", "page-break-before:always;");
+            fragment.attr("style", "display:block;page-break-before:always;");
         for (var icon : content.select(".rich-text-attachment span"))
             icon.replaceWith(new Element("img").attr("src", PdfAttachmentIcon.URI).attr("alt", "")
                     .attr("style", "width:12px;height:12px"));

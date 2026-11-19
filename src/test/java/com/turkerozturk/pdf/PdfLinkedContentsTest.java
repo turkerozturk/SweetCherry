@@ -31,7 +31,31 @@ class PdfLinkedContentsTest {
         assertThat(parsed.select("[id]").eachAttr("id")).containsExactly("sc-fragment-1-a", "sc-fragment-2-a");
         assertThat(parsed.select("a").eachAttr("href")).containsExactly("#sc-fragment-1-a", "#sc-fragment-2-a");
         try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(new NodePdfDocument().prepare("Host", html, 1)))) {
-            assertThat(new PDFTextStripper().getText(pdf)).contains("Before", "between", "after", "Included text", "Source 2");
+            assertThat(new PDFTextStripper().getText(pdf)).contains("Before", "between", "after", "Included text").doesNotContain("Source 2");
+        }
+    }
+    @Test void inlineFileNameStartsAtLinkPositionWithoutSourceLabelOrArtificialBreaks() throws Exception {
+        target(2, 2, "custom-colors", "<div><strong>sweetcherry_1.11.0_all_os_portable.zip</strong></div>");
+        var html = expander(3, 20).expand("<div>Get-FileHash -Algorithm SHA256 .\\<a href='/nodes/2'>version variable</a> suffix</div>", 1);
+        var parsed = Jsoup.parseBodyFragment(html);
+        assertThat(parsed.select(".pdf-linked-content").first().tagName()).isEqualTo("span");
+        assertThat(parsed.select("br")).isEmpty();
+        try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(new NodePdfDocument().prepare("Host", html, 1)))) {
+            var text = new PDFTextStripper(); text.setSortByPosition(true);
+            assertThat(text.getText(pdf))
+                    .contains("Get-FileHash -Algorithm SHA256 .\\sweetcherry_1.11.0_all_os_portable.zip suffix")
+                    .doesNotContain("Source 2", "version variable");
+        }
+    }
+    @Test void multilineFragmentsKeepEmptyLinesNestedInclusionsAndInlineEdges() throws Exception {
+        target(2, 2, "custom-colors", "<div>first<a href='/nodes/3'>nested</a></div>\n<div><br></div><div>last</div>");
+        target(3, 3, "custom-colors", "<p>INNER</p>");
+        var html = expander(3, 20).expand("<div>prefix<a href='/nodes/2'>target</a>suffix</div>", 1);
+        assertThat(Jsoup.parseBodyFragment(html).select("br")).hasSize(2);
+        try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(new NodePdfDocument().prepare("Host", html, 1)))) {
+            var text = new PDFTextStripper(); text.setSortByPosition(true);
+            assertThat(text.getText(pdf)).contains("prefixfirstINNER", "lastsuffix")
+                    .doesNotContain("Source 2", "Source 3");
         }
     }
     @Test void cyclesIncludingAliasesAndUnavailableTargetsKeepTheirLabels() {
@@ -41,6 +65,26 @@ class PdfLinkedContentsTest {
         var html = expander(3, 20).expand("<a href='/nodes/2'>start</a><a href='/nodes/4'>hidden label</a>", 1);
         assertThat(html).contains("Included", "alias back", "hidden label").doesNotContain("must never include");
         assertThat(Jsoup.parseBodyFragment(html).select(".pdf-linked-content")).hasSize(1);
+    }
+    @Test void plainTextNewlinesAndIntentionalLeadingEmptyLinesSurvive() throws Exception {
+        target(2, 2, "plain-text", "<div>first\nsecond</div>");
+        target(3, 3, "custom-colors", "<div><br></div><div>after blank</div>");
+        var html = expander(3, 20).expand("<div>prefix<a href='/nodes/2'>plain</a>suffix</div><div><a href='/nodes/3'>rich</a></div>", 1);
+        assertThat(Jsoup.parseBodyFragment(html).select(".pdf-linked-content").get(1).select("br")).hasSize(1);
+        try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(new NodePdfDocument().prepare("Host", html, 1)))) {
+            var text = new PDFTextStripper(); text.setSortByPosition(true);
+            assertThat(text.getText(pdf)).contains("prefixfirst\nsecondsuffix", "after blank");
+        }
+    }
+    @Test void includedHeadingsKeepTheirOutlineDestinationWithoutAddingSourceHeadings() throws Exception {
+        target(2, 2, "custom-colors", "<div><span data-pdf-heading='h2'>Included heading</span></div><div>body</div>");
+        var html = expander(3, 20).expand("<a href='/nodes/2'>source label</a>", 1);
+        try (var pdf = Loader.loadPDF(new NodePdfRenderer().render(new NodePdfDocument().prepare("Host", html, 1)))) {
+            var heading = pdf.getDocumentCatalog().getDocumentOutline().getFirstChild().getFirstChild();
+            assertThat(heading.getTitle()).isEqualTo("Included heading");
+            assertThat(heading.findDestinationPage(pdf)).isEqualTo(pdf.getPage(0));
+            assertThat(new PDFTextStripper().getText(pdf)).doesNotContain("Source 2", "source label");
+        }
     }
     @Test void depthAndCountAreSharedAcrossSubtreeRoots() {
         target(2, 2, "custom-colors", "<a href='/nodes/3'>deeper</a>");
