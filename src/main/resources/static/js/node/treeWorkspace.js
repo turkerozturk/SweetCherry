@@ -329,6 +329,7 @@
             await select(/^\d+$/.test(String(id)) ? id : 0, false, true);
             pane.scrollTop = top; pane.scrollLeft = left;
             history.replaceState({nodeId: state.selected}, '', url('/tree', {nodeId: state.selected}));
+            if(workspace.dataset.focusNode===String(state.selected))window.SweetCherryTreeKeyboard?.focusNode(tree,workspace.dataset.focusNode);
         } catch (_) { if (!stopped) status.textContent = workspace.dataset.error; }
     }
     initialize();

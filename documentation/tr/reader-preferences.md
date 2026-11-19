@@ -31,3 +31,5 @@ Mind-map ve ZIP import dosya alanlarının Göz at/Dosya seçilmedi metinleri uy
 `/tree` üzerinde düğüm adına tıklayın veya Tab ile odaklanın. Yukarı/Aşağı önceki/sonraki görünür düğümü, Home/End ilk/son görünür düğümü açar. Sağ kapalı dalı açar; dal açıksa ilk çocuğa gider. Sol açık dalı kapatır; dal kapalıysa üst düğüme gider. Odak ağaçta kalır.
 
 Yalnız ağaçtaki düğüm adı bağlantılarında basılan değiştiricisiz tuşlar işlenir. İçerik kaydırma, metin seçimi, düğmeler, editörler, pencereler ve tarayıcı kısayolları normal davranışını korur. Mevcut Alt+Shift+ok taşıma komutları değişmez. Rich text başlangıcındaki boş satırlar kayıtlı olduğu gibi gösterilir.
+
+Başarılı yapısal taşıma sonrasında `/tree` açıldığında yeni yol görünür olunca odak taşınan düğüme döner; ok tuşlarıyla gezinmeye devam edilebilir. Normal sayfa açılışları odağı ağaca zorlamaz; yükleme sırasında başka bir alan/kontrol odaklanmışsa ona müdahale edilmez.

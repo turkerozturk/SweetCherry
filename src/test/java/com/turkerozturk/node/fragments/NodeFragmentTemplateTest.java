@@ -21,7 +21,8 @@ class NodeFragmentTemplateTest {
             context.setVariable("node",node);context.setVariable("tenantViewToken","current");context.setVariable("nodeFragmentDepth",3);context.setVariable("nodeFragmentInclusions",20);
             String html=engine.process("node/nodeContentFragment",context);var root=org.jsoup.Jsoup.parse(html).selectFirst("[data-node-fragments]");
             assertThat(root.attr("data-fragment-content")).isEqualTo("2");assertThat(root.attr("data-fragment-token")).isEqualTo("current");assertThat(root.attr("data-fragment-depth")).isEqualTo("3");assertThat(html).doesNotContain("??");
-            String menu=engine.process("common/viewModeFragment",context);assertThat(menu).doesNotContain("??");assertThat(org.jsoup.Jsoup.parse(menu).selectFirst("[data-node-fragments-toggle]").attr("aria-pressed")).isEqualTo("false");
+            String menu=engine.process("common/viewModeFragment",context);assertThat(menu).doesNotContain("??");assertThat(org.jsoup.Jsoup.parse(menu).selectFirst("[data-node-fragments-source-toggle]").attr("aria-pressed")).isEqualTo("false");
+            String footer=engine.process("common/footer",context);assertThat(footer).contains("/js/common/nodeFragmentFlow.js");assertThat(footer.indexOf("/js/common/nodeFragmentFlow.js")).isLessThan(footer.indexOf("/js/common/nodeFragments.js"));assertThat(org.jsoup.Jsoup.parse(menu).selectFirst("[data-node-fragments-toggle]").attr("aria-pressed")).isEqualTo("false");
         }
     }
 }

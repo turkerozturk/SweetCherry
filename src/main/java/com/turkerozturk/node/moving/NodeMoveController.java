@@ -50,11 +50,12 @@ public class NodeMoveController {
     /** Accepts only structural directions and redirects to the same node in the requested new view. */
     @PostMapping("/nodes/move/{id}")
     public String move(@PathVariable long id, @RequestParam String direction, @RequestParam String revision,
-            @RequestParam(defaultValue="reader") String view) {
+            @RequestParam(defaultValue="reader") String view, org.springframework.web.servlet.mvc.support.RedirectAttributes flash) {
         NodeMoveService.Direction selected;
         try { selected = NodeMoveService.Direction.valueOf(direction); }
         catch (IllegalArgumentException error) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid direction"); }
         service.move(id,selected,revision);
+        if("tree".equals(view))flash.addFlashAttribute("treeFocusNode",Long.toString(id));
         return "tree".equals(view) ? "redirect:/tree?nodeId="+id : "redirect:/nodes/"+id;
     }
 }

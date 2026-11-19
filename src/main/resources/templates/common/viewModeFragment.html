@@ -27,6 +27,7 @@
     <li th:if="${currentTenantName}" sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}"><i class="fas fa-trash-alt"></i> <span th:text="#{trash.title}"></span></a></li>
     <li><hr class="dropdown-divider"></li>
     <li><button type="button" class="dropdown-item" data-node-fragments-toggle aria-pressed="false" th:title="#{fragments.help}"><i class="fas fa-puzzle-piece" aria-hidden="true"></i> <span th:text="#{fragments.toggle}"></span></button></li>
+    <li><button type="button" class="dropdown-item" data-node-fragments-source-toggle aria-pressed="false" th:title="#{fragments.hideSourceHelp}"><i class="fas fa-eye-slash" aria-hidden="true"></i> <span th:text="#{fragments.hideSource}"></span></button></li>
     <li class="node-zoom-controls" role="group" th:aria-label="#{view.contentZoom}">
         <button type="button" class="btn btn-sm btn-outline-secondary" data-node-zoom="out" th:title="#{view.zoomOut}" th:aria-label="#{view.zoomOut}"><i class="fas fa-search-minus" aria-hidden="true"></i></button>
         <button type="button" class="btn btn-sm btn-outline-secondary" data-node-zoom="reset" th:title="#{view.zoomReset}" th:aria-label="#{view.zoomReset}"><span data-node-zoom-value>100%</span></button>

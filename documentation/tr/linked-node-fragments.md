@@ -75,3 +75,11 @@ paylaşılan düğüm ve A → B → A döngüsü; eksik/büyük hedef deneyin. 
 biçim ve bağlantıların dönmesini, her iki okuyucuda gezinirken tercihin
 korunmasını ve resmin mouse/klavye ile açılmasını kontrol edin. Kaynağı düzenleyip
 kılavuzu yeniden açın; istek beklerken veri kaynağını değiştirin.
+
+## Kaynak etiketi olmadan satır içi değerler
+
+Bağlı içerikler artık bağlantının bulunduğu konumdan başlar. Kaynak görünürken **Kaynağı aç: düğüm adı** bağlantısı aynı konumdadır; ardından satır sonu ve hedef içerik gelir.
+
+**View Mode → Bağlı içerik kaynaklarını gizle**, varsayılanı kapalı olan bağımsız ikinci tercihtir. Bağlı içerik görünümü açıkken etkinleştirilirse kaynak bağlantısı ve ona ait satır sonu gizlenir. Hedef metin iç bağlantının bulunduğu yerden başlar; başına/sonuna yapay satır sonu eklenmez. Örneğin hedefi `sweetcherry_1.11.0_all_os_portable.zip` olan bağlantı doğrudan `Get-FileHash -Algorithm SHA256 .\` metninden sonra kullanılabilir.
+
+Hedefin gerçek satır sonları, boş satırları, biçimlendirmesi ve anchor ad alanları korunur. Tablo, liste ve gömülü codebox kaydırma alanları yapısal yerleşimlerini korur. Bu yalnız tarayıcı okuma görünümünü değiştirir; kayıtlı düğümler ve PDF ayarları bağımsızdır. İki tercih de gezinme/yenileme boyunca hatırlanır ve sekmeler arasında eşitlenir. Kaynak gizleme tercihi bağlı içerikler kapalıyken de seçilebilir ve eklenmiş hedefleri tekrar indirmez.

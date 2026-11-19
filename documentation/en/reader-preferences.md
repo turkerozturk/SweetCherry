@@ -31,3 +31,5 @@ Mind-map and ZIP import file fields display Browse/No file selected in the appli
 Focus a node name in `/tree` with a click or Tab. Up/Down open the previous/next visible node; Home/End open the first/last visible node. Right expands a closed branch, or visits its first child when already open. Left collapses an open branch, or visits its parent. Focus stays in the tree.
 
 Only unmodified keys on tree node-name links are handled. Content scrolling, text selections, buttons, editors, dialogs and browser shortcuts retain their normal behavior. Existing Alt+Shift+arrow move commands are unchanged. Leading blank rich-text lines are displayed as stored.
+
+After a successful structural move returning to `/tree`, focus returns to the moved node once its new path is visible, so arrow-key navigation can continue. Normal page loads do not force tree focus, and an input/control already focused during loading is left alone.

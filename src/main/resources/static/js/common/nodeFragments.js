@@ -1,9 +1,10 @@
 (() => {
     'use strict';
     const core=window.SweetCherryNodeFragments;if(!core)return;
-    const key='sweetcherry.nodeFragments',states=new Map();let enabled=false,paused=false,sequence=0;
-    try{enabled=localStorage.getItem(key)==='true';}catch(_){}
-    function labels(){document.querySelectorAll('[data-node-fragments-toggle]').forEach(button=>button.setAttribute('aria-pressed',String(enabled)));}
+    const key='sweetcherry.nodeFragments',sourceKey='sweetcherry.nodeFragments.hideSource',states=new Map();let enabled=false,hideSource=false,paused=false,sequence=0;
+    try{enabled=localStorage.getItem(key)==='true';hideSource=localStorage.getItem(sourceKey)==='true';}catch(_){}
+    function labels(){document.querySelectorAll('[data-node-fragments-toggle]').forEach(button=>button.setAttribute('aria-pressed',String(enabled)));document.querySelectorAll('[data-node-fragments-source-toggle]').forEach(button=>button.setAttribute('aria-pressed',String(hideSource)));}
+    function sourceVisibility(){document.querySelectorAll('.node-fragment-source,.node-fragment-source-break').forEach(item=>{item.hidden=hideSource;});}
     function roots(container=document){return [...(container.matches?.('[data-node-fragments]')?[container]:[]),...container.querySelectorAll('[data-node-fragments]')];}
     function release(root,state,restore){
         state.controller.abort();states.delete(root);
@@ -57,21 +58,8 @@
             else {const target=new URL(root.dataset.fragmentEndpoint.replace(/fragments\/$/,'')+contentId,location.href);target.searchParams.set('_tenantView',root.dataset.fragmentToken);target.hash=url.hash;link.href=target.href;link.target='_blank';link.rel='noopener noreferrer';link.dataset.fragmentSource='true';}
         }
     }
-    /** Split paragraph/inline wrappers around a block inclusion, retaining surrounding formatting. */
-    function mount(link,section,scope){
-        let host=link.closest('p,h1,h2,h3,h4,h5,h6');
-        if(!host||!scope.contains(host)){
-            host=link;while(host.parentElement!==scope&&host.parentElement&&/^(SPAN|B|STRONG|I|EM|U|S|DEL|SUP|SUB|SMALL|MARK|FONT)$/.test(host.parentElement.tagName))host=host.parentElement;
-        }
-        if(host===link){link.replaceWith(section);return;}
-        const before=document.createRange();before.setStart(host,0);before.setEndBefore(link);const first=before.extractContents();
-        const after=document.createRange();after.setStartAfter(link);after.setEnd(host,host.childNodes.length);const last=after.extractContents();
-        const nodes=[];
-        if(first.childNodes.length){const part=host.cloneNode(false);part.append(first);nodes.push(part);}
-        nodes.push(section);
-        if(last.childNodes.length){const part=host.cloneNode(false);part.removeAttribute('id');part.append(last);nodes.push(part);}
-        host.replaceWith(...nodes);
-    }
+    /** Inline replacements inherit the host's position and formatting without splitting its paragraph. */
+    function mount(link,section){link.replaceWith(section);}
     async function expand(scope,root,state,path,depth){
         const nodePath=new URL(root.dataset.fragmentEndpoint,location.href).pathname.replace(/fragments\/$/,'');
         for(const link of [...scope.querySelectorAll('a[href]')]){
@@ -85,15 +73,17 @@
                 const data=await load(root,state,target.id);if(!live(root,state)||!scope.contains(link))return;
                 if(path.includes(data.contentId)){note(link,root,state,'Cycle');continue;}
                 if(!state.budget.accept(data.html.length)){note(link,root,state,'Limit');continue;}
-                const section=document.createElement('section');section.className='node-fragment'+(data.syntax==='custom-colors'?' theme-note-paper':'');
+                const section=document.createElement('span');section.className='node-fragment';
                 const source=document.createElement('a');source.className='node-fragment-source';source.dataset.fragmentSource='true';const sourceUrl=new URL(target.href);sourceUrl.searchParams.set('_tenantView',root.dataset.fragmentToken);source.href=sourceUrl.href;source.target='_blank';source.rel='noopener noreferrer';source.textContent=(root.dataset.fragmentSourceLabel||'')+': '+data.name;
-                const body=document.createElement('div');body.className='node-fragment-body';
+                const sourceBreak=document.createElement('br');sourceBreak.className='node-fragment-source-break';source.hidden=hideSource;sourceBreak.hidden=hideSource;
+                const body=document.createElement('span');body.className='node-fragment-body';
                 const parsed=new DOMParser().parseFromString(data.html,'text/html');
                 parsed.querySelectorAll('script,style,iframe,object,embed,link,meta,base,form,input,button,textarea,select').forEach(item=>item.remove());
                 for(const element of parsed.body.querySelectorAll('*'))for(const attr of [...element.attributes])if(/^on/i.test(attr.name)||attr.name.toLowerCase()==='srcdoc')element.removeAttribute(attr.name);
                 namespace(parsed.body,'sc-inline-'+(++sequence),root,data.contentId);
+                window.SweetCherryNodeFragmentFlow?.inline(parsed.body,document);
                 parsed.body.querySelectorAll('img').forEach(image=>{image.tabIndex=0;image.title=image.title||root.dataset.fragmentImageTitle||'';});
-                body.append(...[...parsed.body.childNodes].map(item=>document.importNode(item,true)));section.append(source,body);
+                body.append(...[...parsed.body.childNodes].map(item=>document.importNode(item,true)));section.append(source,sourceBreak,body);
                 mount(link,section,scope);
                 document.dispatchEvent(new CustomEvent('sweetcherry:content-loaded',{detail:{root:section}}));
                 if(data.syntax==='custom-colors')await expand(body,root,state,[...path,data.contentId],depth+1);
@@ -105,11 +95,14 @@
         labels();if(!enabled){for(const [root,state] of [...states])release(root,state,true);}else scan();
     }
     document.addEventListener('click',event=>{
-        if(!event.target.closest('[data-node-fragments-toggle]'))return;
-        event.preventDefault();event.stopImmediatePropagation();apply(!enabled,true);
+        const sourceToggle=event.target.closest('[data-node-fragments-source-toggle]');
+        if(!sourceToggle&&!event.target.closest('[data-node-fragments-toggle]'))return;
+        event.preventDefault();event.stopImmediatePropagation();
+        if(sourceToggle){hideSource=!hideSource;try{localStorage.setItem(sourceKey,String(hideSource));}catch(_){}labels();sourceVisibility();}
+        else apply(!enabled,true);
     },true);
     document.addEventListener('sweetcherry:content-loaded',event=>scan(event.detail.root));
-    window.addEventListener('storage',event=>{if(event.key===key||event.key===null)apply(event.newValue==='true',false);});
+    window.addEventListener('storage',event=>{if(event.key===sourceKey||event.key===null){hideSource=event.newValue==='true';labels();sourceVisibility();}if(event.key===key||event.key===null)apply(event.newValue==='true',false);});
     window.addEventListener('pagehide',()=>{paused=true;for(const [root,state] of [...states])release(root,state,true);});
     window.addEventListener('pageshow',()=>{paused=false;labels();scan();});
     labels();scan();

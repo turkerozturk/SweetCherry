@@ -1,8 +1,8 @@
 const test=require('node:test'),assert=require('node:assert/strict');
-const {install}=require('../../main/resources/static/js/node/treeKeyboard.js');
+const {install,focusNode}=require('../../main/resources/static/js/node/treeKeyboard.js');
 function setup(){
  let listener,modal=false,selectedText=false,stopped=false,focused=null;const selections=[],toggles=[];
- const doc={querySelector:()=>modal?{}:null,defaultView:{getSelection:()=>({isCollapsed:!selectedText})}};
+ const doc={body:{},querySelector:()=>modal?{}:null,defaultView:{getSelection:()=>({isCollapsed:!selectedText})}};
  const nodes=[];
  function node(id,parent=null,hasChildren=false,open=false){
   const li={dataset:{nodeId:String(id)},parent,children:[],open,fold:hasChildren?{getAttribute:()=>li.open?'true':'false'}:null};if(parent)parent.children.push(li);
@@ -13,9 +13,9 @@ function setup(){
  }
  function hidden(li){return li.parent?(!li.parent.open||hidden(li.parent)):false;}
  const a=node(1,null,true,true),a1=node(2,a),a2=node(3,a),b=node(4,null,true,false),b1=node(5,b),c=node(6);
- const tree={ownerDocument:doc,contains:link=>nodes.some(n=>n.link===link),querySelectorAll:()=>nodes.map(n=>n.link),addEventListener:(type,fn)=>listener=fn};
+ const tree={ownerDocument:doc,querySelector:selector=>nodes.find(n=>selector.includes('node-id="'+n.dataset.nodeId+'"'))?.link,contains:link=>nodes.some(n=>n.link===link),querySelectorAll:()=>nodes.map(n=>n.link),addEventListener:(type,fn)=>listener=fn};
  install({tree,select:id=>selections.push(id),toggle:async li=>{li.open=!li.open;toggles.push(li.dataset.nodeId);},stopped:()=>stopped});
- return{a,a1,a2,b,b1,c,selections,toggles,get focused(){return focused;},set modal(v){modal=v;},set selectedText(v){selectedText=v;},set stopped(v){stopped=v;},async key(node,key,extra={}){let prevented=false;await listener({target:node.link,key,preventDefault(){prevented=true;},...extra});return prevented;}};
+ return{tree,doc,a,a1,a2,b,b1,c,selections,toggles,get focused(){return focused;},set modal(v){modal=v;},set selectedText(v){selectedText=v;},set stopped(v){stopped=v;},async key(node,key,extra={}){let prevented=false;await listener({target:node.link,key,preventDefault(){prevented=true;},...extra});return prevented;}};
 }
 test('Up/Down and Home/End visit visible nodes, preserve tree focus and skip collapsed descendants',async()=>{
  const c=setup();assert.equal(await c.key(c.a,'ArrowDown'),true);assert.equal(c.focused,2);assert.deepEqual(c.selections,['2']);
@@ -35,4 +35,11 @@ test('modifiers including existing move shortcut, selections, editing and dialog
  c.stopped=true;assert.equal(await c.key(c.a,'ArrowDown'),false);c.stopped=false;
  assert.equal(await c.key({link:{closest:()=>null}},'ArrowDown'),false);
  assert.equal(await c.key(c.a,'Tab'),false);assert.equal(await c.key(c.a,'Enter'),false);assert.deepEqual(c.selections,[]);
+});
+
+test('successful-move focus restoration lets arrow navigation continue without stealing content focus',async()=>{
+ const c=setup();c.doc.activeElement=c.doc.body;
+ assert.equal(focusNode(c.tree,'2'),true);assert.equal(c.focused,2);await c.key(c.a1,'ArrowDown');assert.equal(c.focused,3);assert.deepEqual(c.selections,['3']);
+ c.doc.activeElement={tagName:'INPUT'};assert.equal(focusNode(c.tree,'2'),false);assert.equal(c.focused,3);
+ c.doc.activeElement=c.doc.body;c.selectedText=true;assert.equal(focusNode(c.tree,'2'),false);c.selectedText=false;c.modal=true;assert.equal(focusNode(c.tree,'2'),false);c.modal=false;assert.equal(focusNode(c.tree,'5'),false);assert.equal(focusNode(c.tree,'0'),false);assert.equal(focusNode(c.tree,'bad'),false);
 });

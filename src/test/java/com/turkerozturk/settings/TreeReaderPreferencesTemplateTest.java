@@ -28,13 +28,14 @@ class TreeReaderPreferencesTemplateTest {
             context.setVariable("tenantNames", List.of()); context.setVariable("currentTenantName", "Demo");
             context.setVariable("currentDatabaseIcon", "zero"); context.setVariable("tenantViewToken", "current");
             context.setVariable("treeDefaultWidth", 600); context.setVariable("treeFontSize", 16);
-            context.setVariable("treeVerticalPadding", 1); context.setVariable("initialNodeId", 9L);
+            context.setVariable("treeFocusNode", "9");context.setVariable("treeVerticalPadding", 1); context.setVariable("initialNodeId", 9L);
             for (var color : List.of("ivory", "#fff8dc")) for (var theme : List.of("light", "dark")) {
                 context.setVariable("nodeBackgroundColor", new NodeBackgroundAdvice(color).color());
                 context.setVariable("uiTheme", theme);
                 var html = engine.process("node/treeWorkspace", context); var page = org.jsoup.Jsoup.parse(html);
                 assertThat(page.selectFirst("html").attr("style")).isEqualTo("--sc-node-background:" + color);
                 assertThat(page.selectFirst("html").attr("data-bs-theme")).isEqualTo(theme);
+                assertThat(page.selectFirst("#tree-workspace").attr("data-focus-node")).isEqualTo("9");
                 assertThat(page.select("link[href='" + path + "/css/node/readerPreferences.css']")).hasSize(1);
                 for (var script : List.of("readerPreferencesState.js", "readerPreferences.js")) {
                     var loaded = page.select("head script[src='" + path + "/js/common/" + script + "']");

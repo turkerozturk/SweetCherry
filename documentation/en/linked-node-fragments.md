@@ -10,8 +10,9 @@ works for the current page only.
 For example, keep a repeated software-installation step and its screenshots in
 one note. Link to that note from several manuals. In this reading mode, each
 link is replaced at its position by the referenced note's content. A small
-**Open source** link identifies the original and opens it separately for normal
-navigation/editing. Disabling the toggle restores the original links and layout.
+**Open source** link starts at the original link position, identifies the source
+and opens it separately for normal navigation/editing; its contents follow on
+the next line. Disabling the toggle restores the original links and layout.
 No text, tags, timestamps, link targets or database schema are modified.
 
 Rich-text source notes retain stored images, tables and codeboxes using the
@@ -86,3 +87,9 @@ shared alias and A → B → A recursion; missing and oversized targets. Toggle 
 and verify original surrounding formatting/links, navigate between notes in
 both readers, edit a source and reopen the host, and switch databases while a
 request is pending. Verify image opening with both pointer and keyboard.
+
+## Inline values without source labels
+
+**View Mode → Hide linked-content sources** is an independent, initially disabled preference. With linked contents enabled, turn this on to hide each source link and its associated line break. The target text then starts exactly where the internal link was, without a generated leading/trailing line break. For example, a link whose target contains `sweetcherry_1.11.0_all_os_portable.zip` can be used directly after `Get-FileHash -Algorithm SHA256 .\`.
+
+Actual target line breaks, blank lines, formatting and anchor namespaces are retained. Tables, lists and embedded codebox scroll containers keep their structured layout. This changes only the browser reading representation; stored notes and PDF export settings are independent. Both preferences persist across navigation/reloads and synchronize between tabs. The source-visibility choice can be set while linked contents are off and does not refetch already included targets.

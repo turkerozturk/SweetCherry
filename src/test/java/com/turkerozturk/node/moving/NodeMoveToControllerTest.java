@@ -45,4 +45,15 @@ class NodeMoveToControllerTest {
         verify(service).bookmarkTargets(2);verifyNoMoreInteractions(service);
     }
 
+    @Test void structuralMovesRestoreTreeFocusOnlyAfterSuccessAndOnlyInTreeView()throws Exception {
+        var service=mock(NodeMoveService.class);var mvc=MockMvcBuilders.standaloneSetup(new NodeMoveController(service)).build();
+        mvc.perform(post("/nodes/move/2").param("direction","RIGHT").param("revision","r").param("view","tree"))
+            .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/tree?nodeId=2")).andExpect(flash().attribute("treeFocusNode","2"));
+        mvc.perform(post("/nodes/move/2").param("direction","UP").param("revision","r").param("view","reader"))
+            .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/nodes/2")).andExpect(result->org.assertj.core.api.Assertions.assertThat(result.getFlashMap().containsKey("treeFocusNode")).isFalse());
+        doThrow(new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT)).when(service).move(2,NodeMoveService.Direction.DOWN,"stale");
+        mvc.perform(post("/nodes/move/2").param("direction","DOWN").param("revision","stale").param("view","tree"))
+            .andExpect(status().isConflict()).andExpect(result->org.assertj.core.api.Assertions.assertThat(result.getFlashMap().containsKey("treeFocusNode")).isFalse());
+    }
+
 }
