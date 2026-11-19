@@ -1,0 +1,8 @@
+.workspace-title-row { display:flex;align-items:center;flex-wrap:wrap;gap:.4rem; }
+.workspace-title-row .workspace-node-title { margin:0; }
+.node-title-pencil { opacity:0; }
+.workspace-title-row:hover .node-title-pencil, .workspace-title-row:focus-within .node-title-pencil { opacity:1; }
+.node-title-form:not([hidden]) { display:flex;align-items:center;flex:1;flex-wrap:wrap;gap:.35rem; }
+.node-title-form input[name=name] { flex:1;min-width:10rem; }
+@media (hover:none) { .node-title-pencil { opacity:1; } }
+[data-title-heading][hidden], [data-title-form][hidden], [data-title-open][hidden] { display:none!important; }

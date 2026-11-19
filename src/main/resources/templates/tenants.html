@@ -13,6 +13,7 @@
     <p th:text="#{tenants.description}"> description</p>
 
     <p><a class="btn btn-success" th:href="@{/tenants/wizard}" th:text="#{wizard.create}"></a></p>
+    <p th:if="${automaticBackupNotice}" class="alert alert-info" role="status" th:text="${#messages.msg(automaticBackupNotice)}"></p>
     <table class="table">
         <thead>
         <tr>
@@ -24,6 +25,7 @@
             <th th:text="#{tenants.data_sources_table.driver_class_name}">Driver Class Name</th>
             <th th:text="#{tenants.data_sources_table.file_name}">File Name</th>
             <th th:text="#{tenants.data_sources_table.isWritable}">Is Writable</th>
+            <th th:text="#{backupTenant.column}" th:title="#{backupTenant.help}"></th>
 
         </tr>
         </thead>
@@ -43,7 +45,13 @@
             <td th:text="${tenant.driverClassName}"></td>
             <td th:text="${tenant.fileName}"></td>
             <td th:text="${tenant.isWritable} ? #{tenant.yes} : #{tenant.no}" th:classappend="${tenant.isWritable} ? 'fw-bold text-danger' : ''"></td>
-
+            <td th:with="scheduled=${automaticBackupTenants != null and automaticBackupTenants.contains(tenant.tenantName)}">
+                <span th:text="${scheduled} ? #{tenant.yes} : #{tenant.no}"></span>
+                <form th:if="${scheduled}" method="post" th:action="@{/tenants/backups/automatic/remove}" class="d-inline" th:attr="data-confirm-message=#{backupTenant.confirm(${tenant.tenantName})}">
+                <input type="hidden" name="tenant" th:value="${tenant.tenantName}"><input type="hidden" name="revision" th:value="${automaticBackupRevision}">
+                <button class="btn btn-sm btn-outline-secondary" type="submit" th:disabled="${automaticBackupRevision == null}" th:title="${automaticBackupRevision == null ? #messages.msg('backupTenant.unavailable') : #messages.msg('backupTenant.remove')}" th:text="#{backupTenant.remove}"></button>
+                </form>
+            </td>
         </tr>
         </tbody>
     </table>

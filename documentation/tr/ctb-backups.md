@@ -103,3 +103,11 @@ Otomatik yedekleme açıkken son kimlikli yedeği silerseniz kaynak sonraki kont
 * Birden çok elle alınmış/otomatik/eski yedeği gözden geçirin. Onaydan önce yeni yedek oluşturun: yeni dosya korunmalı. Çift gönderim, on dakikalık süre ve başka tarayıcı oturumunu deneyin.
 * Boyutunu değiştirmeden dosyayı değiştirin, kataloğunu değiştirin, tenant olarak tanıtın veya journal yan dosyası oluşturun. Neden belirtilerek atlanmalı. Diğer geçerli seçim silinebilmeli.
 * Türkçe/İngilizce onayı, mobil seçimi, aktif tenant olmamasını, ADMIN/USER yetkilerini ve CSRF reddini kontrol edin.
+
+## Tenant’ı otomatik zamanlamadan çıkarma
+
+`/tenants` tablosunun son sütunu `myapp.ctb-backup.automatic.tenants` listesinde bulunma durumunu Evet/Hayır olarak gösterir. Bu yapılandırılmış üyelik durumudur; otomatik işlerin çalışması için genel yedekleme ve otomatik yedekleme anahtarları da açık olmalıdır. Listede bulunan tenant için ADMIN kullanıcısına **Zamanlamadan çıkar** düğmesi gösterilir.
+
+Çıkarma yalnız etkin harici `application.yml` içindeki tenant listesini değiştirir ve çalışan zamanlayıcıyı hemen günceller. Bu işlem yeniden başlatma gerektirmez. Diğer tenant adları ve çevredeki yapılandırma korunur. İşlem mevcut yedekleri silmez; başlamış iş mevcut politikasıyla tamamlanabilir. Aynı CTB’ye bağlanan başka bir alias listede kaldıysa onun üzerinden yedekleme devam edebilir. Tekrar eklemek için YAML listesini düzenleyip her zamanki gibi yeniden başlatın.
+
+İşlem CSRF ve güncel yapılandırma revision’ı gerektirir. Etkin harici dosya güvenle belirlenemiyor veya düzenlenemiyorsa düğme kapalıdır. Sayfa açıldıktan sonra YAML değişmişse yeniden denemeden önce sayfayı yenilemek gerekir.

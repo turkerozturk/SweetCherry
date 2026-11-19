@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/node/treeWorkspace.css}"/>
 <link rel="stylesheet" th:href="@{/css/theme.css}">
     <th:block th:replace="~{common/readerPreferences :: assets}"></th:block>
+<link rel="stylesheet" th:href="@{/css/node/nodeTitle.css}">
 </head>
 <body class="tree-workspace-page">
 <header id="workspace-header"><th:block th:replace="~{common/header :: header}"></th:block></header>
@@ -28,5 +29,6 @@
 <script th:src="@{/js/node/nodeMove.js}"></script>
 <script th:src="@{/js/node/nodeDuplicate.js}"></script>
 <script th:src="@{/js/node/nodeBookmark.js}"></script>
+<script defer th:src="@{/js/node/nodeTitle.js}"></script>
 </body>
 </html>

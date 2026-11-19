@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
-<div th:fragment="moveTo(view)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" data-node-move-to>
+<div th:fragment="moveTo(view)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" data-node-move-to data-toolbar-item="move-to">
 <button type="button" class="btn btn-sm btn-outline-primary" data-move-to-open th:attr="aria-controls=|node-move-to-${requestedNodeId}|" aria-haspopup="dialog"><i class="fas fa-folder-open" aria-hidden="true"></i> <span th:text="#{node.moveTo.title}"></span></button>
 <dialog class="node-move-to-dialog" th:id="|node-move-to-${requestedNodeId}|" th:attr="aria-labelledby=|node-move-to-title-${requestedNodeId}|">
 <form method="post" th:action="@{/nodes/move/{id}/to(id=${requestedNodeId})}"

@@ -272,6 +272,9 @@
     });
     window.SweetCherryTreeKeyboard?.install({tree, select:id=>select(id, true, false), toggle,
         stopped:()=>stopped, onError:()=>{if(!stopped)status.textContent=workspace.dataset.error;}});
+    document.addEventListener('sweetcherry:node-renamed',event=>{
+        if(event.detail?.id===String(state.selected))select(state.selected,false,false);
+    });
     window.addEventListener('popstate', () => select(new URL(location.href).searchParams.get('nodeId') || '0', false, true));
     pane.addEventListener('scroll', save, {passive: true});
 

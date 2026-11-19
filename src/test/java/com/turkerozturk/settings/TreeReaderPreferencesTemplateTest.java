@@ -43,6 +43,8 @@ class TreeReaderPreferencesTemplateTest {
                 assertThat(page.select("[data-confirm-toggle]").eachAttr("data-confirm-toggle"))
                         .containsExactly("creation", "duplication", "deletion");
                 assertThat(page.select("[data-node-background-dialog]")).hasSize(1);
+                assertThat(page.select("script[src='" + path + "/js/node/nodeTitle.js']")).hasSize(1);
+                assertThat(page.select("link[href='" + path + "/css/node/nodeTitle.css']")).hasSize(1);
                 assertThat(page.select("script[src='" + path + "/js/node/treeKeyboard.js']")).hasSize(1);
                 assertThat(page.selectFirst("#workspace-tree").attr("aria-label")).isNotBlank();
                 assertThat(html).doesNotContain("??preferences.");

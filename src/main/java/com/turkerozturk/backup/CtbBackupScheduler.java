@@ -86,5 +86,10 @@ public class CtbBackupScheduler {
         }catch(Exception failure){displayError="ctbBackup.error.storage";}
         return new View(enabled(),settings.getAutomatic().getIntervalMinutes(),settings.getAutomatic().getKeepLast(),date(checked),displayError,List.copyOf(rows));
     }
+    /** Serialize persistence/removal with tick so no new job is selected after a successful removal. */
+    public synchronized void removeTenant(String tenant,Runnable persist) {
+        persist.run();
+        settings.getAutomatic().setTenants(settings.getAutomatic().getTenants().stream().filter(name->!name.equals(tenant)).toList());
+    }
     @PreDestroy public synchronized void close(){closed=true;timer.shutdownNow();}
 }

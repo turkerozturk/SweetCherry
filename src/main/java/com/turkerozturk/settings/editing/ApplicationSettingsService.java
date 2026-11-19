@@ -120,10 +120,14 @@ public class ApplicationSettingsService {
         for(var setting:SETTINGS){values.put(setting.key(),nodes.containsKey(setting.key())?nodes.get(setting.key()).getValue():environment.getProperty(setting.key(),setting.fallback()));effective.put(setting.key(),environment.getProperty(setting.key(),setting.fallback()));}
         return new Snapshot(file.toString(),hash(yaml),values,effective);
     }
-    public synchronized void save(String revision,Map<String,String> values)throws IOException {
+    public void save(String revision,Map<String,String> values)throws IOException {
+        edit(revision, yaml -> update(yaml, values));
+    }
+    /** Shared optimistic, permission-preserving file write for narrowly scoped configuration editors. */
+    public synchronized void edit(String revision,java.util.function.UnaryOperator<String> editor)throws IOException {
         Path file=file();String before=Files.readString(file,StandardCharsets.UTF_8);
         if(!hash(before).equals(revision))throw new IllegalArgumentException("stale");
-        String after=update(before,values);
+        validateYaml(before);String after=editor.apply(before);validateYaml(after);
         Path temporary=Files.createTempFile(file.getParent(),".sweetcherry-settings-",".tmp");
         try {
             if(Files.getFileStore(file).supportsFileAttributeView("posix"))Files.setPosixFilePermissions(temporary,Files.getPosixFilePermissions(file));
@@ -171,6 +175,7 @@ public class ApplicationSettingsService {
         }
     }
     private static void zone(String value){try{java.time.ZoneId.of(value);}catch(java.time.DateTimeException invalid){throw new IllegalArgumentException("invalid",invalid);}}
+    public static void validateYaml(String yaml){nodes(yaml);}
     private static Map<String,ScalarNode> nodes(String yaml){
         LoaderOptions options=new LoaderOptions();options.setAllowDuplicateKeys(false);options.setMaxAliasesForCollections(0);options.setCodePointLimit(1048576);options.setNestingDepthLimit(50);
         options.setTagInspector(tag -> false);

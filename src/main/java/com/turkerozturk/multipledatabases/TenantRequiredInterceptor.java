@@ -74,7 +74,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
 
     private boolean dialogApi(HttpServletRequest request) {
         String path=request.getRequestURI();String context=request.getContextPath();
-        return path.startsWith(context+"/nodes/fragments/") || path.startsWith(context+"/nodes/reminders/alarms") || path.startsWith(context+"/attachments/") || path.startsWith(context+"/codebox-gallery/") || path.startsWith(context+"/table-gallery/") || path.startsWith(context+"/image-gallery/") || path.startsWith(context+"/nodes/batch/") || path.startsWith(context+"/nodes/tags/quick/") || path.startsWith(context+"/nodes/richtext/edit/")&&path.endsWith("/wiki-links") || path.equals(context + "/nodes/link-graph/data") || path.startsWith(context + "/nodes/quick/") || path.startsWith(context + "/nodes/backlinks/")
+        return path.startsWith(context+"/nodes/properties/")&&path.endsWith("/title") || path.startsWith(context+"/nodes/fragments/") || path.startsWith(context+"/nodes/reminders/alarms") || path.startsWith(context+"/attachments/") || path.startsWith(context+"/codebox-gallery/") || path.startsWith(context+"/table-gallery/") || path.startsWith(context+"/image-gallery/") || path.startsWith(context+"/nodes/batch/") || path.startsWith(context+"/nodes/tags/quick/") || path.startsWith(context+"/nodes/richtext/edit/")&&path.endsWith("/wiki-links") || path.equals(context + "/nodes/link-graph/data") || path.startsWith(context + "/nodes/quick/") || path.startsWith(context + "/nodes/backlinks/")
                 || path.startsWith(context + "/nodes/saved-filters");
     }
 

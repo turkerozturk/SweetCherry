@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"><body>
-<div th:fragment="mindMapControls" class="dropdown">
+<div th:fragment="mindMapControls" class="dropdown" data-toolbar-item="map">
     <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-sitemap"></i> <span th:text="#{toolbar.map}">Mind Map</span></button>
     <div class="dropdown-menu">
 <a class="dropdown-item" target="_blank" rel="noopener" th:href="@{/nodes/link-graph(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{graph.title}"></a>

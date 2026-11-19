@@ -103,3 +103,11 @@ If automatic backup remains enabled and you delete the latest keyed backup, the 
 * Review several manual/automatic/legacy backups. Create another backup before confirming: the newly created one must remain. Test double submit, ten-minute expiry and a second browser session.
 * Change a reviewed file without changing its size, change its catalog, register it as a tenant or create a journal sidecar. It must be skipped with a reason. A valid other selection should still be deletable.
 * Check English/Turkish confirmation, mobile selection, no active tenant, ADMIN/USER access and CSRF rejection.
+
+## Removing a tenant from the automatic schedule
+
+The last column of `/tenants` shows Yes/No membership in `myapp.ctb-backup.automatic.tenants`. This is configured membership; running automatic jobs also requires the global backup and automatic-backup flags. A configured tenant has a **Remove from schedule** button for ADMIN users.
+
+Removal writes only that tenant sequence in the active external `application.yml` and updates the running scheduler immediately. No restart is required for this action. Other tenant names and surrounding configuration are retained. Existing backups are not deleted by this action, and an already running job can finish under its existing policy. If another listed alias points to the same CTB, that alias can still schedule backups. To add a tenant again, edit the YAML list and restart as usual.
+
+The operation requires CSRF and a current configuration revision. If the active external file cannot be safely identified or edited, the button is disabled. Changes to the YAML made after opening the page require refreshing the page before retrying.
