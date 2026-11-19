@@ -60,6 +60,7 @@ public class ApplicationSettingsService {
         new Setting("myapp.home.created-minimum","nonnegative","5",1000),
         new Setting("myapp.tree.default-width","width","600",1900),
         new Setting("myapp.tree.show-tag-indicator","boolean","true",0),
+        new Setting("myapp.tree.saved-searches-enabled","boolean","true",0),
         new Setting("myapp.tree.font-size","treefont","16",32),
         new Setting("myapp.tree.vertical-padding","nonnegative","1",12),
         new Setting("myapp.calendar.first-day-of-week","weekday","MONDAY",0),

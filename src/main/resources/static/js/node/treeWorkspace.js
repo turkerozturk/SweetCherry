@@ -74,6 +74,7 @@
     function stop(message) {
         stopped = true;
         split?.stop(message);
+        savedSearches?.stop();
         controller?.abort();
         scrollTopButton.hidden = true;
         workspace.replaceChildren();
@@ -170,6 +171,7 @@
     }
     function find(id) { return tree.querySelector('li[data-node-id="' + String(id).replace(/[^0-9]/g, '') + '"]'); }
     function markSelected(id) {
+        savedSearches?.markSelected(id);
         tree.querySelectorAll('[aria-current]').forEach(link => link.removeAttribute('aria-current'));
         const li = find(id);
         if (li) li.querySelector(':scope > .workspace-tree-row > a').setAttribute('aria-current', 'page');
@@ -275,7 +277,7 @@
         if (target.origin !== location.origin) return;
         const match = target.pathname.match(/^\/nodes\/(\d+)$/);
         const id = match ? match[1] : target.pathname === '/tree' ? target.searchParams.get('nodeId') || '0' : null;
-        if (id !== null && /^\d+$/.test(id)) { event.preventDefault(); split.navigate(id, true, !pane.contains(link)); }
+        if (id !== null && /^\d+$/.test(id)) { event.preventDefault(); split.navigate(id, true, !pane.contains(link)||Boolean(savedSearchBox?.contains(link))); }
     });
     window.SweetCherryTreeKeyboard?.install({tree, select:id=>split.navigate(id, true, false), toggle,
         stopped:()=>stopped, onError:()=>{if(!stopped)status.textContent=workspace.dataset.error;}});
@@ -343,6 +345,9 @@
             if(form?.dataset.moveReady==='ready'&&button&&!button.disabled)form.requestSubmit(button);
         }};
     const split=window.SweetCherrySplitView.install({workspace,token,getSelected:()=>state.selected,selectLocal:select,reveal:revealSelection,stop});
+    const savedSearchBox=document.getElementById('workspace-saved-searches');
+    const savedSearches=!embedded&&savedSearchBox&&window.SweetCherryTreeSavedSearches
+        ?window.SweetCherryTreeSavedSearches.install({box:savedSearchBox,request,url,row,keyboard:window.SweetCherryTreeKeyboard,select:id=>split.navigate(id,true,true)}):null;
     /** Restores expanded branches only within this browser tab and selected CTB. */
     async function initialize() {
         setWidth(preferredWidth);
@@ -360,6 +365,7 @@
             pane.scrollTop = top; pane.scrollLeft = left;
             history.replaceState({nodeId: state.selected}, '', url('/tree', {nodeId: state.selected}));
             split.ready();
+            savedSearches?.reload();
             if(workspace.dataset.focusNode===String(state.selected)){
                 if(embedded)split.restoreFocus(state.selected);
                 else window.SweetCherryTreeKeyboard?.focusNode(tree,workspace.dataset.focusNode);

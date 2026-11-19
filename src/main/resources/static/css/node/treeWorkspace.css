@@ -92,3 +92,14 @@ html[data-bs-theme="dark"] .workspace-tree-row .workspace-tag-indicator {color:#
 #workspace-status .workspace-status-tags {margin-left:auto;flex-shrink:0}
 
 .workspace-tree-row > a:focus-visible { outline:2px solid #3584e4;outline-offset:2px; }
+
+/* Saved searches are presentation-only branches, separate from the real occurrence tree. */
+#workspace-saved-searches {border-bottom:1px solid var(--bs-border-color,#ccc);margin-bottom:.5rem;padding-bottom:.5rem;font-size:var(--tree-font-size,16px)}
+#workspace-saved-searches ul {list-style:none;padding:0;margin:0}
+#workspace-saved-searches ul ul {padding-left:1rem}
+.workspace-saved-search-heading {display:flex;gap:.4rem;align-items:center;overflow-wrap:anywhere}
+.workspace-saved-search-heading small {opacity:.7}
+.workspace-saved-search-button {border:0;background:transparent;color:inherit;cursor:pointer;padding:.15rem .35rem}
+.workspace-saved-search-button:focus-visible {outline:2px solid #3584e4}
+.workspace-saved-search-message,#workspace-saved-searches [role=status] {font-size:.85rem;white-space:normal;opacity:.8}
+.workspace-saved-search-pages {display:flex;gap:.4rem}

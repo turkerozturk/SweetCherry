@@ -29,6 +29,7 @@ class TreeReaderPreferencesTemplateTest {
             context.setVariable("currentDatabaseIcon", "zero"); context.setVariable("tenantViewToken", "current");
             context.setVariable("treeDefaultWidth", 600); context.setVariable("treeFontSize", 16);
             context.setVariable("treeFocusNode", "9");context.setVariable("treeVerticalPadding", 1); context.setVariable("initialNodeId", 9L);
+            context.setVariable("treeSavedSearchesEnabled",true);
             for (var color : List.of("ivory", "#fff8dc")) for (var theme : List.of("light", "dark")) {
                 context.setVariable("nodeBackgroundColor", new NodeBackgroundAdvice(color).color());
                 context.setVariable("uiTheme", theme);
@@ -57,7 +58,14 @@ class TreeReaderPreferencesTemplateTest {
                 assertThat(page.selectFirst("#workspace-content-splitter").attr("role")).isEqualTo("separator");
                 assertThat(html).doesNotContain("??split.");
                 assertThat(html).doesNotContain("??preferences.");
+                assertThat(page.select("#workspace-saved-searches")).hasSize(1);
+                assertThat(page.selectFirst("#workspace-saved-searches").attr("data-endpoint")).isEqualTo(path+"/nodes/saved-filters/tree");
+                assertThat(page.select("script[src='"+path+"/js/node/treeSavedSearches.js']")).hasSize(1);
+                assertThat(html).doesNotContain("??savedTree.");
             }
+            context.setVariable("treeSavedSearchesEnabled",false);
+            var disabled=org.jsoup.Jsoup.parse(engine.process("node/treeWorkspace",context));
+            assertThat(disabled.select("#workspace-saved-searches, script[src$='/treeSavedSearches.js']")).isEmpty();
         }
     }
 }

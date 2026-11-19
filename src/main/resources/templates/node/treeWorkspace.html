@@ -16,6 +16,12 @@
 <main id="tree-workspace" th:style="|--tree-width:${treeDefaultWidth}px;--tree-font-size:${treeFontSize}px;--tree-vertical-padding:${treeVerticalPadding}px|" th:attr="data-split-close-confirm=#{split.confirmClose},data-focus-node=${treeFocusNode},data-show-tag-indicator=${treeShowTagIndicator},data-has-tags=#{tree.hasTags},data-default-tree-width=${treeDefaultWidth},data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-missing=#{tree.nodeMissing},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse},data-image-title=#{tree.openImage}">
     <nav id="workspace-tree-pane" th:attr="aria-label=#{tree.workspace}">
         <a class="workspace-database" th:href="@{/tree(nodeId=0,_tenantView=${tenantViewToken})}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}">Database</span></a>
+        <section th:if="${treeSavedSearchesEnabled == true}" id="workspace-saved-searches"
+                 th:attr="aria-label=#{savedTree.title},data-endpoint=@{/nodes/saved-filters/tree},data-loading=#{tree.loading},data-error=#{savedTree.error},data-empty=#{savedTree.empty},data-no-presets=#{savedTree.noPresets},data-refresh=#{savedTree.refresh},data-previous=#{savedTree.previous},data-next=#{savedTree.next}">
+            <div class="workspace-saved-search-heading"><strong th:text="#{savedTree.title}"></strong><button type="button" data-saved-search-reload class="workspace-saved-search-button" th:title="#{savedTree.reload}" th:aria-label="#{savedTree.reload}">↻</button></div>
+            <span data-saved-search-status role="status"></span>
+            <ul data-saved-search-tree></ul>
+        </section>
         <ul id="workspace-tree" th:attr="aria-label=#{tree.keyboardHelp},title=#{tree.keyboardHelp}"></ul>
     </nav>
     <div id="workspace-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-valuemin="20" aria-valuemax="1900" th:attr="aria-valuenow=${treeDefaultWidth},aria-label=#{tree.resize}"></div>
@@ -44,6 +50,7 @@
 <script th:src="@{/js/node/navigationRevision.js}"></script>
 <script th:src="@{/js/node/treeKeyboard.js}"></script>
 <script th:src="@{/js/node/treeSplitView.js}"></script>
+<script th:if="${treeSavedSearchesEnabled == true}" th:src="@{/js/node/treeSavedSearches.js}"></script>
 <script th:src="@{/js/node/treeWorkspace.js}"></script>
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 <script th:src="@{/js/node/nodeMove.js}"></script>
