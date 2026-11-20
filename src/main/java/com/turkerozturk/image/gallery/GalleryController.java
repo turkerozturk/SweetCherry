@@ -37,9 +37,15 @@ public class GalleryController {
                 .cacheControl(CacheControl.noStore()).header("Retry-After", "1").build();
         try {
             var payload = service.payload(nodeId, offset);
-            return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+            var info=GalleryPreview.info(payload.bytes());
+            var response=ResponseEntity.ok().cacheControl(CacheControl.noStore())
                     .header("X-Content-Type-Options", "nosniff")
-                    .contentType(MediaType.IMAGE_PNG)
+                    .header("X-Image-Width",Integer.toString(info.width()))
+                    .header("X-Image-Height",Integer.toString(info.height()))
+                    .header("X-Image-Format",info.format());
+            if(info.bits()!=null)response.header("X-Image-Bits",info.bits().toString());
+            if(info.alpha()!=null)response.header("X-Image-Alpha",info.alpha().toString());
+            return response.contentType(MediaType.IMAGE_PNG)
                     .body(GalleryPreview.png(payload.bytes(), large ? 2560 : 320));
         } finally { decoders.release(); }
     }

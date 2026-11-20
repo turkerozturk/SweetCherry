@@ -4,11 +4,27 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
-- Add debounced title-contains search with breadcrumb/ID selection to the internal-link and Move to dialogs, keeping link labels independent and preserving explicit move confirmation.
+## [1.12.0] - 2026-11-20
 
-- Add a remembered reading toggle that replaces rich-text internal node links with bounded source-content fragments, preserving embedded objects and ordinary source links while handling shared aliases, recursive references and copied anchors.
-
-- Add bounded, read-only attachment text previews with encoding selection and local syntax highlighting, paged offset/hex/ASCII views for any file, and ZIP/TAR/TAR.GZ metadata listings from both the attachment browser and rich-text notes.
+- Added attachment text previews with encoding selection and syntax highlighting, paged hex views, and ZIP/TAR/TAR.GZ archive listings.
+- Added remembered linked-content views that embed internal-link targets inline, with an option to hide source labels.
+- Added title-contains search with selectable node paths and IDs to the internal-link and Move to dialogs.
+- Added PDF options for linked-node content and continuous output, with linked content rendered inline without source labels.
+- Added automatic readiness detection that reopens SweetCherry after a restart.
+- Added persistent, independent confirmation toggles for node creation, duplication and deletion.
+- Added configurable node-content backgrounds through YAML, System settings and an instant color picker.
+- Localized import file selectors and preserved intentional leading blank lines in rich-text content.
+- Added keyboard navigation in the node tree and retained navigation focus after moving a node.
+- Added automatic icon filtering when the selected category changes.
+- Added in-place node-title editing and reorganized the content toolbar for quicker access.
+- Added scheduled-backup status, schedule removal and a button to enable automatic backups for the active database.
+- Added split view for reading two nodes side by side.
+- Added saved searches as virtual tree branches, enabled by default.
+- Added read-only web bookmark nodes with sanitized page previews and an external-open link.
+- Added image annotations with shapes, arrows, freehand drawing, undo/redo and confirmed PNG replacement for PNG, JPEG and BMP sources.
+- Added confirmed sorting of immediate child nodes by name, creation date or modification date in either direction.
+- Added original image dimensions, megapixel counts, source format, color depth and alpha-channel information to the gallery.
+- Documented how to build the Windows launcher locally without GitHub Actions.
 
 ## [1.11.0] - 2026-11-17
 

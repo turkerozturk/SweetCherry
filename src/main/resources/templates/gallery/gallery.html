@@ -5,7 +5,7 @@
   <section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/imageGallery.css}"></section>
 </head>
 <body><main layout:fragment="content" class="container-fluid py-3" id="image-gallery"
-    th:attr="data-error=#{gallery.unavailable},data-loading=#{gallery.loading},data-position=#{gallery.position},data-stale=#{gallery.stale}">
+    th:attr="data-error=#{gallery.unavailable},data-loading=#{gallery.loading},data-position=#{gallery.position},data-stale=#{gallery.stale},data-yes=#{gallery.info.yes},data-no=#{gallery.info.no},data-depth-unit=#{gallery.info.depthUnit}">
   <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
     <h1 class="h3 mb-0" th:text="#{gallery.title}"></h1>
     <span class="text-body-secondary" th:text="#{gallery.count(${gallery.total})}"></span>
@@ -37,6 +37,11 @@
           <dt th:text="#{gallery.identity}"></dt><dd th:text="${item.id}"></dd>
           <dt th:text="#{gallery.created}"></dt><dd th:text="${item.createdText}"></dd>
           <dt th:text="#{gallery.bytes}"></dt><dd th:text="${item.bytes}"></dd>
+          <dt th:text="#{gallery.info.dimensions}"></dt><dd data-image-info="dimensions">—</dd>
+          <dt th:text="#{gallery.info.megapixels}"></dt><dd data-image-info="megapixels">—</dd>
+          <dt th:text="#{gallery.info.format}"></dt><dd data-image-info="format">—</dd>
+          <dt th:text="#{gallery.info.depth}"></dt><dd data-image-info="depth">—</dd>
+          <dt th:text="#{gallery.info.alpha}"></dt><dd data-image-info="alpha">—</dd>
           <th:block th:if="${!item.filename.empty}"><dt th:text="#{gallery.filename}"></dt><dd th:text="${item.filename}"></dd></th:block>
           <th:block th:if="${!item.link.empty}"><dt th:text="#{gallery.link}"></dt><dd th:text="${item.link}"></dd></th:block>
           <th:block th:if="${item.imageTime > 0}"><dt th:text="#{gallery.imageTime}"></dt><dd th:text="${item.imageTimeText}"></dd></th:block>

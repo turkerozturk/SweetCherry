@@ -20,6 +20,17 @@ class GalleryPreviewTest {
         assertThat(large.getWidth()).isEqualTo(1600);assertThat(original).isEqualTo(copy);
         assertThat(GalleryPreview.extension(original)).isEqualTo("png");
     }
+    @Test void reportsOriginalDimensionsFormatColorDepthAndAlphaWithoutThumbnailDimensions()throws Exception{
+        var info=GalleryPreview.info(picture());assertThat(info.width()).isEqualTo(1600);assertThat(info.height()).isEqualTo(800);
+        assertThat(info.format()).isEqualTo("PNG");assertThat(info.bits()).isEqualTo(32);assertThat(info.alpha()).isTrue();
+        var rgb=new BufferedImage(80,40,BufferedImage.TYPE_INT_RGB);var out=new ByteArrayOutputStream();ImageIO.write(rgb,"jpeg",out);
+        var jpeg=GalleryPreview.info(out.toByteArray());assertThat(jpeg.format()).isEqualTo("JPEG");assertThat(jpeg.bits()).isEqualTo(24);assertThat(jpeg.alpha()).isFalse();
+        assertThat(jpeg.width()).isEqualTo(80);assertThat(jpeg.height()).isEqualTo(40);
+    }
+    @Test void missingAndDamagedMetadataAreRejected(){
+        assertThatThrownBy(()->GalleryPreview.info(null)).hasMessageContaining("422");
+        assertThatThrownBy(()->GalleryPreview.info("<svg onload='evil()'/>".getBytes())).hasMessageContaining("422");
+    }
     @Test void refusesActiveOrDamagedDataInsteadOfReturningItAsAnImage() {
         for(byte[] bytes:new byte[][]{new byte[0],"<svg onload='evil()'/>".getBytes(),"<script>evil()</script>".getBytes()})
             assertThatThrownBy(()->GalleryPreview.png(bytes,320)).hasMessageContaining("422");

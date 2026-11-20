@@ -22,6 +22,24 @@ final class GalleryPreview {
         }
         return "bin";
     }
+    record Info(int width,int height,String format,Integer bits,Boolean alpha) {}
+    /** Reads source headers, not thumbnail dimensions and not the complete pixel raster. */
+    static Info info(byte[] bytes) {
+        if(bytes==null||bytes.length==0)throw unavailable();
+        try(var input=new MemoryCacheImageInputStream(new ByteArrayInputStream(bytes))){
+            var readers=ImageIO.getImageReaders(input);if(!readers.hasNext())throw unavailable();var reader=readers.next();
+            try{
+                reader.setInput(input,true,true);int width=reader.getWidth(0),height=reader.getHeight(0);
+                if(width<=0||height<=0||(long)width*height>100000000L)throw unavailable();
+                String format=reader.getFormatName().toUpperCase(java.util.Locale.ROOT);
+                if(!format.matches("[A-Z0-9]{1,16}"))format="UNKNOWN";
+                Integer bits=null;Boolean alpha=null;
+                try{var type=reader.getRawImageType(0);if(type!=null){bits=type.getColorModel().getPixelSize();alpha=type.getColorModel().hasAlpha();}}
+                catch(IOException|UnsupportedOperationException missing){/* Optional color metadata may be absent. */}
+                return new Info(width,height,format,bits,alpha);
+            }finally{reader.dispose();}
+        }catch(IOException|IllegalArgumentException invalid){throw unavailable();}
+    }
     static byte[] png(byte[] bytes, int edge) {
         if (bytes == null || bytes.length == 0) throw unavailable();
         try (var input = new MemoryCacheImageInputStream(new ByteArrayInputStream(bytes))) {

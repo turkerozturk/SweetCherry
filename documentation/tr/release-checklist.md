@@ -1,83 +1,76 @@
-# SweetCherry 1.11.0 yayın adımları — 17 Kasım 2026
+# SweetCherry 1.12.0 yayın adımları — 20 Kasım 2026
 
-Sürüm **1.11.0**, etiket **v1.11.0**. Hazırlık yaması `6bc2027` üzerine uygulanır; sürüm numarası, README, CHANGELOG, kurulum ve yayın belgelerini günceller. Java tabanı **17** kalır. Bu adımlar kendi başına commit, etiket veya GitHub Release oluşturmaz.
+Sürüm **1.12.0**, etiket **v1.12.0**. Yama `ca19797` üzerine resim galerisinde kaynak bilgilerini ve release hazırlığını ekler. Bu dosya komutları tarif eder; kendiliğinden commit, push, etiket veya yayın oluşturmaz. Java tabanı **17** kalır.
 
-## 1. Yamayı uygula ve test et
+## 1. Uygula, derle ve kontrol et
 
-IntelliJ’de çalışan SweetCherry örneğini durdurun. Arşivi **deponun dışında**, repo klasörünün yanındaki `sweetcherry-1.11.0-release-preparation` klasörüne açın. Böylece hazırlık yaması ve kısa release açıklaması yanlışlıkla kaynak depoya eklenmez. Aşağıdaki komutları repo kökünde, temiz `main` üzerinde çalıştırın:
+Çalışan SweetCherry örneğini durdurun. Yamayı depo dışında tutun; aşağıdaki örnekte depo klasörünün yanındadır. Temiz `main` üzerinde:
 
 ```bat
 git switch main
 git pull --ff-only
-git apply --check ..\sweetcherry-1.11.0-release-preparation\sweetcherry-6bc2027-release-1.11.0.patch
-git apply ..\sweetcherry-1.11.0-release-preparation\sweetcherry-6bc2027-release-1.11.0.patch
+git apply --check ..\sweetcherry-ca19797-gallery-info-release-1.12.0.patch
+git apply ..\sweetcherry-ca19797-gallery-info-release-1.12.0.patch
 git diff --check
 mvnw.cmd clean package
 ```
 
-Hazırlık ortamında 211 JavaScript testi geçti; Maven deposu DNS erişimi sağlanamadığından Java derlemesi/paketleme çalışmadı. Aşağıdaki yerel/CI kontrollerini tamamlayın.
-
-Node.js 24 ile **Git Bash** üzerinde JavaScript testlerini de çalıştırın (npm install gerekmez):
+Node.js 24 ile Git Bash üzerinde (npm install gerekmez):
 
 ```bash
 node --test src/test/js/*.test.cjs
 ```
 
-`release/SweetCherry/documentation/releases/v1.11.0.md` dosyasının oluştuğunu ve `release/SweetCherry` klasörünün tamamının kullanılabildiğini kontrol edin. Kopya CTB ile aşağıdaki manuel kontrolleri uygulayın. Son feature commit’i için bildirdiğiniz sonuç 993 Java testi, sıfır hata/başarısızlık ve iki atlanan testtir; bu sonuç hazırlık commit’inin veya son paketlerin testi yerine geçmez.
+Önceki feature commit’i için bildirilen 1079 test, sıfır başarısızlık/hata ve iki atlanan test bu hazırlık commit’inin veya final paketlerin testi değildir. Hazırlık ortamında önbellekteki bağımlılıklarla 27 hedefli Java testi ve 292 JavaScript testi geçti; tam Maven çalışması Maven Central DNS erişimi nedeniyle başlayamadı. Tarayıcıda manuel doğrulama yapılmadı. Bu kontroller tam Maven paketlemesinin yerine geçmez.
 
-Başarılı test ve kısa manuel kontrolden sonra yalnız bu hazırlığın dosyalarını commit/push yapın (aşağıdaki dosyalar dışında değişiklik varsa ayrıca inceleyin):
+Kopya CTB ile resim bilgilerini kontrol edin: 1600×800 resim, 320×160 önizleme gösterilse bile 1600×800 px ve 1.28 MP yazmalı. PNG/JPEG, alfa kanalı olan/olmayan, bozuk/desteklenmeyen resim, bilgi göster/gizle, büyük görüntüleyici ve hızlı ileri/geri geçişlerini deneyin. Renk derinliği kaynak okuyucuya bağlıdır; alfa kanalı bilgisi fiilen saydam piksel bulunduğu anlamına gelmez. DPI tahmini yapılmaz. USER erişimi ve eski CTB sekmesi engelini de kontrol edin.
+
+Ayrıca inline linked content/PDF, split view, kayıtlı arama dalları, web bookmark, başlık düzenleme, klavye gezinmesi, sıralama ve otomatik yedek zamanlamasını deneyin. Çizimde önizleme/iptal/onay, undo/redo ve özgün resmi indirme kontrolü yapın. Desteklenen bir JPEG bulunursa dönüşüm ve yön bilgisini de deneyin. Türkçe/İngilizce, dar ekran ve koyu temayı kontrol edin.
+
+`release/SweetCherry/documentation/releases/v1.12.0.md` oluşmalı. Değişiklikleri gözden geçirip yalnız yamaya ait dosyaları stage edin; sonra:
 
 ```bat
-git add pom.xml README.md CHANGELOG.md documentation/en/setup-and-run.md documentation/tr/installation.md documentation/en/todo.md documentation/tr/todo.md documentation/releases/v1.11.0.md documentation/tr/release-checklist.md
-git commit -m "Prepare SweetCherry 1.11.0 release"
+git diff --check
+git diff --cached --stat
+git commit -m "Prepare SweetCherry 1.12.0 release"
 git push origin main
 ```
 
-GitHub Actions → **CI** üzerinde bu hazırlık commit’inin Windows/Linux Java ve JavaScript adımlarının başarılı olduğunu doğrulayın. Depo kurallarınız PR gerektiriyorsa aynı hazırlık değişikliklerini PR üzerinden birleştirin.
+CI’de hazırlık commit’inin Windows/Linux Java ve JavaScript adımlarını doğrulayın. Depo kuralları PR gerektiriyorsa değişiklikleri PR ile birleştirin.
 
-## 2. Hazırlık commit’ini etiketle
+## 2. Yeni hazırlık commit’ini etiketle
 
-CI başarılı olmalı. Çalışma ağacı temiz olmalı; etiket yamadan önceki `6bc2027` yerine yeni hazırlık commit’ini göstermeli:
+Çalışma ağacı temiz ve CI başarılı olmalı. Etiket `ca19797` yerine yeni hazırlık commit’ini göstermeli:
 
 ```bat
 git status --short
 git log -1 --oneline
-git tag -l v1.11.0
+git tag -l v1.12.0
 ```
 
 Etiket henüz yoksa:
 
 ```bat
-git tag -a v1.11.0 -m "SweetCherry 1.11.0"
-git push origin v1.11.0
+git tag -a v1.12.0 -m "SweetCherry 1.12.0"
+git push origin v1.12.0
 ```
 
-Alternatif: IntelliJ → Git → Tags → **v1.11.0** → sağ tık → **Push to origin**. Var olan/yayımlanmış etiketi taşımayın veya force push kullanmayın.
+Yayımlanmış etiketleri taşımayın; force push kullanmayın.
 
-## 3. Yayın paketlerini etiketten üret
+## 3. Paketleri etiketten üret
 
-GitHub → Actions → **Portable distribution (Windows builder)** → **Run workflow** → **v1.11.0**.
+Actions → **Portable distribution (Windows builder)** → **Run workflow** → **v1.12.0**. Başarılı görevden **sweetcherry-release-assets** artifact’ini indirin ve dış ZIP’i açın. Ürün asset’leri:
 
-Görev JavaScript testlerini, Java 17 Maven paketlemesini, paketlenmiş JAR/lisans envanterini, runtime checksum kontrolünü ve Windows paket/launcher kontrollerini yapar. Tamamı başarılı olduktan sonra **sweetcherry-release-assets** artifact’ini indirip dış ZIP’i açın. GitHub’ın indirme ZIP’i ayrıca bir ürün asset’i değildir.
-
-Dört ürün dosyası:
-
-- `sweetcherry_1.11.0_all_os_portable.zip`
-- `sweetcherry_1.11.0_all_os_portable_with_java_and_setup.exe`
-- `sweetcherry-1.11.0-third_party_licences.zip`
+- `sweetcherry_1.12.0_all_os_portable.zip`
+- `sweetcherry_1.12.0_all_os_portable_with_java_and_setup.exe`
+- `sweetcherry-1.12.0-third_party_licences.zip`
 - `sha256sums.txt`
 
-Java’sız ZIP’te `runtime/` bulunmamalı. Setup’ın açtığı klasörde Windows runtime bulunmalı. `build-info.json` içinde `applicationVersion` **1.11.0**, ZIP için `packageRuntimeIncluded` **false**, setup klasöründe **true** olmalı. Commit alanını şu çıktıyla karşılaştırın:
+Java’sız ZIP’te `runtime/` olmamalı; setup klasöründe Windows runtime bulunmalı. `build-info.json` içinde sürüm **1.12.0**, `packageRuntimeIncluded` ZIP için **false**, setup için **true** olmalı. Commit alanını `git rev-parse "v1.12.0^{commit}"` ile karşılaştırın. README, CHANGELOG, SECURITY.md, release/kurulum belgeleri ve lisanslar paketlerde bulunmalı. Bu yama bağımlılık eklemez; final JAR için `python packaging/update-jar-notices.py --check` yine geçmeli.
 
-```bat
-git rev-parse "v1.11.0^{commit}"
-```
+## 4. Checksum ve final paketler
 
-README, CHANGELOG, SECURITY.md, `documentation/releases/v1.11.0.md`, lisanslar ve kurulum belgeleri iki uygulama paketinde de bulunmalı. Bu hazırlık yaması bağımlılık eklemez. 1.10.0 sonrasındaki Word özelliği `poi-scratchpad` eklemiş ve lisans/JAR envanterini güncellemiştir; son paket üzerinden envanter kontrolü yine gereklidir. Envanter kontrolü hata verirse körlemesine geçmeyin; bağımlılık/lisans değişikliğini inceleyin. Gerekirse `python packaging/update-jar-notices.py` ile yenileyip `--check` ile doğrulayın; Python yalnızca bu bakım kontrolü içindir.
-
-## 4. Checksum ve son paket kontrolü
-
-Dört dosyanın bulunduğu klasörde PowerShell:
+Dört dosyanın olduğu klasörde PowerShell:
 
 ```powershell
 Get-Content .\sha256sums.txt | ForEach-Object {
@@ -88,37 +81,19 @@ Get-Content .\sha256sums.txt | ForEach-Object {
             throw "SHA-256 mismatch: $file"
         }
         Write-Host "OK: $file"
-    } else {
-        throw "Invalid checksum line: $_"
-    }
+    } else { throw "Invalid checksum line: $_" }
 }
 ```
 
-İki paketi ayrı, temiz ve yazılabilir klasörlerde; gerçek notlar yerine **kopya/demo CTB** ile deneyin:
+İki paketi ayrı temiz, yazılabilir klasörlerde kopya/demo CTB ile açın. Java’sız paketi sistem Java 17+ ile, setup paketini kendi runtime’ıyla deneyin. Launcher, login, CTB seçimi, kapatma/yeniden başlatma, resim bilgileri ve yukarıdaki temel özellikleri kontrol edin. Yedek/geri yüklemeyi ayrı bir CTB kopyasında deneyin. Kullandığınız MariaDB/MySQL/PostgreSQL ve HTTPS/proxy bağlantılarını ayrıca kontrol edin. macOS/i386 için test edilmiş destek iddiası eklemeyin.
 
-- Launcher, giriş, veri kaynağı seçme, normal kapatma; Java’sız paketi sistem Java 17+ ve setup’ı kendi runtime’ıyla çalıştırma.
-- Word DOCX/DOC ve Excel XLSX/XLS eklerinde önizleme, orijinal indirme, Excel sayfa seçimi ve sayfalama; formül sonucunun dosyada saklanmış değer olması.
-- Datasources → Veritabanı bilgileri: istatistikler, eksik hedef/çapa raporu, filtre/sayfalama ve bir bağlantıyı içerikten düzelttikten sonra yeniden tarama.
-- `/tree`: etiketli düğümde `#`, hover’da gerçek etiketler ve footer’da seçili düğüm etiketleri; paylaşılan düğüm örneği.
-- TODO: tam `todo` etiketi, `done` ekleyerek tamamlama ve kaldırarak yeniden açma; diğer etiketlerin korunması.
-- Yakın zamana hatırlatıcı ekleme, yaklaşan/geciken filtreleri, düzenleme/iptal/tamamlama; yıllık tekrar ve 29 Şubat seçimi.
-- Alarmın görünmesi ve sesi, kapatma, 10 dakika erteleme, sayfa geçişinde ses tercihi ve iki sekmede ses tekrarının önlenmesi. Tarayıcı otomatik sesi engellerse Sesi aç / dene ile tekrar kontrol.
-- `/system/settings` metin filtresi; açıklama/anahtar/değer eşleşmesi, Türkçe harfler, Temizle/Escape ve filtrelenmiş halde diğer ayarların da korunarak kaydedilmesi.
-- Hatırlatıcı ana ayarı kapalı + yeniden başlatma: bağlantılar ve bağımsız alarm paneli gizli; kayıtlar korunuyor. Yalnız alarm kapalıysa liste/form açık, panel yok; yalnız ses kapalıysa görsel panel açık, ses düğmesi yok. Sonra üç ayarı tekrar açıp yeniden başlatma.
-- USER/salt okunur erişim; başka CTB seçilince eski sekme isteklerinin engellenmesi; Türkçe/İngilizce, dar ekran ve koyu tema.
-- Normal okuma/düzenleme, yedek oluşturma ve ayrı kopyaya geri yükleme; kullandığınız import/export ve senkronizasyon yollarını kontrol etme.
+## 5. GitHub Release
 
-Hatırlatıcı, alarm ve ses varsayılan açık; Trash ve audit varsayılan kapalı kalmalı. Yeni kayıt yokken hatırlatıcı sayfasına bakmak REMINDERS düğümü oluşturmamalı. Mevcut REMINDERS kayıtları kapat/aç sonrasında korunmalı; v2 formatına geçen kayıtları eski sürüm düzenleyemez. Mevcut yardımcı düğümleri başka CTB’ye import/merge etmeyin; bütün CTB yedeği/kopyası kullanın. Kullanıyorsanız MariaDB/MySQL/PostgreSQL ve HTTPS/proxy bağlantılarını ayrıca deneyin. macOS ve 32-bit/i386 için test edilmiş destek iddiası eklemeyin.
+Releases → **Draft a new release**:
 
-## 5. Release’i oluştur
+- Tag: **v1.12.0**
+- Title: **SweetCherry 1.12.0**
+- Description: `documentation/releases/v1.12.0.md` içeriği; göreli belge bağlantılarını `https://github.com/turkerozturk/SweetCherry/blob/v1.12.0/documentation/...` adresleriyle değiştirin.
+- Assets: yukarıdaki dört ürün dosyası.
 
-GitHub → Releases → **Draft a new release**:
-
-- **Tag:** `v1.11.0`
-- **Title:** `SweetCherry 1.11.0`
-- **Description:** hazırlık arşivindeki `sweetcherry-1.11.0-release-body.md` içeriği.
-- **Assets:** yukarıdaki dört dosya. GitHub otomatik Source code bağlantılarını ayrıca ekler.
-
-Hazırlık yaması/ZIP’i, release body dosyasını veya ayrı build-info JSON’u ürün asset’i olarak yüklemeyin. İsterseniz **Save draft** ile bekletin. Kontroller tamamlanınca **Set as a pre-release** kapalı, **Set as the latest release** açık → **Publish release**.
-
-Yayımdan sonra indirme bağlantıları, checksum dosyası, sürüm/kurulum bağlantıları ve etiketin doğru commit’e gittiğini kontrol edin. Önceki `v1.10.0` etiketini veya paketlerini değiştirmeyin.
+Yamayı veya ayrı release-history metnini ürün asset’i olarak eklemeyin. Kontroller tamamlanınca **Set as a pre-release** kapalı, **Set as the latest release** açık → **Publish release**. Ardından indirme bağlantıları, SHA-256 ve etiket/commit eşleşmesini doğrulayın. Önceki release ve etiketleri değiştirmeyin.

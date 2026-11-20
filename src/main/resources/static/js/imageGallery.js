@@ -18,7 +18,18 @@
     }
     try { details.checked = localStorage.getItem('sc.gallery.details') !== 'false'; } catch (_) { }
     details.addEventListener('change', settings); settings();
-    async function raster(url) {
+    function sourceInfo(card, headers) {
+        if(!card)return;
+        const width=Number(headers.get('X-Image-Width')),height=Number(headers.get('X-Image-Height'));
+        if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<1||height<1||width*height>100000000)return;
+        const format=headers.get('X-Image-Format')||'',bits=Number(headers.get('X-Image-Bits')),alpha=headers.get('X-Image-Alpha');
+        const values={dimensions:width+' × '+height+' px',megapixels:(width*height/1000000).toFixed(2)+' MP',
+            format:/^[A-Z0-9]{1,16}$/.test(format)?format:'—',depth:Number.isInteger(bits)&&bits>0&&bits<=256?bits+' '+root.dataset.depthUnit:'—',
+            alpha:alpha==='true'?root.dataset.yes:alpha==='false'?root.dataset.no:'—'};
+        const targets=[card];if(dialog.open&&cards[current]===card)targets.push(dialog.querySelector('[data-gallery-info]'));
+        targets.forEach(target=>Object.entries(values).forEach(([key,value])=>{const field=target.querySelector('[data-image-info="'+key+'"]');if(field)field.textContent=value;}));
+    }
+    async function raster(url, card) {
         for (let attempt = 0; attempt < 3; attempt++) {
             const response = await fetch(url, {cache:'no-store', credentials:'same-origin', signal:requests.signal});
             if (response.status === 429 && attempt < 2) {
@@ -26,6 +37,7 @@
             }
             if (response.redirected || !response.ok || !response.headers.get('Content-Type')?.startsWith('image/png'))
                 throw new Error(response.status === 409 ? root.dataset.stale : root.dataset.error);
+            sourceInfo(card,response.headers);
             const urlObject = URL.createObjectURL(await response.blob()); urls.add(urlObject); return urlObject;
         }
     }
@@ -35,7 +47,7 @@
     function pump() {
         while (running < 2 && queue.length && !requests.signal.aborted && !dialog.open) {
             const thumbnail = queue.shift(); running++;
-            raster(thumbnail.dataset.thumbnail).then(url => {
+            raster(thumbnail.dataset.thumbnail,cards.find(card=>card.querySelector('[data-thumbnail]')===thumbnail)).then(url => {
                 thumbnail.src = url; thumbnail.classList.add('ready');
                 thumbnail.nextElementSibling.hidden = true;
             }).catch(error => {
@@ -66,7 +78,7 @@
         dialog.querySelector('[data-gallery-next]').disabled = index === cards.length - 1;
         if (!dialog.open) dialog.showModal();
         try {
-            const url = await raster(card.querySelector('.gallery-open').dataset.large);
+            const url = await raster(card.querySelector('.gallery-open').dataset.large,card);
             if (version !== generation || !dialog.open) { revoke(url); return; }
             previewUrl = url; image.src = url; image.hidden = false; status.hidden = true;
         } catch (error) {

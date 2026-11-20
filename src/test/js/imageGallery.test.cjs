@@ -2,12 +2,13 @@ const test=require('node:test'),assert=require('node:assert/strict'),vm=require(
 const source=fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/imageGallery.js'),'utf8');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function setup(fetcher){
- function el(){const classes=new Set();return {listeners:{},dataset:{},hidden:false,disabled:false,checked:true,children:[],textContent:'',attributes:{},childNodes:[],classList:{toggle(k,on){const value=on===undefined?!classes.has(k):on;value?classes.add(k):classes.delete(k);return value;},add(k){classes.add(k);},remove(k){classes.delete(k);},contains:k=>classes.has(k)},addEventListener(k,fn){this.listeners[k]=fn;},setAttribute(k,v){this.attributes[k]=v;},removeAttribute(k){delete this.attributes[k];},replaceChildren(...children){this.children=children;},cloneNode(){return this;},focus(){this.focused=true;},set innerHTML(_){throw Error('Unsafe markup insertion');}};}
+ function el(){const classes=new Set();return {listeners:{},dataset:{},hidden:false,disabled:false,checked:true,children:[],textContent:'',attributes:{},childNodes:[],classList:{toggle(k,on){const value=on===undefined?!classes.has(k):on;value?classes.add(k):classes.delete(k);return value;},add(k){classes.add(k);},remove(k){classes.delete(k);},contains:k=>classes.has(k)},addEventListener(k,fn){this.listeners[k]=fn;},setAttribute(k,v){this.attributes[k]=v;},removeAttribute(k){delete this.attributes[k];},replaceChildren(...children){this.children=children;},cloneNode(){return this;},querySelector(k){return this.fields?.[k]||null;},focus(){this.focused=true;},set innerHTML(_){throw Error('Unsafe markup insertion');}};}
  const selectors=['[data-gallery-image]','.gallery-stage','[data-gallery-status]','[data-gallery-zoom]','[data-gallery-details]','[data-gallery-info]','[data-gallery-position]','[data-gallery-prev]','[data-gallery-next]','[data-gallery-close]'];
- const nodes=Object.fromEntries(selectors.map(k=>[k,el()]));const dialog=el();dialog.open=false;dialog.querySelector=k=>nodes[k];dialog.showModal=()=>dialog.open=true;dialog.close=()=>{dialog.open=false;dialog.listeners.close();};
- const details=el(),root=el(),win=el();root.dataset={error:'Unavailable',stale:'Changed database',loading:'Loading',position:'{0}/{1}'};
+ const nodes=Object.fromEntries(selectors.map(k=>[k,el()]));
+ const fields=()=>Object.fromEntries(['dimensions','megapixels','format','depth','alpha'].map(k=>['[data-image-info="'+k+'"]',el()]));nodes['[data-gallery-info]'].fields=fields();const dialog=el();dialog.open=false;dialog.querySelector=k=>nodes[k];dialog.showModal=()=>dialog.open=true;dialog.close=()=>{dialog.open=false;dialog.listeners.close();};
+ const details=el(),root=el(),win=el();root.dataset={error:'Unavailable',stale:'Changed database',loading:'Loading',position:'{0}/{1}',yes:'Yes',no:'No',depthUnit:'bits/pixel'};
  const cards=Array.from({length:4},(_,i)=>{const card=el(),button=el(),info=el(),thumb=el();button.dataset.large='/image-gallery/1/'+i+'/preview?large=true&_tenantView=current';thumb.dataset.thumbnail='/image-gallery/1/'+i+'/preview?_tenantView=current';thumb.nextElementSibling=el();info.childNodes=[el()];info.childNodes[0].textContent='<untrusted>';
- card.querySelector=k=>k==='.gallery-open'?button:k==='.gallery-info'?info:thumb;card.button=button;card.thumb=thumb;return card;});
+ card.fields=fields();card.querySelector=k=>card.fields[k]||(k==='.gallery-open'?button:k==='.gallery-info'?info:thumb);card.button=button;card.thumb=thumb;return card;});
  root.querySelectorAll=k=>k==='.gallery-card'?cards:cards.map(c=>c.thumb);
  let observe;class Observer{constructor(callback){observe=callback;}observe(){}unobserve(){}}
  const requests=[],revoked=[],storage=new Map();let counter=0;
@@ -21,3 +22,22 @@ test('thumbnail loading is bounded to two requests and carries the current sourc
 test('closing the viewer ignores a late image response and releases its object URL',async()=>{let finish;const s=setup((url,options,response)=>new Promise(resolve=>finish=()=>resolve(response)));s.show(0);s.close();finish();await tick();assert.equal(s.nodes['[data-gallery-image]'].hidden,true);assert.deepEqual(s.revoked,['blob:1']);});
 test('rapid navigation cannot replace the current image with an older response',async()=>{const pending=[];const s=setup((url,options,response)=>new Promise(resolve=>pending.push(()=>resolve(response))));s.show(0);s.next();pending[1]();await tick();const selected=s.nodes['[data-gallery-image]'].src;pending[0]();await tick();assert.equal(s.nodes['[data-gallery-image]'].src,selected);assert.equal(s.nodes['[data-gallery-position]'].textContent,'2/4');assert.equal(s.nodes['[data-gallery-info]'].children[0].textContent,'<untrusted>');});
 test('stale database or login HTML is never used as a preview',async()=>{for(const response of [{ok:false,status:409,redirected:false},{ok:true,status:200,redirected:true}]){const s=setup(async()=>response);s.show(0);await tick();assert.equal(s.nodes['[data-gallery-image]'].hidden,true);assert.equal(s.nodes['[data-gallery-status]'].textContent,response.status===409?'Changed database':'Unavailable');}});
+
+function infoResponse(width,height,format='PNG',bits='32',alpha='true'){
+ const headers={'Content-Type':'image/png','X-Image-Width':String(width),'X-Image-Height':String(height),'X-Image-Format':format,'X-Image-Bits':bits,'X-Image-Alpha':alpha};
+ return {ok:true,redirected:false,headers:{get:key=>headers[key]??null},blob:async()=>({})};
+}
+test('source information uses original pixel dimensions in cards and the expanded viewer',async()=>{
+ const s=setup(async()=>infoResponse(1600,800));s.observe();await tick();
+ const field=key=>s.cards[0].fields['[data-image-info="'+key+'"]'].textContent;
+ assert.equal(field('dimensions'),'1600 × 800 px');assert.equal(field('megapixels'),'1.28 MP');assert.equal(field('format'),'PNG');assert.equal(field('depth'),'32 bits/pixel');assert.equal(field('alpha'),'Yes');
+ s.show(0);await tick();assert.equal(s.nodes['[data-gallery-info]'].fields['[data-image-info="dimensions"]'].textContent,'1600 × 800 px');
+});
+test('late metadata for a previous image cannot overwrite the current viewer information',async()=>{
+ const pending=[];const s=setup(()=>new Promise(resolve=>pending.push(resolve)));s.show(0);s.next();pending[1](infoResponse(800,600,'JPEG','24','false'));await tick();pending[0](infoResponse(1600,800));await tick();
+ const fields=s.nodes['[data-gallery-info]'].fields;assert.equal(fields['[data-image-info="dimensions"]'].textContent,'800 × 600 px');assert.equal(fields['[data-image-info="alpha"]'].textContent,'No');
+});
+test('unavailable color metadata and unexpected header text stay plain and unknown',async()=>{
+ const s=setup(async()=>infoResponse(80,40,'<img onerror=evil()>',null,null));s.show(0);await tick();const fields=s.nodes['[data-gallery-info]'].fields;
+ assert.equal(fields['[data-image-info="dimensions"]'].textContent,'80 × 40 px');for(const key of ['format','depth','alpha'])assert.equal(fields['[data-image-info="'+key+'"]'].textContent,'—');
+});
