@@ -34,7 +34,7 @@ class DrawioServiceTest {
     }
     @Test void userObjectLabelsAndGroupsAreKeptWithoutCustomProperties(){
         String xml="<mxGraphModel><root><mxCell id='0'/><mxCell id='1' parent='0'/><object id='g' label='Group' link='https://evil' custom='secret'><mxCell vertex='1' parent='1'><mxGeometry width='200' height='200' as='geometry'/></mxCell></object><mxCell id='child' parent='g' value='Child' vertex='1'><mxGeometry x='10' y='10' width='50' height='50' as='geometry'/></mxCell></root></mxGraphModel>";
-        String clean=parse(xml).pages().get(0).xml();assertThat(clean).contains("id=\"g\"","parent=\"g\"","value=\"Group\"").doesNotContain("secret","https://");
+        String clean=parse(xml).pages().get(0).xml();var cells=org.jsoup.Jsoup.parse(clean,"",org.jsoup.parser.Parser.xmlParser());var group=cells.selectFirst("mxCell[value=Group]");assertThat(cells.selectFirst("mxCell[value=Child]").attr("parent")).isEqualTo(group.attr("id"));assertThat(clean).doesNotContain("secret","https://");
     }
     @Test void malformedExternalEntitiesCyclesAndNonFiniteCoordinatesAreRejected()throws Exception{
         for(String xml:List.of("<svg/>","<mxfile/>","<!DOCTYPE mxfile [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><mxfile>&x;</mxfile>",model("bad").replace("parent='1'","parent='2'"),model("bad").replace("x='20'","x='NaN'"),"<mxfile><diagram>not base64</diagram></mxfile>"))assertThatThrownBy(()->parse(xml)).isInstanceOf(DrawioService.Problem.class);
@@ -48,7 +48,7 @@ class DrawioServiceTest {
     @Test void manualSampleContainsVectorShapesACompressedPageAndAnExternalImagePlaceholder()throws Exception{
         byte[] data=java.nio.file.Files.readAllBytes(java.nio.file.Path.of("documentation/examples/drawio-viewer-demo.drawio"));
         var document=DrawioDocument.parse(data,"demo.drawio","Demo");assertThat(document.pages()).hasSize(3);
-        assertThat(document.pages().get(0).xml()).contains("source=\"a\"","target=\"b\"","endArrow=classic");
+        var first=org.jsoup.Jsoup.parse(document.pages().get(0).xml(),"",org.jsoup.parser.Parser.xmlParser());var edge=first.selectFirst("mxCell[edge=1]");assertThat(edge.attr("source")).isEqualTo(first.selectFirst("mxCell[value=Start]").attr("id"));assertThat(edge.attr("target")).isNotEmpty();assertThat(edge.attr("style")).contains("endArrow=classic");
         assertThat(document.pages().get(1).xml()).contains("Türkçe + text");assertThat(document.pages().get(2).xml()).contains("[Image: screenshot.png]").doesNotContain("https://");
     }
     @Test void readOnlyTenantLoadDoesNotModifyAttachmentsAndChecksMetadataBeforeBlob()throws Exception{

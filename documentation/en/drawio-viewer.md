@@ -34,3 +34,11 @@ myapp:
 ```
 
 The shipped defaults permit 16 MiB sources, 16 MiB per expanded page, 128 MiB total, 512 pages, 20,000 cells/page and 200,000 cells/document. The browser receives the configured page budget; its previous 128-page/2-MiB checks no longer reject valid server output. Upper bounds shown in System settings prevent accidental unbounded allocations. Unsupported document structures may still fail independently of file size.
+
+## Compatibility and diagnostic errors
+
+Draw.io graph roots and layers may use generated identifiers instead of literal `0`/`1`. The viewer now infers the hierarchy and maps cell/parent/connector/port references to safe internal rendering IDs. UserObject wrapper IDs take precedence over inner mxCell IDs, matching Draw.io serialization. Source attachment bytes are unchanged. Empty diagram pages and empty graph models remain selectable as blank pages.
+
+When parsing fails, the page shows a localized reason, a stable code such as `compression`, `graph_root`, `missing_parent` or `geometry_number`, the 1-based page number and XML line/column when available. The console warning includes diagnostic codes/page/location, without the filename, cell labels or raw XML. `invalid` means this viewer could not parse a structure, not proof that the file is corrupt. Limit errors still name the adjustable setting.
+
+Regression checks include two unmodified upstream templates with generated root IDs (source and licence are recorded under `src/test/resources/drawio/UPSTREAM.md`). During development, 155 upstream diagram templates parsed successfully; the separate catalogue index is not a diagram. This verifies parsing compatibility, not complete browser rendering fidelity or the contents of any private file.

@@ -34,3 +34,11 @@ myapp:
 ```
 
 Yeni varsayılanlar 16 MiB kaynak, sayfa başına 16 MiB açılım, 128 MiB toplam, 512 sayfa, sayfa başına 20.000 ve belge başına 200.000 hücreye izin verir. Tarayıcı sunucunun sayfa bütçesini kullanır; eski 128 sayfa/2 MiB kontrolleri geçerli çıktıyı engellemez. System settings üst sınırları sınırsız kaynak kullanımını önler. Desteklenmeyen belge yapıları, dosya boyutundan bağımsız olarak hâlâ reddedilebilir.
+
+## Uyumluluk ve hata ayrıntıları
+
+Draw.io kök ve katman kimlikleri `0`/`1` olmak zorunda değildir. Görüntüleyici hiyerarşiyi çıkarır; hücre/üst/çizgi/port referanslarını güvenli görüntüleme kimliklerine eşler. UserObject sarmalayıcı kimliği, iç mxCell kimliğinden önceliklidir. Ekin özgün baytları değiştirilmez. Boş diyagram sayfaları ve boş grafik modelleri boş sayfa olarak seçilebilir.
+
+Ayrıştırma hatasında yerelleştirilmiş açıklama, `compression`, `graph_root`, `missing_parent`, `geometry_number` gibi sabit neden kodu, 1’den başlayan sayfa numarası ve varsa XML satır/sütunu gösterilir. Konsol uyarısında da kod/sayfa/konum bulunur; dosya adı, hücre metni veya ham XML loglanmaz. `invalid`, bu görüntüleyicinin bir yapıyı ayrıştıramadığını belirtir; dosyanın bozuk olduğunu kanıtlamaz. Limit hataları ayarlanabilir anahtarı göstermeye devam eder.
+
+Regresyon testlerinde farklı kök kimliği kullanan iki değiştirilmemiş upstream şablon vardır; kaynak/lisans bilgisi `src/test/resources/drawio/UPSTREAM.md` dosyasındadır. Geliştirme sırasında 155 upstream diyagram şablonu başarıyla ayrıştırılmıştır; ayrı katalog indeksi diyagram değildir. Bu kontrol ayrıştırma uyumluluğunu doğrular; tam tarayıcı görünümünü veya özel bir dosyanın içeriğini doğrulamaz.

@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Accept Draw.io graph roots/layers with generated IDs, normalize render-only cell/port references, and preserve blank pages instead of rejecting the document.
+- Show localized Draw.io parsing reasons with page and available XML line/column details; log diagnostic codes without note content.
+
+
 - Make Draw.io file/page/cell/XML budgets configurable through YAML and System settings, raise defaults, report the exceeded setting, and avoid counting URI-encoded expansion as decoded page size.
 - Preserve sanitized Draw.io HTML label layout, alignment, line breaks and wrapping; add ordinary-wheel zoom (Shift-wheel scroll) and horizontal fit.
 

@@ -36,8 +36,8 @@ class DrawioSecurityTest {
             mvc.perform(get("/attachments/drawio/frame").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(view().name("attachment/drawioFrame")).andExpect(header().string("Content-Security-Policy",org.hamcrest.Matchers.allOf(org.hamcrest.Matchers.containsString("sandbox allow-scripts"),org.hamcrest.Matchers.containsString("connect-src 'none'"),org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("allow-same-origin")))));
             mvc.perform(post(url+"/data").session(session).param("_tenantView","current").with(csrf()).with(user("reader").roles("USER"))).andExpect(status().isMethodNotAllowed());
             mvc.perform(get("/js/drawio/config.js").with(anonymous())).andExpect(status().isNotFound());
-            when(service.preview(eq(1L),eq(0))).thenThrow(new DrawioService.Problem("invalid"));
-            mvc.perform(get(url+"/data").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isUnprocessableEntity()).andExpect(jsonPath("$.error").value("invalid"));
+            when(service.preview(eq(1L),eq(0))).thenThrow(new DrawioService.Problem("invalid").context("graph_root",2));
+            mvc.perform(get(url+"/data").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isUnprocessableEntity()).andExpect(jsonPath("$.error").value("invalid")).andExpect(jsonPath("$.reason").value("graph_root")).andExpect(jsonPath("$.page").value(2));
             clearInvocations(service);TenantContext.clear();
             mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isConflict());verifyNoInteractions(service);
         }

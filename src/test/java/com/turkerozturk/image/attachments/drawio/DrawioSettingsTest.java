@@ -47,12 +47,12 @@ class DrawioSettingsTest {
         String value="&lt;div style=&quot;text-align:right;white-space:pre-wrap;background-image:url(https://evil)&quot;&gt;one&lt;br&gt;&lt;b&gt;two&lt;/b&gt;&lt;/div&gt;&lt;a href=&quot;javascript:evil()&quot; onclick=&quot;evil()&quot;&gt;link text&lt;/a&gt;";
         String source=DrawioServiceTest.model(value).replace("rounded=1;","align=left;verticalAlign=top;rounded=1;");
         String xml=DrawioDocument.parse(DrawioServiceTest.bytes(source),"test.drawio","Node").pages().get(0).xml();
-        var cell=org.jsoup.Jsoup.parse(xml,"",org.jsoup.parser.Parser.xmlParser()).selectFirst("mxCell[id=2]");
+        var cell=org.jsoup.Jsoup.parse(xml,"",org.jsoup.parser.Parser.xmlParser()).selectFirst("mxCell[vertex=1]");
         assertThat(cell.attr("style")).contains("align=left","verticalAlign=top","whiteSpace=wrap","html=1");
         var html=org.jsoup.Jsoup.parse(cell.attr("value"));assertThat(html.selectFirst("div").attr("style")).contains("text-align:right","white-space:pre-wrap");assertThat(html.select("br")).hasSize(1);assertThat(html.selectFirst("b").text()).isEqualTo("two");assertThat(html.text()).contains("link text");
         assertThat(cell.attr("value")).doesNotContain("href","onclick","javascript:","url(","https://");
         String plain=DrawioServiceTest.model("one&#xa;two").replace("html=1","html=0");var result=DrawioDocument.parse(DrawioServiceTest.bytes(plain),"test.drawio","Node").pages().get(0).xml();
-        assertThat(org.jsoup.Jsoup.parse(result,"",org.jsoup.parser.Parser.xmlParser()).selectFirst("mxCell[id=2]").attr("value")).contains("one<br>two");
+        assertThat(org.jsoup.Jsoup.parse(result,"",org.jsoup.parser.Parser.xmlParser()).selectFirst("mxCell[vertex=1]").attr("value")).contains("one<br>two");
     }
     @Test void drawioSettingsRenderAsLocalizedEditableFieldsInBothLanguages(){
         for(String language:List.of("en","tr")){

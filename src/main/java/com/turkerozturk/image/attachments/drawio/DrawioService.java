@@ -17,7 +17,12 @@ public class DrawioService {
     @PersistenceContext private EntityManager manager;
     public static boolean supports(String filename){return filename!=null&&filename.toLowerCase(Locale.ROOT).endsWith(".drawio");}
     public static final class Problem extends RuntimeException {
-        private final String code,limit;public Problem(String code){this(code,"");}public Problem(String code,String limit){super(code);this.code=code;this.limit=limit;}public String code(){return code;}public String limit(){return limit;}
+        private final String code,limit;private String reason="";private int page,line,column;
+        public Problem(String code){this(code,"");}public Problem(String code,String limit){super(code);this.code=code;this.limit=limit;}
+        public String code(){return code;}public String limit(){return limit;}public String reason(){return reason;}public int page(){return page;}public int line(){return line;}public int column(){return column;}
+        Problem context(String reason,int page){if(this.reason.isEmpty())this.reason=reason;this.page=page;return this;}
+        Problem location(int line,int column){this.line=Math.max(0,line);this.column=Math.max(0,column);return this;}
+        @Override public String getMessage(){if(!"invalid".equals(code))return code;return code+(reason.isEmpty()?"":" [reason="+reason+", page="+page+(line>0?", line="+line+", column="+column:"")+"]");}
     }
     public record Page(String name,String xml) {}
     public record Preview(String filename,String nodeName,List<Page> pages,int maxPageBytes) {

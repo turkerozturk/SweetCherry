@@ -38,14 +38,28 @@
             const response=await fetch(root.dataset.endpoint,{cache:'no-store',credentials:'same-origin',redirect:'error',signal:controller.signal,headers:{Accept:'application/json'}});
             if(!response.ok){
                 if(response.status===409)throw Error('stale');
-                if(response.status===422){try{const info=await response.json();if(info.error==='large'&&/^max-[a-z-]+$/.test(info.limit||''))throw Object.assign(Error('limit'),{limit:info.limit});}catch(error){if(error.message==='limit')throw error;}}
+                if(response.status===422){try{
+                    const info=await response.json(),context={page:info.page,line:info.line,column:info.column};
+                    if(info.error==='large'&&/^max-[a-z-]+$/.test(info.limit||''))throw Object.assign(Error('limit'),context,{limit:info.limit});
+                    if(info.error==='invalid'&&/^[a-z_]{1,40}$/.test(info.reason||''))throw Object.assign(Error('invalid'),context,{reason:info.reason});
+                }catch(error){if(error.message==='limit'||error.message==='invalid')throw error;}}
                 throw Error('error');
             }
             if(!(response.headers.get('Content-Type')||'').includes('application/json'))throw Error('error');
             const result=await response.json();
             if(typeof result.filename!=='string'||!Array.isArray(result.pages)||result.pages.length<1||result.pages.length>2000||!Number.isSafeInteger(result.maxPageBytes)||result.maxPageBytes<1||result.maxPageBytes>67108864||result.pages.some(page=>typeof page.name!=='string'||typeof page.xml!=='string'||page.xml.length>result.maxPageBytes))throw Error('error');
             data=result;title.textContent=data.filename;select.replaceChildren();data.pages.forEach((page,index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=(index+1)+'. '+page.name;select.append(option);});select.disabled=false;select.selectedIndex=0;render();
-        }catch(error){status.textContent=error.message==='limit'&&error.limit?root.dataset.limit+' myapp.drawio-preview.'+error.limit:root.dataset[error.message]||root.dataset.error;}
+        }catch(error){
+            let text=root.dataset.error;
+            if(error.message==='limit'&&error.limit)text=root.dataset.limit+' myapp.drawio-preview.'+error.limit;
+            else if(error.message==='invalid'&&error.reason){
+                const description=root.querySelector('[data-drawio-reason="'+error.reason+'"]')?.textContent||error.reason;
+                text=root.dataset.invalid+' '+description+' ['+error.reason+']';
+            }else text=root.dataset[error.message]||text;
+            if(Number.isSafeInteger(error.page)&&error.page>0)text+=' · '+root.dataset.pageLabel+' '+error.page;
+            if(Number.isSafeInteger(error.line)&&error.line>0)text+=' · '+root.dataset.lineLabel+' '+error.line+':'+(Number.isSafeInteger(error.column)?error.column:0);
+            status.textContent=text;
+        }
         finally{clearTimeout(timer);}
     }
     load();window.addEventListener('pagehide',()=>{controller.abort();clearTimeout(frameTimer);port?.close();});

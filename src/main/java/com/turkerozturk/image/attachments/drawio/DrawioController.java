@@ -27,5 +27,5 @@ public class DrawioController {
         response.setHeader("Content-Security-Policy","default-src 'none'; script-src 'nonce-"+nonce+"'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; sandbox allow-scripts");
         return "attachment/drawioFrame";
     }
-    @ExceptionHandler(DrawioService.Problem.class) public ResponseEntity<java.util.Map<String,String>> failure(DrawioService.Problem problem){return ResponseEntity.status(switch(problem.code()){case "missing"->404;case "request"->400;default->422;}).cacheControl(CacheControl.noStore()).body(java.util.Map.of("error",problem.code(),"limit",problem.limit()));}
+    @ExceptionHandler(DrawioService.Problem.class) public ResponseEntity<java.util.Map<String,Object>> failure(DrawioService.Problem problem){return ResponseEntity.status(switch(problem.code()){case "missing"->404;case "request"->400;default->422;}).cacheControl(CacheControl.noStore()).body(java.util.Map.of("error",problem.code(),"limit",problem.limit(),"reason",problem.reason(),"page",problem.page(),"line",problem.line(),"column",problem.column()));}
 }
