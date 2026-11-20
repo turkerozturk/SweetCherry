@@ -1,0 +1,6 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draw.io</title><style>html,body{margin:0;width:100%;height:100%;background:white;color:#111}#drawio-viewport{position:absolute;inset:0;overflow:auto}#drawio-surface{position:relative;min-width:100%;min-height:100%;background:white}</style>
+<script th:nonce="${drawioNonce}" th:src="@{/js/drawio/config.js}"></script>
+<script th:nonce="${drawioNonce}" th:src="@{/js/drawio/viewer-static.min.js}"></script>
+</head><body><div id="drawio-viewport" tabindex="0"><div id="drawio-surface"></div></div>
+<script th:nonce="${drawioNonce}" th:src="@{/js/drawio/renderer.js}"></script></body></html>

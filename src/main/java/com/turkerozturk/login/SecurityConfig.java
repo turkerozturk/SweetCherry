@@ -159,7 +159,7 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                         .requestMatchers("/img/**", "/about", "/main", "/features", "/static/css/**", "/webjars/**",
                                 "/sw.js", "/workbox-*.js",
-                                "/actuator/health", "/actuator/info", "/application-ready", "/js/common/restartWatch.js")
+                                "/actuator/health", "/actuator/info", "/application-ready", "/js/common/restartWatch.js", "/js/drawio/**")
                         .permitAll()
                         .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**")
                         .hasRole("ADMIN")

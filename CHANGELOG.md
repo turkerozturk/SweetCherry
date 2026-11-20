@@ -4,6 +4,9 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Add a local, read-only multi-page Draw.io attachment viewer with page selection, zoom, fit, scrollbars and fullscreen, inert plain labels and external-image filename placeholders.
+
+
 ## [1.12.0] - 2026-11-20
 
 - Added attachment text previews with encoding selection and syntax highlighting, paged hex views, and ZIP/TAR/TAR.GZ archive listings.

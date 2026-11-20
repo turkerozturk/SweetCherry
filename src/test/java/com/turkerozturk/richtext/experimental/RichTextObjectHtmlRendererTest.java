@@ -41,6 +41,14 @@ class RichTextObjectHtmlRendererTest {
         }
     }
 
+    @Test void drawioAttachmentsKeepDownloadsAndAddViewerOnlyForWeb(){
+        var ref=new EmbeddedObject(ObjectKind.ATTACHMENT,53,2);
+        var payload=Map.<EmbeddedObject,EmbeddedContent>of(ref,new EmbeddedContent.Attachment("<file>.DRAWIO"));
+        assertThat(renderer.render(layout(ref),payload,"token&value")).contains("/download/53/2?","/attachments/53/2/drawio?_tenantView=token%26value").doesNotContain("<file>");
+        assertThat(renderer.render(layout(ref),payload,null)).doesNotContain("/drawio");
+        assertThat(new RichTextObjectHtmlRenderer(true).render(layout(ref),payload,"token")).doesNotContain("/drawio");
+    }
+
     @Test void guardsDownloadLinksAndEscapesFilenames() {
         var ref = new EmbeddedObject(ObjectKind.ATTACHMENT, 53, 2);
         var payload = Map.<EmbeddedObject, EmbeddedContent>of(ref, new EmbeddedContent.Attachment("<file>.txt"));

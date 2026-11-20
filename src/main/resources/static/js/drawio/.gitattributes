@@ -1,0 +1,2 @@
+# Preserve the generated upstream bundle byte-for-byte, including on Windows.
+viewer-static.min.js binary

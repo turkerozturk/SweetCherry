@@ -16,6 +16,7 @@
  <td class="attachment-name"><a th:href="@{/attachments/{node}/{offset}/download(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="${item.filename}"></a>
  <a th:if="${item.excel}" class="btn btn-sm btn-outline-secondary ms-2" target="_blank" rel="noopener noreferrer" th:href="@{/attachments/{node}/{offset}/excel(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{excel.open}"></a>
  <a class="btn btn-sm btn-outline-secondary ms-2" target="_blank" rel="noopener noreferrer" th:href="@{/attachments/{node}/{offset}/preview(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{filepreview.open}"></a>
+ <a th:if="${item.drawio}" class="btn btn-sm btn-outline-secondary ms-2" target="_blank" rel="noopener noreferrer" th:href="@{/attachments/{node}/{offset}/drawio(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{drawio.open}"></a>
  <a th:if="${item.word}" class="btn btn-sm btn-outline-secondary ms-2" target="_blank" rel="noopener noreferrer" th:href="@{/attachments/{node}/{offset}/word(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{word.open}"></a>
  <div class="d-md-none small mt-1"><a th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a> · <span th:text="${item.identity}"></span></div></td>
  <td class="text-nowrap" th:title="#{files.bytes(${item.bytes})}" th:text="${item.sizeText}"></td>

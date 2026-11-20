@@ -1,0 +1,7 @@
+Upstream: https://github.com/jgraph/drawio
+Commit: f411a11f4f6b8994d869bdbc45f4d4d9e2284f34
+File: src/main/webapp/js/viewer-static.min.js (unmodified)
+SHA-256: c294fab9bc4bccb1790709ffa00f2d237863877f4c14d90147ef08da6d3ddd3a
+Licence: Apache-2.0; bundled component notices remain in the original asset.
+Pako 2.2.0 license source: https://github.com/nodeca/pako/blob/2.2.0/LICENSE
+Regenerator runtime license reference: https://github.com/facebook/regenerator/blob/main/LICENSE (unversioned reference; bundled runtime version not asserted)

@@ -23,6 +23,7 @@ public class AttachmentBrowseService {
         public Options{search=search==null?"":search.strip();if(page<1||page>1000000||search.length()>200||!Set.of("newest","name-asc","name-desc","size-asc","size-desc").contains(sort))throw problem(HttpStatus.BAD_REQUEST);}
     }
     public record Item(long nodeId,int offset,String name,String filename,long time,long bytes){
+        public boolean drawio(){return com.turkerozturk.image.attachments.drawio.DrawioService.supports(filename);}
         public boolean word(){return com.turkerozturk.image.attachments.word.WordPreviewService.supports(filename);}
         public boolean excel(){return com.turkerozturk.image.attachments.excel.ExcelPreviewService.supports(filename);}
         public String identity(){return nodeId+":"+offset;}

@@ -1,0 +1,56 @@
+package com.turkerozturk.image.attachments.drawio;
+import com.turkerozturk.login.*;
+import com.turkerozturk.multipledatabases.*;
+import org.junit.jupiter.api.*;
+import org.springframework.context.annotation.*;
+import org.springframework.mock.web.*;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.config.annotation.*;
+import java.util.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.*;
+class DrawioSecurityTest {
+    @AfterEach void clear(){TenantContext.clear();}
+    @Test void authenticatedReadersCanPreviewButAnonymousStaleMissingTokensAndWritesAreBlocked()throws Exception{
+        try(var context=new AnnotationConfigWebApplicationContext()){
+            context.setServletContext(new MockServletContext());context.register(Config.class);context.refresh();
+            var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+            var session=new MockHttpSession();session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");TenantContext.setCurrentTenant("Read-only notes");
+            var service=context.getBean(DrawioService.class);String url="/attachments/1/0/drawio";
+            mvc.perform(get(url).session(session).param("_tenantView","old").with(user("reader").roles("USER"))).andExpect(status().isConflict()).andExpect(header().string("Cache-Control","no-store"));
+            mvc.perform(get(url).session(session).param("_tenantView","current").with(anonymous())).andExpect(status().is3xxRedirection());
+            mvc.perform(get(url).session(session).with(user("reader").roles("USER"))).andExpect(status().isBadRequest());verifyNoInteractions(service);
+            mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(view().name("attachment/drawio")).andExpect(header().string("Cache-Control","no-store"));
+            mvc.perform(get(url).session(session).param("_tenantView","current").cookie(new jakarta.servlet.http.Cookie("viewMode","mobile")).with(user("reader").roles("USER"))).andExpect(view().name("attachment/drawioMobile"));
+            when(service.preview(eq(1L),eq(0))).thenReturn(new DrawioService.Preview("test.drawio","Note",List.of(new DrawioService.Page("Page 1",DrawioServiceTest.model("safe")))));
+            mvc.perform(get(url+"/data").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(jsonPath("$.pages[0].name").value("Page 1"));
+            mvc.perform(get("/attachments/drawio/frame").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(view().name("attachment/drawioFrame")).andExpect(header().string("Content-Security-Policy",org.hamcrest.Matchers.allOf(org.hamcrest.Matchers.containsString("sandbox allow-scripts"),org.hamcrest.Matchers.containsString("connect-src 'none'"),org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("allow-same-origin")))));
+            mvc.perform(post(url+"/data").session(session).param("_tenantView","current").with(csrf()).with(user("reader").roles("USER"))).andExpect(status().isMethodNotAllowed());
+            mvc.perform(get("/js/drawio/config.js").with(anonymous())).andExpect(status().isNotFound());
+            when(service.preview(eq(1L),eq(0))).thenThrow(new DrawioService.Problem("invalid"));
+            mvc.perform(get(url+"/data").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isUnprocessableEntity()).andExpect(jsonPath("$.error").value("invalid"));
+            clearInvocations(service);TenantContext.clear();
+            mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isConflict());verifyNoInteractions(service);
+        }
+    }
+    @Configuration @EnableWebSecurity @EnableWebMvc
+    static class Config implements WebMvcConfigurer{
+        @Bean org.springframework.web.servlet.ViewResolver viewResolver(){return(name,locale)->new org.springframework.web.servlet.view.InternalResourceView("/test-view");}
+        @Bean jakarta.persistence.EntityManagerFactory entityManagerFactory(){return mock(jakarta.persistence.EntityManagerFactory.class);}
+        @Bean InMemoryUserDetailsManager users(){return new InMemoryUserDetailsManager();}
+        @Bean DrawioService previews(){return mock(DrawioService.class);}
+
+        @Bean DrawioController previewController(DrawioService service){return new DrawioController(service);}
+        @Override public void addInterceptors(InterceptorRegistry registry){registry.addInterceptor(new TenantRequiredInterceptor());}
+        @Bean SecurityFilterChain chain(HttpSecurity http)throws Exception{var config=new SecurityConfig();ReflectionTestUtils.setField(config,"loginUserName","user");ReflectionTestUtils.setField(config,"loginAdminName","admin");return config.filterChain(http,new LoginAttemptLimiter(),new LoginClientAddressResolver(""));}
+    }
+}

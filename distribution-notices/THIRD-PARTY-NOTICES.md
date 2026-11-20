@@ -28,6 +28,9 @@ CherryTree icon files were taken from CherryTree sources and converted/resized f
 
 ## Browser assets and fonts
 
+- Draw.io static viewer: Apache-2.0, pinned to upstream commit `f411a11f4f6b8994d869bdbc45f4d4d9e2284f34` in https://github.com/jgraph/drawio . `viewer-static.min.js` is bundled unmodified with its embedded component notices; source path and SHA-256 are recorded beside the asset in `static/js/drawio/SOURCE.txt`. Full upstream licence: `licenses/drawio-Apache-2.0.txt`. Embedded components include DOMPurify 3.4.18 (Apache-2.0/MPL-2.0; Apache terms are included), pako 2.2.0 (MIT/Zlib, `licenses/drawio-pako-2.2.0-LICENSE.txt` and `licenses/drawio-pako-zlib-NOTICE.txt`) and regenerator-runtime (MIT, `licenses/drawio-regenerator-runtime-LICENSE.txt`; runtime banner has no version, so no exact version is asserted). SweetCherry supplies a separate sandboxed read-only integration; it is not the Draw.io editor or a remote service.
+
+
 - Cytoscape.js 3.35.0: MIT, bundled offline for the focused connection map. Upstream: https://js.cytoscape.org/ . Original licence: `licenses/cytoscape-3.35.0-LICENSE.txt`; the asset directory also contains its licence and pinned source reference.
 
 - D3 7.9.0: ISC license; included upstream license text controls.

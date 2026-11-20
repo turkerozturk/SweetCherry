@@ -99,6 +99,10 @@ public final class RichTextObjectHtmlRenderer {
                     preview = " <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(previewUrl)
                             + "\">[" + escape(wordPreview ? com.turkerozturk.image.attachments.word.WordAttachmentLinks.label() : com.turkerozturk.image.attachments.excel.ExcelAttachmentLinks.label()) + "]</a>";
                 }
+                if (!pdfHeadings && com.turkerozturk.image.attachments.drawio.DrawioService.supports(attachment.filename())) {
+                    String diagramUrl="/attachments/"+ref.nodeId()+"/"+ref.bufferOffset()+"/drawio?_tenantView="+URLEncoder.encode(tenantView,StandardCharsets.UTF_8);
+                    preview+=" <a target=\"_blank\" rel=\"noopener noreferrer\" href=\""+escape(diagramUrl)+"\">["+escape(com.turkerozturk.image.attachments.drawio.DrawioAttachmentLinks.label())+"]</a>";
+                }
                 if (!pdfHeadings) {
                     String inspectUrl = "/attachments/" + ref.nodeId() + "/" + ref.bufferOffset() + "/preview?_tenantView=" + URLEncoder.encode(tenantView, StandardCharsets.UTF_8);
                     preview += " <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"" + escape(inspectUrl)
