@@ -33,6 +33,7 @@
         </form>
         </th:block>
         <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" th:title="#{node.meta.header}" th:aria-label="#{tree.info}"><i class="fas fa-info-circle" aria-hidden="true"></i></button>
+        <a th:if="${webBookmarkUrl != null}" class="node-web-bookmark-open btn btn-sm btn-outline-secondary" style="margin-left:auto;flex:none" th:href="${webBookmarkUrl}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" th:title="#{webBookmark.open}" th:aria-label="#{webBookmark.open}"><img th:src="@{/img/ctbicons/ct_link_website.png}" width="24" height="24" alt=""></a>
         </div>
         </header>
         <div class="node-related-shell"><div class="node-related-layout"><div th:replace="~{node/backlinks :: panel}"></div><div class="workspace-rendered" tabindex="0" th:attr="aria-label=#{tree.content}"><th:block th:replace="~{node/nodeContentFragment :: nodeContentFragment}"></th:block></div></div></div>

@@ -269,6 +269,7 @@ myapp:
   default-language: ""
   # ADMIN-only public webpage import; no LAN/local URLs or browser login cookies.
   web-import-enabled: true
+  web-bookmarks-enabled: true # Live, inert previews for read-only empty nodes whose names are HTTP(S) URLs.
   pdf:
     # PDF workload limits; increase deliberately for larger exports on stronger machines.
     max-nodes: 512

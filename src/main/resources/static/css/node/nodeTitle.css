@@ -6,3 +6,5 @@
 .node-title-form input[name=name] { flex:1;min-width:10rem; }
 @media (hover:none) { .node-title-pencil { opacity:1; } }
 [data-title-heading][hidden], [data-title-form][hidden], [data-title-open][hidden] { display:none!important; }
+.workspace-title-row:has(> .node-web-bookmark-open) {flex-wrap:nowrap}
+.workspace-title-row:has(> .node-web-bookmark-open) .workspace-node-title {flex:1;min-width:0}

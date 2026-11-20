@@ -13,6 +13,26 @@ import static org.mockito.Mockito.*;
 
 class AutomaticBackupTenantTest {
     @TempDir Path directory;
+    @Test void enablesWithoutReplacingOtherNamesIntervalsRetentionOrComments(){
+        for(String list:List.of("[]","['Other', 'O''Brien']","\n      - Other\n      - O'Brien")){
+            String yaml="# 🍒 keep\nmyapp:\n ctb-backup:\n  automatic:\n   enabled: false # flag\n   tenants: "+list+" # names\n   interval-minutes: 90\n   keep-last: 5\n";
+            String after=AutomaticBackupTenantList.enable(yaml,"Türkçe");
+            assertThat(after).contains("enabled: true # flag","Türkçe","interval-minutes: 90","keep-last: 5","# 🍒 keep","# names");
+            assertThat(AutomaticBackupTenantList.enable(after,"Türkçe")).isEqualTo(after);
+        }
+        assertThat(AutomaticBackupTenantList.enable("server.port: 8080\n","Notes")).contains("myapp.ctb-backup.automatic.tenants: ['Notes']","myapp.ctb-backup.automatic.enabled: true");
+    }
+    @Test void enablesLiveOnlyAfterPersistenceAndOnlyForEligibleSources(){
+        var settings=new CtbBackupSettings();settings.getAutomatic().setTenants(List.of("Other"));var sources=mock(CtbBackupSources.class);
+        when(sources.resolve(List.of("Notes"))).thenReturn(List.of(new CtbBackupSources.Source("key",directory.resolve("notes.ctb"),List.of("Notes"),null)));
+        var scheduler=new CtbBackupScheduler(settings,sources,mock(CtbBackupService.class),mock(CtbBackupStore.class));
+        try{
+            assertThatThrownBy(()->scheduler.enableTenant("Notes",()->{throw new IllegalArgumentException("stale");})).isInstanceOf(IllegalArgumentException.class);
+            assertThat(settings.getAutomatic().isEnabled()).isFalse();assertThat(settings.getAutomatic().getTenants()).containsExactly("Other");
+            scheduler.enableTenant("Notes",()->{});assertThat(settings.getAutomatic().isEnabled()).isTrue();assertThat(settings.getAutomatic().getTenants()).containsExactly("Other","Notes");
+            assertThatThrownBy(()->scheduler.enableTenant("Unknown",()->{throw new AssertionError("must not persist");})).isInstanceOf(CtbBackupProblem.class);
+        }finally{scheduler.close();}
+    }
     @Test void removesOnlyRequestedNameFromFlowAndBlockListsIncludingUnicodeAndLastEntry(){
         for(var list:List.of("['Notes', 'Türkçe', 'O''Brien']", "\n        - Notes\n        - Türkçe\n        - O'Brien")){
             String yaml="# 🍒 preserve\nmyapp:\n  ctb-backup:\n    automatic:\n      enabled: true\n      tenants: "+list+" # retain\n      interval-minutes: 60\nserver:\n  port: 8080 # keep\n";
@@ -34,6 +54,8 @@ class AutomaticBackupTenantTest {
         assertThat(Files.readString(file)).contains("['Other']");
         assertThatThrownBy(()->configuration.edit(revision,yaml->AutomaticBackupTenantList.remove(yaml,"Other"))).isInstanceOf(IllegalArgumentException.class);
         assertThat(Files.readString(file)).contains("Other");
+        configuration.edit(configuration.read().revision(),yaml->AutomaticBackupTenantList.enable(yaml,"Notes"));
+        assertThat(Files.readString(file)).contains("['Other', 'Notes']","myapp.ctb-backup.automatic.enabled: true");
     }
     @Test void liveSchedulerRemovesOnlyAfterSuccessfulPersistenceAndKeepsOtherAliases(){
         var settings=new CtbBackupSettings();settings.getAutomatic().setTenants(List.of("Notes","Other"));

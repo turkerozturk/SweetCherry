@@ -14,8 +14,14 @@
 
         <div id="content">
 
-            <p th:if="${emptyContent}" class="node-empty-content border rounded bg-body-tertiary text-body-secondary small fst-italic p-3" role="status" th:text="#{node.emptyNotice}"></p>
-            <div th:classappend="${node.syntax == 'custom-colors'} ? 'theme-note-paper'" id="nodeContent" data-node-reading th:unless="${emptyContent}" data-node-fragments
+            <section th:if="${webBookmarkUrl != null}" data-web-bookmark
+                     th:attr="data-endpoint=@{/nodes/web-bookmarks/{id}(id=${requestedNodeId})},data-tenant-view=${tenantViewToken},data-loading=#{webBookmark.loading},data-error=#{webBookmark.error},data-stale=#{tree.stale}">
+                <p data-web-bookmark-status role="status" th:text="#{webBookmark.loading}"></p>
+                <button type="button" data-web-bookmark-reload class="btn btn-sm btn-outline-secondary mb-2" th:text="#{webBookmark.reload}"></button>
+                <iframe data-web-bookmark-frame sandbox="" referrerpolicy="no-referrer" hidden th:title="#{webBookmark.preview}" style="width:100%;height:70dvh;min-height:18rem;border:1px solid #ccc;background:white"></iframe>
+            </section>
+            <p th:if="${emptyContent and webBookmarkUrl == null}" class="node-empty-content border rounded bg-body-tertiary text-body-secondary small fst-italic p-3" role="status" th:text="#{node.emptyNotice}"></p>
+            <div th:classappend="${node.syntax == 'custom-colors'} ? 'theme-note-paper'" id="nodeContent" data-node-reading th:unless="${emptyContent or webBookmarkUrl != null}" data-node-fragments
                  th:attr="data-fragment-content=${node.nodeId},data-fragment-syntax=${node.syntax},data-fragment-token=${tenantViewToken},data-fragment-endpoint=@{/nodes/fragments/},data-fragment-depth=${nodeFragmentDepth},data-fragment-count=${nodeFragmentInclusions},data-fragment-image-title=#{tree.openImage},data-fragment-source-label=#{fragments.source},data-fragment-cycle=#{fragments.cycle},data-fragment-limit=#{fragments.limit},data-fragment-error=#{fragments.error},data-fragment-stale=#{fragments.stale},data-fragment-missing=#{fragments.missing}">
 
 

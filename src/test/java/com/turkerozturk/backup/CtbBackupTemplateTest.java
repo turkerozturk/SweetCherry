@@ -25,6 +25,7 @@ class CtbBackupTemplateTest {
             context.setVariable("backupEnabled",true);context.setVariable("backupSelected",running?"<Source>":null);
             context.setVariable("backupDirectory","backups/ctb");context.setVariable("backupInvalid",0);context.setVariable("backups",List.of(backup));
             context.setVariable("tenantViewToken","token");
+            context.setVariable("automaticBackupRevision","revision");context.setVariable("automaticBackupTenants",List.of());
             context.setVariable("backupAutomatic",new CtbBackupScheduler.View(running,1440,running?2:0,"—",null,
                     running?List.of(new CtbBackupScheduler.Row(List.of("<Source>","Alias"),"DUE","—","—",null)):List.of()));
             if(running)context.setVariable("backupCurrent",new CtbBackupService.Status(id,"<Source>","2026-11-02T12:00:00Z","RUNNING","COPYING",5,10,null));
@@ -34,11 +35,19 @@ class CtbBackupTemplateTest {
             assertThat(doc.selectFirst("form[action$=/open]").attr("method")).isEqualTo("post");
             assertThat(doc.select("form[action$=/start]")).hasSize(running?1:0);
             if(running)assertThat(doc.selectFirst("input[name=_tenantView]").attr("value")).isEqualTo("token");
+            assertThat(doc.select("form[action$='/automatic/enable']")).hasSize(running?1:0);
+            if(running){
+                var form=doc.selectFirst("form[action$='/automatic/enable']");assertThat(form.selectFirst("input[name=revision]").val()).isEqualTo("revision");
+                assertThat(form.selectFirst("button").hasAttr("disabled")).isFalse();assertThat(form.selectFirst("input[name=_tenantView]").val()).isEqualTo("token");
+                context.setVariable("automaticBackupTenants",List.of("<Source>"));
+                assertThat(org.jsoup.Jsoup.parse(engine.process(Files.readString(Path.of("src/main/resources/templates/backup/ctbBackups.html")),context)).selectFirst("form[action$='/automatic/enable'] button").hasAttr("disabled")).isTrue();
+            }
             assertThat(doc.select(".backup-list td[data-label]")).hasSize(running?8:4);
             assertThat(doc.selectFirst("#ctb-backup-automatic")).isNotNull();
             assertThat(doc.selectFirst("#ctb-backup-delete-selection").attr("method")).isEqualTo("post");
             assertThat(doc.selectFirst("input[data-backup-select]").attr("form")).isEqualTo("ctb-backup-delete-selection");
             assertThat(doc.selectFirst("h1").text()).isEqualTo(lang.equals("tr")?"CTB yedekleri":"CTB backups");
+            assertThat(html).doesNotContain("??backupTenant.");
         }
     }
 }

@@ -44,6 +44,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
                 || request.getRequestURI().startsWith(request.getContextPath() + "/mindmap-import/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/zip-import/")
                 || request.getRequestURI().equals(request.getContextPath() + "/system/backups/start")
+                || request.getRequestURI().equals(request.getContextPath() + "/system/backups/automatic/enable")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/cherrytemplatetasks/create")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/cherrytemplatenode/")
                 || request.getRequestURI().equals(request.getContextPath() + "/mindmap-export"));
@@ -75,7 +76,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
     private boolean dialogApi(HttpServletRequest request) {
         String path=request.getRequestURI();String context=request.getContextPath();
         return path.startsWith(context+"/nodes/properties/")&&path.endsWith("/title") || path.startsWith(context+"/nodes/fragments/") || path.startsWith(context+"/nodes/reminders/alarms") || path.startsWith(context+"/attachments/") || path.startsWith(context+"/codebox-gallery/") || path.startsWith(context+"/table-gallery/") || path.startsWith(context+"/image-gallery/") || path.startsWith(context+"/nodes/batch/") || path.startsWith(context+"/nodes/tags/quick/") || path.startsWith(context+"/nodes/richtext/edit/")&&path.endsWith("/wiki-links") || path.equals(context + "/nodes/link-graph/data") || path.startsWith(context + "/nodes/quick/") || path.startsWith(context + "/nodes/backlinks/")
-                || path.startsWith(context + "/nodes/saved-filters");
+                || path.startsWith(context + "/nodes/saved-filters") || path.startsWith(context + "/nodes/web-bookmarks/");
     }
 
     private void quickConflict(HttpServletResponse response) throws java.io.IOException {

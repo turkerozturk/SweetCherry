@@ -26,6 +26,7 @@ public class ApplicationSettingsService {
         new Setting("myapp.file-preview.max-characters","number","200000",1000000),
         new Setting("myapp.file-preview.max-entries","number","1000",2000),
         new Setting("myapp.reminders.enabled","boolean","true",0),
+        new Setting("myapp.web-bookmarks-enabled","boolean","true",0),
         new Setting("myapp.reminders.alarms-enabled","boolean","true",0),
         new Setting("myapp.reminders.sound-enabled","boolean","true",0),
         new Setting("myapp.word-preview.max-characters","number","200000",1000000),

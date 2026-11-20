@@ -6,6 +6,7 @@
 <p th:text="#{ctbBackup.intro}"></p>
 <p class="small text-body-secondary"><span th:text="#{ctbBackup.directory}"></span> <code th:text="${backupDirectory}" style="overflow-wrap:anywhere"></code></p>
 <p th:if="${backupError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg(backupError)}"></p>
+<p th:if="${automaticBackupNotice != null}" class="alert alert-info" role="status" th:text="${#messages.msg(automaticBackupNotice)}"></p>
 <p th:if="${backupInvalid > 0}" class="alert alert-warning" th:text="#{ctbBackup.invalid(${backupInvalid})}"></p>
 <p th:if="${!backupEnabled}" class="alert alert-info" th:text="#{ctbBackup.error.disabled}"></p>
 <form th:if="${backupEnabled and backupSelected != null}" method="post" th:action="@{/system/backups/start}" class="mb-3" th:attr="data-confirm-message=#{ctbBackup.confirm(${backupSelected})}">
@@ -14,6 +15,11 @@
 <button type="submit" class="btn btn-primary" th:disabled="${backupCurrent != null and backupCurrent.state == 'RUNNING'}"><i class="fa-solid fa-database" aria-hidden="true"></i> <span th:text="#{ctbBackup.start}"></span></button>
 </form>
 <p th:if="${backupSelected == null}" class="alert alert-info" th:text="#{ctbBackup.selectFirst}"></p>
+<form th:if="${backupEnabled and backupSelected != null}" method="post" th:action="@{/system/backups/automatic/enable}" class="mb-3" th:attr="data-confirm-message=#{backupTenant.enableConfirm(${backupSelected})}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="revision" th:value="${automaticBackupRevision}">
+<button type="submit" class="btn btn-outline-primary" th:disabled="${automaticBackupRevision == null or (backupAutomatic != null and backupAutomatic.enabled and automaticBackupTenants != null and automaticBackupTenants.contains(backupSelected))}" th:text="#{backupTenant.enableCurrent}"></button>
+<span th:if="${automaticBackupRevision == null}" class="small" th:text="#{backupTenant.unavailable}"></span>
+</form>
 <div th:if="${backupCurrent != null}" class="border rounded p-3 mb-3" id="ctb-backup-job"
      th:attr="data-running=${backupCurrent.state == 'RUNNING'},data-status-url=@{/system/backups/status/{id}(id=${backupCurrent.id})},data-paused=#{ctbBackup.pollPaused},data-copying=#{ctbBackup.phase.COPYING},data-checking=#{ctbBackup.phase.CHECKING},data-hashing=#{ctbBackup.phase.HASHING},data-cleaning=#{ctbBackup.phase.CLEANING}">
 <h2 class="h5" th:text="#{ctbBackup.job}"></h2>

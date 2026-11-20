@@ -91,5 +91,14 @@ public class CtbBackupScheduler {
         persist.run();
         settings.getAutomatic().setTenants(settings.getAutomatic().getTenants().stream().filter(name->!name.equals(tenant)).toList());
     }
+    /** Persist first, then publish the new schedule under the same lock as tick. */
+    public synchronized void enableTenant(String tenant,Runnable persist){
+        if(!settings.isEnabled())throw new CtbBackupProblem("disabled");
+        var candidates=sources.resolve(List.of(tenant));
+        if(candidates.size()!=1||candidates.get(0).error()!=null)throw new CtbBackupProblem("unsupported");
+        persist.run();
+        var names=new LinkedHashSet<>(settings.getAutomatic().getTenants());names.add(tenant);
+        settings.getAutomatic().setTenants(List.copyOf(names));settings.getAutomatic().setEnabled(true);start();
+    }
     @PreDestroy public synchronized void close(){closed=true;timer.shutdownNow();}
 }

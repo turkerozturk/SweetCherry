@@ -22,6 +22,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.*;
 
 class AutomaticBackupTenantSecurityTest {
+    @org.junit.jupiter.api.AfterEach void clear(){com.turkerozturk.multipledatabases.TenantContext.clear();}
+    @Test void enablingUsesOnlyTheCurrentTenantAndRequiresAdminCsrfAndViewToken()throws Exception{
+        try(var context=new AnnotationConfigWebApplicationContext()){
+            context.setServletContext(new MockServletContext());context.register(Config.class);context.refresh();
+            var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();String route="/system/backups/automatic/enable";
+            var session=new org.springframework.mock.web.MockHttpSession();session.setAttribute(com.turkerozturk.multipledatabases.TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");
+            com.turkerozturk.multipledatabases.TenantContext.setCurrentTenant("Notes");
+            mvc.perform(post(route).session(session).param("revision","r").param("_tenantView","current").with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+            mvc.perform(post(route).session(session).param("revision","r").param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
+            mvc.perform(post(route).session(session).param("revision","r").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
+            mvc.perform(post(route).session(session).param("revision","r").param("_tenantView","old").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
+            var scheduler=context.getBean(CtbBackupScheduler.class);verifyNoInteractions(scheduler);
+            mvc.perform(post(route).session(session).param("revision","r").param("_tenantView","current").param("tenant","Other").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(redirectedUrl("/system/backups")).andExpect(flash().attribute("automaticBackupNotice","backupTenant.enabled"));
+            verify(scheduler).enableTenant(eq("Notes"),any());
+        }
+    }
     @Test void onlyAdminWithCsrfCanRemoveAndNoSelectedDatabaseIsRequired()throws Exception{
         try(var context=new AnnotationConfigWebApplicationContext()){
             context.setServletContext(new MockServletContext());context.register(Config.class);context.refresh();
@@ -36,7 +52,8 @@ class AutomaticBackupTenantSecurityTest {
         }
     }
     @Configuration @EnableWebSecurity @EnableWebMvc @EnableMethodSecurity
-    static class Config {
+    static class Config implements org.springframework.web.servlet.config.annotation.WebMvcConfigurer {
+        @Override public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry){registry.addInterceptor(new com.turkerozturk.multipledatabases.TenantRequiredInterceptor());}
         @Bean com.turkerozturk.multipledatabases.CustomPropertiesHolder customPropertiesHolder(){return new com.turkerozturk.multipledatabases.CustomPropertiesHolder();}
         @Bean javax.sql.DataSource dataSource(){return mock(javax.sql.DataSource.class);}
         @Bean jakarta.persistence.EntityManagerFactory entityManagerFactory(){return mock(jakarta.persistence.EntityManagerFactory.class);}
