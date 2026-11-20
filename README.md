@@ -10,7 +10,8 @@ SweetCherry is a free, open-source web companion for [CherryTree](https://www.gi
 
 **[Download](https://github.com/turkerozturk/SweetCherry/releases/latest)** · **[English setup](documentation/en/setup-and-run.md)** · **[Türkçe kurulum](documentation/tr/installation.md)** · **[DeepWiki](https://deepwiki.com/turkerozturk/SweetCherry)** · **[Changelog](CHANGELOG.md)**
 
-![SweetCherry desktop launchers and application folder overview](https://github.com/turkerozturk/SweetCherry/releases/download/v1.7.0/sweetcherry-application-folder.png)
+![SweetCherry Notes](documentation/images/sweetcherry-screenshot.png)
+
 
 ## Get started
 
