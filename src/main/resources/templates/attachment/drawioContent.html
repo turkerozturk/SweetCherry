@@ -1,5 +1,5 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
-<section th:fragment="content" id="drawio-preview" class="container-fluid py-3" th:attr="data-endpoint=@{/attachments/{node}/{offset}/drawio/data(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})},data-loading=#{drawio.loading},data-error=#{drawio.error},data-stale=#{gallery.stale}">
+<section th:fragment="content" id="drawio-preview" class="container-fluid py-3" th:attr="data-endpoint=@{/attachments/{node}/{offset}/drawio/data(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})},data-loading=#{drawio.loading},data-error=#{drawio.error},data-limit=#{drawio.limit},data-stale=#{gallery.stale}">
 <h1 class="h3" th:text="#{drawio.title}"></h1><h2 class="h5 text-break" data-drawio-filename></h2>
 <div class="d-flex flex-wrap gap-2 mb-2"><a class="btn btn-outline-primary" th:href="@{/attachments/{node}/{offset}/download(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})}" th:text="#{excel.download}"></a><a class="btn btn-outline-secondary" th:href="@{/tree(nodeId=${nodeId},_tenantView=${tenantViewToken})}" th:text="#{excel.node}"></a><a class="btn btn-outline-secondary" th:href="@{/attachments(_tenantView=${tenantViewToken})}" th:text="#{files.title}"></a></div>
 <p class="small" th:text="#{drawio.help}"></p>
@@ -8,6 +8,7 @@
 <button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-prev th:text="#{gallery.previous}"></button><button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-next th:text="#{gallery.next}"></button>
 <button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="zoom" data-factor="out" disabled th:aria-label="#{drawio.zoomOut}">−</button><span data-drawio-scale>100%</span><button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="zoom" data-factor="in" disabled th:aria-label="#{drawio.zoomIn}">+</button>
 <button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="reset" disabled>100%</button><button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="fit" disabled th:text="#{drawio.fit}"></button>
+<button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="fit-width" disabled th:text="#{drawio.fitWidth}"></button>
 <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" data-drawio-fullscreen aria-pressed="false" th:text="#{drawio.fullscreen}"></button></div>
 <p data-drawio-status role="status" th:text="#{drawio.loading}"></p>
 <iframe sandbox="allow-scripts" referrerpolicy="no-referrer" th:title="#{drawio.title}" th:attr="data-src=@{/attachments/drawio/frame(_tenantView=${tenantViewToken})}"></iframe>

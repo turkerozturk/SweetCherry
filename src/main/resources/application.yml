@@ -169,6 +169,22 @@ myapp:
     max-html-characters: 1048576 # Per fragment response, 1024..2097152.
     max-object-bytes: 16777216 # Stored image/attachment payload budget, 1024..33554432.
     max-objects: 200 # Images/attachments/anchors/codeboxes/tables, 1..500.
+  drawio-preview:
+    max-file-bytes: 16777216
+    max-page-bytes: 16777216
+    max-total-bytes: 134217728
+    max-pages: 512
+    max-cells-per-page: 20000
+    max-total-cells: 200000
+    max-label-characters: 100000
+    max-xml-elements: 500000
+    max-xml-attributes: 128
+    max-xml-depth: 128
+    max-parent-depth: 256
+    max-geometry-depth: 16
+    max-geometry-points: 10000
+    max-coordinate: 1000000
+
   file-preview:
     max-text-bytes: 262144 # First text bytes only; 1024..1048576.
     max-characters: 200000 # Unicode code points; 1..1000000.

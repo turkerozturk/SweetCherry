@@ -5,7 +5,7 @@
     const title=root.querySelector('[data-drawio-filename]'),scale=root.querySelector('[data-drawio-scale]'),panel=root.querySelector('[data-drawio-panel]'),full=root.querySelector('[data-drawio-fullscreen]');
     const controller=new AbortController();let data=null,port=null,ready=false,version=0,frameTimer=null;
     const buttons=root.querySelectorAll('[data-drawio-command]');
-    function render(){if(data){root.querySelector('[data-drawio-prev]').disabled=select.selectedIndex===0;root.querySelector('[data-drawio-next]').disabled=select.selectedIndex===data.pages.length-1;}if(!ready||!data)return;version++;status.textContent=root.dataset.loading;port.postMessage({type:'render',version,xml:data.pages[select.selectedIndex].xml});}
+    function render(){if(data){root.querySelector('[data-drawio-prev]').disabled=select.selectedIndex===0;root.querySelector('[data-drawio-next]').disabled=select.selectedIndex===data.pages.length-1;}if(!ready||!data)return;version++;status.textContent=root.dataset.loading;port.postMessage({type:'render',version,xml:data.pages[select.selectedIndex].xml,maxPageBytes:data.maxPageBytes});}
     frame.addEventListener('load',()=>{
         ready=false;port?.close();clearTimeout(frameTimer);frameTimer=setTimeout(()=>{if(!ready)status.textContent=root.dataset.error;},15000);const channel=new MessageChannel();port=channel.port1;
         port.onmessage=event=>{
@@ -36,12 +36,16 @@
         const timer=setTimeout(()=>controller.abort(),30000);
         try{
             const response=await fetch(root.dataset.endpoint,{cache:'no-store',credentials:'same-origin',redirect:'error',signal:controller.signal,headers:{Accept:'application/json'}});
-            if(!response.ok)throw Error(response.status===409?'stale':'error');
+            if(!response.ok){
+                if(response.status===409)throw Error('stale');
+                if(response.status===422){try{const info=await response.json();if(info.error==='large'&&/^max-[a-z-]+$/.test(info.limit||''))throw Object.assign(Error('limit'),{limit:info.limit});}catch(error){if(error.message==='limit')throw error;}}
+                throw Error('error');
+            }
             if(!(response.headers.get('Content-Type')||'').includes('application/json'))throw Error('error');
             const result=await response.json();
-            if(typeof result.filename!=='string'||!Array.isArray(result.pages)||result.pages.length<1||result.pages.length>128||result.pages.some(page=>typeof page.name!=='string'||typeof page.xml!=='string'||page.xml.length>2*1024*1024))throw Error('error');
+            if(typeof result.filename!=='string'||!Array.isArray(result.pages)||result.pages.length<1||result.pages.length>2000||!Number.isSafeInteger(result.maxPageBytes)||result.maxPageBytes<1||result.maxPageBytes>67108864||result.pages.some(page=>typeof page.name!=='string'||typeof page.xml!=='string'||page.xml.length>result.maxPageBytes))throw Error('error');
             data=result;title.textContent=data.filename;select.replaceChildren();data.pages.forEach((page,index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=(index+1)+'. '+page.name;select.append(option);});select.disabled=false;select.selectedIndex=0;render();
-        }catch(error){status.textContent=root.dataset[error.message]||root.dataset.error;}
+        }catch(error){status.textContent=error.message==='limit'&&error.limit?root.dataset.limit+' myapp.drawio-preview.'+error.limit:root.dataset[error.message]||root.dataset.error;}
         finally{clearTimeout(timer);}
     }
     load();window.addEventListener('pagehide',()=>{controller.abort();clearTimeout(frameTimer);port?.close();});

@@ -4,6 +4,10 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+- Make Draw.io file/page/cell/XML budgets configurable through YAML and System settings, raise defaults, report the exceeded setting, and avoid counting URI-encoded expansion as decoded page size.
+- Preserve sanitized Draw.io HTML label layout, alignment, line breaks and wrapping; add ordinary-wheel zoom (Shift-wheel scroll) and horizontal fit.
+
+
 - Add a local, read-only multi-page Draw.io attachment viewer with page selection, zoom, fit, scrollbars and fullscreen, inert plain labels and external-image filename placeholders.
 
 

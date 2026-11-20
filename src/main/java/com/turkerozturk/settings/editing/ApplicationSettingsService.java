@@ -23,6 +23,20 @@ public class ApplicationSettingsService {
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
     public static final List<Setting> SETTINGS=List.of(
+        new Setting("myapp.drawio-preview.max-xml-attributes","number","128",1024),
+        new Setting("myapp.drawio-preview.max-file-bytes","number","16777216",67108864),
+        new Setting("myapp.drawio-preview.max-page-bytes","number","16777216",67108864),
+        new Setting("myapp.drawio-preview.max-total-bytes","number","134217728",268435456),
+        new Setting("myapp.drawio-preview.max-pages","number","512",2000),
+        new Setting("myapp.drawio-preview.max-cells-per-page","number","20000",50000),
+        new Setting("myapp.drawio-preview.max-total-cells","number","200000",500000),
+        new Setting("myapp.drawio-preview.max-label-characters","number","100000",1000000),
+        new Setting("myapp.drawio-preview.max-xml-elements","number","500000",2000000),
+        new Setting("myapp.drawio-preview.max-xml-depth","number","128",256),
+        new Setting("myapp.drawio-preview.max-parent-depth","number","256",512),
+        new Setting("myapp.drawio-preview.max-geometry-depth","number","16",32),
+        new Setting("myapp.drawio-preview.max-geometry-points","number","10000",50000),
+        new Setting("myapp.drawio-preview.max-coordinate","number","1000000",10000000),
         new Setting("myapp.file-preview.max-characters","number","200000",1000000),
         new Setting("myapp.file-preview.max-entries","number","1000",2000),
         new Setting("myapp.reminders.enabled","boolean","true",0),

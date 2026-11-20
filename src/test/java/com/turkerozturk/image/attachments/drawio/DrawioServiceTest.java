@@ -19,18 +19,18 @@ class DrawioServiceTest {
     @Test void dozensOfMixedCompressedAndNormalPagesRemainSelectableAndNamed()throws Exception{
         var file=new StringBuilder("<mxfile>");for(int n=1;n<=48;n++)file.append("<diagram name='Page ").append(n).append("'>").append(n%2==0?compressed(model("Türkçe + &amp; text")):model("Türkçe + &amp; text")).append("</diagram>");file.append("</mxfile>");
         var preview=parse(file.toString());assertThat(preview.pages()).hasSize(48);assertThat(preview.pages().get(47).name()).isEqualTo("Page 48");
-        assertThat(preview.pages().get(0).xml()).contains("Türkçe + &amp; text","rounded=1","fillColor=#ffcc00","html=0");
+        assertThat(preview.pages().get(0).xml()).contains("Türkçe + &amp;amp; text","rounded=1","fillColor=#ffcc00","html=1");
     }
     @Test void supportsStandaloneAndEmptyPagesAndPreservesPlainTextAndRelativeGeometry(){
         assertThat(parse(model("hello")).pages()).hasSize(1);
         var plain=model("List&lt;T&gt;").replace("html=1","html=0").replace("x='20'","relative='1' x='0.5'");
-        assertThat(parse(plain).pages().get(0).xml()).contains("List&lt;T&gt;","relative=\"1\"","x=\"0.5\"");
+        assertThat(parse(plain).pages().get(0).xml()).contains("List&amp;lt;T&amp;gt;","relative=\"1\"","x=\"0.5\"");
         assertThat(parse("<mxfile><diagram name='Blank'><mxGraphModel><root><mxCell id='0'/><mxCell id='1' parent='0'/></root></mxGraphModel></diagram></mxfile>").pages()).hasSize(1);
     }
-    @Test void richLabelsAndImagesBecomeInertTextAndResourceStylesAreRemoved(){
+    @Test void richLabelsStaySanitizedAndImagesBecomeFilenamePlaceholders(){
         String value="&lt;b&gt;Bold&lt;/b&gt;&lt;br&gt;next&lt;script&gt;evil()&lt;/script&gt;&lt;img src=&quot;https://example.test/a.png?secret=1&quot; onerror=&quot;evil()&quot;&gt;";
         String xml=parse(model(value).replace("rounded=1;","rounded=1;image=https://example.test/other.jpg;shape=image;fillColor=url(https://evil);fontSource=https://evil;link=javascript:evil();")).pages().get(0).xml();
-        assertThat(xml).contains("Bold","next","[Image: a.png]","[Image: other.jpg]","shape=rectangle;").doesNotContain("https://","javascript:","onerror","evil()","&lt;b&gt;","url(");
+        assertThat(xml).contains("Bold","next","[Image: a.png]","[Image: other.jpg]","shape=rectangle;").doesNotContain("https://","javascript:","onerror","evil()","url(");
     }
     @Test void userObjectLabelsAndGroupsAreKeptWithoutCustomProperties(){
         String xml="<mxGraphModel><root><mxCell id='0'/><mxCell id='1' parent='0'/><object id='g' label='Group' link='https://evil' custom='secret'><mxCell vertex='1' parent='1'><mxGeometry width='200' height='200' as='geometry'/></mxCell></object><mxCell id='child' parent='g' value='Child' vertex='1'><mxGeometry x='10' y='10' width='50' height='50' as='geometry'/></mxCell></root></mxGraphModel>";
@@ -38,12 +38,12 @@ class DrawioServiceTest {
     }
     @Test void malformedExternalEntitiesCyclesAndNonFiniteCoordinatesAreRejected()throws Exception{
         for(String xml:List.of("<svg/>","<mxfile/>","<!DOCTYPE mxfile [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><mxfile>&x;</mxfile>",model("bad").replace("parent='1'","parent='2'"),model("bad").replace("x='20'","x='NaN'"),"<mxfile><diagram>not base64</diagram></mxfile>"))assertThatThrownBy(()->parse(xml)).isInstanceOf(DrawioService.Problem.class);
-        var deep="<x>".repeat(70)+"</x>".repeat(70);assertThatThrownBy(()->parse(deep)).isInstanceOf(DrawioService.Problem.class);
+        var deep="<x>".repeat(DrawioSettings.defaults().xmlDepth()+1)+"</x>".repeat(DrawioSettings.defaults().xmlDepth()+1);assertThatThrownBy(()->parse(deep)).isInstanceOf(DrawioService.Problem.class);
     }
     @Test void expansionPageCountAndCellLimitsFailExplicitly()throws Exception{
         String bomb=compressed("x".repeat(DrawioDocument.PAGE_BYTES+1));assertThatThrownBy(()->parse("<mxfile><diagram>"+bomb+"</diagram></mxfile>")).hasMessage("large");
-        String pages="<mxfile>"+("<diagram>"+model("x")+"</diagram>").repeat(129)+"</mxfile>";assertThatThrownBy(()->parse(pages)).hasMessage("large");
-        String many="<mxGraphModel><root>";var buffer=new StringBuilder(many);for(int n=0;n<=4000;n++)buffer.append("<mxCell id='").append(n).append("'/>");buffer.append("</root></mxGraphModel>");assertThatThrownBy(()->parse(buffer.toString())).hasMessage("large");
+        String pages="<mxfile>"+("<diagram>"+model("x")+"</diagram>").repeat(DrawioDocument.MAX_PAGES+1)+"</mxfile>";assertThatThrownBy(()->parse(pages)).hasMessage("large");
+        String many="<mxGraphModel><root>";var buffer=new StringBuilder(many);for(int n=0;n<=DrawioDocument.MAX_CELLS;n++)buffer.append("<mxCell id='").append(n).append("'/>");buffer.append("</root></mxGraphModel>");assertThatThrownBy(()->parse(buffer.toString())).hasMessage("large");
     }
     @Test void manualSampleContainsVectorShapesACompressedPageAndAnExternalImagePlaceholder()throws Exception{
         byte[] data=java.nio.file.Files.readAllBytes(java.nio.file.Path.of("documentation/examples/drawio-viewer-demo.drawio"));
@@ -56,6 +56,8 @@ class DrawioServiceTest {
             try(var q=c.createStatement()){q.execute("CREATE TABLE node(node_id INTEGER PRIMARY KEY,name TEXT)");q.execute("CREATE TABLE image(node_id INTEGER,offset INTEGER,filename TEXT,anchor TEXT,png BLOB)");q.execute("INSERT INTO node VALUES(1,'Read-only note')");}
             byte[] original=bytes(model("hello"));try(var q=c.prepareStatement("INSERT INTO image VALUES(1,7,'a.DRAWIO','',?)")){q.setBytes(1,original);q.executeUpdate();}
             assertThat(DrawioService.load(c,1,7).filename()).isEqualTo("a.DRAWIO");
+            var tiny=DrawioSettingsTest.with("fileBytes",100);
+            assertThatThrownBy(()->DrawioService.load(c,1,7,tiny)).isInstanceOf(DrawioService.Problem.class).satisfies(e->assertThat(((DrawioService.Problem)e).limit()).isEqualTo("max-file-bytes"));
             try(var q=c.createStatement();var rs=q.executeQuery("SELECT png FROM image")){rs.next();assertThat(rs.getBytes(1)).isEqualTo(original);}
             try(var q=c.createStatement()){q.execute("UPDATE image SET png=zeroblob("+(DrawioService.MAX_BYTES+1)+")");}assertThatThrownBy(()->DrawioService.load(c,1,7)).hasMessage("large");
             try(var q=c.createStatement()){q.execute("UPDATE image SET filename='not.txt'");}assertThatThrownBy(()->DrawioService.load(c,1,7)).hasMessage("unsupported");
