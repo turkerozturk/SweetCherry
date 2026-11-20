@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layoutMobile}">
+<head><title th:text="#{annotation.title}"></title><section layout:fragment="pageSpecificCssStyles"><link rel="stylesheet" th:href="@{/css/imageAnnotations.css}"></section></head>
+<body><main layout:fragment="content" id="image-annotation" class="container-fluid py-3"
+    th:attr="data-endpoint=@{/image-gallery/{node}/{offset}/annotation(node=${annotationNode},offset=${annotationOffset})},data-tenant-view=${tenantViewToken},data-loading=#{annotation.loading},data-error=#{annotation.error},data-conflict=#{annotation.conflict},data-readonly=#{annotation.readonly},data-unsupported=#{annotation.unsupported},data-confirm=#{annotation.confirm},data-leave=#{annotation.leave},data-saved=#{annotation.saved}">
+<h1 class="h3" th:text="#{annotation.title}"></h1>
+<p th:text="#{annotation.help}"></p>
+<div class="d-flex flex-wrap gap-2 mb-2">
+<a class="btn btn-outline-secondary" th:href="@{/image-gallery(_tenantView=${tenantViewToken})}" th:text="#{gallery.title}"></a>
+<a download class="btn btn-outline-secondary" th:href="@{/image-gallery/{node}/{offset}/original(node=${annotationNode},offset=${annotationOffset},_tenantView=${tenantViewToken})}" th:text="#{annotation.original}"></a>
+<button type="button" class="btn btn-outline-secondary" data-annotation-reload th:text="#{annotation.reload}"></button>
+<a class="btn btn-outline-secondary" th:href="@{/tree(nodeId=${annotationNode},_tenantView=${tenantViewToken})}" th:text="#{annotation.node}"></a>
+</div>
+<p data-annotation-status role="status" th:text="#{annotation.loading}"></p>
+<fieldset data-annotation-controls disabled class="annotation-tools d-flex flex-wrap gap-2 align-items-end mb-2">
+<div><label for="annotation-tool" th:text="#{annotation.tool}"></label><select id="annotation-tool" class="form-select" data-annotation-tool>
+<option th:each="tool:${ {'arrow','rect','ellipse','line','pen'} }" th:value="${tool}" th:text="${#messages.msg('annotation.'+tool)}"></option>
+</select></div>
+<div><label for="annotation-color" th:text="#{annotation.color}"></label><input id="annotation-color" type="color" value="#e01b24" class="form-control form-control-color" data-annotation-color></div>
+<div><label for="annotation-width" th:text="#{annotation.width}"></label><select id="annotation-width" class="form-select" data-annotation-width><option>2</option><option selected>4</option><option>8</option><option>12</option><option>20</option></select></div>
+<button type="button" class="btn btn-outline-secondary" data-annotation-undo th:text="#{annotation.undo}"></button>
+<button type="button" class="btn btn-outline-secondary" data-annotation-redo th:text="#{annotation.redo}"></button>
+<button type="button" class="btn btn-outline-secondary" data-annotation-reset th:text="#{annotation.reset}"></button>
+<button type="button" class="btn btn-primary" data-annotation-preview th:text="#{annotation.preview}"></button>
+</fieldset>
+<div class="annotation-stage"><canvas data-annotation-canvas th:aria-label="#{annotation.canvas}" tabindex="0"></canvas></div>
+<form method="post" th:action="@{/image-gallery/{node}/{offset}/annotation(node=${annotationNode},offset=${annotationOffset})}" data-annotation-csrf hidden></form>
+<dialog data-annotation-dialog th:aria-label="#{annotation.preview}">
+<p th:text="#{annotation.confirm}"></p><img data-annotation-result alt="" class="annotation-result">
+<div class="d-flex gap-2 mt-2"><button type="button" class="btn btn-danger" data-annotation-save th:text="#{annotation.overwrite}"></button><button type="button" class="btn btn-outline-secondary" data-annotation-cancel th:text="#{annotation.cancel}"></button></div>
+</dialog>
+</main><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/imageAnnotationDrawing.js}"></script><script defer th:src="@{/js/imageAnnotations.js}"></script></section></body></html>

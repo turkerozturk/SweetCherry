@@ -1,0 +1,6 @@
+.annotation-stage{overflow:auto;border:1px solid var(--bs-border-color,#ccc);max-height:75dvh;background:repeating-conic-gradient(#ddd 0% 25%,white 0% 50%) 50%/20px 20px}
+.annotation-stage canvas{display:block;width:auto;max-width:100%;height:auto;touch-action:none;cursor:crosshair}
+.annotation-tools{border:0;padding:0}.annotation-tools label{display:block}
+[data-annotation-dialog]{width:min(95vw,1200px);max-height:95dvh;overflow:auto;border:1px solid #aaa;border-radius:.5rem}
+[data-annotation-dialog]::backdrop{background:#0007}
+.annotation-result{display:block;max-width:100%;max-height:70dvh;object-fit:contain}

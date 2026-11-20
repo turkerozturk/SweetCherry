@@ -42,6 +42,7 @@
           <th:block th:if="${item.imageTime > 0}"><dt th:text="#{gallery.imageTime}"></dt><dd th:text="${item.imageTimeText}"></dd></th:block>
         </dl>
         <a class="gallery-download small" th:href="@{/image-gallery/{node}/{offset}/original(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{gallery.download}"></a>
+        <a xmlns:sec="http://www.thymeleaf.org/extras/spring-security" sec:authorize="hasRole('ADMIN')" th:if="${galleryCanAnnotate == true and (item.filename.empty or #strings.toLowerCase(item.filename).endsWith('.png'))}" class="btn btn-sm btn-outline-primary ms-2" th:href="@{/image-gallery/{node}/{offset}/annotate(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{annotation.edit}"></a>
       </div>
     </article>
   </div>
