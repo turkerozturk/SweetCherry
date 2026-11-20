@@ -15,14 +15,14 @@ class ImageAnnotationTemplateTest {
  public record Tile(long nodeId,int offset,String name,String filename,String link,long imageTime,long bytes){public String id(){return nodeId+":"+offset;}public String createdText(){return "—";}public String imageTimeText(){return "—";}}
  public record Options(int page,String search,String sort,String tag){}
  public record Gallery(List<Tile> items,long total,Options options,List<String> tags){public long pages(){return 1;}}
- @Test void galleryShowsTheEntryOnlyWhenTheConnectionIsWritableAndTheFilenameCanBePng(){
+ @Test void galleryShowsTheEntryOnlyWhenTheConnectionIsWritableAndTheFilenameIsSupported(){
   var engine=new SpringTemplateEngine();var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setCharacterEncoding("UTF-8");engine.setTemplateResolver(resolver);
   var messages=new ResourceBundleMessageSource();messages.setBasename("messages");messages.setDefaultEncoding("UTF-8");engine.setTemplateEngineMessageSource(messages);
   var servlet=new MockServletContext();var context=new WebContext(JakartaServletWebApplication.buildApplication(servlet).buildExchange(new MockHttpServletRequest(servlet),new MockHttpServletResponse()),Locale.ENGLISH);
   context.setVariable("tenantViewToken","current");context.setVariable("gallery",new Gallery(List.of(new Tile(42,7,"Screenshot","test.png","",0,100)),1,new Options(1,"","newest",""),List.of()));
   context.setVariable("galleryCanAnnotate",false);assertThat(org.jsoup.Jsoup.parse(engine.process("gallery/gallery",context)).select("a[href*='/annotate']")).isEmpty();
   context.setVariable("galleryCanAnnotate",true);var doc=org.jsoup.Jsoup.parse(engine.process("gallery/gallery",context));assertThat(doc.select("a[href*='/annotate']")).hasSize(1);assertThat(doc.selectFirst("a[href*='/annotate']").attr("href")).contains("/42/7/annotate","_tenantView=current");
-  context.setVariable("gallery",new Gallery(List.of(new Tile(42,7,"Photo","test.jpg","",0,100)),1,new Options(1,"","newest",""),List.of()));assertThat(org.jsoup.Jsoup.parse(engine.process("gallery/gallery",context)).select("a[href*='/annotate']")).isEmpty();
+  context.setVariable("gallery",new Gallery(List.of(new Tile(42,7,"Photo","test.jpg","",0,100)),1,new Options(1,"","newest",""),List.of()));assertThat(org.jsoup.Jsoup.parse(engine.process("gallery/gallery",context)).select("a[href*='/annotate']")).hasSize(1);
  }
  @Test void originalDownloadPreviewAndExplicitOverwriteRenderInBothLanguagesAndContextPaths(){
   for(String language:List.of("en","tr"))for(String path:List.of("","/app")){

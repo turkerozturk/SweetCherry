@@ -56,6 +56,24 @@ class ImageAnnotationServiceTest {
   c.setAutoCommit(false);assertThatThrownBy(()->ImageAnnotationService.save(c,1,7,snapshot.revision(),original)).isInstanceOf(ResponseStatusException.class);c.rollback();assertThat(stored()).isEqualTo(original);
   try(var q=c.createStatement();var r=q.executeQuery("SELECT ts_lastsave FROM node")){r.next();assertThat(r.getLong(1)).isEqualTo(10);}
  }
+ @Test void jpegAndBmpAttachmentsAreRenamedToPngWhileOtherMetadataIsRetained()throws Exception{
+  for(String format:List.of("jpeg","bmp")){
+   byte[] original=AnnotationRasterTest.picture(format);
+   try(var q=c.prepareStatement("UPDATE image SET png=?,filename=? WHERE offset=7")){q.setBytes(1,original);q.setString(2,"photo."+format);q.executeUpdate();}
+   var snapshot=ImageAnnotationService.open(c,1,7);assertThat(snapshot.png()).startsWith("data:image/png;base64,");
+   byte[] replacement=java.util.Base64.getDecoder().decode(snapshot.png().substring(snapshot.png().indexOf(',')+1));
+   c.setAutoCommit(false);ImageAnnotationService.save(c,1,7,snapshot.revision(),replacement);c.commit();c.setAutoCommit(true);
+   try(var q=c.createStatement();var rs=q.executeQuery("SELECT filename,link,justification,time FROM image WHERE offset=7")){rs.next();assertThat(rs.getString(1)).isEqualTo("photo.png");assertThat(rs.getString(2)).isEqualTo("node 3");assertThat(rs.getString(3)).isEqualTo("center");assertThat(rs.getLong(4)).isEqualTo(123);}
+   assertThat(ImageAnnotationService.open(c,1,7).width()).isEqualTo(20);
+  }
+ }
+ @Test void orientedJpegReplacementUsesTheDisplayedDimensions()throws Exception{
+  byte[] source=AnnotationRasterTest.oriented(AnnotationRasterTest.picture("jpeg"),6);
+  try(var q=c.prepareStatement("UPDATE image SET png=?,filename='rotated.jpg' WHERE offset=7")){q.setBytes(1,source);q.executeUpdate();}
+  var snapshot=ImageAnnotationService.open(c,1,7);assertThat(snapshot.width()).isEqualTo(10);assertThat(snapshot.height()).isEqualTo(20);
+  byte[] replacement=java.util.Base64.getDecoder().decode(snapshot.png().substring(snapshot.png().indexOf(',')+1));
+  c.setAutoCommit(false);ImageAnnotationService.save(c,1,7,snapshot.revision(),replacement);c.commit();assertThat(ImageAnnotationService.dimensions(stored())).containsExactly(10,20);
+ }
  @Test void malformedAndAnimatedPngsAreRejectedBeforeDecoding()throws Exception{
   assertThatThrownBy(()->ImageAnnotationService.normalize(new byte[40])).isInstanceOf(ResponseStatusException.class);
   byte[] png=picture(0,1,1);var out=new java.io.ByteArrayOutputStream();out.write(png,0,8);out.write(new byte[]{0,0,0,0,'a','c','T','L',0,0,0,0});out.write(png,8,png.length-8);

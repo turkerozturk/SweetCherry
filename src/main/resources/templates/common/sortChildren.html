@@ -1,0 +1,14 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
+<th:block th:fragment="menu" sec:authorize="hasRole('ADMIN')">
+<li><hr class="dropdown-divider"></li>
+<li data-sort-children th:attr="data-base=@{/nodes/children/},data-token=${tenantViewToken},data-confirm=#{sortChildren.confirm},data-error=#{sortChildren.error},data-conflict=#{sortChildren.conflict},data-select=#{sortChildren.select},data-empty=#{sortChildren.empty}">
+<details><summary class="dropdown-item" th:text="#{sortChildren.title}">Sort Children…</summary>
+<div class="ps-3" role="group" th:aria-label="#{sortChildren.title}">
+<th:block th:each="order:${ {'DESC','ASC'} }">
+<hr th:if="${order == 'ASC'}" class="dropdown-divider">
+<button th:each="key:${ {'CREATED','MODIFIED','NAME'} }" type="button" class="dropdown-item" th:attr="data-sort-key=${key},data-sort-order=${order}"><span th:text="${#messages.msg('sortChildren.'+key)}"></span> <span th:text="${#messages.msg('sortChildren.'+order)}"></span> <span aria-hidden="true" th:text="${order == 'DESC' ? '↓' : '↑'}"></span></button>
+</th:block>
+</div></details>
+<form method="post" th:action="@{/nodes/children/1/sort}" hidden data-sort-csrf></form>
+</li>
+</th:block></body></html>

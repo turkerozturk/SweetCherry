@@ -21,7 +21,11 @@ public class ImageAnnotationController {
         response.setHeader("Cache-Control","no-store");model.addAttribute("annotationNode",nodeId);model.addAttribute("annotationOffset",offset);return "gallery/annotate";
     }
     @GetMapping("/annotation") @ResponseBody
-    public ResponseEntity<ImageAnnotationService.Snapshot> open(@PathVariable long nodeId,@PathVariable int offset,@RequestParam String _tenantView){return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(service.open(nodeId,offset));}
+    public ResponseEntity<ImageAnnotationService.Snapshot> open(@PathVariable long nodeId,@PathVariable int offset,@RequestParam String _tenantView){
+        if(!encoders.tryAcquire())return ResponseEntity.status(429).cacheControl(CacheControl.noStore()).build();
+        try{return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(service.open(nodeId,offset));}
+        finally{encoders.release();}
+    }
     @PostMapping(value="/annotation",consumes=MediaType.IMAGE_PNG_VALUE) @ResponseBody
     public ResponseEntity<Void> save(@PathVariable long nodeId,@PathVariable int offset,@RequestParam String _tenantView,
             @RequestParam String revision,@RequestParam(defaultValue="false") boolean confirmed,HttpServletRequest request)throws IOException{

@@ -23,7 +23,7 @@ public class ImageAnnotationService {
     @PersistenceContext private EntityManager manager;
     public ImageAnnotationService(NodePropertiesService properties){this.properties=properties;}
     public record Snapshot(String revision,int width,int height,String png) {}
-    private record Stored(byte[] png,String revision,String text,String tags,String syntax,long flags,Long modified) {}
+    private record Stored(byte[] png,String revision,String text,String tags,String syntax,long flags,Long modified,String filename) {}
     private void guard(){if(!properties.writable())throw problem(HttpStatus.FORBIDDEN);}
     @Transactional(readOnly=true) public Snapshot open(long node,int offset){guard();return manager.unwrap(Session.class).doReturningWork(c->snapshot(read(c,node,offset,false)));}
     @Transactional public void save(long node,int offset,String revision,byte[] png,boolean confirmed){
@@ -35,7 +35,7 @@ public class ImageAnnotationService {
     static void save(Connection c,long node,int offset,String revision,byte[] clean)throws SQLException{
         var old=read(c,node,offset,true);
         if(!old.revision().equals(revision))throw problem(HttpStatus.CONFLICT);
-        if(!Arrays.equals(dimensions(old.png()),dimensions(clean)))throw problem(HttpStatus.UNPROCESSABLE_ENTITY);
+        if(!Arrays.equals(AnnotationRaster.dimensions(old.png()),dimensions(clean)))throw problem(HttpStatus.UNPROCESSABLE_ENTITY);
         // Acquire a write lock and recheck the node state before touching the image row.
         String sql="UPDATE node SET ts_lastsave=? WHERE node_id=? AND is_ro=?"
                 +(old.text()==null?" AND txt IS NULL":" AND txt=?")+(old.tags()==null?" AND tags IS NULL":" AND tags=?")
@@ -46,8 +46,8 @@ public class ImageAnnotationService {
             if(q.executeUpdate()!=1)throw problem(HttpStatus.CONFLICT);
         }
         // Binary compare-and-swap also protects against external replacements at the same offset.
-        try(var q=c.prepareStatement("UPDATE image SET png=? WHERE node_id=? AND "+quote(c)+"=? AND png=?")){
-            q.setBytes(1,clean);q.setLong(2,node);q.setInt(3,offset);q.setBytes(4,old.png());
+        try(var q=c.prepareStatement("UPDATE image SET png=?,filename=? WHERE node_id=? AND "+quote(c)+"=? AND png=?")){
+            q.setBytes(1,clean);q.setString(2,AnnotationRaster.outputName(old.filename()));q.setLong(3,node);q.setInt(4,offset);q.setBytes(5,old.png());
             if(q.executeUpdate()!=1)throw problem(HttpStatus.CONFLICT);
         }
     }
@@ -63,25 +63,25 @@ public class ImageAnnotationService {
                 if((r.getLong(1)&1)!=0||HELPERS.contains(Objects.requireNonNullElse(r.getString(2),"")))throw problem(HttpStatus.FORBIDDEN);
                 if(r.getLong(3)>MAX_BYTES)throw problem(HttpStatus.PAYLOAD_TOO_LARGE);
                 String name=Objects.requireNonNullElse(r.getString(4),"");
-                if(!Objects.requireNonNullElse(r.getString(5),"").isEmpty()||!name.isEmpty()&&!name.toLowerCase(Locale.ROOT).endsWith(".png"))throw problem(HttpStatus.UNPROCESSABLE_ENTITY);
+                if(!Objects.requireNonNullElse(r.getString(5),"").isEmpty()||!AnnotationRaster.filename(name))throw problem(HttpStatus.UNPROCESSABLE_ENTITY);
             }
         }
         try(var q=c.prepareStatement("SELECT i.png,n.txt,n.tags,n.syntax,n.is_ro,n.ts_lastsave,i.filename,i.anchor,i.justification,i.link,i.time"+from+" AND "+bytes+"<=?"+suffix)){
             q.setLong(1,node);q.setInt(2,offset);q.setInt(3,MAX_BYTES);try(var r=q.executeQuery()){
                 if(!r.next())throw problem(HttpStatus.CONFLICT);
-                byte[] png=r.getBytes(1);dimensions(png);
+                byte[] png=r.getBytes(1);AnnotationRaster.dimensions(png);
                 if((r.getLong(5)&1)!=0||HELPERS.contains(Objects.requireNonNullElse(r.getString(3),"")))throw problem(HttpStatus.FORBIDDEN);
                 String filename=Objects.requireNonNullElse(r.getString(7),"");
-                if(!Objects.requireNonNullElse(r.getString(8),"").isEmpty()||!filename.isEmpty()&&!filename.toLowerCase(Locale.ROOT).endsWith(".png"))throw problem(HttpStatus.UNPROCESSABLE_ENTITY);
+                if(!Objects.requireNonNullElse(r.getString(8),"").isEmpty()||!AnnotationRaster.filename(filename))throw problem(HttpStatus.UNPROCESSABLE_ENTITY);
                 var digest=digest();digest.update(java.nio.ByteBuffer.allocate(4).putInt(png.length).array());digest.update(png);
                 field(digest,Long.toString(node));field(digest,Integer.toString(offset));
                 for(int i=2;i<=11;i++)field(digest,r.getString(i));
                 long stamp=r.getLong(6);Long modified=r.wasNull()?null:stamp;
-                return new Stored(png,HexFormat.of().formatHex(digest.digest()),r.getString(2),r.getString(3),r.getString(4),r.getLong(5),modified);
+                return new Stored(png,HexFormat.of().formatHex(digest.digest()),r.getString(2),r.getString(3),r.getString(4),r.getLong(5),modified,r.getString(7));
             }
         }
     }
-    private static Snapshot snapshot(Stored value){var size=dimensions(value.png());return new Snapshot(value.revision(),size[0],size[1],"data:image/png;base64,"+Base64.getEncoder().encodeToString(value.png()));}
+    private static Snapshot snapshot(Stored value){byte[] png=AnnotationRaster.png(value.png());var size=dimensions(png);return new Snapshot(value.revision(),size[0],size[1],"data:image/png;base64,"+Base64.getEncoder().encodeToString(png));}
     static int[] dimensions(byte[] png){
         if(png==null||png.length<24||png.length>MAX_BYTES||!Arrays.equals(Arrays.copyOf(png,8),new byte[]{(byte)137,80,78,71,13,10,26,10}))throw problem(HttpStatus.UNPROCESSABLE_ENTITY);
         // Animated PNGs cannot retain their animation after flattening a canvas.

@@ -3,7 +3,7 @@
 <body>
 <form th:fragment="moveControls(view)" th:if="${node != null and canDeleteNode == true}" sec:authorize="hasRole('ADMIN')"
       th:action="@{/nodes/move/{id}(id=${requestedNodeId})}" method="post" data-node-move data-toolbar-item="move"
-      th:attr="data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-error=#{node.move.error},aria-label=#{node.move.title}">
+      th:attr="data-sort-node=${requestedNodeId},data-state-url=@{/nodes/move/{id}/state(id=${requestedNodeId})},data-error=#{node.move.error},aria-label=#{node.move.title}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" value="">
 <input type="hidden" name="direction" value="">

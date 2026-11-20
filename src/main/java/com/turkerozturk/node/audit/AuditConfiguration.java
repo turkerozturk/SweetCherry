@@ -19,6 +19,7 @@ public class AuditConfiguration {
   if(name.equals("com.turkerozturk.node.todo.TodoService")&&m.equals("update"))return "todo.update";
   if(name.equals("com.turkerozturk.node.tags.QuickTagService")&&m.equals("save"))return "tags.update";
   if(name.equals("com.turkerozturk.node.tags.TagManagementService")&&m.equals("apply"))return "tags.manage";
+  if(name.equals("com.turkerozturk.node.moving.SortChildrenService")&&m.equals("sort"))return "tree.sort";
   if(name.equals("com.turkerozturk.node.moving.NodeMoveService")&&Set.of("move","moveTo").contains(m))return "tree.move";
   if(name.equals("com.turkerozturk.node.moving.BatchNodeService")&&m.equals("apply"))return args==null?"batch": "batch."+args[2];
   if(name.equals("com.turkerozturk.bookmark.BookmarkWriteService")&&Set.of("add","remove","reorder","reorderAll").contains(m))return "bookmark."+m;

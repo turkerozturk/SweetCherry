@@ -336,7 +336,7 @@
         if(active===controller){markSelected(id);save();}
     }
     let resolveReady;const ready=new Promise(resolve=>{resolveReady=resolve;});
-    window.SweetCherryWorkspace={select:id=>ready.then(()=>select(id,true,true)),
+    window.SweetCherryWorkspace={selected:()=>state.selected,select:id=>ready.then(()=>select(id,true,true)),
         status:()=>content.querySelector('template[data-workspace-status]')?.content,
         move:direction=>{
             if(stopped||!['UP','DOWN','LEFT','RIGHT'].includes(direction))return;
