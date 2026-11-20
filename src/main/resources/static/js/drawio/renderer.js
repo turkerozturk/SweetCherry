@@ -8,7 +8,7 @@
         const b=bounds(),w=Math.ceil(Math.max(viewport.clientWidth,b.x+b.width+40)),h=Math.ceil(Math.max(viewport.clientHeight,b.y+b.height+40));
         surface.style.width=w+'px';surface.style.height=h+'px';
         const svg=surface.querySelector('svg');if(svg){svg.setAttribute('width',w);svg.setAttribute('height',h);}
-        report('rendered',{scale:graph.view.scale});
+        report('rendered',{scale:graph.view.scale,missing:window.SweetCherryDrawioLibraries?.warnings()||[]});
     }
     function origin(){const b=bounds(),scale=graph.view.scale,t=graph.view.translate;graph.view.setTranslate(t.x+(24-b.x)/scale,t.y+(24-b.y)/scale);}
     function fit(horizontal=false){
@@ -24,9 +24,11 @@
     function render(xml,maxPageBytes){
         if(!Number.isSafeInteger(maxPageBytes)||maxPageBytes<1||maxPageBytes>67108864||typeof xml!=='string'||xml.length>maxPageBytes)throw Error('invalid');
         graph?.destroy();surface.replaceChildren();surface.style.width=viewport.clientWidth+'px';surface.style.height=viewport.clientHeight+'px';
+        window.SweetCherryDrawioLibraries?.begin();
         mxStencilRegistry.allowEval=false;mxStencil.allowEval=false;
         graph=new Graph(surface);graph.setEnabled(false);graph.setConnectable(false);graph.setTooltips(false);graph.setPanning(false);
         graph.isHtmlLabel=()=>true;graph.getLinkForCell=()=>null;graph.getImage=()=>null;graph.mathEnabled=false;
+        window.SweetCherryDrawioLibraries?.attach(graph);
         graph.enableFlowAnimation=false;graph.foldingEnabled=false;graph.resizeContainer=false;
         const doc=mxUtils.parseXml(xml);if(doc.documentElement.nodeName!=='mxGraphModel')throw Error('invalid');
         new mxCodec(doc).decode(doc.documentElement,graph.getModel());graph.refresh();fit();

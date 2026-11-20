@@ -63,7 +63,9 @@ class DrawioSettingsTest {
             var values=defaults();context.setVariable("settings",ApplicationSettingsService.SETTINGS);context.setVariable("snapshot",new ApplicationSettingsService.Snapshot("application.yml","revision",values,values));
             String html=engine.process("applicationSettings",context);assertThat(html).doesNotContain("??appsettings.");var doc=org.jsoup.Jsoup.parse(html);
             for(var setting:ApplicationSettingsService.SETTINGS)if(setting.key().startsWith("myapp.drawio-preview.")){
-                var input=doc.getElementsByAttributeValue("name",setting.key());assertThat(input).hasSize(1);assertThat(input.attr("value")).isEqualTo(setting.fallback());assertThat(input.attr("max")).isEqualTo(Long.toString(setting.maximum()));
+                var input=doc.getElementsByAttributeValue("name",setting.key());assertThat(input).hasSize(1);
+                if(setting.type().equals("boolean")){assertThat(input.first().tagName()).isEqualTo("select");assertThat(input.select("option[selected]").attr("value")).isEqualTo("true");}
+                else{assertThat(input.attr("value")).isEqualTo(setting.fallback());assertThat(input.attr("max")).isEqualTo(Long.toString(setting.maximum()));}
             }
         }
     }

@@ -2,6 +2,26 @@ Upstream: https://github.com/jgraph/drawio
 Commit: f411a11f4f6b8994d869bdbc45f4d4d9e2284f34
 File: src/main/webapp/js/viewer-static.min.js (unmodified)
 SHA-256: c294fab9bc4bccb1790709ffa00f2d237863877f4c14d90147ef08da6d3ddd3a
-Licence: Apache-2.0; bundled component notices remain in the original asset.
+Code licence: Apache-2.0; bundled component notices remain in the original asset.
+Shape/icon artwork has additional upstream asset terms; see the files below.
 Pako 2.2.0 license source: https://github.com/nodeca/pako/blob/2.2.0/LICENSE
 Regenerator runtime license reference: https://github.com/facebook/regenerator/blob/main/LICENSE (unversioned reference; bundled runtime version not asserted)
+
+Additional assets from the SAME pinned upstream commit:
+- src/main/webapp/js/stencils.min.js (unmodified packed stencil definitions)
+- src/main/webapp/img/lib/** (1910 original PNG/SVG bytes, base64-packed by family)
+- 204 stencil sets, 9090 definitions (9089 unique shape identifiers).
+- 75 configurable families including JS shapes already in viewer-static.min.js.
+Catalogues/manifests and icon wrappers are generated, not upstream originals.
+Regeneration: packaging/drawio/generate-packs.py; see documentation/en/drawio-viewer.md.
+Individual original icon SHA-256 values: asset-sha256.json.
+Asset terms (NOT a claim that the artwork is unrestricted Apache or GPL):
+  distribution-notices/licenses/drawio-stencils-TERMS.txt
+  distribution-notices/licenses/drawio-shapes-TERMS.txt
+  distribution-notices/licenses/drawio-icons-TERMS.txt
+  distribution-notices/licenses/drawio-upstream-README.md
+These include a restriction on use as software assets in Atlassian products and
+its marketplace/plugin ecosystem. End-user diagram output is exempt.
+Third-party icons and trademarks retain their respective ownership and terms.
+SweetCherry is independent of Draw.io and does not claim endorsement.
+stencils.min.js SHA-256: 989d72d18bbf02e61c74937d7f51f048d198bb559c3ede4ae66c08e52544b983

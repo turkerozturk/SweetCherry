@@ -4,7 +4,7 @@ Ekler sayfasında veya rich-text içerikte `.drawio` eki için **Diyagramı gör
 
 Normal XML ve raw-DEFLATE/base64 sıkıştırılmış mxfile sayfaları ile tek mxGraphModel belgeleri desteklenir. Draw.io’nun sabit commit’e bağlı statik görüntüleyicisi yerel paketlenir; dosya veya resimler çevrim içi servise gönderilmez. Yeni Maven bağımlılığı yoktur.
 
-Salt okunur önizlemede HTML etiketlerin güvenli biçimlendirmesi, blok/satır sonları, yatay/dikey hizalaması ve kaydırması korunur. Bağlantılar, çalıştırılabilir içerik, özel XML stencil’leri, dış yazı tipleri/arkaplanlar ve kaynak URL’leri kaldırılır. Resimlerin yerine dosya adını gösteren dikdörtgen konur (gömülü resimler dahil). Normal vektör şekiller, çizgiler, gruplar ve güvenli renk/çizgi stilleri korunur. Özel şekiller, ikon fontları, matematik ve biçimli metin özgün Draw.io görünümünden farklı olabilir.
+Salt okunur önizlemede HTML etiketlerin güvenli biçimlendirmesi, blok/satır sonları, yatay/dikey hizalaması ve kaydırması korunur. Bağlantılar, çalıştırılabilir içerik, özel XML stencil’leri, dış yazı tipleri/arkaplanlar ve kaynak URL’leri kaldırılır. Paketlenmiş Draw.io kütüphane ikonları yerel olarak gösterilir; diğer resimlerin yerine dosya adını gösteren dikdörtgen konur (eke gömülü resimler dahil). Normal vektör şekiller, çizgiler, gruplar ve güvenli renk/çizgi stilleri korunur. Özel şekiller, ikon fontları, matematik ve biçimli metin özgün Draw.io görünümünden farklı olabilir.
 
 Görüntüleme allow-same-origin içermeyen sandbox iframe’de yapılır; CSP dış bağlantıları, resim/fontları ve aktif kaynakları engeller. İletişim özel MessageChannel ile kurulur; çizim koduna oturum belirteci veya veritabanı erişimi verilmez. Frame’in açılması, veri ve indirme istekleri oturum ve güncel CTB belirteci gerektirir. USER ve salt okunur kaynaklar da görüntüleyebilir; yazma endpoint’i yoktur.
 
@@ -42,3 +42,29 @@ Draw.io kök ve katman kimlikleri `0`/`1` olmak zorunda değildir. Görüntüley
 Ayrıştırma hatasında yerelleştirilmiş açıklama, `compression`, `graph_root`, `missing_parent`, `geometry_number` gibi sabit neden kodu, 1’den başlayan sayfa numarası ve varsa XML satır/sütunu gösterilir. Konsol uyarısında da kod/sayfa/konum bulunur; dosya adı, hücre metni veya ham XML loglanmaz. `invalid`, bu görüntüleyicinin bir yapıyı ayrıştıramadığını belirtir; dosyanın bozuk olduğunu kanıtlamaz. Limit hataları ayarlanabilir anahtarı göstermeye devam eder.
 
 Regresyon testlerinde farklı kök kimliği kullanan iki değiştirilmemiş upstream şablon vardır; kaynak/lisans bilgisi `src/test/resources/drawio/UPSTREAM.md` dosyasındadır. Geliştirme sırasında 155 upstream diyagram şablonu başarıyla ayrıştırılmıştır; ayrı katalog indeksi diyagram değildir. Bu kontrol ayrıştırma uyumluluğunu doğrular; tam tarayıcı görünümünü veya özel bir dosyanın içeriğini doğrulamaz.
+
+## Yerel şekil kütüphaneleri
+
+Sabit Draw.io sürümündeki 204 stencil seti (9.089 benzersiz şekil adı) ve 1.910 PNG/SVG kütüphane ikonu paketlenir. Infographic gibi JavaScript şekilleri mevcut statik görüntüleyicide bulunur. Standard/Basic/Flowchart, Cabinets, EIP, ağ ve diğer paketli aileler bu yapıya dahildir. Yeni Java bağımlılığı veya çevrim içi servis yoktur. General temel geometrik şekilleri ayrı anahtar gerektirmeden kullanılabilir.
+
+75 aile anahtarının hepsi varsayılan olarak açıktır. **System settings** filtresinde `drawio` veya `cabinets` gibi aile adıyla arayın, etkinliğini değiştirin, kaydedip uygulamayı yeniden başlatın. Tam liste `application.yml` içindedir. Mevcut eşlemeye eklenecek örnek:
+
+```yaml
+myapp:
+  drawio-preview:
+    shape-libraries:
+      cabinets: true
+      infographic: true
+      eip: true
+      clip-art: true
+      cisco: true
+      azure2: false
+```
+
+Tanımlar `static/js/drawio/stencils.min.js` ve `catalog.js` içinde hazırdır. Stencil seti ilk kullanıldığında açılır/kaydedilir; her sayfada bütün şekiller oluşturulmaz. İkonlar `static/js/drawio/icons/` altında ailelere ayrılmıştır; kapalı ikon paketleri iframe'e yüklenmez. Dosyalar uygulamayla gelir ve görüntüleme sırasında internetten kaynak indirilmez. Dış bir resim URL'si ikon desteği sayesinde izinli hale gelmez.
+
+Bulunamayan veya kapalı şekiller diyagramın üzerinde uyarı olarak ve **tarayıcı geliştirici konsolunda** `[SweetCherry Draw.io]` önekiyle görünür. Yalnızca tanım adı loglanır; içerik ve ham XML loglanmaz. Uyarılar tekrarsızdır ve her sayfa çiziminde en fazla 100 ad tutulur. Desteklenmeyen şekil normal dikdörtgene düşerken diğer hücreler çizilmeye devam eder. Dosyaya gömülmüş özel XML stencil'leri, kullanıcı kütüphaneleri, dış resimler, daha yeni sürümlerin şekilleri ve desteklenmeyen ikon fontları kapsam dışıdır; bütün diyagramlar için birebir görünüm garantisi değildir.
+
+Manuel örnek: `documentation/examples/drawio-library-shapes.drawio` dosyasını ekleyin. Cabinets/EIP/Flowchart/Infographic ve yerel ikon hücrelerini görüntüleyin; bir aileyi kapatıp yeniden başlatarak tekrar açın. Örnekte bilerek bulunamayan bir tanım ve dış bitmap yer tutucusu da vardır.
+
+Kod ve görsel varlık lisans koşulları aynı değildir. Kaynak sürümü, özgün ikon hash'leri ve tam kullanım bildirimleri `distribution-notices` ile `static/js/drawio/SOURCE.txt` içindedir. Atlassian ürünleri/marketplace için ek varlık kısıtları korunmuştur; bütün çizimler sınırsız Apache/GPL olarak etiketlenmez. Paket üretimi için isteğe bağlı geliştirici komutu ve ayrıntılar İngilizce kılavuzdadır; normal derleme/çalıştırma sırasında kaynak indirme veya Python/Node.js gerekmez.

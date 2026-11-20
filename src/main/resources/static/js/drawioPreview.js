@@ -13,7 +13,8 @@
             if(message?.type==='ready'){clearTimeout(frameTimer);ready=true;render();}
             else if(message?.type==='escape'){panel.classList.remove('drawio-expanded');fullState();}
             else if(message?.version===version&&message.type==='rendered'){
-                status.textContent='';if(Number.isFinite(message.scale))scale.textContent=Math.round(message.scale*100)+'%';buttons.forEach(button=>button.disabled=false);
+                const missing=Array.isArray(message.missing)?message.missing.filter(name=>typeof name==='string'&&name.length<=260).slice(0,100):[];
+                status.textContent=missing.length?(root.dataset.missing+' '+missing.join(' · ')):'';if(Number.isFinite(message.scale))scale.textContent=Math.round(message.scale*100)+'%';buttons.forEach(button=>button.disabled=false);
             }else if(message?.version===version&&message.type==='error'){status.textContent=root.dataset.error;buttons.forEach(button=>button.disabled=true);}
         };port.start();frame.contentWindow.postMessage({type:'sweetcherry-drawio-connect'},'*',[channel.port2]);
     });

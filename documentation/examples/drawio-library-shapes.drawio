@@ -1,0 +1,31 @@
+<mxfile host="SweetCherry offline example">
+  <diagram name="Offline library shapes">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" vertex="1" value="Cabinets" style="shape=mxgraph.cabinets.cb_1p;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
+          <mxGeometry as="geometry" x="30" y="30" width="140" height="140" />
+        </mxCell>
+        <mxCell id="3" parent="1" vertex="1" value="EIP Aggregator" style="shape=mxgraph.eip.aggregator;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
+          <mxGeometry as="geometry" x="250" y="30" width="140" height="140" />
+        </mxCell>
+        <mxCell id="4" parent="1" vertex="1" value="Flowchart" style="shape=mxgraph.flowchart.process;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
+          <mxGeometry as="geometry" x="470" y="30" width="140" height="140" />
+        </mxCell>
+        <mxCell id="5" parent="1" vertex="1" value="Infographic" style="shape=mxgraph.infographic.numberedEntryVert;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
+          <mxGeometry as="geometry" x="690" y="30" width="140" height="140" />
+        </mxCell>
+        <mxCell id="6" parent="1" vertex="1" value="Local Azure icon" style="shape=image;image=img/lib/azure2/ai_machine_learning/AI_Foundry.svg;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
+          <mxGeometry as="geometry" x="30" y="270" width="140" height="140" />
+        </mxCell>
+        <mxCell id="7" parent="1" vertex="1" value="Intentionally missing definition" style="shape=mxgraph.missing.demo;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
+          <mxGeometry as="geometry" x="250" y="270" width="140" height="140" />
+        </mxCell>
+        <mxCell id="8" parent="1" vertex="1" value="External bitmap placeholder" style="shape=image;image=https://example.invalid/architecture.png;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
+          <mxGeometry as="geometry" x="470" y="270" width="140" height="140" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

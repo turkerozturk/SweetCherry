@@ -7,7 +7,7 @@ function fixture({status=200,limit="",reason="",page=0,line=0,column=0,maxPageBy
  const keys=['iframe','[data-drawio-pages]','[data-drawio-status]','[data-drawio-filename]','[data-drawio-scale]','[data-drawio-panel]','[data-drawio-fullscreen]','[data-drawio-prev]','[data-drawio-next]'];const nodes=Object.fromEntries(keys.map(k=>[k,node()]));
  nodes['[data-drawio-reason="compression"]']=Object.assign(node(),{textContent:'Compressed page could not be decoded.'});
  const buttons=['fit','reset','zoom','zoom'].map(type=>Object.assign(node(),{dataset:{drawioCommand:type,factor:'in'}}));
- const root=node();root.dataset={endpoint:'/app/attachments/42/7/drawio/data?_tenantView=current',loading:'Loading',error:'Error',stale:'Stale',limit:'Limit exceeded:',invalid:'Cannot preview.',pageLabel:'Page',lineLabel:'Line'};root.querySelector=key=>nodes[key];root.querySelectorAll=()=>buttons;
+ const root=node();root.dataset={endpoint:'/app/attachments/42/7/drawio/data?_tenantView=current',missing:'Unavailable shapes:',loading:'Loading',error:'Error',stale:'Stale',limit:'Limit exceeded:',invalid:'Cannot preview.',pageLabel:'Page',lineLabel:'Line'};root.querySelector=key=>nodes[key];root.querySelectorAll=()=>buttons;
  const document=node();document.getElementById=()=>root;document.createElement=()=>node();const window=node();
  let framePort;const messages=[],requests=[];
  class Channel{constructor(){const one={start(){},close(){},postMessage(data){messages.push(data);}},two={postMessage(data){one.onmessage?.({data});}};this.port1=one;this.port2=two;}}
@@ -44,4 +44,12 @@ test('invalid documents identify the parser reason and page instead of calling t
 });
 test('unexpected diagnostic text is not used as a selector or rendered as markup',async()=>{
  const s=fixture({status:422,reason:'<img onerror=evil()>',page:2});await tick();assert.equal(s.nodes['[data-drawio-status]'].textContent,'Error');
+});
+
+test('missing shape diagnostics stay literal and old pages cannot replace the current warning',async()=>{
+ const s=fixture();await tick();s.connect();
+ s.reply({type:'rendered',version:1,scale:1,missing:['missing: mxgraph.unknown.demo','<img onerror=evil()>']});
+ assert.equal(s.nodes['[data-drawio-status]'].textContent,'Unavailable shapes: missing: mxgraph.unknown.demo · <img onerror=evil()>');
+ s.nodes['[data-drawio-next]'].listeners.click();s.reply({type:'rendered',version:1,scale:1,missing:['old']});assert.equal(s.nodes['[data-drawio-status]'].textContent,'Loading');
+ s.reply({type:'rendered',version:2,scale:1,missing:[]});assert.equal(s.nodes['[data-drawio-status]'].textContent,'');
 });

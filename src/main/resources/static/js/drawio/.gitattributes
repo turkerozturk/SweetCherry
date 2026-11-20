@@ -1,2 +1,4 @@
 # Preserve the generated upstream bundle byte-for-byte, including on Windows.
 viewer-static.min.js binary
+stencils.min.js binary
+icons/*.js binary

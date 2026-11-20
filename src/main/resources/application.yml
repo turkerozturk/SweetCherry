@@ -170,6 +170,83 @@ myapp:
     max-object-bytes: 16777216 # Stored image/attachment payload budget, 1024..33554432.
     max-objects: 200 # Images/attachments/anchors/codeboxes/tables, 1..500.
   drawio-preview:
+    # Bundled shape families; all enabled by default. Changes require restart.
+    shape-libraries:
+      active-directory: true
+      alibaba-cloud: true
+      allied-telesis: true
+      android: true
+      archimate: true
+      archimate3: true
+      archimate4: true
+      arrows: true
+      arrows2: true
+      atlassian: true
+      atlassian2: true
+      aws: true
+      aws2: true
+      aws3: true
+      aws3d: true
+      aws4: true
+      azure: true
+      azure2: true
+      basic: true
+      bootstrap: true
+      bpmn: true
+      c4: true
+      cabinets: true
+      cisco: true
+      cisco19: true
+      cisco-safe: true
+      citrix: true
+      citrix2: true
+      clip-art: true
+      cumulus: true
+      dfd: true
+      dynamics365: true
+      eip: true
+      electrical: true
+      emoji: true
+      er: true
+      floorplan: true
+      flowchart: true
+      fluid-power: true
+      gcp: true
+      gcp2: true
+      gcp3: true
+      gmdl: true
+      ibm: true
+      ibm-cloud: true
+      infographic: true
+      ios: true
+      ios7: true
+      ios7ui: true
+      kubernetes: true
+      kubernetes2: true
+      lean-mapping: true
+      mockup: true
+      mscae: true
+      networks: true
+      networks2: true
+      office: true
+      openstack: true
+      pid: true
+      pid2inst: true
+      pid2misc: true
+      pid2valves: true
+      rack: true
+      rackgeneral: true
+      salesforce: true
+      sap: true
+      signs: true
+      sitemap: true
+      sysml: true
+      uml25: true
+      veeam: true
+      veeam2: true
+      vvd: true
+      webicons: true
+      weblogos: true
     max-file-bytes: 16777216
     max-page-bytes: 16777216
     max-total-bytes: 134217728

@@ -22,7 +22,9 @@ public class ApplicationSettingsService {
         public long minimum(){return ApplicationSettingsService.minimum(this);}
         public List<String> choices(){return ApplicationSettingsService.choices(this);}
     }
-    public static final List<Setting> SETTINGS=List.of(
+    public static final List<Setting> SETTINGS=settings();
+    private static List<Setting> settings(){
+        var result=new ArrayList<Setting>(List.of(
         new Setting("myapp.drawio-preview.max-xml-attributes","number","128",1024),
         new Setting("myapp.drawio-preview.max-file-bytes","number","16777216",67108864),
         new Setting("myapp.drawio-preview.max-page-bytes","number","16777216",67108864),
@@ -106,7 +108,10 @@ public class ApplicationSettingsService {
         new Setting("myapp.pdf.max-node-text-characters","number","8388608",2147483647),
         new Setting("myapp.pdf.max-html-characters","number","67108864",2147483647),
         new Setting("myapp.pdf.max-image-bytes","number","50331648",2147483647),
-        new Setting("myapp.pdf.max-image-pixels","number","40000000",2147483647));
+        new Setting("myapp.pdf.max-image-pixels","number","40000000",2147483647)));
+        for(String group:com.turkerozturk.image.attachments.drawio.DrawioLibraries.GROUPS)result.add(new Setting(com.turkerozturk.image.attachments.drawio.DrawioLibraries.key(group),"boolean","true",0));
+        return List.copyOf(result);
+    }
     private final ConfigurableEnvironment environment;
     public ApplicationSettingsService(ConfigurableEnvironment environment){this.environment=environment;}
     public Path file()throws IOException {

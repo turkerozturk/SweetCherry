@@ -49,7 +49,7 @@ class DrawioSecurityTest {
         @Bean InMemoryUserDetailsManager users(){return new InMemoryUserDetailsManager();}
         @Bean DrawioService previews(){return mock(DrawioService.class);}
 
-        @Bean DrawioController previewController(DrawioService service){return new DrawioController(service);}
+        @Bean DrawioController previewController(DrawioService service){return new DrawioController(service,new DrawioLibraries(new org.springframework.core.env.StandardEnvironment()));}
         @Override public void addInterceptors(InterceptorRegistry registry){registry.addInterceptor(new TenantRequiredInterceptor());}
         @Bean SecurityFilterChain chain(HttpSecurity http)throws Exception{var config=new SecurityConfig();ReflectionTestUtils.setField(config,"loginUserName","user");ReflectionTestUtils.setField(config,"loginAdminName","admin");return config.filterChain(http,new LoginAttemptLimiter(),new LoginClientAddressResolver(""));}
     }

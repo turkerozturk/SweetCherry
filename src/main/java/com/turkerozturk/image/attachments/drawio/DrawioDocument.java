@@ -141,7 +141,7 @@ final class DrawioDocument {
             for(String token:cell.getAttribute("style").split(";")){
                 int equals=token.indexOf('=');String key=equals<0?token:token.substring(0,equals),v=equals<0?"":token.substring(equals+1);
                 if(key.equals("sourcePort")||key.equals("targetPort")){if(ids.containsKey(v))style.append(key).append('=').append(ids.get(v)).append(';');continue;}
-                if(key.equalsIgnoreCase("image")){image=imageName(v);continue;}
+                if(key.equalsIgnoreCase("image")){String icon=DrawioLibraries.iconPath(v);if(icon!=null)style.append("image=sc-icon:").append(icon).append(';');else image=imageName(v);continue;}
                 if(Set.of("html","imageBackground","imageBorder","fontSource","link","whiteSpace","flowAnimation","animated","sketch","jiggle").contains(key))continue;
                 if(v.equalsIgnoreCase("NaN")||v.equalsIgnoreCase("Infinity"))continue;
                 if(v.matches("[+\\-]?[0-9.]+([eE][+\\-]?[0-9]+)?")){try{double number=Double.parseDouble(v);if(!Double.isFinite(number)||Math.abs(number)>10000)continue;}catch(NumberFormatException invalid){continue;}}
