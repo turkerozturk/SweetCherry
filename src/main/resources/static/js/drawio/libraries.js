@@ -2,9 +2,10 @@
 (() => {
     'use strict';
     const catalog=window.SweetCherryDrawioCatalog,icons=window.SweetCherryDrawioIcons;
+    const locals=window.SweetCherryDrawioLocalImages||{};
     const known=new Set(catalog.groups);
     const enabled=new Set((document.body.dataset.drawioLibraries||'').split(','));
-    const loaded=new Set(),warnings=new Set(),trustedImages=new Set(Object.values(icons));
+    const loaded=new Set(),warnings=new Set(),trustedImages=new Set([...Object.values(icons),...Object.values(locals)]);
     const own=(object,key)=>Object.prototype.hasOwnProperty.call(object,key);
     function warn(reason,name){
         // Bounded, deduplicated identifiers only: no labels, raw XML, URLs or attachment names.
@@ -38,6 +39,7 @@
         if(trustedImages.has(value))return value;
         const name=value.startsWith('sc-icon:')?value.substring(8):value.startsWith('img/lib/')?value.substring(8):null;
         if(!name)return null;
+        if(own(locals,'shape.'+name))return locals['shape.'+name];
         const group=name.split('/')[0];
         if(!enabled.has(group)){warn('disabled icon',name);return null;}
         if(!own(icons,name)){warn('missing icon',name);return null;}
@@ -51,14 +53,33 @@
     window.SweetCherryDrawioLibraries={
         begin(){warnings.clear();},warnings(){return [...warnings];},image,
         attach(graph){
-            const getStyle=graph.getCellStyle;
+            const getStyle=graph.getCellStyle,getLabel=graph.getLabel;
+            const escape=value=>String(value).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+            function fallback(style,name){return {...style,shape:'rectangle',scPlaceholder:'Shape: '+name};}
             graph.getCellStyle=function(...args){
-                const style=getStyle.apply(this,args),name=style.shape;
-                if(!allowed(name))return {...style,shape:'rectangle'};
+                const style=getStyle.apply(this,args),name=style.scOriginalShape||style.shape;
+                if(name&&own(locals,'shape.'+name))return {...style,shape:'image',image:locals['shape.'+name],scLocalReplacement:true};
+                if(style.scImageKey){
+                    const key='image.'+style.scImageKey;
+                    if(own(locals,key))return {...style,shape:'image',image:locals[key],scLocalReplacement:true};
+                    if(!style.image||!image(style.image))warn('local image key',key);
+                    if(!style.image)return style;
+                }
+                if(style.image&&!image(style.image)){
+                    const id=style.image.startsWith('sc-icon:')?style.image.substring(8):'unavailable image';
+                    return {...style,scPlaceholder:'Image: '+id};
+                }
+                if(!allowed(name))return fallback(style,name);
                 if(name&&!own(mxCellRenderer.defaultShapes,name)&&!own(catalog.shapes,name)){
-                    warn('missing',name);return {...style,shape:'rectangle'};
+                    warn('missing',name);return fallback(style,name);
                 }
                 return style;
+            };
+            graph.getLabel=function(cell){
+                let label=getLabel.call(this,cell);const style=this.getCellStyle(cell);
+                if(style.scLocalReplacement)label=String(label||'').replace(/(?:<br\s*\/?>)?<span\b[^>]*\bclass="sc-drawio-placeholder"[^>]*>[\s\S]*?<\/span>/g,'');
+                if(style.scPlaceholder)label=(label?label+'<br>':'')+'<span class="sc-drawio-placeholder">['+escape(style.scPlaceholder)+']</span>';
+                return label;
             };
             graph.getImage=state=>image(state?.style?.image);
             graph.getIndicatorImage=()=>null;

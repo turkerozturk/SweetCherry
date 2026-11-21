@@ -28,4 +28,24 @@
       </root>
     </mxGraphModel>
   </diagram>
+  <diagram name="Colors and placeholders">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" vertex="1" value="&lt;div style='color:rgb(180, 20, 30);background-color:#123456'&gt;RGB foreground and hex background&lt;/div&gt;&lt;span style='color:#654321;background:rgba(255, 240, 100, 0.7)'&gt;Highlighted text&lt;/span&gt;" style="rounded=1;html=1;">
+          <mxGeometry as="geometry" x="30" y="30" width="290" height="140" />
+        </mxCell>
+        <mxCell id="3" parent="1" vertex="1" value="External screenshot" style="shape=image;image=https://example.invalid/manual/screenshot.png;html=1;">
+          <mxGeometry as="geometry" x="380" y="30" width="290" height="140" />
+        </mxCell>
+        <mxCell id="4" parent="1" vertex="1" value="Local replacement example" style="shape=mxgraph.example.missing;html=1;">
+          <mxGeometry as="geometry" x="30" y="220" width="290" height="140" />
+        </mxCell>
+        <mxCell id="5" parent="1" vertex="1" value="" style="shape=image;html=1;">
+          <mxGeometry as="geometry" x="380" y="220" width="290" height="140" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
 </mxfile>

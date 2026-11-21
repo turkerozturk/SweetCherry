@@ -87,8 +87,13 @@ final class DrawioDocument {
         if(!htmlLabel)return org.jsoup.nodes.Entities.escape(value).replace("\r\n","\n").replace("\r","\n").replace("\n","<br>");
         var html=org.jsoup.Jsoup.parse(value);html.outputSettings().prettyPrint(false);
         html.select("script,style,iframe,object,embed,svg,math").remove();
-        html.select("img").forEach(image->image.replaceWith(new org.jsoup.nodes.TextNode("[Image: "+imageName(image.attr("src"))+"]")));
-        var safe=new org.jsoup.safety.Safelist().addTags("div","p","span","b","strong","i","em","u","s","strike","sub","sup","br","ul","ol","li","pre","code","font").addAttributes(":all","style","align").addAttributes("font","color","size","face");
+        html.getAllElements().forEach(e->{e.removeAttr("data-sc-placeholder");e.removeAttr("data-sc-image-key");});
+        html.select("img").forEach(image->{
+            String name=imageName(image.attr("src")),alt=image.attr("alt").strip();
+            if((name.equals("image")||name.equals("missing source")||name.startsWith("embedded"))&&!alt.isBlank())name=alt.substring(0,Math.min(160,alt.length()));
+            image.replaceWith(new org.jsoup.nodes.Element("span").attr("data-sc-placeholder","1").attr("data-sc-image-key",imageKey(image.attr("src"))).text("↗ [Image: "+name+"]"));
+        });
+        var safe=new org.jsoup.safety.Safelist().addTags("div","p","span","b","strong","i","em","u","s","strike","sub","sup","br","ul","ol","li","pre","code","font").addAttributes(":all","style","align").addAttributes("font","color","size","face").addAttributes("span","data-sc-placeholder","data-sc-image-key");
         html=new org.jsoup.safety.Cleaner(safe).clean(html);html.outputSettings().prettyPrint(false);
         if(html.getAllElements().size()>settings.xmlElements())throw limit("max-xml-elements");
         for(var element:html.getAllElements()){
@@ -96,19 +101,31 @@ final class DrawioDocument {
             StringBuilder css=new StringBuilder();
             for(String entry:element.attr("style").split(";")){
                 int colon=entry.indexOf(':');if(colon<0)continue;String key=entry.substring(0,colon).strip().toLowerCase(Locale.ROOT),v=entry.substring(colon+1).strip();
-                if(!Set.of("text-align","vertical-align","white-space","font-size","font-family","font-weight","font-style","color","background-color","text-decoration","line-height","margin","padding","word-wrap","overflow-wrap").contains(key)||v.length()>200||!v.matches("[A-Za-z0-9_#.,% +\\-]+"))continue;
+                if(!Set.of("text-align","vertical-align","white-space","font-size","font-family","font-weight","font-style","color","background-color","background","text-decoration","line-height","margin","padding","word-wrap","overflow-wrap").contains(key)||v.length()>200)continue;
+                if(Set.of("color","background-color","background").contains(key)){if(safeColor(v))css.append(key.equals("background")?"background-color":key).append(':').append(v).append(';');continue;}
+                if(!v.matches("[A-Za-z0-9_#.,% +\\-]+"))continue;
                 var numbers=java.util.regex.Pattern.compile("[0-9]+(?:\\.[0-9]+)?").matcher(v);boolean large=false;while(numbers.find())if(Double.parseDouble(numbers.group())>4096)large=true;
                 if(!large)css.append(key).append(':').append(v).append(';');
             }
+            if(element.hasAttr("data-sc-placeholder"))element.attr("class","sc-drawio-placeholder");
             if(element.hasAttr("align")&&!Set.of("left","right","center","justify").contains(element.attr("align")))element.removeAttr("align");
             element.removeAttr("style");if(!css.isEmpty())element.attr("style",css.toString());
-            for(String attr:List.of("color","size","face"))if(element.hasAttr(attr)&&!element.attr(attr).matches("[A-Za-z0-9_#., +\\-]{1,100}"))element.removeAttr(attr);
+            for(String attr:List.of("color","size","face"))if(element.hasAttr(attr)&&(attr.equals("color")?!safeColor(element.attr(attr)):!element.attr(attr).matches("[A-Za-z0-9_#., +\\-]{1,100}")))element.removeAttr(attr);
         }
         return html.body().html();
     }
+    private static boolean safeColor(String value){
+        return value.matches("#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|[A-Za-z]{1,30}")
+            ||value.length()<=100&&value.matches("(?i)(?:rgb|rgba|hsl|hsla)\\([0-9.,% +\\-]+\\)");
+    }
+    static String imageKey(String value){
+        try{return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8)));}catch(java.security.NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}
+    }
+    private static String placeholder(String label,String key){return "<span class=\"sc-drawio-placeholder\" data-sc-placeholder=\"1\" title=\"Local image key: image."+key+"\">"+org.jsoup.nodes.Entities.escape(label)+"</span>";}
     private static String imageName(String value){
+        if(value.startsWith("data:image/svg"))return "embedded SVG image";
         if(value.startsWith("data:"))return "embedded image";
-        String name=value.split("[?#]",2)[0].replace('\\','/');name=name.substring(name.lastIndexOf('/')+1);if(name.isBlank())name="image";return name.length()>160?name.substring(0,160):name;
+        String name=value.split("[?#]",2)[0].replace('\\','/');name=name.substring(name.lastIndexOf('/')+1);if(name.isBlank())name="missing source";return name.length()>160?name.substring(0,160):name;
     }
     private static final String EMPTY_MODEL="<mxGraphModel><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/></root></mxGraphModel>";
     private String clean(Element model)throws Exception{
@@ -137,17 +154,28 @@ final class DrawioDocument {
             String parent=parents.get(id);if(!parent.isEmpty()){if(!ids.containsKey(parent))throw invalid("missing_parent");copy.setAttribute("parent",ids.get(parent));}
             for(String ref:List.of("source","target")){String target=cell.getAttribute(ref);if(originals.containsKey(target)&&"1".equals(originals.get(target).getAttribute("vertex")))copy.setAttribute(ref,ids.get(target));}
             String value=!"root".equals(wrapper.getTagName())&&wrapper.hasAttribute("label")?wrapper.getAttribute("label"):cell.getAttribute("value");value=plain(value,Arrays.asList(cell.getAttribute("style").split(";")).contains("html=1"));
-            var style=new StringBuilder();String image=null;
+            var style=new StringBuilder();String image=null,missingKey=null;boolean hasImage=false;
             for(String token:cell.getAttribute("style").split(";")){
                 int equals=token.indexOf('=');String key=equals<0?token:token.substring(0,equals),v=equals<0?"":token.substring(equals+1);
                 if(key.equals("sourcePort")||key.equals("targetPort")){if(ids.containsKey(v))style.append(key).append('=').append(ids.get(v)).append(';');continue;}
-                if(key.equalsIgnoreCase("image")){String icon=DrawioLibraries.iconPath(v);if(icon!=null)style.append("image=sc-icon:").append(icon).append(';');else image=imageName(v);continue;}
+                if(Set.of("fontColor","labelBackgroundColor","labelBorderColor").contains(key)){if(safeColor(v))style.append(key).append('=').append(v).append(';');continue;}
+                if(key.equalsIgnoreCase("image")){hasImage=true;missingKey=imageKey(v);style.append("scImageKey=").append(missingKey).append(';');String icon=DrawioLibraries.iconPath(v);if(icon!=null)style.append("image=sc-icon:").append(icon).append(';');else{image=imageName(v);}continue;}
                 if(Set.of("html","imageBackground","imageBorder","fontSource","link","whiteSpace","flowAnimation","animated","sketch","jiggle").contains(key))continue;
                 if(v.equalsIgnoreCase("NaN")||v.equalsIgnoreCase("Infinity"))continue;
                 if(v.matches("[+\\-]?[0-9.]+([eE][+\\-]?[0-9]+)?")){try{double number=Double.parseDouble(v);if(!Double.isFinite(number)||Math.abs(number)>10000)continue;}catch(NumberFormatException invalid){continue;}}
                 if(key.matches("[A-Za-z][A-Za-z0-9_]{0,60}")&&v.length()<=200&&v.matches("[A-Za-z0-9_#., +\\-]*"))style.append(key).append(equals<0?"":"="+v).append(';');
             }
-            if(image!=null){value+=(value.isBlank()?"":"<br>")+org.jsoup.nodes.Entities.escape("[Image: "+image+"]");style.append("shape=rectangle;");}
+            if(image==null&&!hasImage&&Arrays.asList(cell.getAttribute("style").split(";")).contains("shape=image")){image="missing source";missingKey=imageKey("");style.append("scImageKey=").append(missingKey).append(';');}
+            if(image!=null){
+                var original=java.util.regex.Pattern.compile("(?:^|;)shape=([A-Za-z][A-Za-z0-9_.-]{0,199})(?:;|$)").matcher(cell.getAttribute("style"));
+                if(original.find())style.append("scOriginalShape=").append(original.group(1)).append(';');
+                if(image.equals("image")||image.startsWith("embedded")){
+                    var shape=java.util.regex.Pattern.compile("(?:^|;)shape=([^;]+)").matcher(cell.getAttribute("style"));String name=shape.find()?shape.group(1):"";
+                    if(!Set.of("image","rectangle","label","").contains(name))image=name;
+                    else{String caption=org.jsoup.Jsoup.parse(value).text();if(!caption.isBlank())image=caption.substring(0,Math.min(100,caption.length()));}
+                }
+                value+=(value.isBlank()?"":"<br>")+placeholder("↗ [Image: "+image+"]",missingKey);style.append("shape=rectangle;");
+            }
             copy.setAttribute("value",value);copy.setAttribute("style",style+"html=1;whiteSpace=wrap;");
             for(Node node=cell.getFirstChild();node!=null;node=node.getNextSibling())if(node instanceof Element e&&"mxGeometry".equals(e.getTagName()))copy.appendChild(geometry(result,e,0));
             root.appendChild(copy);

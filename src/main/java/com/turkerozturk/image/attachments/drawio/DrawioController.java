@@ -22,7 +22,7 @@ public class DrawioController {
     }
     @GetMapping("/attachments/drawio/frame")
     public String frame(@RequestParam String _tenantView,Model model,HttpServletResponse response){
-        model.addAttribute("drawioLibraries",String.join(",",libraries.enabled()));model.addAttribute("drawioIconScripts",libraries.iconScripts());
+        model.addAttribute("drawioLocalImages",libraries.localImages());model.addAttribute("drawioLibraries",String.join(",",libraries.enabled()));model.addAttribute("drawioIconScripts",libraries.iconScripts());
         String nonce=java.util.UUID.randomUUID().toString();model.addAttribute("drawioNonce",nonce);
         response.setHeader("Cache-Control","no-store");response.setHeader("X-Content-Type-Options","nosniff");
         response.setHeader("Content-Security-Policy","default-src 'none'; script-src 'nonce-"+nonce+"'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; sandbox allow-scripts");

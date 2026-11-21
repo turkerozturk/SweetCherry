@@ -170,6 +170,7 @@ myapp:
     max-object-bytes: 16777216 # Stored image/attachment payload budget, 1024..33554432.
     max-objects: 200 # Images/attachments/anchors/codeboxes/tables, 1..500.
   drawio-preview:
+    local-images-directory: "" # Optional administrator-provided PNG/JPEG replacements; see Draw.io viewer guide. Restart required.
     # Bundled shape families; all enabled by default. Changes require restart.
     shape-libraries:
       active-directory: true

@@ -1,6 +1,6 @@
 # Draw.io ek görüntüleyici
 
-Ekler sayfasında veya rich-text içerikte `.drawio` eki için **Diyagramı görüntüle** bağlantısını açın. Sayfa seçimi (varsayılan en fazla 512 sayfa), %2–400 yakınlaştırma, %100, ekrana sığdırma, kaydırma çubukları ve tam ekran vardır. Diyagram üzerinde normal tekerlek yakınlaştırır; Shift basılıyken kaydırır. **Genişliğe sığdır** yatay alanı doldurur; yüksek diyagram dikey kaydırılabilir. Tarayıcı tam ekranı kullanılamazsa büyütülmüş panel açılır; Escape kapatır. Özgün dosya indirilebilir.
+Ekler sayfasında veya rich-text içerikte `.drawio` eki için **Diyagramı görüntüle** bağlantısını açın. Sayfa seçimi (varsayılan en fazla 512 sayfa), %2–400 yakınlaştırma, %100, ekrana sığdırma, kaydırma çubukları ve tam ekran vardır. Diyagram üzerinde normal tekerlek işaretçinin konumunu sabit tutarak yakınlaştırır; Shift basılıyken kaydırır. **Genişliğe sığdır** yatay alanı doldurur; yüksek diyagram dikey kaydırılabilir. Tarayıcı tam ekranı kullanılamazsa büyütülmüş panel açılır; Escape kapatır. Özgün dosya indirilebilir.
 
 Normal XML ve raw-DEFLATE/base64 sıkıştırılmış mxfile sayfaları ile tek mxGraphModel belgeleri desteklenir. Draw.io’nun sabit commit’e bağlı statik görüntüleyicisi yerel paketlenir; dosya veya resimler çevrim içi servise gönderilmez. Yeni Maven bağımlılığı yoktur.
 
@@ -68,3 +68,42 @@ Bulunamayan veya kapalı şekiller diyagramın üzerinde uyarı olarak ve **tara
 Manuel örnek: `documentation/examples/drawio-library-shapes.drawio` dosyasını ekleyin. Cabinets/EIP/Flowchart/Infographic ve yerel ikon hücrelerini görüntüleyin; bir aileyi kapatıp yeniden başlatarak tekrar açın. Örnekte bilerek bulunamayan bir tanım ve dış bitmap yer tutucusu da vardır.
 
 Kod ve görsel varlık lisans koşulları aynı değildir. Kaynak sürümü, özgün ikon hash'leri ve tam kullanım bildirimleri `distribution-notices` ile `static/js/drawio/SOURCE.txt` içindedir. Atlassian ürünleri/marketplace için ek varlık kısıtları korunmuştur; bütün çizimler sınırsız Apache/GPL olarak etiketlenmez. Paket üretimi için isteğe bağlı geliştirici komutu ve ayrıntılar İngilizce kılavuzdadır; normal derleme/çalıştırma sırasında kaynak indirme veya Python/Node.js gerekmez.
+
+## Renkler, yer tutucular ve yerel görsel tamamlama
+
+HTML metinlerinde güvenli foreground/highlight renkleri (isim, hex, RGB/RGBA/HSL) ve tek renk içeren `background` korunur. Hex renkler sayısal boyut sınırına takılmaz. Hücre font/etiket arkaplan renkleri de korunur; aktif CSS, URL ve scriptler çalışmaz.
+
+**Eksik şekil ve resim adlarını göster** kutusu, diyagramdaki yer tutucu metinlerini ve üstteki uyarı özetini açar/kapatır. Varsayılan açıktır; tercih tarayıcıda hatırlanır. Özgün açıklama metni ve hücre geometrisi korunur. Konsol logları devam eder. Bilinmeyen vektör şekillerin tanım adı, bulunamayan ikonların kütüphane yolu; diğer resimlerin dosya adı, varsa shape adı/açıklaması veya `missing source` gösterilir. Dış resim URL'si ziyaret edilmez.
+
+Yönetici, SweetCherry’nin çalıştığı bilgisayarda bir klasöre **PNG/JPEG karşılıkları** yerleştirebilir. Bu özellik shape/resim hücreleri içindir; JavaScript, XML stencil, SVG veya HTML etiketinin içindeki img öğeleri için bir eklenti yükleyicisi değildir.
+
+1. Örneğin `C:/SweetCherry/drawio-images` klasörüne `appliance.png` dosyanızı koyun.
+2. Aynı klasörde UTF-8 `images.properties` oluşturun:
+
+```properties
+shape.mxgraph.example.missing=appliance.png
+# Bir resim için yer tutucu hover bilgisinden veya tarayıcı konsolundan anahtarı kopyalayın:
+# image.<64-karakterlik-SHA-256-anahtarı>=screenshot.jpg
+```
+
+3. System settings içindeki **Draw.io yerel PNG/JPEG eşleme klasörü** alanını ayarlayın veya mevcut YAML eşlemesine ekleyin:
+
+```yaml
+myapp:
+  drawio-preview:
+    local-images-directory: 'C:/SweetCherry/drawio-images'
+```
+
+4. Yeniden başlatıp diyagramı açın. Dosya/eşleme değişikliklerinde de restart gerekir; ayarı boş bırakmak özelliği kapatır. Dosya adları bu klasöre göre göreli olmalıdır; mutlak yollar, klasör dışına çıkış ve dışarı yönelen symlink'ler reddedilir. URL yazılmaz. Yerel karşılıklar kaynak hücrenin geometrisinde gösterilir; kaynak CTB/ek dosya değiştirilmez. Açıklama metni kalır, çözülen resmin yer tutucusu kaldırılır. Eşlemeler uygulama genelindedir ve farklı CTB'lerden erişen okuyuculara da sunulur; yalnızca sunmak istediğiniz görselleri içeren bir uygulama klasörü kullanın. Açıkça tanımlanan yerel karşılıklar eşleşen hazır/fallback şekilden önce gelir.
+
+Resim hücresinin eşleme anahtarı özgün kaynak metninin (sorgu parametreleri dahil) SHA-256 değeridir. Ham dış URL temizlenmiş diyagrama gönderilmez. Sunucunun oluşturduğu resim yer tutucusunun üzerine gelince `image.<anahtar>` görülür; eksik resim hücresi anahtarları tarayıcı konsoluna da yazılır. Dış görüntüyü kendiniz temin edip bu anahtara bağlayabilirsiniz.
+
+Manifest en fazla 64 KiB/128 kayıt; tek resim 2 MiB/16 milyon piksel; toplam 8 MiB/32 milyon piksel olabilir. Dosyanın gerçek raster türü ve boyutları kontrol edilir. Geçersiz kayıtlar atlanıp sunucuya anahtar bazlı uyarı yazılır. Dosyalar başlangıçta okunur; tarayıcının gönderdiği keyfi bir yoldan dosya okuyan endpoint yoktur.
+
+`documentation/examples/drawio-library-shapes.drawio` içindeki `Colors and placeholders` sayfası renkleri, eksik adları/kaynakları ve `shape.mxgraph.example.missing` yerel karşılığını denemek içindir.
+
+## Gizlilik sınırı ve Windows CI
+
+SweetCherry önizlemesi yerel script/kaynak kullanır. Sandbox içinde `connect-src 'none'`, `img-src data:`, `font-src 'none'` ve nonce'lu script politikası korunur. Diyagram Draw.io’ya gönderilmez, dış resimler indirilmez. Çevrim içi editörün bulut, AI, işbirliği veya sunucu dönüştürme özellikleri bu görüntüleyiciye dahil değildir. Ayrı Draw.io web editörünün güncel gizlilik politikasında bazı PDF/resim export, AI ve işbirliği işlemlerinin sunucuda işlendiği belirtilir: https://www.drawio.com/trust/ .
+
+Önceki kütüphane testindeki CI hatası Windows CRLF satır sonlarından kaynaklanıyordu: test yalnızca LF ile bölünce aile adlarında CR kalıyordu. Fixture düzeltildi ve `core.autocrlf=true` checkout'unda doğrulandı. Özgün vendor paketleri değiştirilmedi.

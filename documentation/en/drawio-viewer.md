@@ -1,6 +1,6 @@
 # Draw.io attachment viewer
 
-Open **View diagram** for a `.drawio` file in Attachments or a rich-text attachment link. The original download remains available. Choose any page within the configured budget (512 pages by default); zoom from 2% to 400%, reset to 100%, fit the current page, scroll, or toggle fullscreen. The ordinary wheel zooms inside the diagram; hold Shift for native scrolling. **Fit horizontally** fills the available width while tall content remains vertically scrollable. Fullscreen uses the browser API with an expanded-panel fallback; Escape closes the fallback.
+Open **View diagram** for a `.drawio` file in Attachments or a rich-text attachment link. The original download remains available. Choose any page within the configured budget (512 pages by default); zoom from 2% to 400%, reset to 100%, fit the current page, scroll, or toggle fullscreen. The ordinary wheel zooms around the pointer inside the diagram; hold Shift for native scrolling. **Fit horizontally** fills the available width while tall content remains vertically scrollable. Fullscreen uses the browser API with an expanded-panel fallback; Escape closes the fallback.
 
 Normal and raw-DEFLATE/base64 compressed mxfile pages and standalone mxGraphModel documents are supported. The official Draw.io static viewer is bundled locally at a pinned commit; neither diagrams nor external images are sent to Draw.io or another service. No Nasdanika/Java renderer or new Maven dependency is needed.
 
@@ -70,3 +70,40 @@ Manual sample: attach `documentation/examples/drawio-library-shapes.drawio`, vie
 Vendor code and artwork terms differ. The exact pinned icon/stencil usage terms, third-party ownership/trademark notice, original asset hashes and source revision are recorded in `distribution-notices` and `static/js/drawio/SOURCE.txt`. The additional asset terms include restrictions relating to Atlassian products/marketplace; these resources are not labelled as unrestricted Apache/GPL artwork.
 
 For maintainers, regeneration is optional and happens only at development time. Use a local Draw.io clone checked out at the revision in `SOURCE.txt`, with `src/main/webapp/js/stencils.min.js` and the complete `src/main/webapp/img/lib/` present. Run `python packaging/drawio/generate-packs.py /path/to/drawio` (Python 3 and Node.js, no extra packages). Review licence changes before changing the pinned revision. Generated packs preserve original image payload bytes; the generator rejects active/external SVG references and incomplete input. Normal SweetCherry builds and runs do not download these assets or need Python/Node.js for the viewer.
+
+## Colors, missing names and local replacements
+
+HTML label foreground/highlight colors now preserve safe named/hex/RGB/RGBA/HSL colors, including `background` used as a single color. Hex colors are not treated as numeric sizes. Active CSS, resource URLs and scripts remain removed. Cell-level font/label background colors are preserved as well.
+
+**Show missing shape and image names** controls the placeholder text inside the diagram and the diagnostic summary above it. It defaults to on, and the preference persists in browser local storage across pages and visits. Hiding these names keeps the original captions and the placeholder geometry; it does not delete cells. The browser console continues to report missing identifiers. Unknown vector shapes show their shape identifier; unresolved library icons show their library path. Other unavailable images show a marked `[Image: filename]`, their original shape name/caption when available, or `missing source`. The original external image URL is never fetched. Hover a server-generated image marker to find its stable `image.<SHA-256>` mapping key; missing image-cell keys are also logged in the browser console. The hash is calculated from the exact source string, including query parameters, without exposing that URL in the sanitized model.
+
+An administrator may provide **PNG/JPEG raster replacements** on the computer running SweetCherry. This supports missing shape/image cells; it does not install executable JavaScript, XML stencil packs, SVG overrides or images inside HTML labels.
+
+1. Create a directory such as `C:/SweetCherry/drawio-images` and place your PNG/JPEG files there.
+2. Create UTF-8 `images.properties` inside it, for example:
+
+```properties
+shape.mxgraph.example.missing=appliance.png
+# For an unavailable image, copy its exact key from the marker tooltip/console:
+# image.<64-character SHA-256 key>=screenshot.jpg
+```
+
+3. Set **Draw.io local PNG/JPEG mapping directory** in System settings, or merge the following into the existing YAML mapping:
+
+```yaml
+myapp:
+  drawio-preview:
+    local-images-directory: 'C:/SweetCherry/drawio-images'
+```
+
+4. Restart SweetCherry and reopen the diagram. Restart after changing files/mappings. An empty directory setting disables replacements. Use paths relative to this directory in `images.properties`; absolute paths, traversal and symlinks escaping it are rejected. Never put a URL in the filename field. A mapped image is embedded locally as a data image, keeping the caption and using the original cell geometry. Explicit local replacements take precedence over the matching bundled/fallback shape; they are global to this SweetCherry instance, including its selected databases. Keep replacements in an application-owned folder containing only the images you intend to make available to its readers.
+
+The manifest is limited to 64 KiB/128 entries; each raster is at most 2 MiB and 16 million pixels; totals are capped at 8 MiB and 32 million pixels. Image signatures/dimensions are checked. Invalid entries are skipped with a bounded-key server warning; an invalid/unavailable manifest disables the pack. Files are read at startup, not downloaded or requested by arbitrary paths from a browser. The source attachment/database is never overwritten.
+
+The `Colors and placeholders` page in `documentation/examples/drawio-library-shapes.drawio` exercises colors, unknown names, missing image sources and `shape.mxgraph.example.missing` for a local replacement.
+
+## Privacy boundary
+
+This SweetCherry preview uses fixed local vendor scripts/resources, a sanitized graph and an opaque sandbox. Its frame policy retains `connect-src 'none'`, `img-src data:`, `font-src 'none'` and nonced scripts. It does not include the online editor, cloud storage, AI, collaboration or server conversion. It sends no diagram content to Draw.io and does not fetch external media referenced by diagrams. This does not describe every feature of the separate online Draw.io editor: its current privacy policy lists server-processed functions such as PDF/image export, collaboration and AI (https://www.drawio.com/trust/).
+
+The Windows CI failure in the first library tests was a CRLF fixture-reading bug: splitting `groups.txt` on only LF left a CR on each name. The fixture now handles Windows line endings. This was reproduced using an actual `core.autocrlf=true` checkout; the fix does not alter the unmodified vendor bundles.

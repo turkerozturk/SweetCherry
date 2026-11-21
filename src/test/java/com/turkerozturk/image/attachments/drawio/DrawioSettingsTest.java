@@ -65,7 +65,7 @@ class DrawioSettingsTest {
             for(var setting:ApplicationSettingsService.SETTINGS)if(setting.key().startsWith("myapp.drawio-preview.")){
                 var input=doc.getElementsByAttributeValue("name",setting.key());assertThat(input).hasSize(1);
                 if(setting.type().equals("boolean")){assertThat(input.first().tagName()).isEqualTo("select");assertThat(input.select("option[selected]").attr("value")).isEqualTo("true");}
-                else{assertThat(input.attr("value")).isEqualTo(setting.fallback());assertThat(input.attr("max")).isEqualTo(Long.toString(setting.maximum()));}
+                else if(!setting.type().equals("localdir")){assertThat(input.attr("value")).isEqualTo(setting.fallback());assertThat(input.attr("max")).isEqualTo(Long.toString(setting.maximum()));}
             }
         }
     }

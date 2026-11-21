@@ -11,6 +11,7 @@
 <button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="reset" disabled>100%</button><button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="fit" disabled th:text="#{drawio.fit}"></button>
 <button type="button" class="btn btn-sm btn-outline-secondary" data-drawio-command="fit-width" disabled th:text="#{drawio.fitWidth}"></button>
 <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" data-drawio-fullscreen aria-pressed="false" th:text="#{drawio.fullscreen}"></button></div>
+<label class="small"><input type="checkbox" data-drawio-placeholders checked> <span th:text="#{drawio.showPlaceholders}"></span></label>
 <p data-drawio-status role="status" th:text="#{drawio.loading}"></p>
 <iframe sandbox="allow-scripts" referrerpolicy="no-referrer" th:title="#{drawio.title}" th:attr="data-src=@{/attachments/drawio/frame(_tenantView=${tenantViewToken})}"></iframe>
 </section></section></body></html>

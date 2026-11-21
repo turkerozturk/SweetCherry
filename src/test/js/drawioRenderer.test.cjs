@@ -4,9 +4,10 @@ function setup({height=500}={}){
  const listeners={},viewport={clientWidth:800,clientHeight:600,scrollLeft:0,scrollTop:0,listeners:{},addEventListener(name,handler){this.listeners[name]=handler;}},surface={style:{},replaceChildren(){},querySelector:()=>({setAttribute(){}})},reports=[];
  let graph;class Graph{constructor(){graph=this;this.view={scale:1,translate:{x:0,y:0},scaleAndTranslate(scale,x,y){this.scale=scale;this.translate={x,y};},setScale(scale){this.scale=scale;},setTranslate(x,y){this.translate={x,y};}};this.flags={};}
   setEnabled(value){this.flags.enabled=value;}setConnectable(value){this.flags.connectable=value;}setTooltips(value){this.flags.tooltips=value;}setPanning(value){this.flags.panning=value;}getGraphBounds(){return {x:0,y:0,width:1000*this.view.scale,height:height*this.view.scale};}getModel(){return {};}refresh(){}destroy(){this.destroyed=true;}}
+ const hiddenClasses=new Set(),body={classList:{toggle(name,on){if(on)hiddenClasses.add(name);else hiddenClasses.delete(name);}}};
  const parent={},port={postMessage:data=>reports.push(data),start(){},close(){}};
- vm.runInNewContext(source,{document:{getElementById:id=>id==='drawio-viewport'?viewport:surface},window:{parent,addEventListener:(name,handler)=>listeners[name]=handler},Graph,mxStencilRegistry:{},mxStencil:{},mxUtils:{parseXml:()=>({documentElement:{nodeName:'mxGraphModel'}})},mxCodec:class{decode(){}}});
- return {reports,listeners,parent,port,viewport,surface,get graph(){return graph;},connect(from=parent){listeners.message({source:from,data:{type:'sweetcherry-drawio-connect'},ports:[port]});},command:data=>port.onmessage({data})};
+ vm.runInNewContext(source,{document:{body,getElementById:id=>id==='drawio-viewport'?viewport:surface},window:{parent,addEventListener:(name,handler)=>listeners[name]=handler},Graph,mxStencilRegistry:{},mxStencil:{},mxUtils:{parseXml:()=>({documentElement:{nodeName:'mxGraphModel'}})},mxCodec:class{decode(){}}});
+ return {hiddenClasses,reports,listeners,parent,port,viewport,surface,get graph(){return graph;},connect(from=parent){listeners.message({source:from,data:{type:'sweetcherry-drawio-connect'},ports:[port]});},command:data=>port.onmessage({data})};
 }
 test('renderer accepts only a parent channel and creates a non-editable HTML-label graph',()=>{
  const s=setup();s.connect({});assert.equal(s.reports.length,0);s.connect();assert.equal(s.reports[0].type,'ready');s.command({type:'render',version:4,xml:'<mxGraphModel/>',maxPageBytes:16777216});
@@ -25,4 +26,20 @@ test('ordinary wheel zooms and Shift-wheel retains native scrolling',()=>{
  const s=setup();s.connect();s.command({type:'render',version:1,xml:'<mxGraphModel/>',maxPageBytes:16777216});const old=s.graph.view.scale;let prevented=false;
  s.viewport.listeners.wheel({deltaY:-100,shiftKey:false,preventDefault(){prevented=true;}});assert(prevented);assert(s.graph.view.scale>old);
  const current=s.graph.view.scale;s.viewport.listeners.wheel({deltaY:100,shiftKey:true,preventDefault(){assert.fail('Shift-wheel must scroll');}});assert.equal(s.graph.view.scale,current);
+});
+
+test('wheel zoom preserves the world point below the pointer at both scroll positions and the left boundary',()=>{
+ const s=setup();s.connect();s.command({type:'render',version:1,xml:'<mxGraphModel/>',maxPageBytes:16777216});
+ s.viewport.getBoundingClientRect=()=>({left:50,top:75});
+ function point(x,y){const v=s.graph.view;return [(s.viewport.scrollLeft+x)/v.scale-v.translate.x,(s.viewport.scrollTop+y)/v.scale-v.translate.y];}
+ for(const boundary of [false,true]){
+  s.viewport.scrollLeft=boundary?0:250;s.viewport.scrollTop=boundary?0:120;
+  const before=point(100,150);s.viewport.listeners.wheel({deltaY:boundary?100:-100,clientX:150,clientY:225,shiftKey:false,preventDefault(){}});
+  const after=point(100,150);assert(Math.abs(before[0]-after[0])<1e-8);assert(Math.abs(before[1]-after[1])<1e-8);assert(s.viewport.scrollLeft>=0);assert(s.viewport.scrollTop>=0);
+ }
+});
+test('placeholder visibility survives replacement pages through explicit render state',()=>{
+ const s=setup();s.connect();s.command({type:'render',version:1,xml:'<mxGraphModel/>',maxPageBytes:16777216,showPlaceholders:false});assert(s.hiddenClasses.has('sc-hide-placeholders'));
+ s.command({type:'placeholders',show:true});assert(!s.hiddenClasses.has('sc-hide-placeholders'));
+ s.command({type:'render',version:2,xml:'<mxGraphModel/>',maxPageBytes:16777216,showPlaceholders:false});assert(s.hiddenClasses.has('sc-hide-placeholders'));
 });

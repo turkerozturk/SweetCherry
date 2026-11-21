@@ -1,14 +1,14 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib'),crypto=require('node:crypto');
 const folder=path.join(__dirname,'../../main/resources/static/js/drawio');
 const read=name=>fs.readFileSync(path.join(folder,name),'utf8');
-const groups=read('groups.txt').trim().split('\n');
-function fixture(enabled=groups){
+const groups=read('groups.txt').trim().split(/\r?\n/).map(name=>name.trim());
+function fixture(enabled=groups,localImages={}){
  const warnings=[];class Stencil{constructor(node){this.desc=node;}}
  class Renderer{getShape(name){return Renderer.defaultShapes[name];}}
  Renderer.defaultShapes={rectangle:class{},'mxgraph.infographic.ribbon':class{}};
  const registry={stencils:Object.create(null),loadStencil(){throw Error('Network fallback forbidden');},parseStencilSet(root){for(let n=root.firstChild;n;n=n.nextSibling)if(n.nodeName==='shape')this.stencils[(root.getAttribute('name')+'.'+n.getAttribute('name').replace(/ /g,'_')).toLowerCase()]=new Stencil(n);}};
  class Canvas{image(...args){return args;}}
- const window={setTimeout:fn=>fn(),SweetCherryDrawioIcons:Object.create(null)};
+ const window={SweetCherryDrawioLocalImages:localImages,setTimeout:fn=>fn(),SweetCherryDrawioIcons:Object.create(null)};
  const context=vm.createContext({window,document:{body:{dataset:{drawioLibraries:enabled.join(',')}}},console:{warn:message=>warnings.push(message)},mxStencilRegistry:registry,mxStencil:Stencil,mxCellRenderer:Renderer,mxSvgCanvas2D:Canvas,STENCIL_PATH:'local',atob:s=>Buffer.from(s,'base64').toString('binary'),pako:{inflateRaw:bytes=>new Uint8Array(zlib.inflateRawSync(bytes))},Uint8Array,DataView,TextDecoder,Map,Set});
  for(const script of ['stencils.min.js','catalog.js',...fs.readdirSync(path.join(folder,'icons')).map(f=>'icons/'+f),'libraries.js'])vm.runInContext(read(script),context);
  const api=window.SweetCherryDrawioLibraries;
@@ -52,4 +52,20 @@ test('unknown names and prototype keys use ordinary rectangles',()=>{
  const s=fixture(),graph={getCellStyle:cell=>({shape:cell})};s.api.attach(graph);
  for(const name of ['constructor','__proto__','unknown','mxgraph.eip.future_shape'])assert.equal(graph.getCellStyle(name).shape,'rectangle');
  assert.equal(graph.getImage({style:{image:'https://example.com/image.svg'}}),null);
+});
+
+test('missing shapes and icons show escaped identifiers while ordinary captions survive',()=>{
+ const s=fixture(),graph={getCellStyle:cell=>cell.style,getLabel:cell=>cell.value};s.api.attach(graph);
+ const cell={style:{shape:'mxgraph.local.missing'},value:'Caption'};
+ assert.match(graph.getLabel(cell),/Caption<br><span class="sc-drawio-placeholder">\[Shape: mxgraph.local.missing\]/);
+ const icon={style:{shape:'image',image:'sc-icon:azure2/missing.svg'},value:''};assert.match(graph.getLabel(icon),/Image: azure2\/missing.svg/);
+});
+test('administrator local images replace missing shapes and source-key images without permitting remote sources',()=>{
+ const png='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j1ioAAAAASUVORK5CYII=';
+ const hash='a'.repeat(64),s=fixture(groups,{'shape.mxgraph.local.server':png,['image.'+hash]:png});
+ const graph={getCellStyle:cell=>cell.style,getLabel:cell=>cell.value};s.api.attach(graph);
+ let style=graph.getCellStyle({style:{shape:'mxgraph.local.server'}});assert.equal(style.shape,'image');assert.equal(graph.getImage({style}),png);
+ const cell={style:{shape:'rectangle',scImageKey:hash},value:'Caption<br><span class="sc-drawio-placeholder" title="local">[Image: server.png]</span>'};
+ style=graph.getCellStyle(cell);assert.equal(style.shape,'image');assert.equal(graph.getImage({style}),png);assert.equal(graph.getLabel(cell),'Caption');
+ assert.equal(s.api.image('https://example.invalid/server.png'),null);
 });

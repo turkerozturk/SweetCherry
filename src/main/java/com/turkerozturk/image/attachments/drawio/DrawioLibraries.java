@@ -11,9 +11,10 @@ public final class DrawioLibraries {
     public static final String PREFIX="myapp.drawio-preview.shape-libraries.";
     public static final List<String> GROUPS=groups();
     private static final Set<String> ICON_GROUPS=Set.of("active_directory","allied_telesis","atlassian","azure2","clip_art","cumulus","dynamics365","ibm","mscae","sap");
-    private final List<String> enabled;
-    public DrawioLibraries(Environment environment){enabled=GROUPS.stream().filter(g->environment.getProperty(key(g),Boolean.class,true)).toList();}
+    private final List<String> enabled;private final Map<String,String> localImages;
+    public DrawioLibraries(Environment environment){localImages=DrawioLocalImages.load(environment.getProperty("myapp.drawio-preview.local-images-directory",""));enabled=GROUPS.stream().filter(g->environment.getProperty(key(g),Boolean.class,true)).toList();}
     public static String key(String group){return PREFIX+group.toLowerCase(Locale.ROOT).replace('_','-');}
+    public Map<String,String> localImages(){return localImages;}
     public List<String> enabled(){return enabled;}
     public List<String> iconScripts(){return enabled.stream().filter(ICON_GROUPS::contains).map(g->"/js/drawio/icons/"+g+".js").toList();}
     private static List<String> groups(){

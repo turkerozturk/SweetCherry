@@ -25,6 +25,7 @@ public class ApplicationSettingsService {
     public static final List<Setting> SETTINGS=settings();
     private static List<Setting> settings(){
         var result=new ArrayList<Setting>(List.of(
+        new Setting("myapp.drawio-preview.local-images-directory","localdir","",0),
         new Setting("myapp.drawio-preview.max-xml-attributes","number","128",1024),
         new Setting("myapp.drawio-preview.max-file-bytes","number","16777216",67108864),
         new Setting("myapp.drawio-preview.max-page-bytes","number","16777216",67108864),
@@ -181,6 +182,7 @@ public class ApplicationSettingsService {
     private static void validate(Setting setting,String value){
         if(value==null||value.length()>160||value.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("invalid");
         switch(setting.type()) {
+            case "localdir" -> {if(value.length()>160||value.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("invalid");}
             case "color" -> {if(!NodeBackgroundAdvice.valid(value))throw new IllegalArgumentException("invalid");}
             case "boolean" -> {if(!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("invalid");}
             case "number","nonnegative","width","treefont","auditlimit" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
