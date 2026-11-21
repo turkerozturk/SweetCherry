@@ -1,5 +1,5 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
-<section th:fragment="content" id="drawio-preview" class="container-fluid py-3" th:attr="data-endpoint=@{/attachments/{node}/{offset}/drawio/data(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})},data-missing=#{drawio.missingShapes},data-loading=#{drawio.loading},data-error=#{drawio.error},data-limit=#{drawio.limit},data-stale=#{gallery.stale},data-invalid=#{drawio.invalid},data-page-label=#{drawio.page},data-line-label=#{drawio.line}">
+<section th:fragment="content" id="drawio-preview" class="container-fluid py-3" th:attr="data-endpoint=@{/attachments/{node}/{offset}/drawio/data(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})},data-link-missing=#{drawio.linkMissing},data-missing=#{drawio.missingShapes},data-loading=#{drawio.loading},data-error=#{drawio.error},data-limit=#{drawio.limit},data-stale=#{gallery.stale},data-invalid=#{drawio.invalid},data-page-label=#{drawio.page},data-line-label=#{drawio.line}">
 <h1 class="h3" th:text="#{drawio.title}"></h1><h2 class="h5 text-break" data-drawio-filename></h2>
 <div class="d-flex flex-wrap gap-2 mb-2"><a class="btn btn-outline-primary" th:href="@{/attachments/{node}/{offset}/download(node=${nodeId},offset=${offset},_tenantView=${tenantViewToken})}" th:text="#{excel.download}"></a><a class="btn btn-outline-secondary" th:href="@{/tree(nodeId=${nodeId},_tenantView=${tenantViewToken})}" th:text="#{excel.node}"></a><a class="btn btn-outline-secondary" th:href="@{/attachments(_tenantView=${tenantViewToken})}" th:text="#{files.title}"></a></div>
 <p class="small" th:text="#{drawio.help}"></p>
@@ -13,5 +13,5 @@
 <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" data-drawio-fullscreen aria-pressed="false" th:text="#{drawio.fullscreen}"></button></div>
 <label class="small"><input type="checkbox" data-drawio-placeholders checked> <span th:text="#{drawio.showPlaceholders}"></span></label>
 <p data-drawio-status role="status" th:text="#{drawio.loading}"></p>
-<iframe sandbox="allow-scripts" referrerpolicy="no-referrer" th:title="#{drawio.title}" th:attr="data-src=@{/attachments/drawio/frame(_tenantView=${tenantViewToken})}"></iframe>
+<iframe sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" th:title="#{drawio.title}" th:attr="data-src=@{/attachments/drawio/frame(_tenantView=${tenantViewToken})}"></iframe>
 </section></section></body></html>

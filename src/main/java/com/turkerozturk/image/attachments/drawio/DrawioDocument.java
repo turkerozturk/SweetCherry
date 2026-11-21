@@ -51,7 +51,7 @@ final class DrawioDocument {
                 stage="model";cells+=model.getElementsByTagName("mxCell").getLength();if(cells>settings.totalCells())throw limit("max-total-cells");
                 String cleaned=clean(model);expanded+=Math.max(sourceBytes,cleaned.getBytes(StandardCharsets.UTF_8).length);if(expanded>settings.totalBytes())throw limit("max-total-bytes");
                 String name=diagram.getAttribute("name");if(name.length()>255)name=name.substring(0,255);if(name.isBlank())name=Integer.toString(pages.size()+1);
-                pages.add(new Page(name,cleaned));
+                pages.add(new Page(name,cleaned,DrawioLinks.pageId(diagram.getAttribute("id"))));
             }
             if(pages.isEmpty())throw invalid("no_pages");return new Preview(filename,nodeName,List.copyOf(pages),settings.pageBytes());
         }catch(Problem problem){throw problem.context(stage,page);}catch(Exception malformed){
@@ -87,13 +87,14 @@ final class DrawioDocument {
         if(!htmlLabel)return org.jsoup.nodes.Entities.escape(value).replace("\r\n","\n").replace("\r","\n").replace("\n","<br>");
         var html=org.jsoup.Jsoup.parse(value);html.outputSettings().prettyPrint(false);
         html.select("script,style,iframe,object,embed,svg,math").remove();
+        html.select("a").forEach(anchor->{String link=DrawioLinks.safe(anchor.attr("href"));if(link==null)anchor.unwrap();else anchor.attr("href",link).attr("target","_blank").attr("rel","noopener noreferrer");});
         html.getAllElements().forEach(e->{e.removeAttr("data-sc-placeholder");e.removeAttr("data-sc-image-key");});
         html.select("img").forEach(image->{
             String name=imageName(image.attr("src")),alt=image.attr("alt").strip();
             if((name.equals("image")||name.equals("missing source")||name.startsWith("embedded"))&&!alt.isBlank())name=alt.substring(0,Math.min(160,alt.length()));
             image.replaceWith(new org.jsoup.nodes.Element("span").attr("data-sc-placeholder","1").attr("data-sc-image-key",imageKey(image.attr("src"))).text("↗ [Image: "+name+"]"));
         });
-        var safe=new org.jsoup.safety.Safelist().addTags("div","p","span","b","strong","i","em","u","s","strike","sub","sup","br","ul","ol","li","pre","code","font").addAttributes(":all","style","align").addAttributes("font","color","size","face").addAttributes("span","data-sc-placeholder","data-sc-image-key");
+        var safe=new org.jsoup.safety.Safelist().addTags("a","div","p","span","b","strong","i","em","u","s","strike","sub","sup","br","ul","ol","li","pre","code","font").addAttributes(":all","style","align").addAttributes("a","href","target","rel").addProtocols("a","href","http","https","data").addAttributes("font","color","size","face").addAttributes("span","data-sc-placeholder","data-sc-image-key");
         html=new org.jsoup.safety.Cleaner(safe).clean(html);html.outputSettings().prettyPrint(false);
         if(html.getAllElements().size()>settings.xmlElements())throw limit("max-xml-elements");
         for(var element:html.getAllElements()){
@@ -149,7 +150,9 @@ final class DrawioDocument {
         var cells=new HashMap<String,Element>();
         for(var entry:originals.entrySet()){
             String id=entry.getKey();var cell=entry.getValue();var wrapper=(Element)cell.getParentNode();
-            var copy=result.createElement("mxCell");copy.setAttribute("id",ids.get(id));cells.put(id,copy);
+            String link=DrawioLinks.safe(wrapper.hasAttribute("link")?wrapper.getAttribute("link"):cell.getAttribute("link"));
+            if(link==null)for(String token:cell.getAttribute("style").split(";"))if(token.startsWith("link=")){link=DrawioLinks.safe(token.substring(5));break;}
+            var copy=result.createElement("mxCell");if(link!=null)copy.setAttribute("scLink",link);copy.setAttribute("id",ids.get(id));cells.put(id,copy);
             for(String key:List.of("vertex","edge","connectable","visible","collapsed"))if(cell.hasAttribute(key))copy.setAttribute(key,cell.getAttribute(key));
             String parent=parents.get(id);if(!parent.isEmpty()){if(!ids.containsKey(parent))throw invalid("missing_parent");copy.setAttribute("parent",ids.get(parent));}
             for(String ref:List.of("source","target")){String target=cell.getAttribute(ref);if(originals.containsKey(target)&&"1".equals(originals.get(target).getAttribute("vertex")))copy.setAttribute(ref,ids.get(target));}

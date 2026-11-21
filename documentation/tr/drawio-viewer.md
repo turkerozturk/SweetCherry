@@ -4,9 +4,9 @@ Ekler sayfasında veya rich-text içerikte `.drawio` eki için **Diyagramı gör
 
 Normal XML ve raw-DEFLATE/base64 sıkıştırılmış mxfile sayfaları ile tek mxGraphModel belgeleri desteklenir. Draw.io’nun sabit commit’e bağlı statik görüntüleyicisi yerel paketlenir; dosya veya resimler çevrim içi servise gönderilmez. Yeni Maven bağımlılığı yoktur.
 
-Salt okunur önizlemede HTML etiketlerin güvenli biçimlendirmesi, blok/satır sonları, yatay/dikey hizalaması ve kaydırması korunur. Bağlantılar, çalıştırılabilir içerik, özel XML stencil’leri, dış yazı tipleri/arkaplanlar ve kaynak URL’leri kaldırılır. Paketlenmiş Draw.io kütüphane ikonları yerel olarak gösterilir; diğer resimlerin yerine dosya adını gösteren dikdörtgen konur (eke gömülü resimler dahil). Normal vektör şekiller, çizgiler, gruplar ve güvenli renk/çizgi stilleri korunur. Özel şekiller, ikon fontları, matematik ve biçimli metin özgün Draw.io görünümünden farklı olabilir.
+Salt okunur önizlemede HTML etiketlerin güvenli biçimlendirmesi, blok/satır sonları, yatay/dikey hizalaması ve kaydırması korunur. Güvensiz bağlantılar, çalıştırılabilir içerik, özel XML stencil’leri, dış yazı tipleri/arkaplanlar ve kaynak URL’leri kaldırılır. Paketlenmiş Draw.io kütüphane ikonları yerel olarak gösterilir; diğer resimlerin yerine dosya adını gösteren dikdörtgen konur (eke gömülü resimler dahil). Normal vektör şekiller, çizgiler, gruplar ve güvenli renk/çizgi stilleri korunur. Özel şekiller, ikon fontları, matematik ve biçimli metin özgün Draw.io görünümünden farklı olabilir.
 
-Görüntüleme allow-same-origin içermeyen sandbox iframe’de yapılır; CSP dış bağlantıları, resim/fontları ve aktif kaynakları engeller. İletişim özel MessageChannel ile kurulur; çizim koduna oturum belirteci veya veritabanı erişimi verilmez. Frame’in açılması, veri ve indirme istekleri oturum ve güncel CTB belirteci gerektirir. USER ve salt okunur kaynaklar da görüntüleyebilir; yazma endpoint’i yoktur.
+Görüntüleme allow-same-origin içermeyen sandbox iframe’de yapılır; CSP dış bağlantıları, resim/fontları ve aktif kaynakları engeller. İletişim özel MessageChannel ile kurulur; kanal tenant/oturum belirteci taşımaz ve veritabanı erişimi vermez. Frame’in açılması, veri ve indirme istekleri oturum ve güncel CTB belirteci gerektirir. USER ve salt okunur kaynaklar da görüntüleyebilir; yazma endpoint’i yoktur.
 
 Kaynak bütçeleri YAML ve **System settings** içinde `myapp.drawio-preview` altında ayarlanır; değişiklikten sonra yeniden başlatın. Aşağıdaki varsayılanlar eski sabit bütçelerin (8 MiB kaynak, 2 MiB/sayfa, 128 sayfa, 4.000 hücre/sayfa) yerini alır. Mevcut dış YAML paket varsayılanlarını geçersiz kılar. Sınır hatası ilgili ayarın tam adını gösterir. URI kodlu açılım için çözülmüş sayfa bütçesinin üç katına kadar okuma yapılır, ardından gerçek UTF-8 bayt boyutu kontrol edilir; toplam bütçe giriş ve çıktıyı iki kere saymaz. Yapısal doğrulama ve aktif içerik korumaları devam eder.
 
@@ -107,3 +107,21 @@ Manifest en fazla 64 KiB/128 kayıt; tek resim 2 MiB/16 milyon piksel; toplam 8 
 SweetCherry önizlemesi yerel script/kaynak kullanır. Sandbox içinde `connect-src 'none'`, `img-src data:`, `font-src 'none'` ve nonce'lu script politikası korunur. Diyagram Draw.io’ya gönderilmez, dış resimler indirilmez. Çevrim içi editörün bulut, AI, işbirliği veya sunucu dönüştürme özellikleri bu görüntüleyiciye dahil değildir. Ayrı Draw.io web editörünün güncel gizlilik politikasında bazı PDF/resim export, AI ve işbirliği işlemlerinin sunucuda işlendiği belirtilir: https://www.drawio.com/trust/ .
 
 Önceki kütüphane testindeki CI hatası Windows CRLF satır sonlarından kaynaklanıyordu: test yalnızca LF ile bölünce aile adlarında CR kalıyordu. Fixture düzeltildi ve `core.autocrlf=true` checkout'unda doğrulandı. Özgün vendor paketleri değiştirilmedi.
+
+## İç sayfa bağlantıları ve dış web bağlantıları
+
+Shape/connector üzerindeki `link` alanı (UserObject ve eski style biçimi dahil) ile HTML metninin içindeki bağlantılar desteklenir:
+
+- `data:page/id,<kimlik>` aynı ek dosyanın ilgili sayfasını seçer. Kaynak diagram ID korunur; sayfa adı değişse de bağlantı ID ile çalışır. Hedef yoksa veya ID tekrarlıysa yerel hata gösterilir. URL kodlanmış ID'ler de desteklenir.
+- Açık `http://` ve `https://` adresleri yeni sekmede, `noopener` ve `noreferrer` ile açılır. Metin bağlantıları klavye/fare ile, şekil bağlantıları görüntüleyicinin fare/dokunma işleyicisiyle çalışır. Kanal mesajları keyfi dış URL açamaz.
+- `javascript:`, `file:`, genel `data:` içerikleri, `data:action/json,...`, göreli URL'ler, kullanıcı/parola içeren URL'ler ve kontrol karakterleri reddedilir. Güvensiz bağlantının açıklama metni kalır. Draw.io action/animasyon komutları açılmaz. İç bağlantı burada başka bir diagram sayfasıdır; CherryTree node linkine otomatik dönüşüm yapılmaz.
+
+Kaynak ek/CTB değiştirilmez. Görüntülerken dış hedef ziyaret edilmez; bağlantıya tıklanınca o adrese bilinçli olarak gidilir. Örnek dosyanın `Links` sayfasında şekil/metin bağlantıları, geri dönüş, eksik hedef ve etkisiz güvensiz bağlantı bulunur.
+
+Dış sekmenin normal çalışabilmesi için sandbox'ta popup ve popup'ın kendi sandbox'ından çıkmasına izin verilir. Çizim iframe'i hâlâ opaque origin'dedir; `allow-same-origin`, form veya üst sayfayı yönlendirme izni yoktur. Script nonce zorunluluğu, `connect-src 'none'`, `img-src data:` ve `font-src 'none'` korunur. Yeni sekmeye opener/referrer verilmez; frame için DNS prefetch kapalı ve referrer politikası `no-referrer` olur.
+
+### Yerel kaynak CSP uyarıları
+
+Genel fallback `default-src 'self'` olarak düzenlendi. Böylece Firefox geliştirici araçlarının script olarak sınıflandırılmayan yerel kaynak yeniden okumalarına izin verilebilir. Script/ağ/resim/font/frame/child/worker/media/manifest/object/form/base türleri açık ayrı kurallarla kısıtlanır. `script-src` içine `'self'`, unsafe-inline veya unsafe-eval eklenmez. Bu değişiklik diyagramın dış kaynağa bağlanma veya iframe'in aynı origin yetkisini kazanması anlamına gelmez.
+
+`NetUtil.sys.mjs` kaynaklı `default-src` mesajları, nonce'lu scriptin çalışamamasından çok kaynak yeniden okumalarıyla uyumludur; ancak Firefox'taki tam tetikleyici bu ortamda yeniden üretilemedi. Yeniden başlatma/sayfa yenileme sonrası konsolu Firefox'ta kontrol edin. Diyagramın çizilmesi tek başına bütün konsol uyarılarının çözüldüğünü doğrulamaz.

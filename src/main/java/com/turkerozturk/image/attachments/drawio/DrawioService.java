@@ -24,7 +24,7 @@ public class DrawioService {
         Problem location(int line,int column){this.line=Math.max(0,line);this.column=Math.max(0,column);return this;}
         @Override public String getMessage(){if(!"invalid".equals(code))return code;return code+(reason.isEmpty()?"":" [reason="+reason+", page="+page+(line>0?", line="+line+", column="+column:"")+"]");}
     }
-    public record Page(String name,String xml) {}
+    public record Page(String name,String xml,String id) {public Page(String name,String xml){this(name,xml,"");}}
     public record Preview(String filename,String nodeName,List<Page> pages,int maxPageBytes) {
         public Preview(String filename,String nodeName,List<Page> pages){this(filename,nodeName,pages,DrawioSettings.defaults().pageBytes());}
     }

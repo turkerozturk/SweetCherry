@@ -7,7 +7,7 @@ function fixture({storedPlaceholders=null,status=200,limit="",reason="",page=0,l
  const keys=['iframe','[data-drawio-pages]','[data-drawio-status]','[data-drawio-filename]','[data-drawio-scale]','[data-drawio-panel]','[data-drawio-fullscreen]','[data-drawio-prev]','[data-drawio-next]','[data-drawio-placeholders]'];const nodes=Object.fromEntries(keys.map(k=>[k,node()]));
  nodes['[data-drawio-reason="compression"]']=Object.assign(node(),{textContent:'Compressed page could not be decoded.'});
  const buttons=['fit','reset','zoom','zoom'].map(type=>Object.assign(node(),{dataset:{drawioCommand:type,factor:'in'}}));
- const root=node();root.dataset={endpoint:'/app/attachments/42/7/drawio/data?_tenantView=current',missing:'Unavailable shapes:',loading:'Loading',error:'Error',stale:'Stale',limit:'Limit exceeded:',invalid:'Cannot preview.',pageLabel:'Page',lineLabel:'Line'};root.querySelector=key=>nodes[key];root.querySelectorAll=()=>buttons;
+ const root=node();root.dataset={endpoint:'/app/attachments/42/7/drawio/data?_tenantView=current',missing:'Unavailable shapes:',loading:'Loading',error:'Error',stale:'Stale',limit:'Limit exceeded:',invalid:'Cannot preview.',pageLabel:'Page',lineLabel:'Line',linkMissing:'Linked page unavailable'};root.querySelector=key=>nodes[key];root.querySelectorAll=()=>buttons;
  const document=node();document.getElementById=()=>root;document.createElement=()=>node();const window=node();const storage=new Map();if(storedPlaceholders!==null)storage.set('sc.drawio.placeholders',storedPlaceholders);window.localStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)};
  let framePort;const messages=[],requests=[];
  class Channel{constructor(){const one={start(){},close(){},postMessage(data){messages.push(data);}},two={postMessage(data){one.onmessage?.({data});}};this.port1=one;this.port2=two;}}
@@ -59,4 +59,18 @@ test('placeholder preference persists, applies to every page and hides diagnosti
  s.reply({type:'rendered',version:1,scale:1,missing:['missing: mxgraph.local.box']});assert.equal(s.nodes['[data-drawio-status]'].textContent,'');
  const toggle=s.nodes['[data-drawio-placeholders]'];toggle.checked=true;toggle.listeners.change();assert.equal(s.storage.get('sc.drawio.placeholders'),'true');assert.equal(s.messages.at(-1).type,'placeholders');assert.equal(s.messages.at(-1).show,true);assert.match(s.nodes['[data-drawio-status]'].textContent,/mxgraph.local.box/);
  s.nodes['[data-drawio-next]'].listeners.click();assert.equal(s.messages.at(-1).showPlaceholders,true);
+});
+
+test('internal page links select the unique stable page ID, including encoded IDs, and ignore stale replies',async()=>{
+ const s=fixture({pages:[{id:'first',name:'First',xml:'<mxGraphModel/>'},{id:'page two',name:'Two',xml:'<mxGraphModel/>'}]});await tick();s.connect();
+ s.reply({type:'navigate',version:1,link:'data:page/id,page%20two'});assert.equal(s.nodes['[data-drawio-pages]'].selectedIndex,1);assert.equal(s.messages.at(-1).version,2);
+ s.reply({type:'navigate',version:1,link:'data:page/id,first'});assert.equal(s.nodes['[data-drawio-pages]'].selectedIndex,1);
+ s.reply({type:'navigate',version:2,link:'data:page/id,first'});assert.equal(s.nodes['[data-drawio-pages]'].selectedIndex,0);assert.equal(s.requests.length,1);
+});
+test('unavailable or ambiguous internal pages show a local error and external channel URLs are ignored',async()=>{
+ for(const duplicate of [false,true]){
+  const s=fixture({pages:[{id:'same',name:'One',xml:'<mxGraphModel/>'},{id:duplicate?'same':'other',name:'Two',xml:'<mxGraphModel/>'}]});await tick();s.connect();
+  s.reply({type:'navigate',version:1,link:'data:page/id,'+(duplicate?'same':'missing')});assert.equal(s.nodes['[data-drawio-status]'].textContent,'Linked page unavailable');assert.equal(s.nodes['[data-drawio-pages]'].selectedIndex,0);
+  const count=s.messages.length;s.reply({type:'navigate',version:1,link:'https://example.test/'});assert.equal(s.messages.length,count);assert.equal(s.requests.length,1);
+ }
 });

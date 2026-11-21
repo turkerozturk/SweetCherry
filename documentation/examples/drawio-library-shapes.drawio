@@ -1,5 +1,5 @@
 <mxfile host="SweetCherry offline example">
-  <diagram name="Offline library shapes">
+  <diagram name="Offline library shapes" id="library-shapes">
     <mxGraphModel>
       <root>
         <mxCell id="0" />
@@ -25,10 +25,13 @@
         <mxCell id="8" parent="1" vertex="1" value="External bitmap placeholder" style="shape=image;image=https://example.invalid/architecture.png;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;">
           <mxGeometry as="geometry" x="470" y="270" width="140" height="140" />
         </mxCell>
+        <mxCell id="back-to-links" parent="1" vertex="1" value="Back to link demo" link="data:page/id,links" style="rounded=1;html=1;fillColor=#d5e8d4;">
+          <mxGeometry as="geometry" x="30" y="560" width="200" height="50" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram name="Colors and placeholders">
+  <diagram name="Colors and placeholders" id="colors-placeholders">
     <mxGraphModel>
       <root>
         <mxCell id="0" />
@@ -44,6 +47,32 @@
         </mxCell>
         <mxCell id="5" parent="1" vertex="1" value="" style="shape=image;html=1;">
           <mxGeometry as="geometry" x="380" y="220" width="290" height="140" />
+        </mxCell>
+        <mxCell id="back-to-links" parent="1" vertex="1" value="Back to link demo" link="data:page/id,links" style="rounded=1;html=1;fillColor=#d5e8d4;">
+          <mxGeometry as="geometry" x="30" y="560" width="200" height="50" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="links" name="Links">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" vertex="1" value="Open library shapes" style="rounded=1;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" link="data:page/id,library-shapes">
+          <mxGeometry as="geometry" x="30" y="30" width="280" height="80" />
+        </mxCell>
+        <mxCell id="3" parent="1" vertex="1" value="External documentation (new tab)" style="rounded=1;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" link="https://www.drawio.com/docs/">
+          <mxGeometry as="geometry" x="380" y="30" width="280" height="80" />
+        </mxCell>
+        <mxCell id="4" parent="1" vertex="1" value="&lt;a href=&quot;data:page/id,colors-placeholders&quot;&gt;Text link: colors&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://www.drawio.com/docs/&quot;&gt;Text link: web&lt;/a&gt;" style="rounded=1;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;">
+          <mxGeometry as="geometry" x="30" y="160" width="280" height="80" />
+        </mxCell>
+        <mxCell id="5" parent="1" vertex="1" value="Missing page (local error)" style="rounded=1;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" link="data:page/id,not-present">
+          <mxGeometry as="geometry" x="380" y="160" width="280" height="80" />
+        </mxCell>
+        <mxCell id="6" parent="1" vertex="1" value="Unsafe link stays inert" style="rounded=1;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" link="javascript:alert(1)">
+          <mxGeometry as="geometry" x="30" y="290" width="280" height="80" />
         </mxCell>
       </root>
     </mxGraphModel>

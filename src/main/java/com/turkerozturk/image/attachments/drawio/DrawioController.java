@@ -25,7 +25,10 @@ public class DrawioController {
         model.addAttribute("drawioLocalImages",libraries.localImages());model.addAttribute("drawioLibraries",String.join(",",libraries.enabled()));model.addAttribute("drawioIconScripts",libraries.iconScripts());
         String nonce=java.util.UUID.randomUUID().toString();model.addAttribute("drawioNonce",nonce);
         response.setHeader("Cache-Control","no-store");response.setHeader("X-Content-Type-Options","nosniff");
-        response.setHeader("Content-Security-Policy","default-src 'none'; script-src 'nonce-"+nonce+"'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; sandbox allow-scripts");
+        response.setHeader("Referrer-Policy","no-referrer");response.setHeader("X-DNS-Prefetch-Control","off");
+        // Permit local fallback reads (e.g. developer-tool source requests). Active resource types stay explicit.
+        // Popups are for validated user-clicked links; the rendering frame stays opaque and cannot navigate its parent.
+        response.setHeader("Content-Security-Policy","default-src 'self'; script-src 'nonce-"+nonce+"'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; media-src 'none'; manifest-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox");
         return "attachment/drawioFrame";
     }
     @ExceptionHandler(DrawioService.Problem.class) public ResponseEntity<java.util.Map<String,Object>> failure(DrawioService.Problem problem){return ResponseEntity.status(switch(problem.code()){case "missing"->404;case "request"->400;default->422;}).cacheControl(CacheControl.noStore()).body(java.util.Map.of("error",problem.code(),"limit",problem.limit(),"reason",problem.reason(),"page",problem.page(),"line",problem.line(),"column",problem.column()));}
