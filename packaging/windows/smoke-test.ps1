@@ -3,8 +3,9 @@ param([Parameter(Mandatory)][string]$InstallerPath)
 $ErrorActionPreference = 'Stop'
 # Exercise the actual installer, user-file preservation and launcher in a path with spaces/Unicode.
 $testDir = Join-Path $env:RUNNER_TEMP 'SweetCherry test Türkçe'
-New-Item "$testDir/CTBDATA","$testDir/allTenants" -ItemType Directory -Force | Out-Null
+New-Item "$testDir/CTBDATA","$testDir/allTenants","$testDir/drawio-images" -ItemType Directory -Force | Out-Null
 $sentinels = @{
+    'drawio-images/images.properties'='KEEP-DRAWIO-MANIFEST'; 'drawio-images/private.png'='KEEP-PRIVATE-IMAGE';
     'CTBDATA/demo.ctb'='KEEP-CTB'; 'allTenants/demo.txt'='KEEP-TENANT';
     'application.yml'="server:`n  address: 127.0.0.1`nmyapp:`n  openWebBrowserOnStartup: false`n";
     'login-credentials.properties'="admin.password=ci-test-only`nuser.password=ci-test-only`n"
@@ -14,6 +15,9 @@ $setup = Start-Process $InstallerPath -ArgumentList @('/VERYSILENT','/SUPPRESSMS
 if ($setup.ExitCode -ne 0) { throw "Installer failed: $($setup.ExitCode)" }
 foreach ($entry in $sentinels.GetEnumerator()) {
     if ([IO.File]::ReadAllText((Join-Path $testDir $entry.Key)) -cne $entry.Value) { throw "Installer overwrote $($entry.Key)" }
+}
+foreach ($file in @('drawio-images/README.md','documentation/examples/drawio-library-shapes.drawio','documentation/examples/drawio-viewer-demo.drawio')) {
+    if (!(Test-Path (Join-Path $testDir $file))) { throw "Installer omitted $file" }
 }
 # Remove deliberately invalid CTB fixture before startup; it was only an overwrite sentinel.
 Remove-Item "$testDir/CTBDATA/demo.ctb","$testDir/allTenants/demo.txt"

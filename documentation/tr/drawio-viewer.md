@@ -125,3 +125,7 @@ Dış sekmenin normal çalışabilmesi için sandbox'ta popup ve popup'ın kendi
 Genel fallback `default-src 'self'` olarak düzenlendi. Böylece Firefox geliştirici araçlarının script olarak sınıflandırılmayan yerel kaynak yeniden okumalarına izin verilebilir. Script/ağ/resim/font/frame/child/worker/media/manifest/object/form/base türleri açık ayrı kurallarla kısıtlanır. `script-src` içine `'self'`, unsafe-inline veya unsafe-eval eklenmez. Bu değişiklik diyagramın dış kaynağa bağlanma veya iframe'in aynı origin yetkisini kazanması anlamına gelmez.
 
 `NetUtil.sys.mjs` kaynaklı `default-src` mesajları, nonce'lu scriptin çalışamamasından çok kaynak yeniden okumalarıyla uyumludur; ancak Firefox'taki tam tetikleyici bu ortamda yeniden üretilemedi. Yeniden başlatma/sayfa yenileme sonrası konsolu Firefox'ta kontrol edin. Diyagramın çizilmesi tek başına bütün konsol uyarılarının çözüldüğünü doğrulamaz.
+
+## Portable paket kaynakları
+
+Hazır görüntüleyici, shape tanımları ve yerel ikon paketleri `SweetCherry.jar` içindedir; ayrıca çıkarma/indirme gerekmez. Paketlerde bu kılavuz ile `documentation/examples/*.drawio` dosyaları da bulunur. İsteğe bağlı `drawio-images/` klasöründe yorumlu `images.properties` örneği ve README vardır. Kullanmak için mevcut local-images-directory ayarını bu klasörün mutlak yoluna ayarlayın; varsayılan boş/kapalı kalır. Maven hazırlığı ve Windows kurucusu mevcut örnek dosyaları/kullanıcı resimlerini korur. ZIP güncellemelerini yeni klasöre açın; bu klasörü ayrıca taşıyıp yedekleyin.

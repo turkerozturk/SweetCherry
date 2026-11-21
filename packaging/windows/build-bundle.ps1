@@ -16,8 +16,25 @@ if (!(Test-Path (Join-Path $bundle 'application.yml'))) {
     Copy-Item $filteredConfig (Join-Path $bundle 'application.yml')
 }
 # Never package a developer's existing release folder; the workflow starts from a clean checkout.
-foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','SECURITY.md','THIRD-PARTY-NOTICES.md','licenses','CTBDATA/demo.ctb','allTenants/demo.txt','CTBDATA/sweetcherry-hizli-baslangic.ctb','CTBDATA/sweetcherry-quickstart-en.ctb','allTenants/quickstart-tr.txt','allTenants/quickstart-en.txt')) {
+foreach ($name in @('SweetCherry.jar','application.yml','LICENSE','SECURITY.md','THIRD-PARTY-NOTICES.md','licenses','drawio-images/images.properties','drawio-images/README.md','documentation/examples/drawio-library-shapes.drawio','documentation/examples/drawio-viewer-demo.drawio','CTBDATA/demo.ctb','allTenants/demo.txt','CTBDATA/sweetcherry-hizli-baslangic.ctb','CTBDATA/sweetcherry-quickstart-en.ctb','allTenants/quickstart-tr.txt','allTenants/quickstart-en.txt')) {
     if (!(Test-Path (Join-Path $bundle $name))) { throw "Missing distribution file: $name. Run Maven package first." }
+}
+# The optional replacement folder must be pristine: never publish a maintainer's images/mappings.
+$seed = Join-Path $repo 'external/drawio-images'
+$replacementRoot = Join-Path $bundle 'drawio-images'
+$replacementItems = @((Get-Item $replacementRoot -Force)) + @(Get-ChildItem $replacementRoot -Recurse -Force)
+if (@($replacementItems | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }).Count) {
+    throw 'Do not package linked Draw.io replacement paths; use a clean distribution.'
+}
+$seedFiles = @(Get-ChildItem $seed -File -Recurse -Force)
+$customFiles = @(Get-ChildItem (Join-Path $bundle 'drawio-images') -File -Recurse -Force)
+if ($customFiles.Count -ne $seedFiles.Count) { throw 'Do not package custom Draw.io replacements; use a clean distribution.' }
+foreach ($file in $seedFiles) {
+    $relative = [IO.Path]::GetRelativePath($seed, $file.FullName)
+    $copy = Join-Path (Join-Path $bundle 'drawio-images') $relative
+    if (!(Test-Path -LiteralPath $copy) -or (Get-FileHash -LiteralPath $file.FullName).Hash -ne (Get-FileHash -LiteralPath $copy).Hash) {
+        throw "Do not package edited Draw.io replacement files: $relative"
+    }
 }
 if ((Test-Path (Join-Path $bundle 'login-credentials.properties')) -or (Test-Path (Join-Path $bundle 'saved-filters'))) { throw 'Do not package an already-used distribution.' }
 if ((Get-FileHash $RuntimeArchive -Algorithm SHA256).Hash -ne $RuntimeSha256) { throw 'Runtime checksum mismatch.' }

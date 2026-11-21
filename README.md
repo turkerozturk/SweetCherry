@@ -43,7 +43,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | **Tasks and reminders** | [TODO tasks](documentation/en/todo.md) using `todo`/`done` tags; [node-linked reminders](documentation/en/reminders.md), annual recurrence and in-page visual/audio alarms. |
 | **Connect and configure** | Data-source wizard with [empty CTB creation](documentation/en/empty-ctb.md); SQLite, MariaDB/MySQL and PostgreSQL connections; application settings editors; local use or explicitly configured network access. |
 
-**New in 1.12.0:** Inline linked-node content and PDF options, split view, saved-search tree branches, searchable node pickers, image annotations and metadata, child sorting, web bookmark previews, backup scheduling controls, and faster reading/navigation tools. [Release details](documentation/releases/v1.12.0.md).
+**New in 1.13.0:** Offline multi-page Draw.io previews with local shape/icon libraries and links, inline Unicode/CherryTree/Font Awesome symbols across reading views and PDFs, safer export filenames, and remembered editor text zoom with more compact tools. [Release details](documentation/releases/v1.13.0.md).
 
 ## Documentation
 
@@ -52,7 +52,7 @@ Open the browser from the launcher, sign in using the generated credentials, the
 | [English installation and usage](documentation/en/setup-and-run.md) | [First-start help / İlk çalıştırma](documentation/tr/first-start.md) |
 | [Türkçe kurulum ve kullanım](documentation/tr/installation.md) | [English feature guides](documentation/en) · [Türkçe özellik kılavuzları](documentation/tr) |
 | [Import folders and files from ZIP](documentation/en/zip-import.md) | [ZIP içe aktarım kılavuzu](documentation/tr/zip-import.md) |
-| [Changes and upgrade notes](CHANGELOG.md) | [1.12.0 release notes](documentation/releases/v1.12.0.md) · [All release notes](documentation/releases) |
+| [Changes and upgrade notes](CHANGELOG.md) | [1.13.0 release notes](documentation/releases/v1.13.0.md) · [All release notes](documentation/releases) |
 
 **Automatically generated documentation is also available on [DeepWiki](https://deepwiki.com/turkerozturk/SweetCherry).** Use it to explore the repository and codebase. DeepWiki is an external, automatically generated resource; check the version-matched project guides for installation instructions, supported behavior and limits.
 

@@ -17,6 +17,8 @@ jobs:
       - name: Test JavaScript before packaging
         shell: bash
         run: node --test src/test/js/*.test.cjs
+      - name: Test release resource verification
+        run: python -m unittest discover -s packaging -p test_viewer_resources.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -27,6 +29,8 @@ jobs:
         run: |
           .\mvnw.cmd --batch-mode clean package
           if ($LASTEXITCODE -ne 0) { throw 'Maven package failed.' }
+      - name: Verify offline viewer resources in packaged JAR
+        run: python packaging/verify-viewer-resources.py --clean
       - name: Verify packaged dependency notice inventory
         run: python packaging/update-jar-notices.py --check
       - name: Download and verify Java 17 JRE
@@ -69,6 +73,8 @@ jobs:
           $portable = Join-Path $verify 'SweetCherry'
           if (Test-Path "$portable/runtime") { throw 'Portable ZIP contains Java.' }
           if (!(Test-Path 'release/SweetCherry/runtime/bin/java.exe')) { throw 'Setup runtime was removed.' }
+          & python packaging/verify-viewer-resources.py --bundle $portable --clean
+          if ($LASTEXITCODE -ne 0) { throw 'Portable viewer resource check failed.' }
           $info = Get-Content "$portable/build-info.json" -Raw | ConvertFrom-Json
           $setupInfo = Get-Content 'release/SweetCherry/build-info.json' -Raw | ConvertFrom-Json
           if ($info.packageRuntimeIncluded -ne $false -or $setupInfo.packageRuntimeIncluded -ne $true) { throw 'Incorrect runtime metadata.' }

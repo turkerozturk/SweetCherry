@@ -66,3 +66,6 @@ login-credentials.properties
 
 # Private CTB backup catalog and restored working copies
 /backups/
+
+# Python release-verifier test cache
+/packaging/__pycache__/

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.turkerozturk</groupId>
 	<artifactId>SweetCherry</artifactId>
-	<version>1.12.0</version>
+	<version>1.13.0</version>
 	<name>SweetCherry</name>
 	<description>A web companion and viewer for CherryTree CTB note databases</description>
 	<url>https://github.com/turkerozturk/SweetCherry</url>
@@ -519,6 +519,16 @@
 								<mkdir dir="${project.basedir}/release/SweetCherry/allTenants"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/exportedFiles"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/documentation/tr"/>
+                                <mkdir dir="${project.basedir}/release/SweetCherry/drawio-images"/>
+                                <!-- User-maintained replacements are external; seed files only if absent. -->
+                                <available file="${project.basedir}/release/SweetCherry/drawio-images/images.properties" property="release.drawio.manifest.exists"/>
+                                <copy file="${project.basedir}/external/drawio-images/images.properties"
+                                      tofile="${project.basedir}/release/SweetCherry/drawio-images/images.properties"
+                                      unless:set="release.drawio.manifest.exists"/>
+                                <available file="${project.basedir}/release/SweetCherry/drawio-images/README.md" property="release.drawio.readme.exists"/>
+                                <copy file="${project.basedir}/external/drawio-images/README.md"
+                                      tofile="${project.basedir}/release/SweetCherry/drawio-images/README.md"
+                                      unless:set="release.drawio.readme.exists"/>
 
 								<copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
 									  tofile="${project.basedir}/release/SweetCherry/${project.build.finalName}.${project.packaging}"
@@ -576,6 +586,7 @@
                                 <copy todir="${project.basedir}/release/SweetCherry/documentation" overwrite="true">
                                     <fileset dir="${project.basedir}/documentation">
                                         <include name="releases/**/*.md"/>
+                                        <include name="examples/**/*.drawio"/>
                                         <include name="images/**/*.md"/>
                                         <include name="images/**/*.png"/>
                                     </fileset>

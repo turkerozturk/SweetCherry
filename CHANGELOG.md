@@ -4,16 +4,22 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
-- Accept Draw.io graph roots/layers with generated IDs, normalize render-only cell/port references, and preserve blank pages instead of rejecting the document.
-- Show localized Draw.io parsing reasons with page and available XML line/column details; log diagnostic codes without note content.
+## [1.13.0] - 2026-11-21
 
-
-- Make Draw.io file/page/cell/XML budgets configurable through YAML and System settings, raise defaults, report the exceeded setting, and avoid counting URI-encoded expansion as decoded page size.
-- Preserve sanitized Draw.io HTML label layout, alignment, line breaks and wrapping; add ordinary-wheel zoom (Shift-wheel scroll) and horizontal fit.
-
-
-- Add a local, read-only multi-page Draw.io attachment viewer with page selection, zoom, fit, scrollbars and fullscreen, inert plain labels and external-image filename placeholders.
-
+- Added a read-only multi-page Draw.io attachment viewer with page selection, fullscreen, scrolling, zoom, page fit and horizontal fit.
+- Improved Draw.io compatibility with generated root/layer IDs, ports and blank pages, and added localized parsing diagnostics.
+- Added configurable diagram size, page, cell and XML limits through YAML and System settings.
+- Preserved supported label wrapping, alignment, line breaks and foreground/background colors.
+- Bundled local stencil and icon libraries with configurable families, including networking, Cabinets and EIP definitions.
+- Added meaningful, hideable missing-shape/image labels and optional administrator-provided PNG/JPEG replacements.
+- Made wheel zoom follow the pointer, and enabled validated internal-page and external HTTP/HTTPS links.
+- Added a filtered picker for Unicode characters, CherryTree icons and installed Font Awesome styles, with copy and insertion actions.
+- Added display-only icon markers in node names and rich-text content, including maps, graph labels, lists and PDFs.
+- Removed recognized icon markers from generated export filenames while preserving stored CTB names and export contents.
+- Added remembered editor text zoom, end-of-content startup and blank writing space below the final line.
+- Reorganized rich-text history, alignment, object-safety and other tools into more compact groups.
+- Fixed Windows CRLF library tests and binary font resource copying during Maven packaging.
+- Added an optional external replacement-folder template, bundled diagram examples and release checks for offline resources and private-file exclusion.
 
 ## [1.12.0] - 2026-11-20
 

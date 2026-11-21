@@ -32,6 +32,9 @@ jobs:
         shell: bash
         run: node --test src/test/js/*.test.cjs
 
+      - name: Test release resource verification
+        run: python -m unittest discover -s packaging -p test_viewer_resources.py
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -62,3 +65,6 @@ jobs:
           test -f release/SweetCherry/CTBDATA/demo.ctb
           test -f release/SweetCherry/allTenants/demo.txt
           test -d release/SweetCherry/exportedFiles
+
+      - name: Verify offline viewer resources in packaged JAR
+        run: python packaging/verify-viewer-resources.py --clean
