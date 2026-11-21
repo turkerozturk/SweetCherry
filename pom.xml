@@ -471,7 +471,11 @@
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<nonFilteredFileExtensions>
-						<!-- Add other binary file extensions if needed -->
+						<!-- Binary fonts must be copied byte-for-byte, never decoded as UTF-8. -->
+						<nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+						<nonFilteredFileExtension>otf</nonFilteredFileExtension>
+						<nonFilteredFileExtension>woff</nonFilteredFileExtension>
+						<nonFilteredFileExtension>woff2</nonFilteredFileExtension>
 					</nonFilteredFileExtensions>
 				</configuration>
 				<!-- Resource copying is handled by the standard Maven resources lifecycle. -->
