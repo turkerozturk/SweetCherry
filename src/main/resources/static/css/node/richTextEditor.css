@@ -24,3 +24,18 @@ body:has(#richEditForm) #editorRecovery{max-height:25dvh;margin:.2rem 0;padding:
 .rich-savebar{margin:.2rem 0;gap:.3rem}.rich-savebar button,.rich-savebar a{padding:.2rem .45rem;font-size:.875rem}
 
 #richWikiDialog{width:48rem;max-width:94vw;max-height:90dvh;overflow:auto;border:1px solid #888;border-radius:.4rem;padding:1rem}#richWikiDialog::backdrop{background:#0006}#richWikiIssues section{margin:.7rem 0;padding:.5rem;border:1px solid #aaa;border-radius:.3rem}#richWikiIssues select{max-width:100%;width:100%}.wiki-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1rem}.wiki-help{display:block;margin:.3rem 0;font-size:.85rem}#richWikiStatus:empty{display:none}
+
+/* Compact, content-sized tools. Reading/writing zoom never scales the toolbar. */
+#richControls .toolbar{flex-direction:row;flex-wrap:wrap;align-items:center;gap:.35rem}
+#richControls .toolbar>button,#richControls .toolbar>select{flex:0 1 auto;width:auto;max-width:100%}
+#richControls .toolbar .tool-group{max-width:100%;flex:0 1 auto}
+.rich-mode-row{display:flex;align-items:center;flex-wrap:nowrap;gap:.3rem;font-size:.875rem}
+.rich-mode-row .tool-group{flex:none;border:0;padding:.1rem;gap:.1rem}.rich-mode-row button{min-width:1.8rem;padding:.2rem}
+.rich-paragraph-row{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem;max-width:100%}
+.rich-paragraph-row select{width:auto;max-width:100%;font-size:.875rem}.rich-align-buttons{display:inline-flex;flex:none;gap:.1rem}
+#richControls .rich-align-buttons button{min-width:1.8rem;padding:.25rem}
+#richControls .toolbar .rich-object-safety{flex:1 0 100%;display:flex;flex-wrap:nowrap;font-size:.85rem}
+.rich-object-safety label{flex:1;min-width:0}.rich-object-safety button{flex:0 1 auto;min-width:0}
+#richControls>[role=note]{font-size:.8rem;margin:.5rem 0 0}
+
+.rich-mode-row>label{flex:1;min-width:0}.rich-mode-row input[type=checkbox]{flex:none}

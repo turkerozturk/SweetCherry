@@ -23,13 +23,14 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
     }
     if (visual) { ids.richVisualMode=element('richVisualMode'); ids.richVisualMode.checked=true; }
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
+    const alignAction=element('alignAction');alignAction.dataset={align:'center'};
     const align = element('align'); align.dataset = {choice:'justification'};
     const symbol=element('symbol');symbol.dataset={insertSymbol:'☐'};
     let saved, dirty, windowObject, recovery, uuid=0;
     ids.richEditForm.querySelector=()=>({value:"initial-revision"});
     const document = {
         getElementById: id => ids[id],
-        querySelectorAll: selector => selector === '[data-insert-symbol]' ? [symbol] : selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
+        querySelectorAll: selector => selector === '[data-insert-symbol]' ? [symbol] : selector === '[data-align]' ? [alignAction] : selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
         createElement: () => element(),
         createDocumentFragment: () => element(),
         createTextNode: text => ({text}),
@@ -341,6 +342,7 @@ test('web import rejects stale state, oversized images and protected selections 
 
 test('mobile HTTP can add generic-MIME PNG cloud files without randomUUID',async()=>{
  const e=editor(undefined,undefined,undefined,undefined,false,{secure:false,crypto:{getRandomValues(bytes){bytes.fill(42);return bytes;}}});
+ e.select(0,0);
  const file=Object.assign(new Blob([new Uint8Array([137,80,78,71,13,10,26,10])],{type:'application/octet-stream'}),{name:'cloud.png',data:'data:application/octet-stream;base64,AQID'});
  e.ids.richImageFile.files=[file];e.fire('richImageFile','change');await new Promise(resolve=>setImmediate(resolve));
  assert.equal(text(e.runs()),'\uFFFCA😀B\nC');const images=JSON.parse(e.ids.richImages.value);
@@ -349,13 +351,13 @@ test('mobile HTTP can add generic-MIME PNG cloud files without randomUUID',async
 });
 test('mobile beforeinput DataTransfer uses the rich paste converter and undo',()=>{
  const clipboard={fromHtml:()=>[{text:'Rich',attributes:{weight:'heavy'}}]};const e=editor(undefined,undefined,undefined,clipboard,true);
- let prevented=false;e.fire('richPreview','beforeinput',{inputType:'insertFromPaste',cancelable:true,preventDefault(){prevented=true;},dataTransfer:{files:[],getData:type=>type==='text/html'?'<b>Rich</b>':type==='text/plain'?'Plain':''}});
+ e.select(0,0);let prevented=false;e.fire('richPreview','beforeinput',{inputType:'insertFromPaste',cancelable:true,preventDefault(){prevented=true;},dataTransfer:{files:[],getData:type=>type==='text/html'?'<b>Rich</b>':type==='text/plain'?'Plain':''}});
  assert.equal(prevented,true);assert.equal(e.runs()[0].attributes.weight,'heavy');e.key('z');assert.equal(e.dirty(),false);
 });
 test('clipboard button preserves HTML on secure contexts and explains HTTP without reading',async()=>{
  const clipboard={fromHtml:()=>[{text:'Rich',attributes:{weight:'heavy'}}]};let reads=0;
  const reader={read:async()=>{reads++;return [{types:['text/html','text/plain'],getType:async type=>new Blob([type==='text/html'?'<b>Rich</b>':'Plain'])}];}};
- const secure=editor(undefined,undefined,undefined,clipboard,false,{clipboardReader:reader});await secure.fire('richPasteImage','click');assert.equal(secure.runs()[0].attributes.weight,'heavy');
+ const secure=editor(undefined,undefined,undefined,clipboard,false,{clipboardReader:reader});secure.select(0,0);await secure.fire('richPasteImage','click');assert.equal(secure.runs()[0].attributes.weight,'heavy');
  const http=editor(undefined,undefined,undefined,clipboard,false,{secure:false,clipboardReader:reader});http.ids.richClipboardHint.dataset.http='Use HTTPS or native paste';await http.fire('richPasteImage','click');assert.equal(reads,1);assert.equal(http.ids.richClipboardHint.textContent,'Use HTTPS or native paste');assert.equal(http.dirty(),false);
 });
 
@@ -518,3 +520,11 @@ test('symbol insertion rejects stale content and protected objects',()=>{
  const e=editor([{text:'ABC',attributes:{}}]);e.select(1,1);const ticket=e.symbols().capture();e.type('ABCD');assert.throws(()=>e.symbols().insert(ticket,'🙂'),/changed/);
  const protectedEditor=editor([{text:'\uFFFC',attributes:{__sweet_object:'image:1'}}],undefined,{'image:1':{label:'Image'}});protectedEditor.select(0,1);const bridge=protectedEditor.symbols();assert.throws(()=>bridge.insert(bridge.capture(),'🙂'),/protected/);assert.equal(text(protectedEditor.runs()),'\uFFFC');
 });
+
+ test('source and visual editors open at the model end without becoming dirty or adding undo steps',()=>{
+  for(const visual of [false,true]){const e=editor(undefined,undefined,undefined,undefined,visual);assert.equal(e.ids.richText.selectionStart,'A😀B\nC'.length);assert.equal(e.ids.richText.selectionEnd,'A😀B\nC'.length);assert.equal(e.dirty(),false);assert.equal(e.ids.richUndo.disabled,true);}
+ });
+ test('alignment buttons set the caret paragraph, repeat without toggling off, and share undo history',()=>{
+  const e=editor();e.fire('alignAction','click');assert.equal(e.runs().at(-1).attributes.justification,'center');assert.equal(e.runs()[0].attributes.justification,undefined);
+  e.fire('alignAction','click');assert.equal(e.runs().at(-1).attributes.justification,'center');e.key('z');assert.equal(e.dirty(),false);
+ });

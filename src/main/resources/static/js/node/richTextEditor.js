@@ -8,7 +8,7 @@
     input.value = previous;
     const count = value => Array.from(value).length;
     const sub = (value, start, end) => Array.from(value).slice(start, end).join('');
-    let selection = [0, 0];
+    let selection = [count(previous), count(previous)];
     const pendingImages = {}, pendingFiles = {};
     let tableChanges = {};
     let codeboxChanges = {};
@@ -18,7 +18,7 @@
     const plainClipboard = text => text.replace(/\uFFFC/g, '');
     const mode = document.getElementById('richVisualMode');
     const visual = () => !!(mode && mode.checked && window.RichTextVisualModel);
-    function focusEditor() { if (visual()) preview.focus(); else input.focus(); }
+    function focusEditor() { if (visual()) preview.focus({preventScroll:true}); else input.focus({preventScroll:true}); }
     function restoreSelection() {
         if (visual()) {
             window.RichTextVisualModel.restore(preview, selection[0], selection[1]);
@@ -37,9 +37,9 @@
                     if(element?.nodeName==='BR')element=element.parentElement;
                     rect=element?.getBoundingClientRect?.();
                 }
-                if(rect){const bounds=preview.getBoundingClientRect(),pad=6;
+                if(rect){const bounds=preview.getBoundingClientRect(),pad=Math.max(6,Math.min(240,(preview.clientHeight||0)*.35));
                     if(rect.bottom>bounds.bottom-pad)preview.scrollTop+=rect.bottom-bounds.bottom+pad;
-                    else if(rect.top<bounds.top+pad)preview.scrollTop-=bounds.top+pad-rect.top;
+                    else if(rect.top<bounds.top+6)preview.scrollTop-=bounds.top+6-rect.top;
                 }
             }
         }
@@ -164,13 +164,13 @@
     /** Applies a property only to selected text; alignment covers all touched paragraphs. */
     function format(key, value, toggle = false, targetRange = null) {
         let [start, end] = targetRange || selection;
-        if (start === end) { document.getElementById('selectionHint').hidden = false; return; }
-        captureSelection();
         if (key === 'justification') {
             const chars = Array.from(input.value);
             while (start > 0 && chars[start - 1] !== '\n') start--;
             while (end < chars.length && chars[end] !== '\n') end++;
         }
+        if (start === end) { document.getElementById('selectionHint').hidden = false; return; }
+        captureSelection();
         document.getElementById('selectionHint').hidden = true;
         let offset = 0;
         const output = [];
@@ -203,6 +203,10 @@
     document.querySelectorAll('[data-format]').forEach(button => {
         button.addEventListener('pointerdown', event => event.preventDefault());
         button.addEventListener('click', () => format(button.dataset.format, button.dataset.value, true));
+    });
+    document.querySelectorAll('[data-align]').forEach(button=>{
+        button.addEventListener('pointerdown',event=>event.preventDefault());
+        button.addEventListener('click',()=>format('justification',button.dataset.align));
     });
     document.querySelectorAll('[data-color]').forEach(control => control.addEventListener('change', () => format(control.dataset.color, control.value)));
     document.querySelectorAll('[data-choice]').forEach(control => control.addEventListener('change', () => format(control.dataset.choice, control.value)));
@@ -319,7 +323,7 @@
             captureSelection();codeboxSelection=[...selection];codeboxKey=key;
             const value=key ? codeboxChanges[key] || window.richEditorObjects[key].codebox : {text:'',syntax:'plain-text'};
             text.value=value.text;selectLanguage(value.syntax);search.value='';search.dispatchEvent(new Event('input'));error.hidden=true;
-            codeboxDialog.showModal();text.focus();
+            codeboxDialog.showModal();text.focus();text.setSelectionRange(text.value.length,text.value.length);window.SweetCherryEditorComfort?.bottom(text);
         };
         function closeCodebox(){codeboxDialog.close();selection=[...codeboxSelection];focusEditor();restoreSelection();}
         codeboxButton.addEventListener('pointerdown',event=>event.preventDefault());
@@ -815,7 +819,7 @@
         preview.addEventListener('drop',event=>{if(visual())event.preventDefault();});
         syncMode();
     }
-    render(); commitHistory();
+    render(); focusEditor(); restoreSelection(); commitHistory();
     // Ignore caret/mode changes and run boundaries; only persisted content contributes to dirty state.
     function contentSignature() {
         const normalized=[];
@@ -916,4 +920,10 @@
         }
     });
     window.EditorLeaveGuard.install(form,()=>readingImage || contentSignature()!==initialContent);
+    window.SweetCherryEditorComfort?.register({
+        surfaces:[input,preview],surface:()=>visual()?preview:input,
+        capture(){if(composing||readingImage)return null;captureSelection();return {range:[...selection],text:contentSignature()};},
+        restore(ticket){if(composing||readingImage||ticket.text!==contentSignature())return;selection=[...ticket.range];focusEditor();restoreSelection();},
+        atEnd:()=>!composing&&!readingImage&&selection[0]===count(previous)&&selection[1]===count(previous)
+    });
 })();

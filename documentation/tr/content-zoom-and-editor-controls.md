@@ -45,3 +45,13 @@ Geri al/yinele düğmeleri, Ctrl+Z, Ctrl+Y ve Ctrl+Shift+Z aynı geçmişi kulla
 - Özelliklerde **Kod Dili** araması, ikonlu alfabetik liste ve **Markdown** kısayolu bulunur. Bunlar içerik tipinin mevcut kilitlerini kaldırmaz; seçim Kaydet ile kalıcı olur. JavaScript yoksa standart dil listesi kullanılabilir.
 
 Manuel kontrol: uzun içerik yazın; Enter, yapıştırma, geri alma/yineleme ve seçili metin biçimlendirmesini deneyin. Kurtarma panelini açıp kapatın ve pencereyi yeniden boyutlandırın. Markdown önizlemesini gizleyip açın. Kod dili arayın, Markdown seçin; salt okunur ve zengin metin düğümlerinin kilitli kaldığını doğrulayın. Mobilde araç çekmecesini ve metin seçimini kontrol edin.
+
+## Editörde başlangıç, metin yakınlaştırma ve yazım alanı
+
+Düz metin/kod, Markdown, HTML kaynak ve rich text görsel/kaynak editörleri açıldığında imleç son satırın sonuna gelir. Yerleşim tamamlanınca yazım yüzeyi ve sayfa sona kayar. Bu sırada seçim değiştirir, diyalog açar veya kurtarma taslağı yüklerseniz başlangıç kaydırması yeni konumunuzu bozmaz. Save and continue sonrası da kayıtlı içeriğin sonundan devam edilir. Gömülü codebox metni açıldığında da imleç sona gelir.
+
+Save / Save and continue / Cancel sağındaki eksi, yüzde ve artı düğmeleri editör metnini %70–%200 aralığında, 10 puanlık adımlarla büyütür/küçültür. Yüzde düğmesi %100'e döndürür. Tercih aynı tarayıcı/site üzerindeki editörler arasında hatırlanır (`sweetcherry.editorTextZoom`); okuyucu yakınlaştırmasından bağımsızdır. Seçimi korur, undo adımı oluşturmaz ve kayıtlı metni/yazı boyutunu değiştirmez. Depolama engelliyse o sayfada çalışır.
+
+Son satırın altında yazım yüzeyinin yaklaşık %35'i kadar (32–240 piksel aralığında) rahatlık alanı bulunur. Bu CSS boşluğudur; içerikte boş paragraf/satır oluşturmaz. Sonda yazarken veya Enter kullanırken boşluk görünür kalır. Önceki satırlarda çalışmak sizi tekrar sona atmaz.
+
+Rich text araçlarında Undo/Redo WYSIWYG anahtarının sağındadır; stil listesinin yanında dört hizalama düğmesi bulunur. Kontroller metinleri kadar yer kaplar, dar alanda gerektiğinde sarılır. Nesne silme izni ve Manage objects, Dismiss link üzerinde ayrı bir satırdadır. Yedekleme hatırlatması araç panelinin en altındadır.

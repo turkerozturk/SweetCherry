@@ -29,3 +29,5 @@ test('plain recovery restores text, cursor and undo/redo without submitting or r
 });
 
 test('TAB and list buttons insert literal text and share undo/redo',()=>{const e=editor();e.els.nodeText.selectionStart=1;e.els.nodeText.selectionEnd=3;e.fire('plainTab','click');assert.equal(e.els.nodeText.value,'A\tB');e.fire('plainUndo','click');assert.equal(e.els.nodeText.value,'A😀B');e.fire('plainRedo','click');assert.equal(e.els.nodeText.value,'A\tB');e.fire('plainBullet','click');assert.equal(e.els.nodeText.value,'A\t• B');});
+
+test('plain/code/Markdown/HTML source starts after the last UTF-16 character without dirtying history',()=>{const e=editor();assert.equal(e.els.nodeText.selectionStart,'A😀B'.length);assert.equal(e.els.nodeText.selectionEnd,'A😀B'.length);assert.equal(e.dirty(),false);assert.equal(e.els.plainUndo.disabled,true);});

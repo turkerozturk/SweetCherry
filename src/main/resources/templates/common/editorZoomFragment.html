@@ -1,0 +1,7 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<span th:fragment="zoom" class="editor-zoom-controls" role="group" th:aria-label="#{editor.textZoom}">
+<button type="button" data-editor-zoom="out" th:title="#{view.zoomOut}" th:aria-label="#{view.zoomOut}"><i class="fas fa-search-minus" aria-hidden="true"></i></button>
+<button type="button" data-editor-zoom="reset" th:title="#{view.zoomReset}" th:aria-label="#{view.zoomReset}"><span data-editor-zoom-value>100%</span></button>
+<button type="button" data-editor-zoom="in" th:title="#{view.zoomIn}" th:aria-label="#{view.zoomIn}"><i class="fas fa-search-plus" aria-hidden="true"></i></button>
+</span>
+</body></html>

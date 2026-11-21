@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
-<head><title th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/node/editorLayout.css}"></head>
+<head><title th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/node/editorLayout.css}"><link rel="stylesheet" th:href="@{/css/node/editorComfort.css}"></head>
 <body>
 <section layout:fragment="content" class="container-fluid py-1 plain-editor-page">
-    <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
     <h1 class="fs-5 mb-1" th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></h1>
     <p class="mb-1"><strong data-inline-symbols th:text="${node.name}">Düğüm adı</strong>
         <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>
@@ -15,6 +14,7 @@
         <div class="plain-savebar d-flex flex-wrap gap-1 mb-1">
             <button type="submit" class="btn btn-sm btn-primary" th:text="#{richtext.edit.save}">Kaydet</button><button type="submit" name="continueEditing" value="true" class="btn btn-sm btn-success" th:text="#{editor.saveContinue}">Save and continue</button>
             <a class="btn btn-sm btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}">İptal</a>
+            <th:block th:replace="~{common/editorZoomFragment :: zoom}"></th:block>
         </div>
         <label for="nodeText" class="visually-hidden" th:text="#{markdown.contentLabel}"></label>
         <div class="d-flex gap-1 mb-1" role="group" th:aria-label="#{editor.tools}">
@@ -67,8 +67,10 @@
 </section></div>
 
     </form>
+    <div class="editor-backup-note" th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
 <script th:src="@{/js/common/editorRecovery.js}"></script>
 <script th:src="@{/js/common/editorLeaveGuard.js}"></script>
+<script th:src="@{/js/node/editorComfort.js}"></script>
 <script th:src="@{/js/node/plainTextEditor.js}"></script>
 <script th:src="@{/js/node/editorViewport.js}"></script>
 <script th:if="${node.syntax == 'markdown'}" th:src="@{/js/markdown/markdownEditor.js}"></script>

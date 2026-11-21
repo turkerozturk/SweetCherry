@@ -1,6 +1,7 @@
 (() => {
     'use strict';
     const input=document.getElementById('nodeText'), form=document.getElementById('plainEditForm');
+    input.focus({preventScroll:true});input.setSelectionRange(input.value.length,input.value.length);
     const initial=input.value, undo=document.getElementById('plainUndo'), redo=document.getElementById('plainRedo');
     let composing=false, history=[snapshot()], index=0;
     function snapshot() {return {text:input.value,start:input.selectionStart,end:input.selectionEnd};}
@@ -51,4 +52,10 @@
         }
     });
     window.EditorLeaveGuard.install(form,()=>input.value!==initial);
+    window.SweetCherryEditorComfort?.register({
+        surfaces:[input],surface:()=>input,
+        capture:()=>({range:[input.selectionStart,input.selectionEnd],text:input.value}),
+        restore:ticket=>{if(composing||ticket.text!==input.value)return;input.focus({preventScroll:true});input.setSelectionRange(...ticket.range);},
+        atEnd:()=>!composing&&input.selectionStart===input.value.length&&input.selectionEnd===input.value.length
+    });
 })();
