@@ -61,7 +61,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         ids.richText.selectionStart = ids.richText.selectionEnd = value.length;
         fire('richText','input');
     }
-    return {ids, align, fire, select, runs, key, type, symbol, recovery:()=>recovery,dirty:()=>dirty(), internal:()=>windowObject.RichTextInternalLinkBridge, bridge:()=>windowObject.RichTextImportBridge,busy:()=>recovery?.busy()};
+    return {ids, align, fire, select, runs, key, type, symbol, recovery:()=>recovery,dirty:()=>dirty(), symbols:()=>windowObject.RichTextSymbolBridge, internal:()=>windowObject.RichTextInternalLinkBridge, bridge:()=>windowObject.RichTextImportBridge,busy:()=>recovery?.busy()};
 }
 
 function text(runs) {return runs.map(run => run.text).join('');}
@@ -504,4 +504,17 @@ test('content changed while the picker was open cannot receive images at an obso
 });
 test('cancel or empty selection leaves content and history unchanged',async()=>{
  const e=editor();e.select(1,1);e.fire('richAddImage','click');e.fire('richImageFile','cancel');e.ids.richImageFile.files=[];await e.fire('richImageFile','change');assert.equal(e.dirty(),false);assert.equal(e.ids.richUndo.disabled,true);
+});
+
+test('symbol insertion preserves Unicode selection, formatting and one-step undo in both editor modes',()=>{
+ for(const visual of [false,true]){
+  const e=editor([{text:'A😀B',attributes:{weight:'heavy',future:'keep'}}],undefined,undefined,undefined,visual);e.select(1,3);
+  const bridge=e.symbols(),ticket=bridge.capture(),range=bridge.insert(ticket,'{{fa-solid fa-image}}');bridge.restore(range);
+  assert.equal(text(e.runs()),'A{{fa-solid fa-image}}B');assert(e.runs().every(run=>run.attributes.future==='keep'&&run.attributes.weight==='heavy'));
+  e.key('z');assert.equal(text(e.runs()),'A😀B');e.key('y');assert.equal(text(e.runs()),'A{{fa-solid fa-image}}B');
+ }
+});
+test('symbol insertion rejects stale content and protected objects',()=>{
+ const e=editor([{text:'ABC',attributes:{}}]);e.select(1,1);const ticket=e.symbols().capture();e.type('ABCD');assert.throws(()=>e.symbols().insert(ticket,'🙂'),/changed/);
+ const protectedEditor=editor([{text:'\uFFFC',attributes:{__sweet_object:'image:1'}}],undefined,{'image:1':{label:'Image'}});protectedEditor.select(0,1);const bridge=protectedEditor.symbols();assert.throws(()=>bridge.insert(bridge.capture(),'🙂'),/protected/);assert.equal(text(protectedEditor.runs()),'\uFFFC');
 });

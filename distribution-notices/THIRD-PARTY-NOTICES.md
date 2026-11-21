@@ -257,3 +257,8 @@ The transitive `org.jetbrains:annotations:24.0.1` uses Apache License 2.0; see [
 ## Clipboard HTML sanitization (2026-11-12)
 
 DOMPurify 3.4.17 is bundled unmodified for offline rich-text paste and webpage import. It is dual-licensed Apache-2.0 OR MPL-2.0; SweetCherry uses the Apache-2.0 alternative. See [upstream license](licenses/upstream-reference/DOMPurify-LICENSE.txt), [versioned source](https://github.com/cure53/DOMPurify/tree/3.4.17) and [source archive](https://github.com/cure53/DOMPurify/archive/refs/tags/3.4.17.tar.gz). The local asset includes its original copyright/license header and a SOURCE.md recording its upstream commit and SHA-256.
+
+
+## Inline symbol picker (2026-11-21)
+
+The offline picker catalogue is generated from `metadata/icons.json` in the existing `org.webjars:font-awesome:7.3.0` dependency, copyright Fonticons, Inc. No new Font Awesome font or artwork is copied: display uses the same local WebJar CSS/fonts and retains its original Free License (icons CC BY 4.0, fonts SIL OFL 1.1, code MIT). The generated metadata source/version/hash is recorded in `static/js/symbols/SOURCE.txt`; regeneration is in `packaging/symbols/generate-catalog.py`. CTB icon entries reference the already distributed CherryTree PNGs under their existing notices. Unicode entries are ordinary characters displayed with the user's system fonts; no emoji artwork/font package is introduced.

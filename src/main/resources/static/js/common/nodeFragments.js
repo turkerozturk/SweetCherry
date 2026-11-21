@@ -74,15 +74,15 @@
                 if(path.includes(data.contentId)){note(link,root,state,'Cycle');continue;}
                 if(!state.budget.accept(data.html.length)){note(link,root,state,'Limit');continue;}
                 const section=document.createElement('span');section.className='node-fragment';
-                const source=document.createElement('a');source.className='node-fragment-source';source.dataset.fragmentSource='true';const sourceUrl=new URL(target.href);sourceUrl.searchParams.set('_tenantView',root.dataset.fragmentToken);source.href=sourceUrl.href;source.target='_blank';source.rel='noopener noreferrer';source.textContent=(root.dataset.fragmentSourceLabel||'')+': '+data.name;
+                const source=document.createElement('a');source.className='node-fragment-source';source.dataset.fragmentSource='true';source.dataset.inlineSymbols='true';const sourceUrl=new URL(target.href);sourceUrl.searchParams.set('_tenantView',root.dataset.fragmentToken);source.href=sourceUrl.href;source.target='_blank';source.rel='noopener noreferrer';source.textContent=(root.dataset.fragmentSourceLabel||'')+': '+data.name;
                 const sourceBreak=document.createElement('br');sourceBreak.className='node-fragment-source-break';source.hidden=hideSource;sourceBreak.hidden=hideSource;
-                const body=document.createElement('span');body.className='node-fragment-body';
+                const body=document.createElement('span');body.className='node-fragment-body';if(data.syntax==='custom-colors')body.dataset.inlineSymbols='true';else body.dataset.symbolsSkip='true';
                 const parsed=new DOMParser().parseFromString(data.html,'text/html');
                 parsed.querySelectorAll('script,style,iframe,object,embed,link,meta,base,form,input,button,textarea,select').forEach(item=>item.remove());
                 for(const element of parsed.body.querySelectorAll('*'))for(const attr of [...element.attributes])if(/^on/i.test(attr.name)||attr.name.toLowerCase()==='srcdoc')element.removeAttribute(attr.name);
                 namespace(parsed.body,'sc-inline-'+(++sequence),root,data.contentId);
                 window.SweetCherryNodeFragmentFlow?.inline(parsed.body,document);
-                parsed.body.querySelectorAll('img').forEach(image=>{image.tabIndex=0;image.title=image.title||root.dataset.fragmentImageTitle||'';});
+                parsed.body.querySelectorAll('img:not(.sc-inline-icon)').forEach(image=>{image.tabIndex=0;image.title=image.title||root.dataset.fragmentImageTitle||'';});
                 body.append(...[...parsed.body.childNodes].map(item=>document.importNode(item,true)));section.append(source,sourceBreak,body);
                 mount(link,section,scope);
                 document.dispatchEvent(new CustomEvent('sweetcherry:content-loaded',{detail:{root:section}}));

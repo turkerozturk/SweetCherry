@@ -40,7 +40,7 @@
         }
     }
     content.addEventListener('keydown', event => {
-        if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('.workspace-rendered img')) {
+        if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('.workspace-rendered img:not(.sc-inline-icon)')) {
             event.preventDefault(); openContentImage(event.target);
         }
     });
@@ -126,7 +126,7 @@
         link.append(image(child.iconName));
         const states=statusIcons(child);if(states)link.append(states);
         const name = document.createElement('span');
-        name.textContent = child.name;
+        name.textContent = child.name; name.dataset.inlineSymbols="true";
         if (/^#[0-9a-fA-F]{1,6}$/.test(child.titleColor)) name.style.color = '#' + child.titleColor.slice(1).padStart(6, '0');
         if (child.bold) name.style.fontWeight = 'bold';
         link.append(name);
@@ -229,7 +229,7 @@
             content.replaceChildren(document.importNode(fragment, true));
             content.scrollTop = 0;
             updateScrollTopButton();
-            content.querySelectorAll('.workspace-rendered img').forEach(image => {
+            content.querySelectorAll('.workspace-rendered img:not(.sc-inline-icon)').forEach(image => {
                 image.tabIndex = 0;
                 image.title = image.title || workspace.dataset.imageTitle;
             });
@@ -266,7 +266,7 @@
         } finally { if (active === controller) content.removeAttribute('aria-busy'); }
     }
     workspace.addEventListener('click', event => {
-        const contentImage = event.target.closest('.workspace-rendered img');
+        const contentImage = event.target.closest('.workspace-rendered img:not(.sc-inline-icon)');
         if (contentImage && event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
             event.preventDefault(); openContentImage(contentImage); return;
         }

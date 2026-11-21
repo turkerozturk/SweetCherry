@@ -12,13 +12,13 @@
             window.open(source, '_blank', 'noopener,noreferrer');
         }
     }
-    function prepare(root){root.querySelectorAll('img').forEach(image=>{image.tabIndex=0;image.title=image.title||document.body.dataset.imageTitle;});}
+    function prepare(root){root.querySelectorAll('img:not(.sc-inline-icon)').forEach(image=>{image.tabIndex=0;image.title=image.title||document.body.dataset.imageTitle;});}
     content.addEventListener('click',event=>{
-        const image=event.target.closest('img');if(!image||!content.contains(image))return;
+        const image=event.target.closest('img:not(.sc-inline-icon)');if(!image||!content.contains(image))return;
         event.preventDefault();openImage(image);
     });
     content.addEventListener('keydown',event=>{
-        if((event.key==='Enter'||event.key===' ')&&event.target.matches('img')){event.preventDefault();openImage(event.target);}
+        if((event.key==='Enter'||event.key===' ')&&event.target.matches('img:not(.sc-inline-icon)')){event.preventDefault();openImage(event.target);}
     });
     document.addEventListener('sweetcherry:content-loaded',event=>{if(content.contains(event.detail.root))prepare(event.detail.root);});
     prepare(content);

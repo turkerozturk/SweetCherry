@@ -10,7 +10,7 @@
         <nav class="workspace-breadcrumbs" th:attr="aria-label=#{tree.path}">
             <a th:href="@{/tree(nodeId=0)}"><span th:text="${currentTenantName}"></span></a>
             <th:block th:each="entry : ${node.breadcrumbs}">
-                <span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}"></a>
+                <span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}" data-inline-symbols></a>
             </th:block>
         </nav>
         <p th:if="${isSharedNode == true}" class="alert alert-info py-1 my-1">
@@ -20,13 +20,14 @@
         <th:block th:replace="~{node/nodeToolbarFragment :: controls('tree')}"></th:block>
         <div class="workspace-title-row" data-node-title-editor
              th:attr="data-title-id=${requestedNodeId},data-title-endpoint=@{/nodes/properties/{id}/title(id=${requestedNodeId})},data-title-loading=#{title.loading},data-title-saving=#{title.saving},data-title-changed=#{title.changed},data-title-error=#{title.error},data-title-readonly=#{title.readonly}">
-        <h1 class="workspace-node-title" data-title-heading th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}"><img th:if="${node.nodeIcon != null and node.nodeIcon.iconName != 'zero'}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="26" height="26" alt=""><th:block th:replace="~{node/nodeStatusIcons :: headerStates(${node},${nodeBookmarked})}"></th:block><span data-title-text th:text="${node.name}"></span></h1>
+        <h1 class="workspace-node-title" data-title-heading th:attr="data-path-ids=${#strings.arrayJoin(node.breadcrumbs.keySet().toArray(), ',')}"><img th:if="${node.nodeIcon != null and node.nodeIcon.iconName != 'zero'}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="26" height="26" alt=""><th:block th:replace="~{node/nodeStatusIcons :: headerStates(${node},${nodeBookmarked})}"></th:block><span data-title-text th:text="${node.name}" data-inline-symbols></span></h1>
         <th:block th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
         <button type="button" class="btn btn-sm btn-outline-primary node-title-pencil" data-title-open th:title="#{title.edit}" th:aria-label="#{title.edit}"><i class="fas fa-pen" aria-hidden="true"></i></button>
         <form hidden data-title-form class="node-title-form" method="post" th:action="@{/nodes/properties/{id}/title(id=${requestedNodeId})}">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
         <label class="visually-hidden" th:for="|node-title-${requestedNodeId}|" th:text="#{title.name}"></label>
         <input class="form-control" name="name" th:id="|node-title-${requestedNodeId}|" maxlength="255" required data-title-value autocomplete="off">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-symbol-picker-open th:attr="data-symbol-target=|node-title-${requestedNodeId}|" th:text="#{symbols.open}"></button>
         <button type="submit" class="btn btn-sm btn-primary" data-title-save th:text="#{title.save}"></button>
         <button type="button" class="btn btn-sm btn-outline-secondary" data-title-cancel th:text="#{title.cancel}"></button>
         <span data-title-status role="status" class="small text-danger"></span>

@@ -2,7 +2,7 @@
 <html th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
-<link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/nodeTargetSearch.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/theme.css}"></head>
+<link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}"><link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/nodeTargetSearch.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/theme.css}"></head>
 <body>
 <header class="rich-page-header"><h1 th:text="#{richtext.edit.title}"></h1><strong th:text="${editor.node.name}"></strong></header>
 <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>
@@ -49,6 +49,7 @@
 <button type="button" id="richAddFile" th:text="#{richtext.edit.addFile}"></button>
 <button type="button" id="richTable" th:text="#{richtext.edit.table}" th:attr="data-edit=#{richtext.edit.tableEdit}"></button>
 <button type="button" id="richCodebox" th:text="#{richtext.codebox.add}" th:attr="data-edit=#{richtext.codebox.edit}"></button>
+<button type="button" data-symbol-picker-open data-symbol-rich th:text="#{symbols.open}"></button>
 <button type="button" id="richSeparator" th:title="#{editor.separator.help}">33~</button>
 <button type="button" id="richObjects" th:text="#{richtext.edit.objects}"></button>
 </div>
@@ -159,6 +160,7 @@
 </dialog>
 <script th:inline="javascript">window.richEditorDocument = /*[[${editor.document}]]*/ {runs: []}; window.richEditorObjects = /*[[${editor.objects}]]*/ {}; window.richEditorMaxFileBytes = /*[[${editor.maxEmbeddedFileBytes}]]*/ 9000000; window.richEditorTenant = /*[[${tenantViewToken}]]*/ "";</script>
 <dialog id="richWikiDialog" aria-labelledby="richWikiTitle" th:attr="data-endpoint=@{/nodes/richtext/edit/{id}/wiki-links(id=${editor.node.nodeId})},data-loading=#{wiki.loading},data-error=#{wiki.error},data-missing=#{wiki.missing},data-ambiguous=#{wiki.ambiguous},data-literal=#{wiki.literal},data-shared=#{wiki.shared},data-limit=#{wiki.limit}"><h2 id="richWikiTitle" th:text="#{wiki.title}"></h2><p th:text="#{wiki.explain}"></p><div id="richWikiIssues"></div><div class="wiki-actions"><button id="richWikiCancel" type="button" autofocus th:text="#{wiki.cancel}"></button><button id="richWikiSave" type="button" th:text="#{wiki.save}"></button></div></dialog>
+<th:block th:replace="~{common/symbolPicker :: assets}"></th:block>
 <script src="/js/node/richTextVisualModel.js"></script>
 <script src="/js/thirdparty/dompurify/purify.min.js"></script>
 <script src="/js/node/richTextClipboard.js"></script>

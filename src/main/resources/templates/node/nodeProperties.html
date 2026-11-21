@@ -14,6 +14,7 @@
 <div class="col-md-6">
 <label for="nodeName" class="form-label" th:text="#{node.properties.name}"></label>
 <input id="nodeName" class="form-control form-control-sm" name="name" type="text" required maxlength="255" th:value="${node.name}">
+<button type="button" class="btn btn-sm btn-outline-secondary mt-1" data-symbol-picker-open data-symbol-target="nodeName" th:text="#{symbols.open}"></button>
 <label for="nodeTags" class="form-label mt-2" th:text="#{tags.label}"></label>
 <div class="input-group input-group-sm"><input id="nodeTags" class="form-control" name="tags" type="text" maxlength="20000" th:value="${node.tags}" th:attr="aria-label=#{tags.label}">
 <button id="nodeTagsChoose" class="btn btn-outline-secondary" type="button" th:title="#{tags.choose}" th:aria-label="#{tags.choose}"><i class="fas fa-tags" aria-hidden="true"></i></button></div>

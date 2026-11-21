@@ -20,7 +20,7 @@
                             <a th:href="'/nodes/' + ${entry.key}"
                                th:text="${entry.value}"
                                style="color: #666666;"
-                            ></a>
+                             data-inline-symbols></a>
                         </b>
                     </h2>
                 </th:block>
@@ -48,13 +48,13 @@
 
                     <!--
                     <li th:each="entry : ${node.breadcrumbs}" class="breadcrumb-item">
-                        <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}"></a>
+                        <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}" data-inline-symbols></a>
                     </li>
                     -->
 
 
                         <li th:each="entry, stat : ${node.breadcrumbs}" th:if="${stat.index < node.breadcrumbs.size() - 1}" class="breadcrumb-item">
-                            <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}"></a>
+                            <a th:href="'/nodes/' + ${entry.key}" th:text="${entry.value}" data-inline-symbols></a>
                         </li>
 
 

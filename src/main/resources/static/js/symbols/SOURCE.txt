@@ -1,0 +1,6 @@
+Font Awesome 7.3.0 metadata/icons.json from the existing org.webjars:font-awesome dependency.
+Metadata SHA-256: 06ea246416198e5bcd1cf0cf5559859809e6395dfb2cd8dce3f5b88135281fbe
+Icon/font/code terms remain as recorded in the WebJar LICENSE and distribution-notices.
+CTB entries reference existing static/img/ctbicons/*.png files without copying/changing artwork.
+Unicode entries are a curated native-text list; no emoji artwork or additional font is bundled.
+Regenerate with packaging/symbols/generate-catalog.py and the pinned local WebJar.

@@ -590,10 +590,10 @@
     /** Applies plain text input to the same model/history used by the textarea mode. */
     function visualChange(text, start = selection[0], end = selection[1]) {
         captureSelection();
-        if (!replace(start,end,text)) return;
+        if (!replace(start,end,text)) return false;
         previous = runs.map(run=>run.text).join(''); input.value = previous;
         selection = [start + count(text), start + count(text)];
-        render(); focusEditor(); restoreSelection(); commitHistory();
+        render(); focusEditor(); restoreSelection(); commitHistory(); return true;
     }
     /** Keeps file data local until Save and adds its protected slot to the shared undo/redo model. */
     const addImage = file => addObject(file, false);
@@ -832,6 +832,14 @@
         return JSON.stringify({runs:normalized,deleted:[...deletedKeys].sort(),tables,codeboxes});
     }
     // Layout controls can move focus without changing the content model or undo history.
+    window.RichTextSymbolBridge={
+        capture(){if(readingImage||composing)throw Error('busy');captureSelection();return {selection:[...selection],content:contentSignature()};},
+        insert(ticket,text){
+            if(readingImage||composing||!ticket||ticket.content!==contentSignature()||typeof text!=='string'||text.length>200)throw Error('changed');
+            selection=[...ticket.selection];if(!visualChange(text,selection[0],selection[1]))throw Error('protected');return [...selection];
+        },
+        restore(range){selection=[...range];focusEditor();restoreSelection();}
+    };
     window.RichTextSelectionBridge={
         capture(){captureSelection();return [...selection];},
         restore(ticket){if(!ticket)return;selection=[...ticket];focusEditor();restoreSelection();}

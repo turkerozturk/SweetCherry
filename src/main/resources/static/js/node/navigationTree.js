@@ -35,7 +35,7 @@
         link.append(icon(child.iconName));
         const states=statusIcons(child);if(states)link.append(states);
         const title = document.createElement('span');
-        title.textContent = child.name;
+        title.textContent = child.name; title.dataset.inlineSymbols="true";
         if (/^#[0-9a-fA-F]{6}$/.test(child.titleColor)) title.style.color = child.titleColor;
         if (child.bold) title.className = 'boldTitle';
         link.append(title);

@@ -39,7 +39,7 @@
 
                         <span th:text="${childNode.name}"
                               th:style="${'color:' + childNode.titleColorAsHtmlHex + ';'}"
-                              th:class="${childNode.boldnessBit ? 'boldTitle' : ''}"></span>
+                              th:class="${childNode.boldnessBit ? 'boldTitle' : ''}" data-inline-symbols></span>
                     </a>
                 </th:block>
                 <th:block th:unless="${childNode}">

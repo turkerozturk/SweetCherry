@@ -68,7 +68,7 @@
             const target = new URL('/nodes/' + id, location.origin);
             target.searchParams.set('_tenantView', token);
             link.href = target.pathname + target.search;
-            link.textContent = node.name;
+            link.textContent = node.name; link.dataset.inlineSymbols="true";
             if (node.bold) link.style.fontWeight = 'bold';
             if (node.titleColor && /^#[0-9a-f]{6}$/i.test(node.titleColor)) link.style.color = node.titleColor;
             if (id === body.dataset.selectedId) link.setAttribute('aria-current','page');
