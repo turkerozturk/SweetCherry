@@ -78,7 +78,7 @@
             signature = next; cards.replaceChildren();
             for (const item of presentation.rows) {
                 const card = document.createElement('section'); card.className = 'reminder-alarm-card';
-                const title = document.createElement('strong'); title.textContent = item.name;
+                const title = document.createElement('strong'); title.textContent = item.name;title.dataset.inlineSymbols="true";
                 const note = document.createElement('p'); note.className = 'reminder-alarm-note'; note.textContent = item.message;
                 const date = document.createElement('small'); date.textContent = item.dueText;
                 const buttons = document.createElement('div'); buttons.className = 'reminder-alarm-actions';

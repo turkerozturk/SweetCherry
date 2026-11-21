@@ -20,41 +20,17 @@
  */
 package com.turkerozturk.helpers;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.html.simpleparser.HTMLWorker;
-import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-
+/** List exports share the offline renderer, Unicode fonts and symbol support of node PDFs. */
 @Component
 public class PDFFromHTMLHelper {
-
-    /**
-     *
-     * @param sourceHTMLContent
-     * @return
-     */
     public byte[] createPdfFromHtml(String sourceHTMLContent) {
-
-        try (Document document = new Document(PageSize.A4);
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            PdfWriter.getInstance(document, outputStream);
-            document.open();
-            HTMLWorker htmlWorker = new HTMLWorker(document);
-            htmlWorker.parse(new StringReader(sourceHTMLContent));
-            document.close();
-
-            return outputStream.toByteArray();
-        } catch (DocumentException | IOException exception) {
-
-            System.out.println(exception.getMessage());
-            return new byte[0];
-        }
+        var input = org.jsoup.Jsoup.parse(sourceHTMLContent);
+        var options = new com.turkerozturk.pdf.PdfExportOptions("A4", "portrait", true,
+                false, false, false, true, false, false, false);
+        var document = new com.turkerozturk.pdf.NodePdfDocument().prepare("SweetCherry",
+                input.body().html(), 0, options, null);
+        return new com.turkerozturk.pdf.NodePdfRenderer().render(document);
     }
-
 }

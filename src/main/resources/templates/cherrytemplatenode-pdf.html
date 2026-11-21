@@ -25,7 +25,7 @@
         <tbody>a
         <tr th:each="projectNode : ${cherryTemplateNode.projectNodes}">
             <td th:text="${projectNode.nodeId}"></td>
-            <td th:text="${projectNode.name}" class="sortAlphabetic"></td>
+            <td data-inline-symbols th:text="${projectNode.name}" class="sortAlphabetic"></td>
             <td>
                 <table border="1" width="100%" class="dataTable">
                     <tbody>

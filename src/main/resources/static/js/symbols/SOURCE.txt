@@ -2,5 +2,7 @@ Font Awesome 7.3.0 metadata/icons.json from the existing org.webjars:font-awesom
 Metadata SHA-256: 06ea246416198e5bcd1cf0cf5559859809e6395dfb2cd8dce3f5b88135281fbe
 Icon/font/code terms remain as recorded in the WebJar LICENSE and distribution-notices.
 CTB entries reference existing static/img/ctbicons/*.png files without copying/changing artwork.
-Unicode entries are a curated native-text list; no emoji artwork or additional font is bundled.
+Unicode entries are a curated native-text list; no emoji artwork or additional emoji font is bundled.
+Server properties catalogue and glyph values come from this same metadata.
+PDF TrueType copies in resources/symbols are conversions of the three pinned WOFF2 fonts (SIL OFL 1.1); use --pdf-fonts with fonttools[woff] to regenerate.
 Regenerate with packaging/symbols/generate-catalog.py and the pinned local WebJar.

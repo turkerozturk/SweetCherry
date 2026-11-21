@@ -9,7 +9,7 @@
  <p th:if="${excelError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg('excel.error.'+excelError)}"></p>
  <th:block th:if="${excel != null}">
  <h2 class="h5 text-break" th:text="${excel.filename}"></h2>
- <p><span th:text="${excel.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span></p>
+ <p><span data-inline-symbols th:text="${excel.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span></p>
  <p class="small text-body-secondary" th:text="#{excel.help}"></p>
  <form method="get" th:action="@{/attachments/{node}/{offset}/excel(node=${nodeId},offset=${offset})}" class="d-flex flex-wrap gap-2 align-items-end mb-3">
  <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">

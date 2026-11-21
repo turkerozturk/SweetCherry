@@ -19,7 +19,7 @@
 <tbody><tr th:each="node : ${nodes}">
 <td><a data-node-info-link th:title="#{node.meta.header}" th:href="@{/nodes/{id}/info(id=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="${node.nodeId}"></a></td>
 <td class="timeline-parent"><a th:if="${node.listParentId > 0 and node.listParentName != null}" th:href="@{/nodes/{id}(id=${node.listParentId},_tenantView=${tenantViewToken})}" target="_blank" rel="noopener" th:text="${node.listParentName}"></a><span th:unless="${node.listParentId > 0 and node.listParentName != null}" th:text="${node.listParentId==0 ? #messages.msg('tags.root') : #messages.msg('tags.missingParent')}"></span></td>
-<td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}"><img th:if="${node.nodeIcon != null}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="20" height="20" alt="" loading="lazy"> <span th:text="${node.name}"></span></a></td>
+<td><a th:href="@{/nodes/{id}(id=${node.nodeId},_tenantView=${tenantViewToken})}"><img th:if="${node.nodeIcon != null}" th:src="@{/img/ctbicons/{name}.png(name=${node.nodeIcon.iconName})}" width="20" height="20" alt="" loading="lazy"> <span data-inline-symbols th:text="${node.name}"></span></a></td>
 <td th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>
 <td th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></td>
 </tr></tbody></table></div>

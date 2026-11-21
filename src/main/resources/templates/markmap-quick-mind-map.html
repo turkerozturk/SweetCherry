@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title th:text="#{quickmap.markmapTitle(${rootNodeName})}">
+    <title data-symbols-native th:text="#{quickmap.markmapTitle(${rootNodeName})}">
         Markmap Quick Mind Map
     </title>
 
@@ -176,7 +176,7 @@
 
 <main class="container-fluid py-3 mind-map-page">
     <div class="d-flex flex-wrap align-items-center gap-2 mb-3 mind-map-toolbar">
-        <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
+        <h1 data-inline-symbols class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
 
         <span class="badge text-bg-secondary"
               th:text="${rootNodeId == 0 ? #messages.msg('quickmap.allRoots') : #messages.msg('quickmap.node', rootNodeId)}">Node</span>
@@ -315,6 +315,9 @@
         const addChildLabel = /*[[#{markmap.child.add}]]*/ 'Add child node';
         const revealParentId = new URLSearchParams(window.location.search).get('childOf');
 
+        await new Promise(resolve => { if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',resolve,{once:true});else resolve(); });
+        await window.SweetCherrySymbolImages?.ready().catch(()=>{});
+        await document.fonts?.ready;
         prepareLabels(data);
 
         const options = {
@@ -434,7 +437,7 @@
 
             // Markmap düğüm içeriğini HTML olarak işler. Veritabanından gelen
             // başlık önce metne çevrilerek script/HTML çalıştırması engellenir.
-            const safeTitle = escapeHtml(node.content || '');
+            const safeTitle = window.SweetCherryInlineSymbols?.html(node.content || '') ?? escapeHtml(node.content || '');
             const titleClasses = isBold
                 ? 'markmap-node-link markmap-node-title is-bold'
                 : 'markmap-node-link markmap-node-title';
@@ -562,5 +565,6 @@
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 
 <script th:src="@{/js/common/closePage.js}" defer></script>
+<th:block th:replace="~{common/symbolPicker :: display}"></th:block>
 </body>
 </html>

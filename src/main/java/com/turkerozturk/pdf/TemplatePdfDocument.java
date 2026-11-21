@@ -23,7 +23,7 @@ public final class TemplatePdfDocument {
         for (var project : template.getProjectNodes()) {
             Element row = body.appendElement("tr");
             row.appendElement("td").addClass("number").text(Integer.toString(++index));
-            Element name = row.appendElement("td").addClass("node-name");
+            Element name = row.appendElement("td").addClass("node-name").attr("data-inline-symbols", "");
             twoWords(name, project.getName());
             name.appendElement("br");
             name.appendText("(" + project.getNodeId() + ")");
@@ -31,7 +31,7 @@ public final class TemplatePdfDocument {
                     .appendElement("table").addClass("variable-table").appendElement("tbody");
             for (var label : template.getDataLabels().entrySet()) {
                 Element pair = nested.appendElement("tr");
-                twoWords(pair.appendElement("td").addClass("variable-name"), label.getValue());
+                twoWords(pair.appendElement("td").addClass("variable-name").attr("data-inline-symbols", ""), label.getValue());
                 var field=com.turkerozturk.node.TemplateField.of(project,label.getKey(),label.getValue());
                 Element value=pair.appendElement("td").addClass("variable-value");
                 if(field.status().equals("value"))value.html(values.getOrDefault(field.data().getNodeId(), ""));
@@ -51,7 +51,7 @@ public final class TemplatePdfDocument {
         var images=document.getElementsByTagName("img");
         for(int i=0;i<images.getLength();i++) {
             var image=(org.w3c.dom.Element)images.item(i);
-            if(image.hasAttribute("data-sc-latex") || (image.getParentNode() instanceof org.w3c.dom.Element parent && parent.getAttribute("class").contains("rich-text-attachment")))continue;
+            if((image.getAttribute("class").contains("pdf-inline-symbol") || image.getAttribute("class").contains("sc-name-symbol")) || image.hasAttribute("data-sc-latex") || (image.getParentNode() instanceof org.w3c.dom.Element parent && parent.getAttribute("class").contains("rich-text-attachment")))continue;
             var width=java.util.regex.Pattern.compile("width:([0-9.]+)px").matcher(image.getAttribute("style"));
             var height=java.util.regex.Pattern.compile("height:([0-9.]+)px").matcher(image.getAttribute("style"));
             if(width.find() && height.find()) {
@@ -79,7 +79,8 @@ public final class TemplatePdfDocument {
     }
 
     private static void twoWords(Element element, String text) {
-        String[] words = (text == null ? "" : text.trim()).split("\\s+");
+        String[] words = java.util.regex.Pattern.compile("\\{\\{[^{}\\r\\n]{1,100}\\}\\}|\\S+").matcher(text == null ? "" : text.trim())
+                .results().map(java.util.regex.MatchResult::group).toArray(String[]::new);
         for (int i = 0; i < words.length; i++) {
             if (i > 0) {
                 if (i % 2 == 0) element.appendElement("br");

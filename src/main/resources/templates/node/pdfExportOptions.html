@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
 <head><title th:text="#{pdf.options.title}"></title></head>
 <body><section layout:fragment="content">
-<h1 th:text="#{pdf.options.title}"></h1><p th:text="${nodeName}"></p>
+<h1 th:text="#{pdf.options.title}"></h1><p data-inline-symbols th:text="${nodeName}"></p>
 <p class="text-muted" th:text="#{pdf.options.remember}"></p>
 <div class="card"><div class="card-body">
 <form th:action="${includeDescendants == true} ? @{/nodes/pdf/{id}/subtree(id=${nodeId})} : @{/nodes/pdf/{id}(id=${nodeId})}" method="post">

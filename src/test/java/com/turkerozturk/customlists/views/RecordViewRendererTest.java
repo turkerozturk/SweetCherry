@@ -43,4 +43,11 @@ class RecordViewRendererTest {
         var settings=settings();assertThat(settings.now(NOW,Locale.ENGLISH)).isEqualTo("2026-11-03 10:11:12");settings.setDateTimeFormat("dd.MM.yyyy HH:mm");settings.setTimeZone("Europe/Istanbul");assertThat(settings.now(NOW,Locale.ENGLISH)).isEqualTo("03.11.2026 13:11");
         assertThatThrownBy(()->settings.setDateTimeFormat("invalid [")).isInstanceOf(IllegalArgumentException.class);assertThatThrownBy(()->settings.setTimeZone("Invalid/Zone")).isInstanceOf(java.time.DateTimeException.class);
     }
+    @Test void nameIconsStayLocalAndInsertedNamesDoNotBecomeExecutableTemplateExpressions(){
+        var project=record();project.setName("Report {{fa-solid fa-image}} {{ctb:ct_camera}} {{now}}");
+        var output=new RecordViewRenderer(settings(),messages()).render("<h1>{{record.name}}</h1><p>{{fa-brands fa-github}}</p>",node(1,"template","a"),"D",project,"v",Locale.ENGLISH,NOW);
+        var doc=Jsoup.parse(output.document());assertThat(doc.select("img")).hasSize(3);assertThat(doc.select("img").eachAttr("src")).allMatch(src->src.startsWith("data:image/png;base64,"));
+        assertThat(doc.select("script,iframe")).isEmpty();assertThat(doc.select("h1").text()).contains("Report","{{now}}").doesNotContain("fa-solid","ctb:");
+        assertThat(doc.select("meta[http-equiv=Content-Security-Policy]").attr("content")).isEqualTo(RecordViewRenderer.CSP);
+    }
 }

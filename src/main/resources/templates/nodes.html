@@ -47,7 +47,7 @@
     <tr th:each="node:${nodes}">
         <td><img th:src="@{/img/icons/__${node.nodeIcon.iconName}__.svg}" th:alt="${'/img/icons/' + node.nodeIcon.iconName}" class="childiconcss"/></td>
         <td><a th:href="@{'/nodes/' + ${node.nodeId}}"><span th:text="${node.nodeId}"></span></a></td>
-        <td th:text="${node.name}"></td>
+        <td data-inline-symbols th:text="${node.name}"></td>
         <td th:text="${node.syntax}"></td>
         <td th:text="${node.tags}"></td>
         <td th:text="${node.isRichText}"></td>

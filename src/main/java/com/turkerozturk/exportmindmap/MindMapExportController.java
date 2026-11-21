@@ -499,7 +499,7 @@ public class MindMapExportController {
             return "cherrytree-mindmap";
         }
 
-        String sanitized = name
+        String sanitized = com.turkerozturk.symbols.InlineSymbols.filename(name)
                 .replaceAll("[\\\\/:*?\"<>|]", "_")
                 .replaceAll("[\\p{Cntrl}]", "_")
                 .replaceAll("\\s+", " ")

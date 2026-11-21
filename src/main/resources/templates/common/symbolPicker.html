@@ -1,6 +1,6 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <th:block th:fragment="assets" sec:authorize="isAuthenticated()">
-<link rel="stylesheet" th:href="@{/css/symbols.css}">
+<th:block th:replace="~{common/symbolPicker :: display}"></th:block>
 <dialog id="symbol-picker" data-symbol-picker th:attr="data-empty=#{symbols.empty},data-copied=#{symbols.copied},data-copy-failed=#{symbols.copyFailed},data-changed=#{symbols.changed},data-long=#{symbols.tooLong},data-count=#{symbols.count}" aria-labelledby="symbol-picker-title">
 <header class="sc-symbol-header"><h2 id="symbol-picker-title" th:text="#{symbols.title}"></h2><button type="button" data-symbol-close th:aria-label="#{symbols.close}">×</button></header>
 <p th:text="#{symbols.help}"></p>
@@ -11,7 +11,11 @@
 <div class="sc-symbol-selection"><span data-symbol-preview aria-hidden="true"></span><label><span th:text="#{symbols.value}"></span><input type="text" data-symbol-value readonly></label></div>
 <p data-symbol-status role="status" aria-live="polite"></p><footer class="sc-symbol-actions"><button type="button" data-symbol-copy disabled th:text="#{symbols.copy}"></button><button type="button" data-symbol-insert disabled th:text="#{symbols.insert}"></button><button type="button" data-symbol-cancel th:text="#{symbols.close}"></button></footer>
 </dialog>
+<script defer th:src="@{/js/symbols/picker.js}"></script>
+</th:block><th:block th:fragment="display" sec:authorize="isAuthenticated()">
+<link rel="stylesheet" th:href="@{/css/symbols.css}">
+<link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
 <script defer th:src="@{/js/symbols/catalog.js}"></script>
 <script defer th:src="@{/js/symbols/inlineSymbols.js}" th:attr="data-ctb-base=@{/img/ctbicons/}"></script>
-<script defer th:src="@{/js/symbols/picker.js}"></script>
+<script defer th:src="@{/js/symbols/images.js}" th:attr="data-ctb-base=@{/img/ctbicons/}"></script>
 </th:block></body></html>

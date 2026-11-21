@@ -10,7 +10,7 @@
  <p th:if="${wordError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg('word.error.'+wordError)}"></p>
  <th:block th:if="${word != null}">
  <h2 class="h5 text-break" th:text="${word.filename}"></h2>
- <p><span th:text="${word.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span></p>
+ <p><span data-inline-symbols th:text="${word.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span></p>
  <p class="small text-body-secondary" th:text="#{word.summary}"></p>
  <details class="small mb-3"><summary th:text="#{word.details}"></summary><p class="mt-2" th:text="#{word.help}"></p><p th:if="${word.legacy}" th:text="#{word.legacy}"></p></details>
  <p th:if="${word.clipped}" class="alert alert-info" th:text="#{word.clipped}"></p>

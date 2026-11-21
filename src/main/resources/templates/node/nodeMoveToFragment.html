@@ -10,7 +10,7 @@
 <input type="hidden" name="view" th:value="${view}">
 <input type="hidden" name="returnUrl" th:value="${view == 'tree'} ? @{/tree(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})} : @{/nodes/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}">
 <h2 class="h5" th:id="|node-move-to-title-${requestedNodeId}|" th:text="#{node.moveTo.title}"></h2>
-<p><strong th:text="${node.name}"></strong> (<span th:text="${requestedNodeId}"></span>)</p>
+<p><strong data-inline-symbols th:text="${node.name}"></strong> (<span th:text="${requestedNodeId}"></span>)</p>
 <label class="form-label" th:for="|node-move-to-parent-${requestedNodeId}|" th:text="#{node.moveTo.parent}"></label>
 <div class="input-group">
 <input class="form-control" type="text" name="parentId" inputmode="numeric" pattern="[0-9]{1,19}" maxlength="19" required autocomplete="off" th:id="|node-move-to-parent-${requestedNodeId}|" th:attr="aria-describedby=|node-move-to-help-${requestedNodeId}|">

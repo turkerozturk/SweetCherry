@@ -18,7 +18,7 @@
  <div class="table-scroll table-preview" tabindex="0" th:aria-label="#{tables.preview}" th:attr="data-preview=@{/table-gallery/{node}/{offset}/data(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}"><p class="p-2 small" th:text="#{gallery.loading}"></p></div>
  <p class="table-summary small text-body-secondary my-1" aria-live="polite"></p>
  <div class="d-flex flex-wrap gap-2 align-items-start my-2"><button class="btn btn-sm btn-primary" type="button" data-table-open th:attr="data-full=@{/table-gallery/{node}/{offset}/data(node=${item.nodeId},offset=${item.offset},full=true,_tenantView=${tenantViewToken})}" th:text="#{tables.open}"></button>
- <a th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}" class="fw-semibold"></a></div>
+ <a data-inline-symbols th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}" class="fw-semibold"></a></div>
  <div class="tg-info small">
  <dl><dt th:text="#{tables.id}"></dt><dd th:text="${item.id}"></dd><dt th:text="#{gallery.created}"></dt><dd th:text="${item.createdText}"></dd><dt th:text="#{tables.storedWidths}"></dt><dd th:text="|${item.colMin} / ${item.colMax}|"></dd></dl>
  <a class="table-source" th:href="@{/table-gallery/{node}/{offset}/source(node=${item.nodeId},offset=${item.offset},_tenantView=${tenantViewToken})}" th:text="#{tables.download}"></a></div>

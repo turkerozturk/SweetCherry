@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/common/nodeTargetSearch.js'),'utf8');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
-function element(){return {children:[],listeners:{},attributes:{},style:{},value:'',disabled:false,isConnected:true,
+function element(){return {dataset:{},children:[],listeners:{},attributes:{},style:{},value:'',disabled:false,isConnected:true,
  append(...items){this.children.push(...items);},replaceChildren(...items){this.children=items;},setAttribute(key,value){this.attributes[key]=String(value);},removeAttribute(key){delete this.attributes[key];},addEventListener(key,fn){this.listeners[key]=fn;},focus(){this.focused=true;},click(){this.listeners.click?.();},scrollIntoView(){}};}
 function setup(){
  const input=element(),list=element(),status=element(),dialog=element(),requests=[],selected=[],timers=new Map();dialog.open=true;let sequence=0,changed=0;

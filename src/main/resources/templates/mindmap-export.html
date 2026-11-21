@@ -4,7 +4,7 @@
 <body><section layout:fragment="content">
 <h1 th:text="#{mindmap.export.title}"></h1>
 <p xmlns:sec="http://www.thymeleaf.org/extras/spring-security" sec:authorize="hasRole('ADMIN')"><a th:href="@{/mindmap-import(_tenantView=${tenantViewToken})}" th:text="#{mmImport.title}"></a></p>
-<p th:if="${rootName != null}" th:text="${rootName}"></p>
+<p data-inline-symbols th:if="${rootName != null}" th:text="${rootName}"></p>
 <div class="card"><div class="card-body">
 <form th:action="@{/mindmap-export}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">

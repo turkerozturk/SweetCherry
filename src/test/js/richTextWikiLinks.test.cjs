@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),vm=require(
 const source=fs.readFileSync(path.join(__dirname,'../../main/resources/static/js/node/richTextWikiLinks.js'),'utf8');
 function setup(preview={choices:{Unique:'1'},issues:[],occurrences:1},failure=false){
  const handlers={},events={};let saved=0,requests=0,focused=false,submitter;
- function element(){return {children:[],listeners:{},textContent:'',append(...items){this.children.push(...items);},replaceChildren(){this.children=[];},setAttribute(){},addEventListener(name,fn){this.listeners[name]=fn;},set innerHTML(_){throw Error('Unsafe HTML insertion');}};}
+ function element(){return {dataset:{},children:[],listeners:{},textContent:'',append(...items){this.children.push(...items);},replaceChildren(){this.children=[];},setAttribute(){},addEventListener(name,fn){this.listeners[name]=fn;},set innerHTML(_){throw Error('Unsafe HTML insertion');}};}
  const form={elements:{xml:{value:'<node><rich_text>[[Unique]]</rich_text></node>'},wikiChoices:{value:'{}'},keepUnresolvedWikiLinks:{value:'false'},_tenantView:{value:'token'}},querySelector:()=>({name:'_csrf',value:'csrf'}),addEventListener:(name,fn)=>events[name]=fn,requestSubmit(button){submitter=button;let prevented=false;events.submit({defaultPrevented:false,preventDefault(){prevented=true;}});if(!prevented)saved++;}};
  const dialog={...element(),dataset:{endpoint:'/nodes/richtext/edit/1/wiki-links',loading:'Checking',error:'Failed',missing:'Missing',ambiguous:'Choose',literal:'Keep text',shared:'Shared'},showModal(){this.open=true;},close(){this.open=false;}};
  const yes=element(),no=element();no.focus=()=>{focused=true;};const list=element(),status=element();

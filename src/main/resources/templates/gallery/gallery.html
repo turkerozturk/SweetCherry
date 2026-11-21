@@ -32,7 +32,7 @@
         <span class="gallery-image-message small" th:text="#{gallery.loading}"></span>
       </button>
       <div class="gallery-info p-2">
-        <a class="fw-semibold" th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a>
+        <a data-inline-symbols class="fw-semibold" th:href="@{/tree(nodeId=${item.nodeId},_tenantView=${tenantViewToken})}" th:text="${item.name}"></a>
         <dl class="small mb-0 mt-1">
           <dt th:text="#{gallery.identity}"></dt><dd th:text="${item.id}"></dd>
           <dt th:text="#{gallery.created}"></dt><dd th:text="${item.createdText}"></dd>

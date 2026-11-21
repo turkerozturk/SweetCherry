@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the offline picker catalogue from the project's pinned Font Awesome WebJar and existing CTB PNGs.
 Usage: python packaging/symbols/generate-catalog.py /path/to/font-awesome-7.3.0.jar
-No downloads, new fonts or artwork. Requires only Python 3.
+No downloads or new artwork. Catalogue: Python 3. Optional --pdf-fonts: fonttools[woff].
 """
 from pathlib import Path
 import sys,zipfile,json,re,hashlib,unicodedata
@@ -26,7 +26,7 @@ for name,icon in sorted(fa.items()):
  for style in icon.get('free',[]):
   if style not in ('solid','regular','brands'):continue
   if not re.fullmatch('[a-z0-9-]+',name):raise ValueError('Unsafe Font Awesome name')
-  items.append({'kind':style,'name':name,'value':'{{fa-'+style+' fa-'+name+'}}','label':icon.get('label',name),'terms':' '.join(icon.get('search',{}).get('terms',[]))+' Font Awesome fa-'+style,'aliases':[n for n in icon.get('aliases',{}).get('names',[]) if re.fullmatch('[a-z0-9-]+',n)]})
+  items.append({'kind':style,'name':name,'glyph':chr(int(icon['unicode'],16)),'value':'{{fa-'+style+' fa-'+name+'}}','label':icon.get('label',name),'terms':' '.join(icon.get('search',{}).get('terms',[]))+' Font Awesome fa-'+style,'aliases':[n for n in icon.get('aliases',{}).get('names',[]) if re.fullmatch('[a-z0-9-]+',n)]})
 translations={'smile':'gulumse gulumsemek mutlu yuz','grinning':'gulumse mutlu yuz','joy':'gulmek nese','face':'yuz','camera':'kamera','image':'resim gorsel','picture':'resim gorsel','file':'dosya','folder':'klasor','note':'not','book':'kitap','heart':'kalp','arrow':'ok yon','check':'onay tamam','clock':'saat','calendar':'takvim','trash':'cop sil','star':'yildiz','warning':'uyari','information':'bilgi','info':'bilgi','lock':'kilit','lightbulb':'ampul fikir','user':'kullanici kisi','people':'insanlar kisiler','computer':'bilgisayar','network':'ag','globe':'dunya web','code':'kod','music':'muzik','bell':'zil hatirlatici','sitemap':'agac hiyerarsi','cherries':'kiraz','cherry':'kiraz','map':'harita','home':'ev ana sayfa','birthday':'dogum gunu','cake':'pasta dogum gunu','gift':'hediye','cloud':'bulut','sun':'gunes','moon':'ay','rain':'yagmur','snow':'kar','dollar':'dolar para','euro':'avro euro para','lira':'lira para'}
 for item in items:
  if item['kind']=='unicode':item['terms']='Unicode '+' '.join(re.findall(r'U\+[0-9A-F]+',item['terms']))
@@ -36,5 +36,17 @@ for item in items:
 data={'fontAwesomeVersion':version,'items':items}
 out=root/'src/main/resources/static/js/symbols';out.mkdir(parents=True,exist_ok=True)
 (out/'catalog.js').write_text('/* Generated offline catalogue; see SOURCE.txt. */\nwindow.SweetCherrySymbolCatalog='+json.dumps(data,separators=(',',':'),ensure_ascii=True)+';\n',encoding='utf-8',newline='\n')
-(out/'SOURCE.txt').write_text('Font Awesome '+version+' metadata/icons.json from the existing org.webjars:font-awesome dependency.\nMetadata SHA-256: '+hashlib.sha256(raw).hexdigest()+'\nIcon/font/code terms remain as recorded in the WebJar LICENSE and distribution-notices.\nCTB entries reference existing static/img/ctbicons/*.png files without copying/changing artwork.\nUnicode entries are a curated native-text list; no emoji artwork or additional font is bundled.\nRegenerate with packaging/symbols/generate-catalog.py and the pinned local WebJar.\n',encoding='utf-8')
+(out/'SOURCE.txt').write_text('Font Awesome '+version+' metadata/icons.json from the existing org.webjars:font-awesome dependency.\nMetadata SHA-256: '+hashlib.sha256(raw).hexdigest()+'\nIcon/font/code terms remain as recorded in the WebJar LICENSE and distribution-notices.\nCTB entries reference existing static/img/ctbicons/*.png files without copying/changing artwork.\nUnicode entries are a curated native-text list; no emoji artwork or additional emoji font is bundled.\nServer properties catalogue and glyph values come from this same metadata.\nPDF TrueType copies in resources/symbols are conversions of the three pinned WOFF2 fonts (SIL OFL 1.1); use --pdf-fonts with fonttools[woff] to regenerate.\nRegenerate with packaging/symbols/generate-catalog.py and the pinned local WebJar.\n',encoding='utf-8')
 print({kind:sum(i['kind']==kind for i in items) for kind in ['unicode','ctb','solid','regular','brands']})
+
+# Compact server catalogue for PDF icons and filename cleanup. No user-supplied resource paths.
+server=root/'src/main/resources/symbols';server.mkdir(exist_ok=True)
+(server/'catalog.properties').write_text(''.join(i['kind']+'.'+i['name']+'='+i['kind']+'|'+i['name']+'|'+i.get('glyph','')+'|'+','.join(i.get('aliases',[]))+'\n' for i in items if i['kind']!='unicode'),encoding='utf-8',newline='\n')
+if '--pdf-fonts' in sys.argv:
+ from fontTools.ttLib import TTFont
+ import io
+ with zipfile.ZipFile(jar) as z:
+  for family,weight in [('solid','900'),('regular','400'),('brands','400')]:
+   font=TTFont(io.BytesIO(z.read(f'META-INF/resources/webjars/font-awesome/{version}/webfonts/fa-{family}-{weight}.woff2')))
+   font.flavor=None; font.save(server/f'fa-{family}.ttf')
+  (server/'LICENSE.txt').write_bytes(z.read(f'META-INF/resources/webjars/font-awesome/{version}/LICENSE.txt'))

@@ -13,7 +13,7 @@
 </div>
 <th:block th:if="${file != null}">
 <h2 class="h5 text-break" th:text="${file.filename}"></h2>
-<p class="text-break"><span th:text="${file.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span> · <span th:text="${file.bytes+' B'}"></span></p>
+<p class="text-break"><span data-inline-symbols th:text="${file.nodeName}"></span> · <span th:text="${nodeId+':'+offset}"></span> · <span th:text="${file.bytes+' B'}"></span></p>
 <form method="get" th:action="@{/attachments/{node}/{offset}/preview(node=${nodeId},offset=${offset})}" class="d-flex flex-wrap gap-2 align-items-end mb-3">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <div><label for="fileMode" th:text="#{filepreview.mode}"></label><select id="fileMode" name="mode" class="form-select"><option th:each="key:${ {'text','hex','archive'} }" th:value="${key}" th:selected="${key==file.mode}" th:text="${#messages.msg('filepreview.mode.'+key)}"></option></select></div>

@@ -25,7 +25,7 @@
         <td class="text-center"
             th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"
             th:title="${node.lastSaveTimestamp} + ', ' + ${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}"></td>
-        <td th:text="${node.name}"></td>
+        <td data-inline-symbols th:text="${node.name}"></td>
     </tr>
     </tbody>
 </table>

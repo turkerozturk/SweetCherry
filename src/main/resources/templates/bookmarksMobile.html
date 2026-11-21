@@ -96,7 +96,7 @@
                                  th:title="${bookmark.node.nodeIcon.iconName}"/>
                         </a>
 
-                        <span th:text="${bookmark.node.name}"
+                        <span data-inline-symbols th:text="${bookmark.node.name}"
                               th:style="${'color:' + bookmark.node.titleColorAsHtmlHex + ';'}"
                               th:class="${bookmark.node.boldnessBit ? 'boldTitle' : ''}">
                         </span>
@@ -116,7 +116,7 @@
                         <a th:href="@{/rootnode(_tenantView=${tenantViewToken})}">Kök</a>
                         <span th:each="entry : ${bookmarkPaths[bookmark.nodeId]}">
                         <span>/</span>
-                        <a th:href="@{/nodes/{id}(id=${entry.key},_tenantView=${tenantViewToken})}" th:text="${entry.value}"></a>
+                        <a th:href="@{/nodes/{id}(id=${entry.key},_tenantView=${tenantViewToken})}" data-inline-symbols th:text="${entry.value}"></a>
                         </span>
 
                     </th:block>

@@ -51,7 +51,8 @@ public final class NodePdfDocument {
             PdfExportOptions options, PdfSourceMetadata.Source source, String filename) {
         if (html.length() > limits.getMaxHtmlCharacters()) throw tooLarge();
         var page = Jsoup.parse("<html xmlns='http://www.w3.org/1999/xhtml'><head><meta charset='UTF-8'/></head><body></body></html>");
-        page.head().appendElement("title").text(title == null ? "SweetCherry" : title);
+        page.selectFirst("html").attr("data-symbols-monochrome", Boolean.toString(!options.colors()));
+        page.head().appendElement("title").text(title == null ? "SweetCherry" : com.turkerozturk.symbols.InlineSymbols.plain(title));
         String css = CSS.replace("size: A4 portrait", "size: " + options.paper() + " " + options.orientation());
         if (!options.colors()) css = css.replace("#3584e4", "#111");
         if (options.filenameHeader()) css += "@page { @top-center { content: element(pdf-header); } } .pdf-header { position: running(pdf-header); font-size: 8pt; text-align: center; }";
@@ -69,7 +70,7 @@ public final class NodePdfDocument {
         content.select("script,style,link,iframe,object,embed,form,input,button").remove();
         for (var element : content.body().getAllElements()) {
             for (var attribute : new java.util.ArrayList<>(element.attributes().asList())) {
-                if (!java.util.Set.of("style", "href", "src", "id", "class", "colspan", "rowspan", "alt", "data-pdf-heading", "data-sc-latex").contains(attribute.getKey()))
+                if (!java.util.Set.of("style", "href", "src", "id", "class", "colspan", "rowspan", "alt", "data-pdf-heading", "data-sc-latex", "data-inline-symbols", "data-symbols-skip").contains(attribute.getKey()))
                     element.removeAttr(attribute.getKey());
             }
             // Only parser-generated CSS is retained; never allow resource-fetching CSS.
@@ -150,6 +151,7 @@ public final class NodePdfDocument {
                     image.attr("src", "data:image/png;base64," + Base64.getEncoder().encodeToString(output.toByteArray()));
                 } catch (java.io.IOException error) { throw new IllegalArgumentException("PDF image conversion failed", error); }
             }
+            if (image.hasClass("sc-name-symbol")) { image.attr("style", "width:16px;height:16px;vertical-align:middle"); continue; }
             image.attr("style", "width:" + Math.max(1, (int)(size[0] * scale)) + "px;height:"
                     + Math.max(1, (int)(size[1] * scale)) + "px;");
         }

@@ -33,3 +33,20 @@ test('markers typed over identical adjacent formatting runs render without chang
  s.core.render(root);assert.equal(root.querySelectorAll('.sc-inline-symbol').length,1);assert.equal(root.textContent,'Start  end');
  const mixed=s.document.createElement('div');for(const [text,color] of [['{{fa-solid ','red'],['fa-image}}','blue']]){const span=s.document.createElement('span');span.setAttribute('style','color:'+color);span.textContent=text;mixed.append(span);}s.core.render(mixed);assert.equal(mixed.textContent,'{{fa-solid fa-image}}');assert.equal(mixed.querySelectorAll('.sc-inline-symbol').length,0);
 });
+
+test('explicit table node labels render while neighboring rich grids and form values stay literal',()=>{
+ const s=setup(),table=s.document.createElement('table'),row=s.document.createElement('tr'),name=s.document.createElement('td'),data=s.document.createElement('td');
+ name.setAttribute('data-inline-symbols','');name.textContent='{{fa-solid fa-image}} name';data.textContent='{{fa-solid fa-image}} grid';row.append(name,data);table.append(row);s.core.render(table);
+ assert.equal(name.querySelectorAll('.sc-inline-symbol').length,1);assert.equal(data.textContent,'{{fa-solid fa-image}} grid');
+});
+test('map label HTML escapes text and marker attributes; native text labels never interpret HTML',()=>{
+ const s=setup(),html=s.core.html('<img onerror=x> " {{fa-solid fa-image}} {{ctb:ct_camera}} {{record.name}}');
+ assert(html.includes('&lt;img onerror=x&gt;'));assert(!html.includes('<img onerror='));assert(html.includes('fa-solid fa-image'));assert(html.includes('/app/img/ctbicons/ct_camera.png'));assert(html.includes('{{record.name}}'));
+ assert.equal(s.core.plain('X {{fa-solid fa-image}} Y {{record.name}}'),'X [Image] Y {{record.name}}');
+});
+test('native label updates are idempotent and unrelated template expressions never cause observer loops',()=>{
+ const s=setup(),title=s.document.createElement('title');title.textContent='{{record.name}}';
+ Object.defineProperty(title,'textContent',{get:()=> '{{record.name}}',set(){assert.fail('Unchanged text must not be rewritten');}});
+ title.setAttribute('title','{{record.name}}');title.setAttribute=()=>assert.fail('Unchanged attribute must not be rewritten');s.core.scan(title);
+ const known=s.document.createElement('title');known.textContent='Node {{fa-solid fa-image}}';s.core.scan(known);assert.equal(known.textContent,'Node [Image]');s.core.scan(known);assert.equal(known.textContent,'Node [Image]');
+});

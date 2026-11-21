@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title th:text="#{quickmap.mermaidTitle(${rootNodeName})}">
+    <title data-symbols-native th:text="#{quickmap.mermaidTitle(${rootNodeName})}">
         Quick Mind Map
     </title>
 
@@ -88,7 +88,7 @@
 
 <main class="container-fluid py-3">
     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-        <h1 class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
+        <h1 data-inline-symbols class="h5 mb-0" th:text="${rootNodeName}">Mind map</h1>
 
         <span class="badge text-bg-secondary"
               th:text="${rootNodeId == 0 ? #messages.msg('quickmap.allRoots') : #messages.msg('quickmap.node', rootNodeId)}">
@@ -203,6 +203,7 @@ mindmap
 
         mermaid.initialize({
             startOnLoad: false,
+            maxTextSize: 5000000,
             securityLevel: 'strict',
             theme: document.documentElement.dataset.bsTheme === 'dark' ? 'dark' : 'default',
             mindmap: {
@@ -210,6 +211,16 @@ mindmap
             }
         });
 
+        await new Promise(resolve => { if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',resolve,{once:true});else resolve(); });
+        await document.fonts?.ready;
+        const symbolCore=window.SweetCherryInlineSymbols;
+        if(symbolCore){
+            const source=document.querySelector('.mermaid');
+            // The controller escaped the Mermaid label; only allowlisted marker substrings change.
+            const text=source.textContent,parts=symbolCore.tokens(text);
+            const converted=await Promise.all(parts.map(async part=>{if(typeof part==='string')return part;try{return "<img src='"+await window.SweetCherrySymbolImages.icon(part.item,document.documentElement.dataset.bsTheme==='dark'?'#e5eaf0':'#20242a')+"' width='16' height='16' alt='"+part.item.name+"'/>";}catch(_){return '['+part.item.name+']';}}));
+            source.textContent=converted.join('');
+        }
         await mermaid.run({querySelector: '.mermaid'});
 
         addContentLinks();
@@ -333,5 +344,6 @@ mindmap
 <th:block th:replace="~{common/sessionViewGuard :: sessionViewGuard}"></th:block>
 
 <script th:src="@{/js/common/closePage.js}" defer></script>
+<th:block th:replace="~{common/symbolPicker :: display}"></th:block>
 </body>
 </html>

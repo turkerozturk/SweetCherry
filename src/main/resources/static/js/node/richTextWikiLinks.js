@@ -22,7 +22,7 @@
     const preview=await response.json();if(!preview.choices||!Array.isArray(preview.issues))throw Error('failed');clearTimeout(timer);
     const choices={...preview.choices};list.replaceChildren();
     for(const issue of preview.issues){
-     const row=document.createElement('section'),title=document.createElement('h3'),label=document.createElement('p');title.className='h6';title.textContent='[['+issue.name+']]';label.textContent=issue.kind==='missing'?dialog.dataset.missing:dialog.dataset.ambiguous;row.append(title,label);
+     const row=document.createElement('section'),title=document.createElement('h3'),label=document.createElement('p');title.className='h6';title.dataset.inlineSymbols='true';title.textContent='[['+issue.name+']]';label.textContent=issue.kind==='missing'?dialog.dataset.missing:dialog.dataset.ambiguous;row.append(title,label);
      const select=document.createElement('select');select.className='form-select';select.setAttribute('aria-label',issue.name);
      const literal=document.createElement('option');literal.value='0';literal.textContent=dialog.dataset.literal;select.append(literal);
      for(const candidate of issue.candidates){const option=document.createElement('option');option.value=candidate.id;option.textContent=candidate.breadcrumb+(candidate.shared?' · '+dialog.dataset.shared:'');select.append(option);}

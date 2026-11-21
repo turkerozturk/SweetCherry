@@ -31,7 +31,7 @@
      for(const item of data.items){if(!/^[1-9][0-9]{0,18}$/.test(item.id))continue;
       const button=document.createElement('button');button.type='button';button.className='quick-node-result';button.title=item.breadcrumb;button.dataset.target=item.id;
       if(/^[a-z0-9_-]+$/.test(item.icon||'')&&item.icon!=='zero'){const image=document.createElement('img');image.src=root.dataset.iconBase+item.icon+'.png';image.alt='';image.width=image.height=20;button.append(image);}
-      const label=document.createElement('span');label.className='quick-node-label';label.textContent=item.name;
+      const label=document.createElement('span');label.className='quick-node-label';label.textContent=item.name;label.dataset.inlineSymbols="true";
       if(/^#[0-9a-f]{6}$/i.test(item.color||''))label.style.color=item.color;if(item.bold)label.style.fontWeight='bold';
       const number=document.createElement('small');number.className='quick-node-number';number.textContent='['+item.id+']'+(item.shared?' · '+root.dataset.shared:'');button.append(label,number);
       button.addEventListener('click',()=>selected(item,button));list.append(button);

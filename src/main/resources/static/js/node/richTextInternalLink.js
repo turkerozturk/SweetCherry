@@ -16,7 +16,7 @@
         const element=document.createElement('div');element.className='rich-internal-target';
         const image=document.createElement('img');image.width=image.height=20;image.alt='';image.loading='lazy';
         image.src=dialog.dataset.icons+(/^[a-z0-9_-]+$/.test(item.iconName)?item.iconName:'ct_code')+'.png';
-        const name=document.createElement('span');name.textContent=item.name;if(item.bold)name.style.fontWeight='bold';if(/^#[a-f0-9]{6}$/i.test(item.color))name.style.color=item.color;
+        const name=document.createElement('span');name.textContent=item.name;name.dataset.inlineSymbols="true";if(item.bold)name.style.fontWeight='bold';if(/^#[a-f0-9]{6}$/i.test(item.color))name.style.color=item.color;
         const number=document.createElement('span');number.textContent='('+item.nodeId+')';element.append(image,name,number);
         return element;
     }

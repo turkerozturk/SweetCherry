@@ -126,4 +126,12 @@ class MindMapExportPageTest {
                 .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
         verifyNoInteractions(children,nodes);
     }
+    @Test void iconMarkersDisappearFromDownloadNameButRemainInExportedNodeData() throws Exception {
+        var children=mock(ChildrenRepository.class);var nodes=mock(NodeRepository.class);
+        when(children.findByNodeId(1L)).thenReturn(new Children().setNodeId(1).setFatherId(0));
+        var node=new Node();node.setNodeId(1);node.setName("Report {{fa-solid fa-image}} {{ctb:ct_camera}}");when(nodes.findById(1L)).thenReturn(node);
+        var response=new MindMapExportController(children,nodes).exportMindMap(1,null,"all-unfolded",false,true);
+        assertThat(response.getHeaders().getContentDisposition().getFilename()).startsWith("Report").doesNotContain("{{","fa-solid","ctb:");
+        assertThat(new String(response.getBody(),java.nio.charset.StandardCharsets.UTF_8)).contains("{{fa-solid fa-image}}","{{ctb:ct_camera}}");
+    }
 }

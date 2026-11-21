@@ -77,6 +77,7 @@ final class PdfLinkedContents {
             if ("custom-colors".equals(fragment.syntax())) expand(parsed.body(), targetId, next, depth + 1);
             PdfFragmentFlow.inline(parsed.body());
             var section = new Element("span").addClass("pdf-linked-content");
+            if (!"custom-colors".equals(fragment.syntax())) section.attr("data-symbols-skip", "");
             // As in the reader's source-free view, start exactly where the link occurred.
             section.appendChildren(new java.util.ArrayList<>(parsed.body().childNodes()));
             link.replaceWith(section);

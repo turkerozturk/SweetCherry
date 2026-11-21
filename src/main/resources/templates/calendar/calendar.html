@@ -49,7 +49,7 @@
 <a class="cal-day-open" th:href="@{/nodes/{id}(id=${entry.id},_tenantView=${tenantViewToken})}" th:text="#{calendar.openNode}"></a>
 </article></div></th:block>
 <dialog id="calendarDialog" class="cal-dialog" aria-labelledby="calendarDialogTitle">
-<header><h2 id="calendarDialogTitle"></h2><button type="button" id="calendarClose" th:text="#{calendar.close}"></button></header>
+<header><h2 id="calendarDialogTitle" data-inline-symbols></h2><button type="button" id="calendarClose" th:text="#{calendar.close}"></button></header>
 <p id="calendarEntryId"></p><p id="calendarShared" hidden th:text="#{calendar.shared}"></p><p id="calendarLocked" hidden th:text="#{calendar.readOnly}"></p>
 <p id="calendarDates"></p>
 <form id="calendarCreatedForm" th:action="@{/nodes/calendar/0/created}" method="post">

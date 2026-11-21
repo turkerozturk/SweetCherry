@@ -20,7 +20,7 @@
 <link rel="stylesheet" th:href="@{/css/theme.css}"></head>
 <body>
 <header>
-    <h1 th:text="${preview.name}">Node</h1>
+    <h1 data-inline-symbols th:text="${preview.name}">Node</h1>
     <p th:text="#{richtext.preview.notice}">Experimental read-only comparison.</p>
     <p><span th:text="#{richtext.preview.treeId}">Tree ID</span>: <span th:text="${preview.treeNodeId}"></span>
        · <span th:text="#{richtext.preview.contentId}">Content ID</span>: <span th:text="${preview.contentNodeId}"></span></p>
@@ -42,5 +42,6 @@
 </main>
 <script src="/js/thirdparty/highlightjs/highlight.min.js"></script>
 <script src="/js/node/richTextPreview.js"></script>
+<th:block th:replace="~{common/symbolPicker :: display}"></th:block>
 </body>
 </html>

@@ -97,7 +97,7 @@
                 }
                 const name = document.createElement('span');
                 name.className = 'node-move-to-bookmark-name';
-                name.textContent = item.name;
+                name.textContent = item.name;name.dataset.inlineSymbols="true";
                 if (/^#[0-9a-fA-F]{6}$/.test(item.color || '')) name.style.color = item.color;
                 if (item.bold === true) name.style.fontWeight = 'bold';
                 const number = document.createElement('span');

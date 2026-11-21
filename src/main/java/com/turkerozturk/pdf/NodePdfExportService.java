@@ -81,6 +81,7 @@ public class NodePdfExportService {
             }
             var linked = linkedContents(options, objects);
             if (linked != null && "custom-colors".equals(node.getSyntax())) html = linked.expand(html, contentId);
+            if (!"custom-colors".equals(node.getSyntax())) html = "<div data-symbols-skip>" + html + "</div>";
             return new Export(node.getName(), renderer.render(new NodePdfDocument(limits).prepare(node.getName(), html, contentId, options, source, PdfFilename.create(node.getName(), occurrenceId))));
         } finally { permit.release(); }
     }
@@ -138,6 +139,7 @@ public class NodePdfExportService {
                 if (linked != null && "custom-colors".equals(node.getSyntax())) html = linked.expand(html, contentId);
                 total += html.length();
                 if (total > limits.getMaxHtmlCharacters()) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE);
+                if (!"custom-colors".equals(node.getSyntax())) html = "<div data-symbols-skip>" + html + "</div>";
                 parts.add(new SubtreePdfDocument.Part(occurrence.getNodeId(), contentId,
                         pending.depth(), node.getName(), html));
                 // Follow the occurrence hierarchy; master_id only selects content.

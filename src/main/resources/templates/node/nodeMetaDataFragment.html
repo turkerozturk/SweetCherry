@@ -17,7 +17,7 @@
                  th:title="#{node.meta.contentTypeTitle(${contentType})}"
                  class="iconcss"/>
             <th:block th:replace="~{node/nodeStatusIcons :: headerStates(${node},${nodeBookmarked})}"></th:block>
-            <span th:text="${node.name}"
+            <span data-inline-symbols th:text="${node.name}"
                   id="nodeName"
                   style="color: gray; font-weight: bold;"
             >Dugum Adi</span>

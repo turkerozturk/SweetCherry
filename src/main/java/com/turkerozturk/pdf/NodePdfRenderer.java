@@ -12,6 +12,7 @@ import java.io.InputStream;
 public class NodePdfRenderer {
     public byte[] render(org.w3c.dom.Document document) {
         try {
+            PdfInlineSymbols.apply(document);
             var renderer = new ITextRenderer();
             renderer.getSharedContext().setUserAgentCallback(new ITextUserAgent(renderer.getOutputDevice(), renderer.getSharedContext().getDotsPerPixel()) {
                 @Override public InputStream resolveAndOpenStream(String uri) {
@@ -21,6 +22,12 @@ public class NodePdfRenderer {
                             ? NodePdfRenderer.class.getClassLoader().getResourceAsStream(path) : null;
                 }
                 @Override public byte[] getBinaryResource(String uri) {
+                    if (uri.matches("sc-symbol-font:(solid|regular|brands)\\.ttf")) {
+                        try (var input = NodePdfRenderer.class.getResourceAsStream("/symbols/fa-" + uri.substring("sc-symbol-font:".length()))) {
+                            if (input == null) throw new IllegalStateException("Bundled symbol font missing");
+                            return input.readAllBytes();
+                        } catch (java.io.IOException error) { throw new IllegalStateException("Unreadable symbol font", error); }
+                    }
                     if (!uri.matches("sc-font:Liberation(Sans|Mono)-(Regular|Bold|Italic|BoldItalic)\\.ttf")) return null;
                     String path = "liberation/" + uri.substring("sc-font:".length());
                     try (var input = NodePdfRenderer.class.getClassLoader().getResourceAsStream(path)) {

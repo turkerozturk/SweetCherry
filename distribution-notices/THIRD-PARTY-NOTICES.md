@@ -262,3 +262,9 @@ DOMPurify 3.4.17 is bundled unmodified for offline rich-text paste and webpage i
 ## Inline symbol picker (2026-11-21)
 
 The offline picker catalogue is generated from `metadata/icons.json` in the existing `org.webjars:font-awesome:7.3.0` dependency, copyright Fonticons, Inc. No new Font Awesome font or artwork is copied: display uses the same local WebJar CSS/fonts and retains its original Free License (icons CC BY 4.0, fonts SIL OFL 1.1, code MIT). The generated metadata source/version/hash is recorded in `static/js/symbols/SOURCE.txt`; regeneration is in `packaging/symbols/generate-catalog.py`. CTB icon entries reference the already distributed CherryTree PNGs under their existing notices. Unicode entries are ordinary characters displayed with the user's system fonts; no emoji artwork/font package is introduced.
+
+The three `symbols/fa-*.ttf` files are offline TrueType conversions of the
+existing pinned Font Awesome Free WebJar WOFF2 fonts, used for PDF embedding.
+They retain the original glyphs and Font Awesome names and remain under
+SIL Open Font License 1.1; the WebJar LICENSE is included beside these files.
+No additional icon set or external font service is used.

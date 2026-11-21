@@ -2,7 +2,7 @@
 <head><title th:text="#{textTree.title}"></title></head>
 <body><section layout:fragment="content" class="container py-3">
 <h1 class="fs-4" th:text="#{textTree.title}"></h1>
-<p><strong th:text="${rootName}"></strong> <span th:text="|[${nodeId}]|"></span></p>
+<p><strong data-inline-symbols th:text="${rootName}"></strong> <span th:text="|[${nodeId}]|"></span></p>
 <div th:if="${textTreeError != null}" class="alert alert-warning" role="alert" th:text="${#messages.msg(textTreeError)}"></div>
 <p th:text="#{textTree.help}"></p>
 <ul><li th:text="#{textTree.folders}"></li><li th:text="#{textTree.leaves}"></li><li th:text="#{textTree.text}"></li><li th:text="#{textTree.names}"></li></ul>

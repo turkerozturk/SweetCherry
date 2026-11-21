@@ -20,7 +20,7 @@ public class RecordViewRenderer {
     public static final String CSP="default-src 'none'; img-src data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'";
     private static final Pattern TOKEN=Pattern.compile("\\{\\{([^{}]{1,256})}}");
     private static final Safelist ALLOWED=new Safelist().addTags("article","section","header","footer","main","div","span","p","br","hr","h1","h2","h3","h4","h5","h6","b","strong","i","em","u","s","del","sup","sub","small","mark","blockquote","pre","code","ul","ol","li","dl","dt","dd","table","thead","tbody","tfoot","tr","th","td","caption","colgroup","col","a","img","style")
-        .addAttributes(":all","class","id","style","title","dir","lang")
+        .addAttributes(":all","class","id","style","title","dir","lang","data-symbol-name")
         .addAttributes("a","href").addAttributes("img","src","alt","width","height")
         .addAttributes("td","colspan","rowspan").addAttributes("th","colspan","rowspan","scope");
     private final RecordViewSettings settings;
@@ -49,7 +49,10 @@ public class RecordViewRenderer {
                     case "template.name"->template.getName();case "template.id"->Long.toString(template.getNodeId());case "view.name"->viewName;case "now"->settings.now(now,locale);default->null;
                 };
                 List<org.jsoup.nodes.Node> replacement;
-                if(value!=null)replacement=List.of(new TextNode(value));
+                if(value!=null)replacement=token.endsWith(".name")||token.equals("record.breadcrumbs")
+                        ?List.of(new Element("span").attr("data-symbol-name","").text(value)):List.of(new TextNode(value));
+                else if(com.turkerozturk.symbols.InlineSymbols.resolve(token)!=null)
+                    replacement=List.of(new Element("span").attr("data-symbol-name","").text(matcher.group()));
                 else if(token.startsWith("field.")&&fields.containsKey(token.substring(6))){
                     var field=fields.get(token.substring(6));
                     if(field.status().equals("value"))replacement=Jsoup.parseBodyFragment(field.data().getData()).body().childNodesCopy();
@@ -75,6 +78,7 @@ public class RecordViewRenderer {
             else link.attr("target","_blank").attr("rel","noopener noreferrer");
         }
         for(var image:doc.select("img[src]"))if(!image.attr("src").matches("data:image/(png|jpeg);base64,[A-Za-z0-9+/=]+")) {image.replaceWith(new TextNode("["+msg("recordviews.imageBlocked",locale)+"]"));}
+        com.turkerozturk.symbols.SymbolNameHtml.apply(doc);
         if(doc.body().text().isBlank() && doc.select("img,table,hr").isEmpty())warnings.add(msg("recordviews.emptyDesign",locale));
         doc.head().empty();doc.head().appendElement("meta").attr("charset","UTF-8");
         doc.head().appendElement("meta").attr("http-equiv","Content-Security-Policy").attr("content",CSP);

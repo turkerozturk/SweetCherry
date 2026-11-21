@@ -19,7 +19,7 @@
 
 <p th:if="${codeboxes != null and !codeboxes.isEmpty()}">
     <b th:text="#{objects.nodeName}">Node name:</b>
-    <span th:text="${codeboxes[0].node.name}"></span>
+    <span data-inline-symbols th:text="${codeboxes[0].node.name}"></span>
 </p>
 
 <p th:if="${codeboxes == null or codeboxes.isEmpty()}" class="text-body-secondary" th:text="#{objects.empty}"></p>

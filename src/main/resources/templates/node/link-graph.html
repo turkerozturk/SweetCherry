@@ -9,7 +9,7 @@
 <label for="graphLimit" th:text="#{graph.limit}"></label><select id="graphLimit" class="form-select form-select-sm"><option>40</option><option>100</option><option>200</option></select>
 <button id="graphRefresh" class="btn btn-sm btn-outline-primary" type="button" th:text="#{graph.refresh}"></button><button id="graphFit" class="btn btn-sm btn-outline-secondary" type="button" th:text="#{graph.fit}"></button>
 <a id="graphOpen" class="btn btn-sm btn-outline-primary" hidden target="_blank" rel="noopener" th:text="#{graph.open}"></a>
-</div><p id="graphStatus" role="status" aria-live="polite"></p><p id="graphWarning" class="alert alert-warning p-2" hidden></p>
-<div class="graph-workspace"><section class="graph-map"><div id="linkGraphCanvas" role="img" th:aria-label="#{graph.title}"></div><details><summary th:text="#{graph.list}"></summary><ul id="graphList" class="list-unstyled"></ul></details></section>
-<aside class="graph-preview"><h2 id="graphFocusName" class="h6"></h2><iframe id="graphPreview" th:title="#{graph.content}" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="same-origin"></iframe></aside></div>
+</div><p id="graphStatus" data-inline-symbols role="status" aria-live="polite"></p><p id="graphWarning" class="alert alert-warning p-2" hidden></p>
+<div class="graph-workspace"><section class="graph-map"><div id="linkGraphCanvas" role="img" th:aria-label="#{graph.title}"></div><details><summary th:text="#{graph.list}"></summary><ul id="graphList" data-inline-symbols class="list-unstyled"></ul></details></section>
+<aside class="graph-preview"><h2 id="graphFocusName" data-inline-symbols class="h6"></h2><iframe id="graphPreview" th:title="#{graph.content}" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="same-origin"></iframe></aside></div>
 </main><section layout:fragment="pageSpecificJsScripts"><script defer th:src="@{/js/thirdparty/cytoscape/cytoscape.min.js}"></script><script defer th:src="@{/js/node/linkGraph.js}"></script></section></body></html>

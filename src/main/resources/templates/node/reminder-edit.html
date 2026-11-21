@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
 <head><title th:text="#{reminder.title}"></title></head><body><section layout:fragment="content" class="container p-3">
 <h1 th:text="${#messages.msg(editor.id.isEmpty() ? 'reminder.add' : 'reminder.edit')}"></h1>
-<p><a th:if="${editor.available}" th:href="@{/nodes/{id}(id=${editor.nodeId},_tenantView=${tenantViewToken})}" th:text="${editor.name}"></a><span th:unless="${editor.available}" th:text="${editor.name}"></span> <span th:text="|[${editor.contentId}]|"></span></p>
+<p><a data-inline-symbols th:if="${editor.available}" th:href="@{/nodes/{id}(id=${editor.nodeId},_tenantView=${tenantViewToken})}" th:text="${editor.name}"></a><span data-inline-symbols th:unless="${editor.available}" th:text="${editor.name}"></span> <span th:text="|[${editor.contentId}]|"></span></p>
 <p th:if="${reminderError != null}" class="alert alert-warning" th:text="${#messages.msg('reminder.error.'+reminderError)}"></p>
 <p th:unless="${editor.available}" class="alert alert-warning" th:text="#{reminder.targetUnavailable}"></p>
 <p th:text="#{reminder.formHelp}"></p>

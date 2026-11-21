@@ -7,7 +7,7 @@ import java.util.*;
 public final class TextTreePaths {
     private final Set<String> used=new HashSet<>();
     public static String safe(String value,long id){
-        String result=Normalizer.normalize(Objects.toString(value,""),Normalizer.Form.NFC)
+        String result=Normalizer.normalize(com.turkerozturk.symbols.InlineSymbols.filename(value),Normalizer.Form.NFC)
                 .replaceAll("[\\p{Cntrl}\\\\/:*?\"<>|]","_").strip().replaceAll("[. ]+$","");
         var bounded=new StringBuilder();int bytes=0;
         for(int point:result.codePoints().toArray()){

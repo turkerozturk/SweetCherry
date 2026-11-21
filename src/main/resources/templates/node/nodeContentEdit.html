@@ -6,7 +6,7 @@
 <section layout:fragment="content" class="container-fluid py-1 plain-editor-page">
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
     <h1 class="fs-5 mb-1" th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></h1>
-    <p class="mb-1"><strong th:text="${node.name}">Düğüm adı</strong>
+    <p class="mb-1"><strong data-inline-symbols th:text="${node.name}">Düğüm adı</strong>
         <span class="text-muted" th:text="|(${node.syntax})|">(plain-text)</span></p>
     <p class="text-muted small mb-1" th:text="${node.syntax == 'html' ? #messages.msg('html.sourceHelp') : (node.syntax == 'markdown' ? #messages.msg('markdown.sourceHelp') : #messages.msg('markdown.plainHelp'))}"></p>
     <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>

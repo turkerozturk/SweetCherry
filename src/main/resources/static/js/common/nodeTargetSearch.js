@@ -27,9 +27,9 @@
                 const image=document.createElement('img');image.src=config.icons+encodeURIComponent(item.icon)+'.png';image.alt='';image.width=image.height=20;image.loading='lazy';button.append(image);
             }
             const content=document.createElement('span');content.className='node-target-result-text';
-            const name=document.createElement('span');name.textContent=item.name;if(item.bold===true)name.style.fontWeight='bold';if(/^#[a-f0-9]{6}$/i.test(item.color||'')&&item.color.toLowerCase()!=='#000000')name.style.color=item.color;
+            const name=document.createElement('span');name.textContent=item.name;name.dataset.inlineSymbols="true";if(item.bold===true)name.style.fontWeight='bold';if(/^#[a-f0-9]{6}$/i.test(item.color||'')&&item.color.toLowerCase()!=='#000000')name.style.color=item.color;
             const number=document.createElement('span');number.className='node-target-result-id';number.textContent=' ['+item.id+']';
-            const path=document.createElement('small');path.className='node-target-result-path';path.textContent=item.breadcrumb||'';
+            const path=document.createElement('small');path.className='node-target-result-path';path.dataset.inlineSymbols='true';path.textContent=item.breadcrumb||'';
             content.append(name,number,path);button.append(content);button.addEventListener('click',()=>select(item));return button;
         }
         async function search(current,value){
