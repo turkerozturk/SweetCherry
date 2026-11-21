@@ -57,8 +57,13 @@ def verify(bundle, root=ROOT, clean=False):
     paths = resource_paths(root)
     with zipfile.ZipFile(jar_path) as jar:
         names = Counter(jar.namelist())
-        build_info = 'BOOT-INF/classes/META-INF/build-info.properties'
-        if names[build_info] != 1: raise Problem('Missing/duplicate JAR build information')
+        # Spring Boot repackaging preserves most META-INF entries at the JAR root.
+        # Also accept classpath-prefixed metadata from alternative archive producers.
+        candidates = ('META-INF/build-info.properties', 'BOOT-INF/classes/META-INF/build-info.properties')
+        matches = [name for name in candidates for _ in range(names[name])]
+        if len(matches) != 1:
+            raise Problem('Missing/duplicate JAR build information (checked ' + ', '.join(candidates) + ')')
+        build_info = matches[0]
         properties = dict(line.split('=', 1) for line in jar.read(build_info).decode('utf-8').splitlines() if '=' in line and not line.startswith('#'))
         if properties.get('build.version') != app_version: raise Problem('Application JAR version does not match pom.xml')
         for path in paths:

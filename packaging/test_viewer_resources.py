@@ -21,7 +21,7 @@ class ViewerResourcesTest(unittest.TestCase):
             for name in ('css/all.min.css', 'webfonts/fa-solid-900.woff2', 'webfonts/fa-regular-400.woff2', 'webfonts/fa-brands-400.woff2', 'LICENSE.txt'):
                 nested.writestr(f'META-INF/resources/webjars/font-awesome/{fa}/' + name, b'fixture')
         cls.entries = {'BOOT-INF/classes/' + p.relative_to(check.ROOT / 'src/main/resources').as_posix(): p.read_bytes() for p in check.resource_paths(check.ROOT)}
-        cls.entries['BOOT-INF/classes/META-INF/build-info.properties'] = f'build.version={version}\n'.encode()
+        cls.entries['META-INF/build-info.properties'] = f'build.version={version}\n'.encode()
         cls.entries[f'BOOT-INF/lib/font-awesome-{fa}.jar'] = webjar.getvalue()
         cls.write_jar(cls.entries)
     @classmethod
@@ -34,8 +34,27 @@ class ViewerResourcesTest(unittest.TestCase):
     def test_complete_offline_resource_tree_and_seed_files(self):
         self.assertEqual(check.verify(self.bundle, clean=True), len(check.resource_paths(check.ROOT)))
     def test_stale_application_version_is_rejected(self):
-        entries = dict(self.entries); entries['BOOT-INF/classes/META-INF/build-info.properties'] = b'build.version=0.0.0\n'; self.write_jar(entries)
+        entries = dict(self.entries); entries['META-INF/build-info.properties'] = b'build.version=0.0.0\n'; self.write_jar(entries)
         with self.assertRaisesRegex(check.Problem, 'Application JAR version'): check.verify(self.bundle)
+    def test_classpath_prefixed_build_information_is_also_accepted(self):
+        entries = dict(self.entries)
+        entries['BOOT-INF/classes/META-INF/build-info.properties'] = entries.pop('META-INF/build-info.properties')
+        self.write_jar(entries); check.verify(self.bundle, clean=True)
+    def test_missing_build_information_is_rejected(self):
+        entries = dict(self.entries); entries.pop('META-INF/build-info.properties'); self.write_jar(entries)
+        with self.assertRaisesRegex(check.Problem, 'Missing/duplicate JAR build information'): check.verify(self.bundle)
+    def test_ambiguous_build_information_locations_are_rejected(self):
+        entries = dict(self.entries)
+        entries['BOOT-INF/classes/META-INF/build-info.properties'] = entries['META-INF/build-info.properties']
+        self.write_jar(entries)
+        with self.assertRaisesRegex(check.Problem, 'Missing/duplicate JAR build information'): check.verify(self.bundle)
+    def test_duplicate_metadata_zip_entries_are_rejected(self):
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', UserWarning)
+            with zipfile.ZipFile(self.bundle / 'SweetCherry.jar', 'a') as jar:
+                jar.writestr('META-INF/build-info.properties', self.entries['META-INF/build-info.properties'])
+        with self.assertRaisesRegex(check.Problem, 'Missing/duplicate JAR build information'): check.verify(self.bundle)
     def test_missing_shape_pack_is_rejected(self):
         entries = dict(self.entries); entries.pop('BOOT-INF/classes/static/js/drawio/stencils.min.js'); self.write_jar(entries)
         with self.assertRaisesRegex(check.Problem, 'Missing/duplicate JAR resource'): check.verify(self.bundle)
