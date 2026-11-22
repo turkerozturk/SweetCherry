@@ -1,0 +1,24 @@
+/* All overrides are limited to the tree reader, including the embedded right pane. */
+html[data-tree-layout-header="false"] .tree-workspace-page #workspace-header,
+html[data-tree-layout-breadcrumbs="false"] .tree-workspace-page .workspace-breadcrumbs,
+html[data-tree-layout-backlinks="false"] .tree-workspace-page .node-backlinks,
+html[data-tree-layout-toolbar="false"] .tree-workspace-page .workspace-toolbar,
+html[data-tree-layout-paneBar="false"] .tree-workspace-page .workspace-pane-controls {display:none!important}
+/* An open backlinks sidebar must not retain an empty grid column when hidden. */
+html[data-tree-layout-backlinks="false"] .tree-workspace-page #workspace-content .node-related-layout {display:flex;flex-direction:column}
+/* Stays reachable even with hidden menus, a scrolled tree or its minimum width. */
+#tree-layout-open {position:fixed;left:.5rem;bottom:2.4rem;z-index:1035;box-shadow:0 1px 5px #0004}
+#tree-reading-layout {border:1px solid var(--bs-border-color,#aaa);border-radius:.5rem;padding:1rem;max-width:min(28rem,95vw);max-height:90dvh;overflow:auto;color:var(--bs-body-color,#222);background:var(--bs-body-bg,#fff)}
+#tree-reading-layout::backdrop {background:#0005}
+#tree-reading-layout label {display:flex;align-items:center;gap:.6rem;margin:.55rem 0}
+#tree-reading-layout .tree-layout-actions {display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+.workspace-tree-id,.workspace-tree-date {display:none;font-size:.85em;opacity:.75;font-variant-numeric:tabular-nums;margin-right:.4em}
+html[data-tree-layout-ids="true"] .workspace-tree-id,
+html[data-tree-layout-dates="true"] .workspace-tree-date {display:inline}
+html[data-tree-layout-compact="true"] .tree-workspace-page .workspace-toolbar {gap:.2rem;margin:.2rem 0;}
+html[data-tree-layout-compact="true"] .tree-workspace-page .workspace-node-header {padding:.25rem .5rem 0}
+html[data-tree-layout-compact="true"] .tree-workspace-page .workspace-breadcrumbs {margin-bottom:.15rem}
+html[data-tree-layout-compact="true"] .tree-workspace-page .workspace-toolbar .btn:not(.dropdown-item) {padding:.2rem .4rem}
+html[data-tree-layout-compact="true"] .tree-workspace-page .workspace-toolbar .btn:not(.dropdown-item) > span,
+html[data-tree-layout-compact="true"] .tree-workspace-page .workspace-toolbar [data-toolbar-item="move"] > span:not([role="status"]) {display:none}
+html.sc-split-embedded #tree-layout-open,html.sc-split-embedded #tree-reading-layout {display:none}

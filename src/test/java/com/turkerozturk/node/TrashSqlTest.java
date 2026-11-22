@@ -67,4 +67,33 @@ class TrashSqlTest {
   String next=TrashSql.purgePreview(c,e.id()).revision();sql("UPDATE node SET txt='changed without timestamp' WHERE node_id=2");assertThatThrownBy(()->TrashSql.purge(c,e.id(),next)).hasMessageContaining("trash.changed");assertThat(parent(2)).isEqualTo(e.id());
  }
 
+ @Test void emptyAllIncludesEveryEntryAndPreservesOutsideSharedContent()throws Exception{
+  trash(2);trash(4);var p=TrashSql.emptyPreview(c);long root=TrashSql.listing(c).rootId();
+  assertThat(p.entries()).isEqualTo(2);assertThat(p.nodes()).isEqualTo(3);assertThat(p.externalSharedLocations()).isPositive();
+  TrashSql.empty(c,p.revision());assertThat(TrashSql.listing(c).entries()).isEmpty();
+  assertThat(TrashSql.listing(c).rootId()).isEqualTo(root);
+  assertThat(number("SELECT COUNT(*) FROM children WHERE node_id IN (2,3,4)")).isZero();
+  assertThat(number("SELECT COUNT(*) FROM node WHERE node_id=11")).isEqualTo(1);
+  assertThat(number("SELECT master_id FROM children WHERE node_id=11")).isZero();
+ }
+ @Test void emptyAllRejectsAddedEntriesRestoresAndSameSecondContentChangesBeforeDeletingAnything()throws Exception{
+  trash(1);var p=TrashSql.emptyPreview(c);var second=trash(2);
+  assertThatThrownBy(()->TrashSql.empty(c,p.revision())).hasMessageContaining("trash.changed");
+  var beforeRestore=TrashSql.emptyPreview(c);TrashSql.restore(c,second.id(),TrashSql.entry(c,second.id()).revision(),true);
+  assertThatThrownBy(()->TrashSql.empty(c,beforeRestore.revision())).hasMessageContaining("trash.changed");
+  var beforeEdit=TrashSql.emptyPreview(c);sql("UPDATE node SET txt='changed in same second' WHERE node_id=1");
+  assertThatThrownBy(()->TrashSql.empty(c,beforeEdit.revision())).hasMessageContaining("trash.changed");
+  assertThat(TrashSql.listing(c).entries()).hasSize(1);
+ }
+ @Test void emptyAllDoesNotPreserveSharedContentWhenAllItsOccurrencesAreInTrash()throws Exception{
+  trash(2);trash(11);var p=TrashSql.emptyPreview(c);TrashSql.empty(c,p.revision());
+  assertThat(TrashSql.listing(c).entries()).isEmpty();assertThat(number("SELECT COUNT(*) FROM children WHERE node_id IN (2,11,12)")).isZero();
+  assertThat(number("SELECT COUNT(*) FROM node WHERE node_id IN (2,11,12)")).isZero();
+ }
+ @Test void emptyBinDoesNotCreateHelpersAndStaleEmptyConfirmationCannotDeleteNewTrash()throws Exception{
+  var p=TrashSql.emptyPreview(c);long count=number("SELECT COUNT(*) FROM node");TrashSql.empty(c,p.revision());
+  assertThat(number("SELECT COUNT(*) FROM node")).isEqualTo(count);trash(1);
+  assertThatThrownBy(()->TrashSql.empty(c,p.revision())).hasMessageContaining("trash.changed");
+ }
+
 }

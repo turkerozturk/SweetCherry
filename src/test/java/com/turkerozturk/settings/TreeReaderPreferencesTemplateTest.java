@@ -30,6 +30,7 @@ class TreeReaderPreferencesTemplateTest {
             context.setVariable("treeDefaultWidth", 600); context.setVariable("treeFontSize", 16);
             context.setVariable("treeFocusNode", "9");context.setVariable("treeVerticalPadding", 1); context.setVariable("initialNodeId", 9L);
             context.setVariable("treeSavedSearchesEnabled",true);
+            context.setVariable("treeMetadataEnabled",true);
             for (var color : List.of("ivory", "#fff8dc")) for (var theme : List.of("light", "dark")) {
                 context.setVariable("nodeBackgroundColor", new NodeBackgroundAdvice(color).color());
                 context.setVariable("uiTheme", theme);
@@ -61,7 +62,13 @@ class TreeReaderPreferencesTemplateTest {
                 assertThat(page.select("#workspace-saved-searches")).hasSize(1);
                 assertThat(page.selectFirst("#workspace-saved-searches").attr("data-endpoint")).isEqualTo(path+"/nodes/saved-filters/tree");
                 assertThat(page.select("script[src='"+path+"/js/node/treeSavedSearches.js']")).hasSize(1);
-                assertThat(html).doesNotContain("??savedTree.");
+                assertThat(html).doesNotContain("??savedTree.","??tree.layout.");
+                assertThat(page.selectFirst("html").attr("data-tree-metadata-enabled")).isEqualTo("true");
+                assertThat(page.select("[data-tree-layout-open]")).hasSize(1);
+                assertThat(page.select("#tree-reading-layout [data-tree-layout-setting]").eachAttr("data-tree-layout-setting"))
+                        .containsExactly("compact","header","breadcrumbs","backlinks","toolbar","paneBar","ids","dates");
+                assertThat(page.select("#tree-reading-layout [data-tree-split-toggle]")).hasSize(1);
+                assertThat(page.select("head script[src='"+path+"/js/node/treeReadingLayout.js']")).hasSize(1);
             }
             context.setVariable("treeSavedSearchesEnabled",false);
             var disabled=org.jsoup.Jsoup.parse(engine.process("node/treeWorkspace",context));

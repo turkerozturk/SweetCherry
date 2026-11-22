@@ -30,6 +30,8 @@ class ChildrenServiceSharedNodeTest {
         master.setName("Original");
         master.setTags("project önemli");
         master.setSyntax("plain-text");
+        master.setCreationTimestamp(1795161600L);
+        master.setLastSaveTimestamp(1795248000L);
         master.setLevel(3);
         master.setIsReadOnly16bit(1);
         master.parseNodeIconAndReadOnlyFlag();
@@ -38,6 +40,8 @@ class ChildrenServiceSharedNodeTest {
         List<NaviNode> result = service.getNaviNodesByFatherId(0);
 
         assertThat(result).extracting(NaviNode::nodeId).containsExactly(55L, 56L);
+        assertThat(result).extracting(NaviNode::displayId).containsExactly("[000055]","[000056]");
+        assertThat(result).extracting(NaviNode::displayDate).doesNotContainNull().doesNotContain("");
         assertThat(result).extracting(NaviNode::name).containsExactly("Original", "Original");
         assertThat(result).extracting(NaviNode::hasChildren).containsExactly(true, false);
         assertThat(result).extracting(NaviNode::bookmarked).containsExactly(false,true);
@@ -49,6 +53,8 @@ class ChildrenServiceSharedNodeTest {
         var navigation = controller.navigationChildren(0);
         assertThat(navigation).allMatch(com.turkerozturk.node.NodeController.NavigationChild::hasTags);
         assertThat(navigation).extracting(com.turkerozturk.node.NodeController.NavigationChild::tags).containsExactly("project önemli", "project önemli");
+        assertThat(navigation).extracting(com.turkerozturk.node.NodeController.NavigationChild::displayId).containsExactly("[000055]","[000056]");
+        assertThat(navigation).extracting(com.turkerozturk.node.NodeController.NavigationChild::displayDate).containsExactlyElementsOf(result.stream().map(NaviNode::displayDate).toList());
         verify(bookmarks,times(2)).findExistingIds(List.of(55L,56L));
         verifyNoMoreInteractions(bookmarks);
         verify(children, never()).findByFatherId(10L);

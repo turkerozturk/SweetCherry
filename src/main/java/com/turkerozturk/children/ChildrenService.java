@@ -40,6 +40,8 @@ public class ChildrenService {
     @Autowired
     private NodeRepository nodeRepository;
     @Autowired private com.turkerozturk.bookmark.BookmarkRepository bookmarkRepository;
+    @Autowired private com.turkerozturk.settings.editing.TreeMetadataSettings treeMetadata =
+            new com.turkerozturk.settings.editing.TreeMetadataSettings(false,"6","yyyy-MM-dd","created");
 
     public List<Children> getChildren() {
         List<Children> children = childrenRepository.findAll();
@@ -90,7 +92,7 @@ public class ChildrenService {
             result.add(new NaviNode(row.getNodeId(), display.getName(), display.getNodeIcon(),
                     !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
                     display.getTitleColorAsHtmlHex(), display.isReadOnly(), display.isBoldnessBit(),
-                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId()), !tags.isEmpty(), String.join(" ", tags)));
+                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId()), !tags.isEmpty(), String.join(" ", tags), treeMetadata.id(row.getNodeId()), treeMetadata.date(display.getCreationTimestamp(),display.getLastSaveTimestamp())));
         }
         return result;
     }

@@ -129,6 +129,13 @@
         name.textContent = child.name; name.dataset.inlineSymbols="true";
         if (/^#[0-9a-fA-F]{1,6}$/.test(child.titleColor)) name.style.color = '#' + child.titleColor.slice(1).padStart(6, '0');
         if (child.bold) name.style.fontWeight = 'bold';
+        for (const [key, value] of [['id', child.displayId], ['date', child.displayDate]]) {
+            if (typeof value !== 'string' || !value) continue;
+            const metadata = document.createElement('span');
+            metadata.className = 'workspace-tree-' + key;
+            metadata.textContent = value;
+            link.append(metadata);
+        }
         link.append(name);
         if (workspace.dataset.showTagIndicator === 'true' && child.hasTags === true) {
             const marker = document.createElement('sup');

@@ -79,6 +79,10 @@ public class ApplicationSettingsService {
         new Setting("myapp.tree.default-width","width","600",1900),
         new Setting("myapp.tree.show-tag-indicator","boolean","true",0),
         new Setting("myapp.tree.saved-searches-enabled","boolean","true",0),
+        new Setting("myapp.tree.metadata.enabled","boolean","false",0),
+        new Setting("myapp.tree.metadata.id-digits","number","6",19),
+        new Setting("myapp.tree.metadata.date-format","treedateformat","yyyy-MM-dd",0),
+        new Setting("myapp.tree.metadata.date-source","treedatesource","created",0),
         new Setting("myapp.tree.font-size","treefont","16",32),
         new Setting("myapp.tree.vertical-padding","nonnegative","1",12),
         new Setting("myapp.calendar.first-day-of-week","weekday","MONDAY",0),
@@ -178,7 +182,7 @@ public class ApplicationSettingsService {
     }
     public static boolean numeric(Setting setting){return Set.of("number","nonnegative","width","treefont","auditlimit").contains(setting.type());}
     public static long minimum(Setting setting){return setting.type().equals("nonnegative")?0:setting.type().equals("width")?20:setting.type().equals("treefont")?10:setting.type().equals("auditlimit")?1000000:1;}
-    public static List<String> choices(Setting setting){return switch(setting.type()){case "theme" -> List.of("light","dark");case "language" -> List.of("","en","tr");case "weekday" -> List.of("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY");default -> List.of();};}
+    public static List<String> choices(Setting setting){return switch(setting.type()){case "treedatesource" -> List.of("created","modified");case "theme" -> List.of("light","dark");case "language" -> List.of("","en","tr");case "weekday" -> List.of("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY");default -> List.of();};}
     private static void validate(Setting setting,String value){
         if(value==null||value.length()>160||value.chars().anyMatch(Character::isISOControl))throw new IllegalArgumentException("invalid");
         switch(setting.type()) {
@@ -186,10 +190,11 @@ public class ApplicationSettingsService {
             case "color" -> {if(!NodeBackgroundAdvice.valid(value))throw new IllegalArgumentException("invalid");}
             case "boolean" -> {if(!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("invalid");}
             case "number","nonnegative","width","treefont","auditlimit" -> {if(!value.matches("0|[1-9][0-9]*")||Long.parseLong(value)<minimum(setting)||Long.parseLong(value)>setting.maximum())throw new IllegalArgumentException("invalid");}
-            case "theme","language" -> {if(!choices(setting).contains(value))throw new IllegalArgumentException("invalid");}
+            case "theme","language","treedatesource" -> {if(!choices(setting).contains(value))throw new IllegalArgumentException("invalid");}
             case "weekday" -> {if(!value.matches("[1-7]"))java.time.DayOfWeek.valueOf(value.toUpperCase(Locale.ROOT));}
             case "systemzone" -> {if(!value.equalsIgnoreCase("system"))zone(value);}
             case "optionalzone" -> {if(!value.isBlank())zone(value);}
+            case "treedateformat" -> TreeMetadataSettings.dateFormatter(value);
             case "dateformat" -> {if(value.isBlank()||value.length()>128)throw new IllegalArgumentException("invalid");java.time.format.DateTimeFormatter.ofPattern(value,Locale.ROOT);}
             case "latitude" -> AstronomyCoordinates.parse(value,true);
             case "longitude" -> AstronomyCoordinates.parse(value,false);

@@ -351,6 +351,11 @@ myapp:
   tree:
     # Desktop /tree only. Saved browser width takes precedence; other splitters are unaffected.
     default-width: 600 # Pixels, clamped to 20..1900 and the available viewport width.
+    metadata:
+      enabled: false # Initial default for BOTH tree ID/date toggles; browser choices override it.
+      id-digits: 6 # Minimum digits, zero padded in brackets; 1..19. Longer IDs are never truncated.
+      date-source: created # created or modified (shared occurrences use their master's timestamps).
+      date-format: yyyy-MM-dd # Java DateTimeFormatter pattern, server system time zone. MM = month.
     show-tag-indicator: true # Small superscript # beside tagged node names in /tree; restart after changing.
     saved-searches-enabled: true # Virtual branches from this user's saved Advanced Search filters; restart after changing.
     font-size: 16 # Tree labels in pixels: 10..32.

@@ -136,6 +136,24 @@ public final class TrashSql {
         // The existing permanent-delete engine preserves shared content with surviving locations.
         NodeDeletionSql.delete(c,h.id);NodeTimestamps.touchContent(c,s.root.id,NodeTimestamps.now());
     }
+    public record EmptyPreview(int entries,int nodes,int externalSharedLocations,String revision){}
+    static EmptyPreview emptyPreview(Connection c)throws SQLException {
+        var s=read(c,false);var ids=new LinkedHashSet<Long>();int nodes=0;
+        for(var h:s.entries.values()){var payload=subtree(s,h.meta.payload);ids.addAll(payload);nodes+=payload.size();}
+        String revision=s.root==null?revision(s):purgeRevision(c,s,s.root,revision(s),false);
+        return new EmptyPreview(s.entries.size(),nodes,external(s,ids),revision);
+    }
+    static void empty(Connection c,String expected)throws SQLException {
+        var s=read(c,true);
+        String revision=s.root==null?revision(s):purgeRevision(c,s,s.root,revision(s),true);
+        if(!revision.equals(expected))throw changed();
+        if(s.entries.isEmpty())return;
+        com.turkerozturk.node.audit.AuditSql.guardMove(c,List.of(s.root.id),0);
+        // All confirmations are checked before the first write. The service transaction rolls
+        // back every entry, binary payload and shared promotion if any deletion fails.
+        for(var h:s.entries.values())NodeDeletionSql.delete(c,h.id);
+        NodeTimestamps.touchContent(c,s.root.id,NodeTimestamps.now());
+    }
     /** Ordinary moves/deletes cannot bypass restore/purge or move active nodes into helper containers. */
     public static void guardMove(Connection c,Collection<Long> ids,long destination)throws SQLException{
         com.turkerozturk.node.audit.AuditSql.guardMove(c,ids,destination);

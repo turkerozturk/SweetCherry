@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" th:style="${'--sc-node-background:' + (nodeBackgroundColor != null ? nodeBackgroundColor : 'white')}">
+<html xmlns:th="http://www.thymeleaf.org" th:attr="data-tree-metadata-enabled=${treeMetadataEnabled},data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" th:style="${'--sc-node-background:' + (nodeBackgroundColor != null ? nodeBackgroundColor : 'white')}">
 <head>
     <title th:text="#{tree.workspace}">Full tree</title>
     <th:block th:replace="~{common/meta :: headerMeta}"></th:block>
@@ -7,6 +7,8 @@
     <link rel="stylesheet" th:href="@{/css/node/treeWorkspace.css}"/>
     <link rel="stylesheet" th:href="@{/css/node/treeSplitView.css}"/>
     <script th:src="@{/js/node/treeSplitState.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/node/treeReadingLayout.css}">
+    <script th:src="@{/js/node/treeReadingLayout.js}"></script>
 <link rel="stylesheet" th:href="@{/css/theme.css}">
     <th:block th:replace="~{common/readerPreferences :: assets}"></th:block>
 <link rel="stylesheet" th:href="@{/css/node/nodeTitle.css}">
@@ -44,6 +46,26 @@
         </section>
     </div>
 </main>
+<button id="tree-layout-open" type="button" class="btn btn-sm btn-secondary" data-tree-layout-open th:title="#{tree.layout.title}" th:aria-label="#{tree.layout.title}"><i class="fas fa-sliders-h" aria-hidden="true"></i></button>
+<dialog id="tree-reading-layout" aria-labelledby="tree-layout-title">
+    <h2 id="tree-layout-title" class="h5" th:text="#{tree.layout.title}"></h2>
+    <label><input type="checkbox" data-tree-layout-setting="compact"><span th:text="#{tree.layout.compact}"></span></label>
+    <label><input type="checkbox" data-tree-layout-setting="header"><span th:text="#{tree.layout.header}"></span></label>
+    <label><input type="checkbox" data-tree-layout-setting="breadcrumbs"><span th:text="#{tree.layout.breadcrumbs}"></span></label>
+    <label><input type="checkbox" data-tree-layout-setting="backlinks"><span th:text="#{tree.layout.backlinks}"></span></label>
+    <label><input type="checkbox" data-tree-layout-setting="toolbar"><span th:text="#{tree.layout.toolbar}"></span></label>
+    <label><input type="checkbox" data-tree-layout-setting="paneBar"><span th:text="#{tree.layout.paneBar}"></span></label>
+    <label><input type="checkbox" data-tree-layout-setting="ids"><span th:text="#{tree.layout.ids}"></span></label>
+    <label><input type="checkbox" data-tree-layout-setting="dates"><span th:text="#{tree.layout.dates}"></span></label>
+    <p class="small" th:text="${treeMetadataModified == true ? #messages.msg('tree.layout.modified') : #messages.msg('tree.layout.created')}"></p>
+    <div class="tree-layout-actions">
+    <button type="button" class="btn btn-sm btn-outline-primary" data-tree-split-toggle aria-pressed="false"><i class="fas fa-columns" aria-hidden="true"></i> <span th:text="#{split.toggle}"></span></button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-split-activate="left" th:text="#{split.left}"></button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-split-activate="right" th:text="#{split.right}"></button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-tree-layout-reset th:text="#{tree.layout.reset}"></button>
+    <button type="button" class="btn btn-sm btn-primary" data-tree-layout-close th:text="#{tree.layout.close}"></button>
+    </div>
+</dialog>
 <button id="scrollToTopBtn" type="button" hidden th:title="#{tree.scrollTop}" th:attr="aria-label=#{tree.scrollTop}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
 <footer id="workspace-status" role="status"></footer>
 <th:block th:replace="~{common/footer :: footerJsLibraries}"></th:block>

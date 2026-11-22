@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <div th:fragment="controls(view)" class="workspace-toolbar">
-<a th:if="${trashHelper == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}" th:text="#{trash.title}"></a>
-<a th:if="${reminderHelper == true and remindersEnabled == true}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/reminders(_tenantView=${tenantViewToken})}" th:text="#{reminder.title}"></a>
+<a th:if="${trashHelper == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}" ><i class="fas fa-trash-restore" aria-hidden="true"></i> <span th:text="#{trash.title}"></span></a>
+<a th:if="${reminderHelper == true and remindersEnabled == true}" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/reminders(_tenantView=${tenantViewToken})}" ><i class="fas fa-bell" aria-hidden="true"></i> <span th:text="#{reminder.title}"></span></a>
 <button th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" type="button" data-toolbar-item="tags" class="btn btn-sm btn-outline-primary" th:attr="data-quick-tags=${requestedNodeId},data-quick-tags-token=${tenantViewToken}"><i class="fas fa-tags" aria-hidden="true"></i> <span th:text="#{tags.quick.button}"></span></button>
 <th:block th:replace="~{node/nodeEditControls :: edit}"></th:block>
 <a th:if="${canDeleteNode == true and isSharedNode != true}" sec:authorize="hasRole('ADMIN')" data-toolbar-item="properties" class="btn btn-sm btn-outline-primary" th:href="@{/nodes/properties/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:title="#{tree.propertiesTitle}"><i class="fas fa-sliders-h"></i> <span th:text="#{tree.properties}"></span></a>
@@ -10,7 +10,7 @@
 <th:block th:replace="~{node/nodeMoveToFragment :: moveTo(${view})}"></th:block>
 <a th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger" data-node-delete data-toolbar-item="delete" th:href="@{/nodes/delete/{id}(id=${requestedNodeId},view=${view},_tenantView=${tenantViewToken})}" th:title="#{node.delete}"><i class="fas fa-trash"></i> <span th:text="#{tree.delete}"></span></a>
 <div class="dropdown" data-toolbar-item="add" th:if="${canDeleteNode == true}" sec:authorize="hasRole('ADMIN')">
-<button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" th:text="#{toolbar.add}"></button>
+<button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" ><i class="fas fa-plus" aria-hidden="true"></i> <span th:text="#{toolbar.add}"></span></button>
 <div class="dropdown-menu">
 <form th:action="@{/nodes/siblings/{id}(id=${requestedNodeId})}" method="post" data-confirm-kind="creation" th:attr="data-confirm-message=#{node.confirmAdd}">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><button class="dropdown-item" type="submit" th:text="#{toolbar.sibling}"></button>
@@ -58,7 +58,7 @@
 <a class="dropdown-item" th:href="@{/mindmap-export(nodeId=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{toolbar.freeplane}"></a>
 <a class="dropdown-item" th:href="@{/nodes/export/text/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{textTree.menu}"></a>
 </div></div>
-<a th:if="${auditEnabled == true or auditHelper == true}" sec:authorize="hasRole('ADMIN')" data-toolbar-item="audit" class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/audit(nodeId=${auditHelper == true ? 0 : requestedNodeId},_tenantView=${tenantViewToken})}" th:text="#{audit.title}"></a>
+<a th:if="${auditEnabled == true or auditHelper == true}" sec:authorize="hasRole('ADMIN')" data-toolbar-item="audit" class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/audit(nodeId=${auditHelper == true ? 0 : requestedNodeId},_tenantView=${tenantViewToken})}" ><i class="fas fa-history" aria-hidden="true"></i> <span th:text="#{audit.title}"></span></a>
 <a th:if="${remindersEnabled == true and canDeleteNode == true and node != null and auditHelper != true and trashHelper != true and reminderHelper != true}" sec:authorize="hasRole('ADMIN')" data-toolbar-item="reminder" class="btn btn-sm btn-outline-secondary" th:href="@{/nodes/reminders/new/{id}(id=${requestedNodeId},_tenantView=${tenantViewToken})}"><i class="fas fa-bell" aria-hidden="true"></i> <span th:text="#{reminder.add}"></span></a>
 <button th:if="${view == 'reader'}" class="btn btn-sm btn-outline-secondary" type="button" th:attr="data-bs-toggle=${view == 'reader' ? 'collapse' : 'offcanvas'}" data-bs-target="#offcanvasScrolling" th:title="#{node.meta.header}"><i class="fas fa-info-circle"></i> <span th:text="#{tree.info}"></span></button>
 </div></body></html>

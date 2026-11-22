@@ -41,6 +41,19 @@ class TrashTransactionTest {
   service.restore(e.id(),e.revision(),false);
   try(var c=source.getConnection();var q=c.createStatement();var rs=q.executeQuery("SELECT png FROM image WHERE node_id=2")){assertThat(rs.next()).isTrue();assertThat(rs.getBytes(1)).containsExactly(1,2,-1);}
  }
+ @Test void emptyAllRollsBackEarlierEntriesIfALaterDeletionFails()throws Exception{
+  var first=service.preview(1);service.trash(1,first.revision());var second=trash();var preview=service.emptyPreview();
+  sql("CREATE TRIGGER refuse_entry_delete BEFORE DELETE ON node WHEN OLD.node_id="+second.id()+" BEGIN SELECT RAISE(ABORT,'test failure'); END");
+  assertThatThrownBy(()->service.empty(preview.revision(),true)).isInstanceOf(RuntimeException.class);
+  assertThat(service.listing().entries()).hasSize(2);assertThat(number("SELECT COUNT(*) FROM children WHERE node_id IN (1,2,3)")).isEqualTo(3);
+  assertThat(number("SELECT master_id FROM children WHERE node_id=11")).isEqualTo(2);
+ }
+ @Test void emptyAllRequiresWritePermissionAndExplicitConfirmation(){
+  assertThatThrownBy(()->service.empty("revision",false)).hasMessageContaining("trash.confirmRequired");
+  custom.addCustomProperties("Trash test",Map.of("custom.isWritable","false"));
+  assertThatThrownBy(()->service.emptyPreview()).hasMessageContaining("trash.readonly");
+  assertThatThrownBy(()->service.empty("revision",true)).hasMessageContaining("trash.readonly");
+ }
  @Test void readonlyDatabaseCannotPreviewRestoreOrPurge(){
   custom.addCustomProperties("Trash test",Map.of("custom.isWritable","false"));assertThatThrownBy(()->service.preview(2)).hasMessageContaining("trash.readonly");assertThatThrownBy(()->service.trash(2,"revision")).hasMessageContaining("trash.readonly");assertThatThrownBy(()->service.restore(1,"revision",true)).hasMessageContaining("trash.readonly");assertThatThrownBy(()->service.purge(1,"revision",true)).hasMessageContaining("trash.readonly");
  }

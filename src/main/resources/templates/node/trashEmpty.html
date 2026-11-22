@@ -1,0 +1,10 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}"><head><title th:text="#{trash.emptyAll}"></title></head><body><section layout:fragment="content" class="container py-3">
+<h1 th:text="#{trash.emptyAll}"></h1>
+<p th:text="#{trash.emptySummary(${emptyPreview.entries},${emptyPreview.nodes},${emptyPreview.externalSharedLocations})}"></p>
+<p class="alert alert-danger" th:text="#{trash.purgeWarning}"></p><p th:text="#{node.delete.survivors}"></p>
+<form th:if="${emptyPreview.entries > 0}" method="post" th:action="@{/nodes/trash/empty}">
+<input type="hidden" name="_tenantView" th:value="${tenantViewToken}"><input type="hidden" name="revision" th:value="${emptyPreview.revision}">
+<label class="d-block mb-2"><input type="checkbox" name="confirmed" value="true" required> <span th:text="#{trash.confirmEmpty}"></span></label>
+<button class="btn btn-danger" type="submit" th:text="#{trash.emptyAll}"></button></form>
+<a class="btn btn-secondary mt-3" th:href="@{/nodes/trash(_tenantView=${tenantViewToken})}" th:text="#{node.delete.cancel}"></a>
+</section></body></html>

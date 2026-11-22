@@ -20,5 +20,7 @@ public class TrashService {
  @Transactional(readOnly=true) public TrashSql.Entry entry(long id){writable();return entityManager.unwrap(Session.class).doReturningWork(c->TrashSql.entry(c,id));}
  @Transactional public long restore(long id,String revision,boolean root){writable();long node=entityManager.unwrap(Session.class).doReturningWork(c->TrashSql.restore(c,id,revision,root));entityManager.clear();return node;}
  @Transactional(readOnly=true) public TrashSql.PurgePreview purgePreview(long id){writable();return entityManager.unwrap(Session.class).doReturningWork(c->TrashSql.purgePreview(c,id));}
+ @Transactional(readOnly=true) public TrashSql.EmptyPreview emptyPreview(){writable();return entityManager.unwrap(Session.class).doReturningWork(TrashSql::emptyPreview);}
+ @Transactional public void empty(String revision,boolean confirmed){writable();if(!confirmed)throw TrashSql.problem(HttpStatus.BAD_REQUEST,"trash.confirmRequired");entityManager.unwrap(Session.class).doWork(c->TrashSql.empty(c,revision));entityManager.clear();}
  @Transactional public void purge(long id,String revision,boolean confirmed){writable();if(!confirmed)throw TrashSql.problem(HttpStatus.BAD_REQUEST,"trash.confirmRequired");entityManager.unwrap(Session.class).doWork(c->TrashSql.purge(c,id,revision));entityManager.clear();}
 }

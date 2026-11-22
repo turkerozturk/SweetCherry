@@ -30,7 +30,14 @@ class TrashSecurityTest {
     mvc.perform(post("/nodes/trash/100/"+action).session(session).param("_tenantView","current").param("revision","r").param("destination","original").with(user("admin").roles("ADMIN"))).andExpect(r->org.assertj.core.api.Assertions.assertThat(r.getResponse().getStatus()).isIn(302,403));
     mvc.perform(post("/nodes/trash/100/"+action).session(session).param("_tenantView","old").param("revision","r").param("destination","original").param("confirmed","true").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
    }
+   mvc.perform(get("/nodes/trash/empty").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isForbidden());
+   mvc.perform(post("/nodes/trash/empty").session(session).param("_tenantView","current").param("revision","r").param("confirmed","true").with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+   mvc.perform(post("/nodes/trash/empty").session(session).param("_tenantView","current").param("revision","r").with(user("admin").roles("ADMIN"))).andExpect(r->org.assertj.core.api.Assertions.assertThat(r.getResponse().getStatus()).isIn(302,403));
+   mvc.perform(post("/nodes/trash/empty").session(session).param("_tenantView","old").param("revision","r").param("confirmed","true").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());
    verifyNoInteractions(service);
+   doThrow(TrashSql.problem(org.springframework.http.HttpStatus.BAD_REQUEST,"trash.confirmRequired")).when(service).empty("r",false);
+   mvc.perform(post("/nodes/trash/empty").session(session).param("_tenantView","current").param("revision","r").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isBadRequest());
+   mvc.perform(post("/nodes/trash/empty").session(session).param("_tenantView","current").param("revision","r").param("confirmed","true").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(redirectedUrl("/nodes/trash"));verify(service).empty("r",true);
    when(service.restore(100,"r",false)).thenReturn(2L);
    mvc.perform(post("/nodes/trash/100/restore").session(session).param("_tenantView","current").param("revision","r").param("destination","original").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/tree?nodeId=2"));verify(service).restore(100,"r",false);
    doThrow(TrashSql.problem(org.springframework.http.HttpStatus.BAD_REQUEST,"trash.confirmRequired")).when(service).purge(100,"r",false);
