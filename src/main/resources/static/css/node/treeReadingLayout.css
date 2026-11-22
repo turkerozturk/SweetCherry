@@ -1,4 +1,5 @@
 /* All overrides are limited to the tree reader, including the embedded right pane. */
+html[data-tree-layout-title="false"] .tree-workspace-page .workspace-title-row,
 html[data-tree-layout-header="false"] .tree-workspace-page #workspace-header,
 html[data-tree-layout-breadcrumbs="false"] .tree-workspace-page .workspace-breadcrumbs,
 html[data-tree-layout-backlinks="false"] .tree-workspace-page .node-backlinks,

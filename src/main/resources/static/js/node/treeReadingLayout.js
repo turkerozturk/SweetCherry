@@ -6,7 +6,7 @@
 })(typeof window==='object'?window:globalThis,()=>{
     'use strict';
     const key='sweetcherry.treeReadingLayout';
-    const defaults={compact:false,header:true,breadcrumbs:true,backlinks:true,toolbar:true,paneBar:true};
+    const defaults={title:true,compact:false,header:true,breadcrumbs:true,backlinks:true,toolbar:true,paneBar:true};
     function read(storage,metadata=false){
         const result={...defaults,ids:metadata,dates:metadata};
         try{const saved=JSON.parse(storage.getItem(key)||'{}');

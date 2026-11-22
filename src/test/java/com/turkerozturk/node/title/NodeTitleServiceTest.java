@@ -66,4 +66,39 @@ class NodeTitleServiceTest {
             assertThatThrownBy(()->service.open(1)).hasMessageContaining("reminder.protected");
         }
     }
+    @Test void nameAndIconSaveTogetherWithoutChangingLockReservedBitsContentOrRichText()throws Exception{
+        try(var c=database()){
+            try(var q=c.createStatement()){q.execute("UPDATE node SET is_ro=32857");}
+            var service=service(c,properties());var before=service.open(1);
+            var icon=com.turkerozturk.helpers.NodeIcon.CT_ADD;
+            var result=service.save(1,"New title",before.revision(),icon);
+            assertThat(result.icon()).isEqualTo(icon.name());assertThat(result.name()).isEqualTo("New title");
+            try(var q=c.createStatement();var row=q.executeQuery("SELECT is_ro,txt,is_richtxt FROM node")){
+                assertThat(row.next()).isTrue();assertThat(row.getLong(1)).isEqualTo(32769L | icon.getIconIdIn16bit());
+                assertThat(row.getString(2)).isEqualTo("<node>keep content</node>");assertThat(row.getLong(3)).isEqualTo(12345);
+            }
+            assertThat(service.save(1,"New title",result.revision(),icon)).isEqualTo(result);
+        }
+    }
+    @Test void iconAndLockChangesInSameSecondInvalidateQuickEdit()throws Exception{
+        try(var c=database()){
+            var service=service(c,properties());var before=service.open(1);
+            try(var q=c.createStatement()){q.execute("UPDATE node SET is_ro=89");}
+            assertThatThrownBy(()->service.save(1,"Overwrite",before.revision(),com.turkerozturk.helpers.NodeIcon.OTHER)).hasMessageContaining("changed");
+            assertThat(service.open(1).name()).isEqualTo("Old title");
+        }
+    }
+    @Test void renamingPreservesUnknownAndNullIconBitsUnlessAnIconIsExplicitlyChosen()throws Exception{
+        try(var c=database()){
+            var service=service(c,properties());
+            try(var q=c.createStatement()){q.execute("UPDATE node SET is_ro=32767");}
+            var before=service.open(1);assertThat(before.icon()).isNull();
+            service.save(1,"Unknown preserved",before.revision());
+            try(var q=c.createStatement();var row=q.executeQuery("SELECT is_ro FROM node")){row.next();assertThat(row.getLong(1)).isEqualTo(32767);}
+            try(var q=c.createStatement()){q.execute("UPDATE node SET is_ro=NULL");}
+            service.save(1,"Null preserved",service.open(1).revision());
+            try(var q=c.createStatement();var row=q.executeQuery("SELECT is_ro FROM node")){row.next();assertThat(row.getObject(1)).isNull();}
+        }
+    }
+
 }

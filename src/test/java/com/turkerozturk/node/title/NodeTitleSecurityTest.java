@@ -32,6 +32,10 @@ class NodeTitleSecurityTest {
    mvc.perform(get("/nodes/properties/1/title").session(session).param("_tenantView","old").with(user("admin").roles("ADMIN"))).andExpect(status().isConflict()).andExpect(content().contentTypeCompatibleWith("application/json"));
    mvc.perform(post("/nodes/properties/1/title").session(session).param("_tenantView","old").param("name","a").param("revision","r").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());verifyNoInteractions(service);
    var snapshot=new NodeTitleService.Snapshot("1","Name","a".repeat(64));when(service.open(1)).thenReturn(snapshot);when(service.save(1,"C++ one,two","r")).thenReturn(snapshot);
+   when(service.save(1,"Icon change","r",com.turkerozturk.helpers.NodeIcon.CT_ADD)).thenReturn(snapshot);
+   mvc.perform(post("/nodes/properties/1/title").session(session).param("_tenantView","current").param("name","Icon change").param("revision","r").param("icon","CT_ADD").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isOk());
+   verify(service).save(1,"Icon change","r",com.turkerozturk.helpers.NodeIcon.CT_ADD);
+   mvc.perform(post("/nodes/properties/1/title").session(session).param("_tenantView","current").param("name","Icon change").param("revision","r").param("icon","NOT_AN_ICON").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isBadRequest());
    mvc.perform(get("/nodes/properties/1/title").session(session).param("_tenantView","current").with(user("admin").roles("ADMIN"))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"));
    mvc.perform(post("/nodes/properties/1/title").session(session).param("_tenantView","current").param("name","C++ one,two").param("revision","r").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isOk());verify(service).save(1,"C++ one,two","r");
   }

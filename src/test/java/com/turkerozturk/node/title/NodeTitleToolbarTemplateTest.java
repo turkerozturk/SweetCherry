@@ -35,6 +35,11 @@ class NodeTitleToolbarTemplateTest {
             when(node.getSyntax()).thenReturn("plain-text");var plain=org.jsoup.Jsoup.parse(engine.process("node/nodeToolbarFragment",context));assertThat(plain.select("div[data-toolbar-item=edit] .dropdown-menu a")).hasSize(2);
             when(node.getSyntax()).thenReturn("custom-colors");context.setVariable("canEditNodeContent",false);
             var tree=org.jsoup.Jsoup.parse(engine.process("node/treeContentFragment",context));assertThat(tree.select("[data-title-open]")).hasSize(1);assertThat(tree.selectFirst("[data-title-form]").hasAttr("hidden")).isTrue();assertThat(tree.select("Title")).isEmpty();
+            assertThat(tree.select("[data-title-form] [data-title-icon-open]")).hasSize(1);
+            assertThat(tree.select("[data-title-form] input[name=icon]")).hasSize(1);
+            assertThat(tree.selectFirst("[data-title-form] [data-symbol-picker-open]").text()).isEqualTo("☺");
+            assertThat(tree.selectFirst("[data-title-form] [data-symbol-picker-open]").attr("aria-label")).isNotBlank();
+            assertThat(tree.select("[data-title-save] .fa-save, [data-title-cancel] .fa-times")).hasSize(2);
             context.setVariable("isSharedNode",true);assertThat(org.jsoup.Jsoup.parse(engine.process("node/treeContentFragment",context)).select("[data-title-open]")).isEmpty();
             context.setVariable("isSharedNode",false);context.setVariable("canDeleteNode",false);assertThat(org.jsoup.Jsoup.parse(engine.process("node/treeContentFragment",context)).select("[data-title-open]")).isEmpty();
             var scheduled=new TenantForm();scheduled.setTenantName("Notes");scheduled.setFileName("notes.txt");var other=new TenantForm();other.setTenantName("Other");other.setFileName("other.txt");

@@ -10,7 +10,7 @@ public class NodeTitleController {
     private final NodeTitleService service;
     public NodeTitleController(NodeTitleService service){this.service=service;}
     @GetMapping("/nodes/properties/{id}/title") public ResponseEntity<NodeTitleService.Snapshot> open(@PathVariable long id,@RequestParam String _tenantView){return response(service.open(id));}
-    @PostMapping("/nodes/properties/{id}/title") public ResponseEntity<NodeTitleService.Snapshot> save(@PathVariable long id,@RequestParam String name,@RequestParam String revision,@RequestParam String _tenantView){return response(service.save(id,name,revision));}
+    @PostMapping("/nodes/properties/{id}/title") public ResponseEntity<NodeTitleService.Snapshot> save(@PathVariable long id,@RequestParam String name,@RequestParam String revision,@RequestParam String _tenantView,@RequestParam(required=false) com.turkerozturk.helpers.NodeIcon icon){return response(icon==null?service.save(id,name,revision):service.save(id,name,revision,icon));}
     private ResponseEntity<NodeTitleService.Snapshot> response(NodeTitleService.Snapshot value){return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(value);}
     @ExceptionHandler(ResponseStatusException.class) public ResponseEntity<?> problem(ResponseStatusException error){return ResponseEntity.status(error.getStatusCode()).cacheControl(CacheControl.noStore()).body(Map.of("error",error.getReason()==null?"failed":error.getReason()));}
 }

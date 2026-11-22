@@ -49,6 +49,7 @@
 <button id="tree-layout-open" type="button" class="btn btn-sm btn-secondary" data-tree-layout-open th:title="#{tree.layout.title}" th:aria-label="#{tree.layout.title}"><i class="fas fa-sliders-h" aria-hidden="true"></i></button>
 <dialog id="tree-reading-layout" aria-labelledby="tree-layout-title">
     <h2 id="tree-layout-title" class="h5" th:text="#{tree.layout.title}"></h2>
+    <label><input type="checkbox" data-tree-layout-setting="title"><span th:text="#{tree.layout.titleRow}"></span></label>
     <label><input type="checkbox" data-tree-layout-setting="compact"><span th:text="#{tree.layout.compact}"></span></label>
     <label><input type="checkbox" data-tree-layout-setting="header"><span th:text="#{tree.layout.header}"></span></label>
     <label><input type="checkbox" data-tree-layout-setting="breadcrumbs"><span th:text="#{tree.layout.breadcrumbs}"></span></label>
@@ -65,6 +66,15 @@
     <button type="button" class="btn btn-sm btn-outline-secondary" data-tree-layout-reset th:text="#{tree.layout.reset}"></button>
     <button type="button" class="btn btn-sm btn-primary" data-tree-layout-close th:text="#{tree.layout.close}"></button>
     </div>
+</dialog>
+<dialog id="node-title-icons" class="node-title-icon-dialog" aria-labelledby="node-title-icons-label">
+<h2 id="node-title-icons-label" class="h5" th:text="#{title.chooseIcon}"></h2>
+<input type="search" data-title-icon-search class="form-control mb-2" th:placeholder="#{icon.search}" th:aria-label="#{icon.search}" autocomplete="off">
+<div class="node-title-icon-choices" data-title-icon-choices>
+<button type="button" th:each="item : ${T(com.turkerozturk.helpers.NodeIcon).values()}" class="btn btn-outline-secondary" th:attr="data-title-icon-choice=${item.name()},data-title-icon-name=${item.iconName},aria-label=${item.name() == 'OTHER' ? #messages.msg('icon.none') : item.iconNameForHuman}" th:title="${item.name() == 'OTHER' ? #messages.msg('icon.none') : item.iconNameForHuman}">
+<img th:if="${item.name() != 'OTHER'}" th:attr="data-title-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="24" height="24" alt=""><span th:if="${item.name() == 'OTHER'}" th:text="#{icon.none}"></span>
+</button></div>
+<button type="button" class="btn btn-secondary mt-2" data-title-icon-close th:text="#{title.cancel}"></button>
 </dialog>
 <button id="scrollToTopBtn" type="button" hidden th:title="#{tree.scrollTop}" th:attr="aria-label=#{tree.scrollTop}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
 <footer id="workspace-status" role="status"></footer>

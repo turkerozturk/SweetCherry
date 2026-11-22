@@ -66,8 +66,12 @@ class TreeReaderPreferencesTemplateTest {
                 assertThat(page.selectFirst("html").attr("data-tree-metadata-enabled")).isEqualTo("true");
                 assertThat(page.select("[data-tree-layout-open]")).hasSize(1);
                 assertThat(page.select("#tree-reading-layout [data-tree-layout-setting]").eachAttr("data-tree-layout-setting"))
-                        .containsExactly("compact","header","breadcrumbs","backlinks","toolbar","paneBar","ids","dates");
+                        .containsExactly("title","compact","header","breadcrumbs","backlinks","toolbar","paneBar","ids","dates");
                 assertThat(page.select("#tree-reading-layout [data-tree-split-toggle]")).hasSize(1);
+                assertThat(page.select("#node-title-icons [data-title-icon-choice]")).hasSize(com.turkerozturk.helpers.NodeIcon.values().length);
+                assertThat(page.select("#node-title-icons img[src]")).isEmpty();
+                assertThat(page.select("#node-title-icons button:not([type=button])")).isEmpty();
+                assertThat(html).doesNotContain("??title.");
                 assertThat(page.select("head script[src='"+path+"/js/node/treeReadingLayout.js']")).hasSize(1);
             }
             context.setVariable("treeSavedSearchesEnabled",false);

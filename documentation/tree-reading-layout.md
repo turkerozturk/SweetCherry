@@ -6,7 +6,7 @@ is scrolled, and when its width is reduced. The original layout remains the defa
 
 - Compact icon buttons keep action names as tooltips and accessible labels.
 - Main menu, breadcrumbs, backlinks, node buttons and split pane controls can be
-  shown or hidden independently. The node title remains visible.
+  shown or hidden independently. The node title row can also be hidden (visible by default).
 - Split View can still be toggled and either pane activated from this dialog
   when the pane controls are hidden. Reading preferences also apply to the right pane.
 - IDs and dates can be shown independently before node names. They do not change
@@ -46,3 +46,14 @@ rolls back all deletions. The empty trash container remains available. Individua
 review, restore and purge behavior is unchanged. ADMIN, writable database, current
 tenant and CSRF protections also apply to emptying the trash. Existing trash can
 be cleaned up even when creating new trash entries is disabled.
+
+## Quick name and icon editing
+
+Hover over the node title and use the pencil to edit its name and CherryTree
+icon together. The icon button opens a searchable local icon chooser; the smiley
+button inserts inline symbols into the name. Save applies both changes; Cancel
+discards both. Compact layout shows Save/Cancel as icons with accessible labels
+and tooltips. The full Properties page remains available for bold, color,
+read-only and other properties. Quick icon editing preserves the read-only bit,
+other title flags and content. A concurrent icon/lock change invalidates an open
+quick edit, even when the name and modification timestamp have not changed.
