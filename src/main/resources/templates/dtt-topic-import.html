@@ -6,18 +6,25 @@
     <h1 th:text="#{dttImport.title}"></h1>
     <p><strong th:text="#{mmImport.target}"></strong> <span th:text="${currentTenantName}"></span></p>
     <p role="alert" class="alert alert-danger" th:if="${dttImportError != null}" th:text="${#messages.msg(dttImportError)}"></p>
-    <p role="status" class="alert alert-info" th:if="${dttImportNotice != null}" th:text="${#messages.msg(dttImportNotice)}"></p>
     <div role="status" class="alert alert-success" th:if="${dttImported != null}">
         <span th:text="#{dttImport.success(${dttImported.count()})}"></span>
         <a class="alert-link" th:href="@{/tree(nodeId=${dttImported.rootId()},_tenantView=${tenantViewToken})}"
            th:text="#{dttImport.open}"></a>
     </div>
     <div th:if="${catalogPreview != null}">
-        <form th:action="@{/dtt-topic-import/confirm}" method="post" class="mb-4">
+        <nav class="mb-3" th:attr="aria-label=#{dttImport.mode}">
+            <a class="btn btn-sm" th:classappend="${missingOnly ? 'btn-primary' : 'btn-outline-primary'}"
+               th:href="@{/dtt-topic-import(missingOnly=true,_tenantView=${tenantViewToken})}" th:text="#{dttImport.missing}"></a>
+            <a class="btn btn-sm" th:classappend="${missingOnly ? 'btn-outline-primary' : 'btn-primary'}"
+               th:href="@{/dtt-topic-import(missingOnly=false,_tenantView=${tenantViewToken})}" th:text="#{dttImport.full}"></a>
+        </nav>
+        <p class="alert alert-info" th:if="${catalogPreview.count() == 0}" th:text="#{dttImport.empty}"></p>
+        <form th:if="${catalogPreview.count() > 0}" th:action="@{/dtt-topic-import/confirm}" method="post" class="mb-4">
             <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
             <input type="hidden" name="revision" th:value="${catalogPreview.revision()}">
-            <label for="dtt-root-name" class="form-label" th:text="#{dttImport.root}"></label>
-            <input id="dtt-root-name" name="rootName" class="form-control mb-3" maxlength="255" required th:value="${rootName}">
+            <input type="hidden" name="missingOnly" th:value="${missingOnly}">
+            <input type="hidden" name="confirmation" th:value="${confirmation}">
+            <p th:text="#{dttImport.timestampRoot}"></p>
             <button type="submit" class="btn btn-primary" th:text="#{dttImport.confirm}"></button>
         </form>
         <p th:text="#{dttImport.previewCount(${catalogPreview.count()})}"></p>

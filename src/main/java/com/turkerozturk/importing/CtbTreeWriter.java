@@ -74,8 +74,7 @@ public final class CtbTreeWriter {
             throws SQLException {
         try (var statement = connection.createStatement()) {
             // Take the write lock before checking for a duplicate, including on an empty CTB.
-            if (product.contains("sqlite")) statement.executeUpdate("UPDATE children SET sequence=sequence WHERE 1=0");
-            if (product.contains("postgresql")) statement.execute("LOCK TABLE node, children IN SHARE ROW EXCLUSIVE MODE");
+            lockForRootWrite(connection, product);
             String sql = """
                     SELECT n.name FROM children c
                     JOIN node n ON n.node_id = COALESCE(NULLIF(c.master_id, 0), c.node_id)
@@ -88,6 +87,13 @@ public final class CtbTreeWriter {
             }
         }
         return false;
+    }
+
+    public static void lockForRootWrite(Connection connection, String product) throws SQLException {
+        try (var statement = connection.createStatement()) {
+            if (product.contains("sqlite")) statement.executeUpdate("UPDATE children SET sequence=sequence WHERE 1=0");
+            if (product.contains("postgresql")) statement.execute("LOCK TABLE node, children IN SHARE ROW EXCLUSIVE MODE");
+        }
     }
 
     private static long scalar(Connection connection, String sql) throws SQLException {

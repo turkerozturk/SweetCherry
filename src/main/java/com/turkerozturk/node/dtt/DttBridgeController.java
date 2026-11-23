@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,11 +27,22 @@ public class DttBridgeController {
         this.nodes = nodes;
     }
 
+    @GetMapping("/nodes/dtt/{id}/entry")
+    public String read(@PathVariable long id, @RequestParam String _tenantView,
+                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                       Model model, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
+        bridge.read(nodes.findDisplayNode(id), date, model);
+        model.addAttribute("requestedNodeId", id);
+        return "node/dttBridge :: panel";
+    }
+
     @PostMapping("/nodes/dtt/{id}/today")
     @PreAuthorize("hasRole('ADMIN')")
     public String update(@PathVariable long id, @RequestParam String _tenantView,
                          @RequestParam String binding, @RequestParam String revision,
                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                         @RequestParam(defaultValue = "false") boolean dated,
                          @RequestParam(defaultValue = "save") String operation,
                          @RequestParam(required = false) Integer status,
                          @RequestParam(defaultValue = "") String note,
@@ -43,7 +55,7 @@ public class DttBridgeController {
         }
         response.setHeader("Cache-Control", "no-store");
         bridge.update(nodes.findDisplayNode(id), binding, new DttBridge.Update(date, revision, status, note),
-                "delete".equals(operation), model);
+                "delete".equals(operation), dated, model);
         model.addAttribute("requestedNodeId", id);
         model.addAttribute("dttSaved", true);
         return "node/dttBridge :: panel";

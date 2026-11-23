@@ -8,12 +8,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.Objects;
 import org.hibernate.Session;
 import org.springframework.http.HttpStatus;
@@ -24,6 +30,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class DttTopicImportService {
+    private static final DateTimeFormatter ROOT_TIME = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT);
     @PersistenceContext
     private EntityManager entityManager;
     private final DttBridge bridge;
@@ -41,9 +48,43 @@ public class DttTopicImportService {
     public record Category(String name, List<Topic> topics) {}
     public record Topic(String name, String id) {}
 
-    public Preview preview(String ungrouped, String uncategorized) {
+    public record Plan(Preview full, Preview selected, boolean missingOnly) {}
+
+    @Transactional(readOnly = true)
+    public Plan preview(String ungrouped, String uncategorized, boolean missingOnly) {
         requireWritable();
-        return preview(bridge.catalog(), ungrouped, uncategorized);
+        Preview full = preview(bridge.catalog(), ungrouped, uncategorized);
+        Preview selected = missingOnly ? entityManager.unwrap(Session.class)
+                .doReturningWork(c -> missing(full, topicIds(c, false))) : full;
+        return new Plan(full, selected, missingOnly);
+    }
+
+    Preview missing(Preview full, Set<String> existing) {
+        var groups = full.groups().stream().map(group -> new Group(group.name(), group.categories().stream()
+                .map(category -> new Category(category.name(), category.topics().stream()
+                        .filter(topic -> !existing.contains(topic.id())).toList()))
+                .filter(category -> !category.topics().isEmpty()).toList()))
+                .filter(group -> !group.categories().isEmpty()).toList();
+        int count = groups.stream().flatMap(group -> group.categories().stream())
+                .mapToInt(category -> category.topics().size()).sum();
+        return new Preview(groups, revision(List.of(full.revision(), groups)), count);
+    }
+
+    static Set<String> topicIds(Connection connection, boolean writing) throws SQLException {
+        String product = connection.getMetaData().getDatabaseProductName().toLowerCase(Locale.ROOT);
+        if (writing) CtbTreeWriter.lockForRootWrite(connection, product);
+        boolean lockRows = writing && (product.contains("mysql") || product.contains("mariadb"));
+        var ids = new HashSet<String>();
+        String sql = "SELECT tags, txt, syntax FROM node WHERE LOWER(tags) LIKE '%dttid%'";
+        try (var statement = connection.createStatement();
+             var rows = statement.executeQuery(sql + (lockRows ? " FOR UPDATE" : ""))) {
+            while (rows.next()) {
+                if (DttBridge.hasTopicTag(rows.getString(1))) {
+                    DttBridge.topicId(rows.getString(2), rows.getString(3)).ifPresent(ids::add);
+                }
+            }
+        }
+        return ids;
     }
 
     Preview preview(DttCatalog catalog, String ungrouped, String uncategorized) {
@@ -84,11 +125,23 @@ public class DttTopicImportService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public CtbTreeWriter.Result write(String root, Preview preview) {
+    public CtbTreeWriter.Result write(Plan plan) {
         requireWritable();
-        var entries = entries(root, preview, Instant.now().getEpochSecond());
-        var result = entityManager.unwrap(Session.class)
-                .doReturningWork(connection -> CtbTreeWriter.insert(connection, entries, true));
+        Instant now = Instant.now();
+        var result = entityManager.unwrap(Session.class).doReturningWork(connection -> {
+            Preview selected = plan.missingOnly() ? missing(plan.full(), topicIds(connection, true)) : plan.full();
+            if (!selected.revision().equals(plan.selected().revision())) {
+                throw problem(HttpStatus.CONFLICT, "dttImport.changed");
+            }
+            if (selected.count() == 0) return null;
+            String base = "DailyTopicTracker-import-" + ROOT_TIME.format(now.atZone(ZoneId.systemDefault()));
+            CtbTreeWriter.Result imported = CtbTreeWriter.insert(connection, entries(base, selected, now.getEpochSecond()), true);
+            for (int suffix = 2; imported == null; suffix++) {
+                String root = base + " (" + suffix + ")";
+                imported = CtbTreeWriter.insert(connection, entries(root, selected, now.getEpochSecond()), true);
+            }
+            return imported;
+        });
         entityManager.clear();
         return result;
     }
@@ -117,9 +170,9 @@ public class DttTopicImportService {
         if (!properties.writable()) throw problem(HttpStatus.FORBIDDEN, "dttImport.readonly");
     }
 
-    private String revision(DttCatalog catalog) {
+    private String revision(Object data) {
         try {
-            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(json.writeValueAsBytes(catalog)));
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(json.writeValueAsBytes(data)));
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }

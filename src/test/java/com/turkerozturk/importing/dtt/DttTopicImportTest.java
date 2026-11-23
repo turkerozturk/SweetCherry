@@ -62,6 +62,36 @@ class DttTopicImportTest {
     }
 
     @Test
+    void missingTopicsUseOnlyValidTaggedIdsAndKeepOnlyRelevantAncestors() throws Exception {
+        var full = service.preview(new DttCatalog(List.of(new DttCatalog.Group("1", "Group"),
+                        new DttCatalog.Group("2", "Already imported group")),
+                List.of(new DttCatalog.Category("10", "Category", "1"),
+                        new DttCatalog.Category("20", "Old category", "2")),
+                List.of(new DttCatalog.Topic("42", "Already imported", "10"),
+                        new DttCatalog.Topic("43", "New", "10"), new DttCatalog.Topic("44", "Old", "20"))),
+                "Ungrouped", "Uncategorized");
+
+        try (var db = DriverManager.getConnection("jdbc:sqlite::memory:"); var sql = db.createStatement()) {
+            sql.execute("CREATE TABLE node(tags TEXT,txt TEXT,syntax TEXT)");
+            sql.executeUpdate("""
+                    INSERT INTO node VALUES
+                    ('other DTTID', '00042', 'plain-text'),
+                    ('dttid', '<node><rich_text>44</rich_text></node>', 'custom-colors'),
+                    ('dttid', '43 invalid', 'plain-text'),
+                    ('notdttid', '43', 'plain-text')
+                    """);
+            var ids = DttTopicImportService.topicIds(db, false);
+            assertThat(ids).containsExactlyInAnyOrder("42", "44");
+            var preview = service.missing(full, ids);
+            assertThat(preview.count()).isEqualTo(1);
+            assertThat(preview.groups()).containsExactly(new DttTopicImportService.Group("Group", List.of(
+                    new DttTopicImportService.Category("Category", List.of(new DttTopicImportService.Topic("New", "43"))))));
+            assertThat(service.missing(full, java.util.Set.of("42", "43", "44")).groups()).isEmpty();
+            assertThat(preview.revision()).isNotEqualTo(full.revision());
+        }
+    }
+
+    @Test
     void keepsLegacyUngroupedCategoriesAndRejectsInvalidBridgeIds() {
         var catalog = new DttCatalog(List.of(), List.of(new DttCatalog.Category("5", "Legacy category", "0")),
                 List.of(new DttCatalog.Topic("42", "Legacy topic", "5"), new DttCatalog.Topic("43", "Orphan", "0")));

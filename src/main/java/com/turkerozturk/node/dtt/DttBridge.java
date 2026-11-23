@@ -1,5 +1,7 @@
 package com.turkerozturk.node.dtt;
 
+import com.turkerozturk.markdown.MarkdownRenderer;
+import com.turkerozturk.markdown.NodeMarkup;
 import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.multipledatabases.TenantService;
 import com.turkerozturk.node.Node;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +55,10 @@ public class DttBridge {
         client = RestClient.builder().requestFactory(factory).build();
     }
 
-    public record Snapshot(String topicId, String topicName, LocalDate date, TodayEntry entry, String revision) {}
+    public record Snapshot(String topicId, String topicName, LocalDate date, TodayEntry entry, String revision,
+                           TopicDetails details) {}
+    public record TopicDetails(String description, String category, String group, String intervalRule,
+                               LocalDate latestDoneDate, LocalDate predictionDate, boolean pinned) {}
     public record TodayEntry(Integer status, String note) {}
     public record Update(LocalDate date, String revision, Integer status, String note) {}
     record Target(URI uri, String token, String topicId, String binding) {}
@@ -71,25 +77,51 @@ public class DttBridge {
         return true;
     }
 
-    void update(Node node, String binding, Update update, boolean delete, Model model) {
+    void read(Node node, LocalDate date, Model model) {
+        Target target = target(node, currentSettings());
+        URI uri = dateUri(target, date);
+        Snapshot snapshot = exchange(target, client.get().uri(uri), true);
+        populatePanel(model, target, requireDate(snapshot, date));
+    }
+
+    void update(Node node, String binding, Update update, boolean delete, boolean dated, Model model) {
         Target target = target(node, currentSettings());
         if (!target.binding().equals(binding)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "dtt.bridge.changed");
         }
+        URI entryUri = dated ? dateUri(target, update.date()) : target.uri();
         RestClient.RequestHeadersSpec<?> request;
         if (delete) {
-            URI uri = UriComponentsBuilder.fromUri(target.uri())
+            URI uri = UriComponentsBuilder.fromUri(entryUri)
                     .queryParam("date", update.date()).queryParam("revision", update.revision()).build().encode().toUri();
             request = client.delete().uri(uri);
         } else {
-            request = client.put().uri(target.uri()).contentType(MediaType.APPLICATION_JSON).body(update);
+            request = client.put().uri(entryUri).contentType(MediaType.APPLICATION_JSON).body(update);
         }
-        populatePanel(model, target, exchange(target, request, false));
+        populatePanel(model, target, requireDate(exchange(target, request, false), update.date()));
+    }
+
+    private static URI dateUri(Target target, LocalDate date) {
+        if (date == null || date.getYear() < 1 || date.getYear() > 9999) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        return target.uri().resolve("entries/" + date);
+    }
+
+    private static Snapshot requireDate(Snapshot snapshot, LocalDate date) {
+        if (!date.equals(snapshot.date())) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "dtt.bridge.unavailable");
+        }
+        return snapshot;
     }
 
     private static void populatePanel(Model model, Target target, Snapshot snapshot) {
         model.addAttribute("dttSnapshot", snapshot);
         model.addAttribute("dttBinding", target.binding());
+        String description = snapshot.details() == null ? null : snapshot.details().description();
+        if (description != null && !description.isBlank() && description.length() <= MarkdownRenderer.MAX_CHARACTERS) {
+            model.addAttribute("dttDescriptionHtml", NodeMarkup.render("markdown", description));
+        }
     }
 
     private Snapshot exchange(Target target, RestClient.RequestHeadersSpec<?> request, boolean reading) {
@@ -164,12 +196,21 @@ public class DttBridge {
     }
 
     static boolean marked(Node node) {
-        return node != null && NodeTags.split(node.getTags()).stream().anyMatch("dttid"::equalsIgnoreCase);
+        return node != null && hasTopicTag(node.getTags());
+    }
+
+    public static boolean hasTopicTag(String tags) {
+        return NodeTags.split(tags).stream().anyMatch("dttid"::equalsIgnoreCase);
     }
 
     static String topicId(Node node) {
         String text = node.getTxt();
-        if (text != null && "custom-colors".equals(node.getSyntax())) {
+        return topicId(text, node.getSyntax()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "dtt.bridge.invalidId"));
+    }
+
+    public static Optional<String> topicId(String text, String syntax) {
+        if (text != null && "custom-colors".equals(syntax)) {
             try {
                 text = new RichTextXmlReader().read(text).runs().stream()
                         .map(RichTextDocument.TextRun::text).collect(Collectors.joining());
@@ -182,13 +223,13 @@ public class DttBridge {
             if (id.matches("[0-9]{1,19}")) {
                 try {
                     long numeric = Long.parseLong(id);
-                    if (numeric > 0) return Long.toString(numeric);
+                    if (numeric > 0) return Optional.of(Long.toString(numeric));
                 } catch (NumberFormatException ignored) {
                     // Above the supported topic ID range.
                 }
             }
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dtt.bridge.invalidId");
+        return Optional.empty();
     }
 
     static URI peerUri(String value) {
