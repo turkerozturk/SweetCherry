@@ -27,6 +27,7 @@
                     || url.pathname === '/mindmap-export'
                     || url.pathname === '/mindmap-import'
                     || url.pathname === '/zip-import'
+                    || url.pathname === '/dtt-topic-import'
                     || url.pathname === '/bookmarks')) return;
                 url.searchParams.set('_tenantView', pageView);
                 link.href = url.pathname + url.search + url.hash;

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{_layout}">
+<head><title th:text="#{dttImport.title}"></title></head>
+<body>
+<section class="container py-3" layout:fragment="content">
+    <h1 th:text="#{dttImport.title}"></h1>
+    <p><strong th:text="#{mmImport.target}"></strong> <span th:text="${currentTenantName}"></span></p>
+    <p role="alert" class="alert alert-danger" th:if="${dttImportError != null}" th:text="${#messages.msg(dttImportError)}"></p>
+    <p role="status" class="alert alert-info" th:if="${dttImportNotice != null}" th:text="${#messages.msg(dttImportNotice)}"></p>
+    <div role="status" class="alert alert-success" th:if="${dttImported != null}">
+        <span th:text="#{dttImport.success(${dttImported.count()})}"></span>
+        <a class="alert-link" th:href="@{/tree(nodeId=${dttImported.rootId()},_tenantView=${tenantViewToken})}"
+           th:text="#{dttImport.open}"></a>
+    </div>
+    <div th:if="${catalogPreview != null}">
+        <form th:action="@{/dtt-topic-import/confirm}" method="post" class="mb-4">
+            <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+            <input type="hidden" name="revision" th:value="${catalogPreview.revision()}">
+            <label for="dtt-root-name" class="form-label" th:text="#{dttImport.root}"></label>
+            <input id="dtt-root-name" name="rootName" class="form-control mb-3" maxlength="255" required th:value="${rootName}">
+            <button type="submit" class="btn btn-primary" th:text="#{dttImport.confirm}"></button>
+        </form>
+        <p th:text="#{dttImport.previewCount(${catalogPreview.count()})}"></p>
+        <ul class="list-unstyled">
+            <li th:each="group : ${catalogPreview.groups()}" class="mb-2">
+                <details>
+                    <summary th:text="${group.name()}"></summary>
+                    <ul>
+                        <li th:each="category : ${group.categories()}">
+                            <details>
+                                <summary th:text="${category.name()}"></summary>
+                                <ul>
+                                    <li th:each="topic : ${category.topics()}">
+                                        <span th:text="${topic.name()}"></span> <code th:text="${topic.id()}"></code>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                    </ul>
+                </details>
+            </li>
+        </ul>
+    </div>
+</section>
+</body>
+</html>

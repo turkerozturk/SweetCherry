@@ -26,6 +26,7 @@ import com.turkerozturk.helpers.SolarSystem;
 import com.turkerozturk.multipledatabases.MultitenantConfiguration;
 import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.multipledatabases.TenantService;
+import com.turkerozturk.node.dtt.DttBridge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -50,6 +51,14 @@ public class GlobalControllerAdvice {
 
     @Autowired
     private TenantService tenantService;
+
+    @Autowired
+    private DttBridge dttBridge;
+
+    @ModelAttribute("dttTopicImportAvailable")
+    public boolean dttTopicImportAvailable() {
+        return dttBridge.topicImportConfigured();
+    }
 
     @ModelAttribute("astronomyEnabled")
     public boolean isAstronomyEnabled() { return astronomy.isEnabled(); }

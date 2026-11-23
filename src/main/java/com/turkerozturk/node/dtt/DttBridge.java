@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +39,8 @@ public class DttBridge {
     private final TenantService tenants;
     private final Environment environment;
     private final RestClient client;
+    @Value("${myapp.dtt.topic-import.enabled:true}")
+    private boolean topicImportEnabled = true;
 
     public DttBridge(TenantService tenants, Environment environment) {
         this.tenants = tenants;
@@ -111,6 +114,30 @@ public class DttBridge {
         }
     }
 
+    public boolean topicImportConfigured() {
+        if (!topicImportEnabled || !TenantContext.hasCurrentTenant()) return false;
+        var settings = currentSettings();
+        return settings != null && !settings.getOrDefault(BASE_URL, "").isBlank()
+                && !settings.getOrDefault(TOKEN_ENV, "").isBlank();
+    }
+
+    public DttCatalog catalog() {
+        if (!topicImportConfigured()) throw configurationError();
+        var settings = currentSettings();
+        var endpoint = endpoint(settings, "/api/bridge/v1/topics");
+        try {
+            return client.get().uri(endpoint).headers(headers -> headers.setBearerAuth(token(settings)))
+                    .accept(MediaType.APPLICATION_JSON).retrieve().body(DttCatalog.class);
+        } catch (RestClientResponseException error) {
+            if (error.getStatusCode().value() == 404) {
+                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "dttImport.apiMissing");
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "dtt.bridge.unavailable");
+        } catch (RestClientException error) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "dtt.bridge.unavailable");
+        }
+    }
+
     private Map<String, String> currentSettings() {
         return tenants.getCustomProperties(TenantContext.getCurrentTenant());
     }
@@ -118,13 +145,22 @@ public class DttBridge {
     private Target target(Node node, Map<String, String> settings) {
         if (!marked(node)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "dtt.bridge.invalidId");
         String id = topicId(node);
+        URI uri = endpoint(settings, API_PATH + id + "/today");
+        return new Target(uri, token(settings), id, binding(uri));
+    }
+
+    private String token(Map<String, String> settings) {
         if (settings == null) throw configurationError();
         String tokenName = settings.getOrDefault(TOKEN_ENV, "").strip();
         String token = tokenName.matches("[A-Za-z_][A-Za-z0-9_]*") ? environment.getProperty(tokenName) : null;
         if (token == null || !token.matches("[A-Za-z0-9_-]{32,256}")) throw configurationError();
+        return token;
+    }
+
+    private static URI endpoint(Map<String, String> settings, String path) {
+        if (settings == null) throw configurationError();
         URI base = peerUri(settings.getOrDefault(BASE_URL, "").strip());
-        URI uri = URI.create(base.toASCIIString().replaceFirst("/+$", "") + API_PATH + id + "/today");
-        return new Target(uri, token, id, binding(uri));
+        return URI.create(base.toASCIIString().replaceFirst("/+$", "") + path);
     }
 
     static boolean marked(Node node) {

@@ -18,6 +18,7 @@ class TenantIconModelTest {
         var holder=new CustomPropertiesHolder();holder.addCustomProperties("Test",Map.of(TenantIcons.PROPERTY,"cherry_blue"));
         var advice=new GlobalControllerAdvice();var service=mock(TenantService.class);when(service.getAllTenants()).thenReturn(Map.of("Test",mock(javax.sql.DataSource.class)));
         ReflectionTestUtils.setField(advice,"tenantService",service);ReflectionTestUtils.setField(advice,"tenantIcons",new TenantIcons(holder));ReflectionTestUtils.setField(advice,"astronomy",mock(AstronomyWidgetService.class));
+        ReflectionTestUtils.setField(advice,"dttBridge",mock(com.turkerozturk.node.dtt.DttBridge.class));
         var mvc=MockMvcBuilders.standaloneSetup(new TestController()).setControllerAdvice(advice).setSingleView(new AbstractView(){protected void renderMergedOutputModel(Map<String,Object> m,jakarta.servlet.http.HttpServletRequest r,jakarta.servlet.http.HttpServletResponse s){}}).build();
         var result=mvc.perform(get("/icon-model")).andReturn();
         assertThat(result.getModelAndView().getModel().get("databaseIcons")).isEqualTo(Map.of("Test","cherry_blue"));

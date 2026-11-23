@@ -1,7 +1,7 @@
 package com.turkerozturk.importing.mindmap;
 
 import com.turkerozturk.helpers.NodeIcon;
-import com.turkerozturk.jdbc.JdbcIdentifiers;
+import com.turkerozturk.importing.CtbTreeWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.NodeTraversor;
@@ -10,7 +10,8 @@ import org.w3c.dom.*;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.*;
 
@@ -159,32 +160,9 @@ public record MindMapImportData(List<Entry> nodes, Map<String,Integer> warnings)
     private static void warn(Map<String,Integer>warnings,String key){warnings.merge(key,1,Integer::sum);}
     private static IllegalArgumentException problem(String key){return new IllegalArgumentException(key);}
 
-    /** The caller supplies one transaction. IDs are always new, never original Freeplane/CTB IDs. */
-    int insert(Connection connection)throws SQLException {
-        if(connection.getAutoCommit() || connection.isReadOnly() || !connection.getMetaData().supportsTransactions())throw new SQLException("Writable transaction required");
-        String product=connection.getMetaData().getDatabaseProductName().toLowerCase(Locale.ROOT);
-        if(product.contains("mysql")||product.contains("mariadb")) {
-            var transactional=new HashSet<String>();
-            try(var s=connection.createStatement();var r=s.executeQuery("SELECT TABLE_NAME,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE()")){
-                while(r.next())if("InnoDB".equalsIgnoreCase(r.getString(2)))transactional.add(r.getString(1));
-            }
-            if(!transactional.containsAll(Set.of("node","children")))throw new SQLException("Transactional tables required");
-        }
-        long max=scalar(connection,"SELECT COALESCE(MAX(node_id),0) FROM (SELECT node_id FROM node UNION ALL SELECT node_id FROM children) AS mm_ids");
-        long rootSequence=Math.addExact(scalar(connection,"SELECT COALESCE(MAX(sequence),0) FROM children WHERE father_id=0"),1);
-        Math.addExact(max,nodes.size()); // Check every allocation before the first write.
-        String[] columns={"node_id","name","txt","syntax","tags","is_ro","is_richtxt","has_codebox","has_table","has_image","level","ts_creation","ts_lastsave"};
-        var quoted=new ArrayList<String>();for(String name:columns)quoted.add(JdbcIdentifiers.quote(connection,name));
-        String nodeSql="INSERT INTO "+JdbcIdentifiers.quote(connection,"node")+" ("+String.join(",",quoted)+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        try(var node=connection.prepareStatement(nodeSql);var child=connection.prepareStatement("INSERT INTO "+JdbcIdentifiers.quote(connection,"children")+" (node_id,father_id,sequence,master_id) VALUES (?,?,?,?)")){
-            for(int i=0;i<nodes.size();i++) {
-                Entry e=nodes.get(i);long id=max+i+1;
-                Object[] values={id,e.name(),e.text(),"plain-text","",e.icon(),e.titleBits(),0,0,0,0,e.created(),e.modified()};
-                for(int j=0;j<values.length;j++)node.setObject(j+1,values[j]);node.executeUpdate();
-                child.setLong(1,id);child.setLong(2,e.parent()<0?0:max+e.parent()+1);child.setLong(3,e.parent()<0?rootSequence:e.sequence());child.setLong(4,0);child.executeUpdate();
-            }
-        }
-        return nodes.size();
+    int insert(Connection connection) throws SQLException {
+        var tree = nodes.stream().map(entry -> new CtbTreeWriter.Entry(entry.name(), entry.text(), "",
+                entry.parent(), entry.sequence(), entry.titleBits(), entry.icon(), entry.created(), entry.modified())).toList();
+        return CtbTreeWriter.insert(connection, tree, false).count();
     }
-    private static long scalar(Connection c,String sql)throws SQLException {try(var s=c.createStatement();var r=s.executeQuery(sql)){r.next();return r.getLong(1);}}
 }
