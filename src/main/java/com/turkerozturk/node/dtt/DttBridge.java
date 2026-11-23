@@ -36,8 +36,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class DttBridge {
-    private static final String BASE_URL = "custom.dtt.baseUrl";
-    private static final String TOKEN_ENV = "custom.dtt.tokenEnv";
+    public static final String BASE_URL = "custom.dtt.baseUrl";
+    public static final String TOKEN_ENV = "custom.dtt.tokenEnv";
     private static final String API_PATH = "/api/bridge/v1/topics/";
     private final TenantService tenants;
     private final Environment environment;
@@ -119,9 +119,9 @@ public class DttBridge {
         model.addAttribute("dttSnapshot", snapshot);
         model.addAttribute("dttBinding", target.binding());
         model.addAttribute("dttTopicUrl", link(target.base(), "entries/weekly-calendar", "topicId", target.topicId()));
-        model.addAttribute("dttCategoryUrl", target.base().resolve("category-groups").toASCIIString());
+        model.addAttribute("dttGroupUrl", target.base().resolve("category-groups").toASCIIString());
         if (snapshot.details() != null && snapshot.details().categoryId() != null) {
-            model.addAttribute("dttGroupUrl", link(target.base(), "entry-filter/form",
+            model.addAttribute("dttCategoryUrl", link(target.base(), "entry-filter/form",
                     "categoryId", snapshot.details().categoryId()));
         }
         String description = snapshot.details() == null ? null : snapshot.details().description();
@@ -176,6 +176,25 @@ public class DttBridge {
         }
     }
 
+    public boolean testWizardConnection(String address, String tokenName) {
+        URI base = DttWizardSettings.validate(address, tokenName);
+        if (base == null) throw new IllegalArgumentException("wizard.test.dttRequired");
+        String value = environment.getProperty(tokenName.strip());
+        if (value == null || !value.matches("[A-Za-z0-9_-]{32,256}")) {
+            throw new IllegalArgumentException("wizard.test.dttTokenMissing");
+        }
+        try {
+            var response = client.head().uri(base.resolve("api/bridge/v1/topics"))
+                    .headers(headers -> headers.setBearerAuth(value))
+                    .accept(MediaType.APPLICATION_JSON).retrieve().toBodilessEntity();
+            var contentType = response.getHeaders().getContentType();
+            return response.getStatusCode().is2xxSuccessful()
+                    && contentType != null && MediaType.APPLICATION_JSON.isCompatibleWith(contentType);
+        } catch (RestClientException error) {
+            return false;
+        }
+    }
+
     private Map<String, String> currentSettings() {
         return tenants.getCustomProperties(TenantContext.getCurrentTenant());
     }
@@ -202,6 +221,15 @@ public class DttBridge {
 
     private static URI base(Map<String, String> settings) {
         if (settings == null) throw configurationError();
+        if ("true".equals(settings.get(DttWizardSettings.MANAGED))) {
+            try {
+                URI approved = DttWizardSettings.validate(settings.get(BASE_URL), settings.get(TOKEN_ENV));
+                if (approved != null) return approved;
+            } catch (IllegalArgumentException error) {
+                throw configurationError();
+            }
+            throw configurationError();
+        }
         URI peer = peerUri(settings.getOrDefault(BASE_URL, "").strip());
         return URI.create(peer.toASCIIString().replaceFirst("/+$", "") + "/");
     }

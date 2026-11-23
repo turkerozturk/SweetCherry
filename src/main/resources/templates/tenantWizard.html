@@ -24,6 +24,26 @@
             <div class="col-12" id="wizardRemote"><label for="url" th:text="#{wizard.url}"></label><input class="form-control" th:field="*{url}" maxlength="4000" placeholder="jdbc:postgresql://server:5432/notes"></div>
             <div class="col-md-6"><label for="username" th:text="#{wizard.username}"></label><input class="form-control" th:field="*{username}" maxlength="256" autocomplete="off"></div>
             <div class="col-md-6"><label for="wizardPassword" th:text="#{wizard.password}"></label><input class="form-control" id="wizardPassword" name="password" type="password" maxlength="1024" autocomplete="new-password"><small th:text="#{wizard.passwordHelp}"></small><label class="d-block"><input type="checkbox" th:field="*{clearPassword}"> <span th:text="#{wizard.clearPassword}"></span></label></div>
+            <div class="col-12">
+                <button type="button" class="btn btn-outline-secondary" data-wizard-test="database" th:text="#{wizard.test.database}"></button>
+                <span class="small ms-2" role="status" data-wizard-test-result="database"></span>
+            </div>
+            <fieldset class="col-12">
+                <legend class="h6" th:text="#{wizard.dttHeading}"></legend>
+                <div class="row g-2">
+                    <div class="col-md-7">
+                        <label for="dttBaseUrl" th:text="#{wizard.dttUrl}"></label>
+                        <input class="form-control" th:field="*{dttBaseUrl}" maxlength="2048" placeholder="http://127.0.0.1:8081">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="dttTokenEnv" th:text="#{wizard.dttEnv}"></label>
+                        <input class="form-control" th:field="*{dttTokenEnv}" maxlength="100" placeholder="DTT_BRIDGE_TOKEN" autocomplete="off">
+                    </div>
+                </div>
+                <p class="form-text mb-2" th:text="#{wizard.dttHelp}"></p>
+                <button type="button" class="btn btn-outline-secondary" data-wizard-test="dtt" th:text="#{wizard.test.dtt}"></button>
+                <span class="small ms-2" role="status" data-wizard-test-result="dtt"></span>
+            </fieldset>
             <div class="col-md-6"><label for="role" th:text="#{wizard.role}"></label><select class="form-select" th:field="*{role}"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select><small th:text="#{wizard.roleHelp}"></small></div>
             <div class="col-md-6"><label for="maxEmbeddedFileSizeMB" th:text="#{wizard.limit}"></label><input class="form-control" type="number" min="1" max="20" step="1" th:field="*{maxEmbeddedFileSizeMB}"></div>
             <div class="col-md-6" data-icon-picker>
@@ -55,6 +75,14 @@
         <button class="btn btn-primary" type="submit" th:text="#{wizard.save}"></button>
         <a class="btn btn-secondary" th:href="@{/tenants}" th:text="#{wizard.cancel}"></a>
     </form>
+    <div id="wizardTestMessages" hidden
+         th:attr="data-loading=#{wizard.test.loading},data-success=#{wizard.test.success},
+                  data-failed=#{wizard.test.failed},data-invalid=#{wizard.invalidConfig},
+                  data-timeout=#{wizard.test.timeout},data-busy=#{wizard.test.busy},
+                  data-stale=#{wizard.stale},data-save-first=#{wizard.test.saveFirst},
+                  data-options=#{wizard.test.options},data-password=#{wizard.test.reenterPassword},
+                  data-target=#{wizard.dttTarget},data-dtt-required=#{wizard.test.dttRequired},
+                  data-token-missing=#{wizard.test.dttTokenMissing}"></div>
     <dialog id="wizardFiles" style="width: min(900px,95vw); max-height: 85vh">
         <h2 th:text="#{wizard.browseTitle}"></h2><p th:text="#{wizard.location}"></p>
         <form id="wizardFolderForm" class="input-group"><input id="wizardFolder" class="form-control" th:aria-label="#{wizard.folder}"><button class="btn btn-primary" th:text="#{wizard.go}"></button></form>
@@ -63,5 +91,5 @@
         <div id="wizardEntries" th:attr="data-folder=#{wizard.folder},data-file=#{wizard.file}"></div>
     </dialog>
 </section>
-<section layout:fragment="pageSpecificJsScripts"><style>.icon-choice[hidden]{display:none!important}</style><script defer th:src="@{/js/icon-picker.js}"></script><script th:src="@{/js/tenantWizard.js}"></script></section>
+<section layout:fragment="pageSpecificJsScripts"><style>.icon-choice[hidden]{display:none!important}</style><script defer th:src="@{/js/icon-picker.js}"></script><script th:src="@{/js/tenantWizard.js}"></script><script defer th:src="@{/js/tenantConnectionTests.js}"></script></section>
 </body></html>

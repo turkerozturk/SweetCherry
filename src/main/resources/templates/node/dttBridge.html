@@ -58,7 +58,10 @@
             </div>
             <div th:if="${details != null and details.category != null}">
                 <dt th:text="#{dtt.bridge.category}"></dt>
-                <dd><a th:href="${dttCategoryUrl}" th:text="${details.category}" target="_blank" rel="noopener noreferrer"></a></dd>
+                <dd>
+                    <a th:if="${dttCategoryUrl != null}" th:href="${dttCategoryUrl}" th:text="${details.category}" target="_blank" rel="noopener noreferrer"></a>
+                    <span th:unless="${dttCategoryUrl != null}" th:text="${details.category}"></span>
+                </dd>
             </div>
             <div th:if="${details != null and details.group != null}">
                 <dt th:text="#{dtt.bridge.group}"></dt>

@@ -58,6 +58,35 @@ class TenantWizardServiceTest {
         assertThat(p.getProperty(TenantIcons.PROPERTY)).isEqualTo("cherry_blue");
         form=wizard.edit("Renamed");assertThat(form.databaseIcon).isEqualTo("cherry_blue");form.clearPassword=true;wizard.save(form);assertThat(properties(config).getProperty("datasource.password")).isNull();
     }
+    @Test void bridgeFieldsCanBeEditedAndClearedWithoutWritingTokenValues() throws Exception {
+        Path config = register(existing(ctb()), mock(ManagedTenantDataSource.class));
+        var form = wizard.edit("Original");
+        form.dttBaseUrl = "http://127.0.0.1:8081";
+        form.dttTokenEnv = "DTT_BRIDGE_TOKEN_HOME";
+        wizard.save(form);
+        assertThat(properties(config).getProperty("custom.dtt.wizardManaged")).isEqualTo("true");
+        var edited = wizard.edit("Original");
+        assertThat(edited.dttBaseUrl).isEqualTo("http://127.0.0.1:8081/");
+        assertThat(edited.dttTokenEnv).isEqualTo("DTT_BRIDGE_TOKEN_HOME");
+        edited.dttBaseUrl = "";
+        edited.dttTokenEnv = "";
+        wizard.save(edited);
+        assertThat(properties(config)).doesNotContainKeys("custom.dtt.baseUrl", "custom.dtt.tokenEnv", "custom.dtt.wizardManaged");
+    }
+
+    @Test void testPasswordIsAvailableOnlyForAnUnchangedConnection() throws Exception {
+        var settings = existing(ctb());
+        settings.setProperty("datasource.driver-class-name", "org.postgresql.Driver");
+        settings.setProperty("datasource.url", "jdbc:postgresql://localhost/notes");
+        settings.setProperty("datasource.username", "reader");
+        Path config = register(settings, mock(ManagedTenantDataSource.class));
+        String revision = TenantWizardService.revision(config);
+        assertThat(wizard.savedTestPassword("Original", revision, "org.postgresql.Driver",
+                "jdbc:postgresql://localhost/notes", "reader")).isEqualTo("private-secret");
+        assertThatThrownBy(() -> wizard.savedTestPassword("Original", revision, "org.postgresql.Driver",
+                "jdbc:postgresql://somewhere/notes", "reader")).hasMessage("wizard.test.reenterPassword");
+    }
+
     @Test void staleFormAndBusyPoolNeverOverwriteConfig()throws Exception {
         var old=mock(ManagedTenantDataSource.class);Path config=register(existing(ctb()),old);var form=wizard.edit("Original");
         Files.writeString(config,"\ncustom.external.change=yes\n",StandardOpenOption.APPEND);byte[] before=Files.readAllBytes(config);

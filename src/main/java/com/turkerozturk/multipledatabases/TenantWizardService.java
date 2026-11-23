@@ -1,5 +1,7 @@
 package com.turkerozturk.multipledatabases;
 
+import com.turkerozturk.node.dtt.DttBridge;
+import com.turkerozturk.node.dtt.DttWizardSettings;
 import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +16,7 @@ public class TenantWizardService {
     private final MultitenantConfiguration configuration;
     private final Path directory;
     private final Path databases;
-    private static final Map<String,String> DRIVERS = Map.of("sqlite","org.sqlite.JDBC","mysql","com.mysql.cj.jdbc.Driver","mariadb","org.mariadb.jdbc.Driver","postgresql","org.postgresql.Driver");
+    static final Map<String,String> DRIVERS = Map.of("sqlite","org.sqlite.JDBC","mysql","com.mysql.cj.jdbc.Driver","mariadb","org.mariadb.jdbc.Driver","postgresql","org.postgresql.Driver");
     @org.springframework.beans.factory.annotation.Autowired
     public TenantWizardService(TenantService tenants, CustomPropertiesHolder custom, MultitenantConfiguration configuration) {
         this(tenants,custom,configuration,Path.of(MultitenantConfiguration.PATH_OF_ALL_DATA_SOURCE_CONNECTION_FILES));
@@ -34,7 +36,10 @@ public class TenantWizardService {
         Properties p=new Properties(); try(var in=Files.newBufferedReader(file,StandardCharsets.UTF_8)){p.load(in);} return p;
     }
     static String revision(Path file) throws IOException {
-        try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(file)));}
+        return revision(Files.readAllBytes(file));
+    }
+    private static String revision(byte[] bytes) {
+        try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));}
         catch(NoSuchAlgorithmException e){throw new IllegalStateException(e);}
     }
     public TenantWizardForm edit(String tenant) throws IOException {
@@ -47,8 +52,51 @@ public class TenantWizardService {
         f.writable=Boolean.parseBoolean(p.getProperty("custom.isWritable","false"));
         f.allowLegacySchemaUpgrade=permission(p.getProperty(CtbSchemaCompatibility.SETTING));
         f.newNodeName=p.getProperty("custom.newNodeName",""); f.newNodeTags=p.getProperty("custom.newNodeTags","");
+        f.dttBaseUrl=p.getProperty(DttBridge.BASE_URL, "");
+        f.dttTokenEnv=p.getProperty(DttBridge.TOKEN_ENV, "");
         f.maxEmbeddedFileSizeMB=p.getProperty("custom.maxEmbeddedFileSizeMB","9"); return f;
     }
+    private static void applyDttSettings(TenantWizardForm form, Properties properties) {
+        if (form.dttBaseUrl == null && form.dttTokenEnv == null) return;
+        String address = Objects.toString(form.dttBaseUrl, "").strip();
+        String tokenEnv = Objects.toString(form.dttTokenEnv, "").strip();
+        if (address.equals(properties.getProperty(DttBridge.BASE_URL, "").strip())
+                && tokenEnv.equals(properties.getProperty(DttBridge.TOKEN_ENV, "").strip())) return;
+        var peer = DttWizardSettings.validate(address, tokenEnv);
+        if (peer == null) {
+            properties.remove(DttBridge.BASE_URL);
+            properties.remove(DttBridge.TOKEN_ENV);
+            properties.remove(DttWizardSettings.MANAGED);
+        } else {
+            properties.setProperty(DttBridge.BASE_URL, peer.toASCIIString());
+            properties.setProperty(DttBridge.TOKEN_ENV, tokenEnv);
+            properties.setProperty(DttWizardSettings.MANAGED, "true");
+        }
+    }
+
+    String savedTestPassword(String tenant, String expectedRevision, String driver, String url, String username)
+            throws IOException {
+        if (tenant.isBlank()) return "";
+        Path file = resolve(tenant);
+        byte[] bytes;
+        try (var stream = Files.newInputStream(file)) { bytes = stream.readNBytes(65537); }
+        if (bytes.length > 65536 || !expectedRevision.equals(revision(bytes))) {
+            throw new IllegalArgumentException("wizard.stale");
+        }
+        var properties = new Properties();
+        try (var reader = new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
+            properties.load(reader);
+        }
+        String password = properties.getProperty("datasource.password", "");
+        if (password.isEmpty()) return password;
+        if (!driver.equals(properties.getProperty("datasource.driver-class-name"))
+                || !url.equals(properties.getProperty("datasource.url"))
+                || !username.equals(properties.getProperty("datasource.username", ""))) {
+            throw new IllegalArgumentException("wizard.test.reenterPassword");
+        }
+        return password;
+    }
+
     private static boolean permission(String s){return s!=null&&(s.trim().equals("1")||s.trim().equalsIgnoreCase("true"));}
     static Path ctb(String input) throws IOException {
         if(input==null||input.isBlank()||input.length()>4096||input.codePoints().anyMatch(Character::isISOControl))
@@ -85,6 +133,7 @@ public class TenantWizardService {
         if(tenants.getAllTenants().containsKey(f.name)&&!f.name.equals(f.tenant))throw new IllegalArgumentException("wizard.duplicateName");
         try { int limit=Integer.parseInt(f.maxEmbeddedFileSizeMB); if(limit<1||limit>20)throw new NumberFormatException(); }
         catch(RuntimeException e){throw new IllegalArgumentException("wizard.invalidLimit");}
+        applyDttSettings(f, p);
         p.setProperty(TenantIcons.PROPERTY,TenantIcons.resolve(f.databaseIcon));
         p.setProperty("name",f.name);p.setProperty("datasource.driver-class-name",DRIVERS.get(f.type));p.setProperty("datasource.url",url);
         p.setProperty("security-role",f.role);p.setProperty("custom.isWritable",String.valueOf(f.writable));

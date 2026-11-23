@@ -3,6 +3,12 @@ package com.turkerozturk.multipledatabases;
 /** Explicit form fields prevent arbitrary property binding. Password is never populated on edit. */
 public class TenantWizardForm {
     public String tenant = "", revision = "", name = "", type = "sqlite", path = "", url = "", username = "", password = "";
+    public String dttBaseUrl, dttTokenEnv;
+    public String getDttBaseUrl() { return dttBaseUrl; }
+    public void setDttBaseUrl(String value) { dttBaseUrl = value; }
+    public String getDttTokenEnv() { return dttTokenEnv; }
+    public void setDttTokenEnv(String value) { dttTokenEnv = value; }
+
     public boolean createEmpty;
     public String databaseFilename = "";
     public boolean isCreateEmpty(){return createEmpty;} public void setCreateEmpty(boolean v){createEmpty=v;}

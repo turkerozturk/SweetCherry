@@ -30,6 +30,12 @@ class TenantWizardSecurityTest {
             mvc.perform(post("/tenants/wizard").with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
             mvc.perform(post("/tenants/wizard").with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
             mvc.perform(post("/tenants/wizard").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isFound()).andExpect(redirectedUrl("/"));
+            for (String test : new String[]{"test-dtt", "test-database"}) {
+                mvc.perform(post("/tenants/wizard/" + test).param("type", "sqlite")
+                        .with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+                mvc.perform(post("/tenants/wizard/" + test).param("type", "sqlite")
+                        .with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
+            }
         }
     }
     @Configuration @EnableWebSecurity @EnableWebMvc @EnableMethodSecurity
@@ -43,6 +49,9 @@ class TenantWizardSecurityTest {
         @Bean TenantWizardService service()throws Exception{var s=mock(TenantWizardService.class);when(s.save(any())).thenReturn("Demo");return s;}
         @Bean DatabaseSwitchController selection(){var c=mock(DatabaseSwitchController.class);when(c.setTenant(eq("Demo"),any())).thenReturn("redirect:/");return c;}
         @Bean TenantWizardController controller(TenantWizardService service,DatabaseSwitchController selection){return new TenantWizardController(service,selection);}
+        @Bean TenantWizardConnectionTests connectionTests(TenantWizardService service) {
+            return new TenantWizardConnectionTests(service, mock(com.turkerozturk.node.dtt.DttBridge.class));
+        }
         @Bean SecurityFilterChain chain(HttpSecurity http)throws Exception {
             var config=new SecurityConfig();ReflectionTestUtils.setField(config,"loginUserName","user");ReflectionTestUtils.setField(config,"loginAdminName","admin");
             return config.filterChain(http,new LoginAttemptLimiter(),new LoginClientAddressResolver(""));
