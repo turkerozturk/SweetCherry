@@ -28,10 +28,19 @@
             if(!iconValue||!iconButton)return;
             iconValue.value=value||'';
             const choice=choices().find(button=>button.dataset.titleIconChoice===value);
-            const source=choice?.querySelector('[data-title-icon-src]')?.getAttribute('data-title-icon-src');
-            const image=iconButton.querySelector('[data-title-icon-preview]'),fallback=iconButton.querySelector('[data-title-icon-fallback]');
-            image.hidden=!source;fallback.hidden=Boolean(source);
-            if(source)image.src=source;else image.removeAttribute('src');
+            const icon = choice?.querySelector('img')?.cloneNode(false);
+            const preview = iconButton.querySelector('[data-title-icon-preview]');
+            const fallback = iconButton.querySelector('[data-title-icon-fallback]');
+            if (icon) {
+                icon.width = 22;
+                icon.height = 22;
+                icon.removeAttribute('loading');
+                preview.replaceChildren(icon);
+            } else {
+                preview.replaceChildren();
+            }
+            preview.hidden = !icon;
+            fallback.hidden = Boolean(icon);
         }
         const state={generation:0,saving:false,record:null,controller:null};states.set(root,state);
         const valid=data=>data?.id===root.dataset.titleId&&typeof data.name==='string'&&/^[a-f0-9]{64}$/.test(data.revision);
@@ -41,8 +50,6 @@
             iconSelection={root,choose(value){if(root.isConnected&&generation===state.generation&&!state.saving)displayIcon(value);}};
             search.value='';choices().forEach(button=>{
                 button.hidden=false;button.setAttribute('aria-pressed',String(button.dataset.titleIconChoice===iconValue.value));
-                const image=button.querySelector('[data-title-icon-src]');
-                if(image&&!image.hasAttribute('src'))image.src=image.getAttribute('data-title-icon-src');
             });
             iconDialog.showModal();search.focus();
         });

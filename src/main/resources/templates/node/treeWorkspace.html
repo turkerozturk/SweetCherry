@@ -72,7 +72,7 @@
 <input type="search" data-title-icon-search class="form-control mb-2" th:placeholder="#{icon.search}" th:aria-label="#{icon.search}" autocomplete="off">
 <div class="node-title-icon-choices" data-title-icon-choices>
 <button type="button" th:each="item : ${T(com.turkerozturk.helpers.NodeIcon).values()}" class="btn btn-outline-secondary" th:attr="data-title-icon-choice=${item.name()},data-title-icon-name=${item.iconName},aria-label=${item.name() == 'OTHER' ? #messages.msg('icon.none') : item.iconNameForHuman}" th:title="${item.name() == 'OTHER' ? #messages.msg('icon.none') : item.iconNameForHuman}">
-<img th:if="${item.name() != 'OTHER'}" th:attr="data-title-icon-src=@{/img/ctbicons/{name}.png(name=${item.iconName})}" width="24" height="24" alt=""><span th:if="${item.name() == 'OTHER'}" th:text="#{icon.none}"></span>
+<img th:if="${item.name() != 'OTHER'}" th:src="@{/img/ctbicons/{name}.png(name=${item.iconName})}" loading="lazy" width="24" height="24" alt=""><span th:if="${item.name() == 'OTHER'}" th:text="#{icon.none}"></span>
 </button></div>
 <button type="button" class="btn btn-secondary mt-2" data-title-icon-close th:text="#{title.cancel}"></button>
 </dialog>

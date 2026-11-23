@@ -28,7 +28,7 @@
         <label class="visually-hidden" th:for="|node-title-${requestedNodeId}|" th:text="#{title.name}"></label>
         <input class="form-control" name="name" th:id="|node-title-${requestedNodeId}|" maxlength="255" required data-title-value autocomplete="off">
         <input type="hidden" data-title-icon-value name="icon" value="">
-        <button type="button" class="btn btn-sm btn-outline-secondary node-title-icon-button" data-title-icon-open th:title="#{title.chooseIcon}" th:aria-label="#{title.chooseIcon}" disabled><img data-title-icon-preview width="22" height="22" alt="" hidden><i data-title-icon-fallback class="fas fa-icons" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-sm btn-outline-secondary node-title-icon-button" data-title-icon-open th:title="#{title.chooseIcon}" th:aria-label="#{title.chooseIcon}" disabled><span data-title-icon-preview hidden></span><i data-title-icon-fallback class="fas fa-icons" aria-hidden="true"></i></button>
         <button type="button" class="btn btn-sm btn-outline-secondary" data-symbol-picker-open th:attr="data-symbol-target=|node-title-${requestedNodeId}|" th:title="#{title.symbols}" th:aria-label="#{title.symbols}"><span aria-hidden="true">☺</span></button>
         <button type="submit" class="btn btn-sm btn-primary" data-title-save th:title="#{title.save}" th:aria-label="#{title.save}"><i class="fas fa-save" aria-hidden="true"></i> <span th:text="#{title.save}"></span></button>
         <button type="button" class="btn btn-sm btn-outline-secondary" data-title-cancel th:title="#{title.cancel}" th:aria-label="#{title.cancel}"><i class="fas fa-times" aria-hidden="true"></i> <span th:text="#{title.cancel}"></span></button>

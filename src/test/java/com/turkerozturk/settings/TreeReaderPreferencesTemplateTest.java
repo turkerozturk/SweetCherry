@@ -69,7 +69,10 @@ class TreeReaderPreferencesTemplateTest {
                         .containsExactly("title","compact","header","breadcrumbs","backlinks","toolbar","paneBar","ids","dates");
                 assertThat(page.select("#tree-reading-layout [data-tree-split-toggle]")).hasSize(1);
                 assertThat(page.select("#node-title-icons [data-title-icon-choice]")).hasSize(com.turkerozturk.helpers.NodeIcon.values().length);
-                assertThat(page.select("#node-title-icons img[src]")).isEmpty();
+                assertThat(page.select("#node-title-icons img[src][loading=lazy]").eachAttr("src"))
+                        .hasSize(com.turkerozturk.helpers.NodeIcon.values().length - 1)
+                        .allMatch(src -> src.startsWith(path + "/img/ctbicons/") && src.endsWith(".png"));
+                assertThat(page.select("#node-title-icons [data-title-icon-src]")).isEmpty();
                 assertThat(page.select("#node-title-icons button:not([type=button])")).isEmpty();
                 assertThat(html).doesNotContain("??title.");
                 assertThat(page.select("head script[src='"+path+"/js/node/treeReadingLayout.js']")).hasSize(1);

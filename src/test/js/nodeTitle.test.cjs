@@ -4,9 +4,9 @@ const record={id:'1',name:'Old title',icon:'CT_CIRCLE_GREEN',revision:'a'.repeat
 function setup(responses=[record,{...record,name:'New title',revision:'b'.repeat(64)}]){
  const requests=[],events=[];
  function control(value={}){return Object.assign({hidden:false,disabled:false,handlers:{},addEventListener(k,fn){this.handlers[k]=fn;},focus(){},select(){}},value);}
- const search=control({value:''}),closeIcon=control(),preview=control({hidden:true,removeAttribute(){delete this.src;}}),fallback=control();
+ const search=control({value:''}),closeIcon=control(),preview=control({hidden:true,replaceChildren(child){this.child=child;}}),fallback=control();
  const choice=(value,name)=>{
-  const image=value==='OTHER'?null:control({getAttribute:()=>'/app/img/ctbicons/'+name+'.png',hasAttribute(){return Boolean(this.src);}});
+  const image=value==='OTHER'?null:control({src:'/app/img/ctbicons/'+name+'.png',cloneNode(){return {...this,removeAttribute(){}};}});
   const button=control({dataset:{titleIconChoice:value},title:name,querySelector:()=>image,setAttribute(name,value){this[name]=value;}});
   button.closest=()=>button;return button;
  };
@@ -42,17 +42,18 @@ test('a pending save cannot be submitted twice or cancelled while its result is 
 
 test('icon chooser filters local choices and submits the selected node icon with name and CSRF',async()=>{
  const c=setup([record,{...record,name:'Name and icon',icon:'CT_ADD',revision:'c'.repeat(64)}]);await c.start();
- assert.equal(c.iconValue.value,'CT_CIRCLE_GREEN');assert.equal(c.preview.src,'/app/img/ctbicons/Circle Green.png');
+ assert.equal(c.iconValue.value,'CT_CIRCLE_GREEN');assert.equal(c.preview.child.src,'/app/img/ctbicons/Circle Green.png');
  c.iconButton.handlers.click();assert.equal(c.iconDialog.open,true);
  c.search.value='add';c.search.handlers.input();assert.equal(c.choices[0].hidden,true);assert.equal(c.choices[1].hidden,false);
  c.iconDialog.handlers.click({target:c.choices[1]});assert.equal(c.iconValue.value,'CT_ADD');assert.equal(c.iconDialog.open,false);
+ assert.equal(c.preview.child.src,'/app/img/ctbicons/Add.png');assert.notEqual(c.preview.child,c.choices[1].querySelector('img'));
  c.input.value='Name and icon';await c.submit();assert.equal(c.requests[1].options.body.get('icon'),'CT_ADD');
  assert.equal(c.requests[1].options.body.get('_csrf'),'csrf');assert.equal(c.events.length,1);
 });
 test('unchanged and unknown node icons are omitted while explicit no-icon selection is saved',async()=>{
  const same=setup();await same.start();await same.submit();assert.equal(same.requests[1].options.body.has('icon'),false);
  const unknown=setup([{...record,icon:null},record]);await unknown.start();await unknown.submit();assert.equal(unknown.requests[1].options.body.has('icon'),false);
- const none=setup();await none.start();none.choose(2);assert.equal(none.preview.hidden,true);assert.equal(none.fallback.hidden,false);
+ const none=setup();await none.start();none.choose(2);assert.equal(none.preview.hidden,true);assert.equal(none.preview.child,undefined);assert.equal(none.fallback.hidden,false);
  await none.submit();assert.equal(none.requests[1].options.body.get('icon'),'OTHER');
 });
 test('cancelling name and icon changes never writes; an icon dialog cannot update a detached node',async()=>{
