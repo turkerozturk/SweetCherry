@@ -33,7 +33,7 @@ class TreeWorkspaceTest {
         request.setParameter("_tenantView", "old-token");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerMethod fragment = new HandlerMethod(controller, NodeController.class.getMethod(
-                "treeContent", long.class, org.springframework.ui.Model.class, jakarta.servlet.http.HttpServletRequest.class));
+                "treeContent", long.class, org.springframework.ui.Model.class, jakarta.servlet.http.HttpServletRequest.class, jakarta.servlet.http.HttpServletResponse.class));
         assertThat(guard.preHandle(request, response, fragment)).isFalse();
         assertThat(response.getStatus()).isEqualTo(409);
     }
@@ -45,7 +45,8 @@ class TreeWorkspaceTest {
         ReflectionTestUtils.setField(controller, "nodeDeletionService", deletion);
         ReflectionTestUtils.setField(controller, "homeActivity", mock(com.turkerozturk.home.HomeActivityService.class));
         ExtendedModelMap model = new ExtendedModelMap();
-        assertThat(controller.treeContent(0, model, new MockHttpServletRequest()))
+        assertThat(controller.treeContent(0, model, new MockHttpServletRequest(),
+                new MockHttpServletResponse()))
                 .isEqualTo("node/treeContentFragment :: treeContent");
         assertThat(model.get("isRootNode")).isEqualTo(true);
         assertThat(model.get("canDeleteNode")).isEqualTo(true);

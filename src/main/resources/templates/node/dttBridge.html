@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<section th:fragment="panel" data-dtt-panel th:if="${dttSnapshot != null}" class="border rounded p-3"
+         th:with="entry=${dttSnapshot.entry}">
+    <h2 class="h5" th:text="${dttSnapshot.topicName}"></h2>
+    <p class="text-body-secondary">
+        <span>DailyTopicTracker</span> · <time th:text="${dttSnapshot.date}"></time>
+        <span th:if="${entry == null}" class="ms-2" th:text="#{dtt.bridge.noEntry}"></span>
+    </p>
+    <form sec:authorize="hasRole('ADMIN')" data-dtt-form method="post"
+          th:action="@{/nodes/dtt/{id}/today(id=${requestedNodeId})}"
+          th:attr="data-error=#{dtt.bridge.saveError},data-conflict=#{dtt.bridge.changed},data-confirm-delete=#{dtt.bridge.confirmDelete}">
+        <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
+        <input type="hidden" name="binding" th:value="${dttBinding}">
+        <input type="hidden" name="revision" th:value="${dttSnapshot.revision}">
+        <input type="hidden" name="date" th:value="${dttSnapshot.date}">
+        <label class="form-label d-block mb-3">
+            <span th:text="#{dtt.bridge.status}"></span>
+            <select class="form-select w-auto" name="status">
+                <option value="0" th:selected="${entry != null and entry.status == 0}" th:text="#{dtt.bridge.neutral}"></option>
+                <option value="1" th:selected="${entry == null or entry.status == null or entry.status == 1}" th:text="#{dtt.bridge.done}"></option>
+                <option value="2" th:selected="${entry != null and entry.status == 2}" th:text="#{dtt.bridge.warning}"></option>
+            </select>
+        </label>
+        <label class="form-label d-block mb-3">
+            <span th:text="#{dtt.bridge.note}"></span>
+            <textarea class="form-control" name="note" rows="3" maxlength="65536"
+                      th:text="${entry == null ? '' : entry.note}"></textarea>
+        </label>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <button type="submit" class="btn btn-primary" name="operation" value="save" th:text="#{dtt.bridge.save}"></button>
+            <button type="submit" class="btn btn-outline-danger" name="operation" value="delete"
+                    th:if="${entry != null}" th:text="#{dtt.bridge.delete}"></button>
+            <span role="status" data-dtt-feedback th:text="${dttSaved == true ? #messages.msg('dtt.bridge.saved') : ''}"></span>
+        </div>
+    </form>
+    <div sec:authorize="!hasRole('ADMIN')" th:if="${entry != null}">
+        <p th:text="${entry.status == 1 ? #messages.msg('dtt.bridge.done') : (entry.status == 2 ? #messages.msg('dtt.bridge.warning') : #messages.msg('dtt.bridge.neutral'))}"></p>
+        <p style="white-space:pre-wrap" th:text="${entry.note}"></p>
+    </div>
+</section>
+</body>
+</html>

@@ -29,6 +29,8 @@ import com.turkerozturk.multipledatabases.TenantContext;
 import com.turkerozturk.multipledatabases.RequiresTenant;
 import com.turkerozturk.node.filter.FormSearch;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import com.turkerozturk.node.dtt.DttBridge;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -429,9 +431,13 @@ public class NodeController {
     @Autowired
     private com.turkerozturk.home.HomeActivityService homeActivity;
 
+    @Autowired
+    private DttBridge dttBridge;
+
     @GetMapping("/tree/content/{nodeId}")
     @RequiresTenant
-    public String treeContent(@PathVariable long nodeId, Model model, HttpServletRequest request) {
+    public String treeContent(@PathVariable long nodeId, Model model, HttpServletRequest request,
+                              HttpServletResponse response) {
         if (nodeId == 0) {
             model.addAttribute("isRootNode", true);
             model.addAttribute("canDeleteNode", nodeDeletionService.isCurrentTenantWritable());
@@ -439,6 +445,9 @@ public class NodeController {
         } else {
             request.setAttribute("newRichTextView", Boolean.TRUE);
             prepareNodePage(nodeId, model, request, "tree");
+            if (dttBridge.populate((Node) model.getAttribute("node"), model)) {
+                response.setHeader("Cache-Control", "no-store");
+            }
             model.addAttribute("isRootNode", false);
         }
         return "node/treeContentFragment :: treeContent";

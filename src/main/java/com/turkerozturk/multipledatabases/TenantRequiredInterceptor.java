@@ -18,6 +18,7 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
         }
         boolean protectedPost = "POST".equalsIgnoreCase(request.getMethod())
                 && (request.getRequestURI().startsWith(request.getContextPath() + "/nodes/reminders/")
+                || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/dtt/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/todo/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/delete/")
                 || request.getRequestURI().startsWith(request.getContextPath() + "/nodes/trash/")
@@ -77,7 +78,8 @@ public class TenantRequiredInterceptor implements HandlerInterceptor {
     private boolean dialogApi(HttpServletRequest request) {
         String path=request.getRequestURI();String context=request.getContextPath();
         return path.startsWith(context+"/nodes/children/")&&path.endsWith("/sort") || path.startsWith(context+"/nodes/properties/")&&path.endsWith("/title") || path.startsWith(context+"/nodes/fragments/") || path.startsWith(context+"/nodes/reminders/alarms") || path.startsWith(context+"/attachments/") || path.startsWith(context+"/codebox-gallery/") || path.startsWith(context+"/table-gallery/") || path.startsWith(context+"/image-gallery/") || path.startsWith(context+"/nodes/batch/") || path.startsWith(context+"/nodes/tags/quick/") || path.startsWith(context+"/nodes/richtext/edit/")&&path.endsWith("/wiki-links") || path.equals(context + "/nodes/link-graph/data") || path.startsWith(context + "/nodes/quick/") || path.startsWith(context + "/nodes/backlinks/")
-                || path.startsWith(context + "/nodes/saved-filters") || path.startsWith(context + "/nodes/web-bookmarks/");
+                || path.startsWith(context + "/nodes/saved-filters") || path.startsWith(context + "/nodes/web-bookmarks/")
+                || path.startsWith(context + "/nodes/dtt/");
     }
 
     private void quickConflict(HttpServletResponse response) throws java.io.IOException {
