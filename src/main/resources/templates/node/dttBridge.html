@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
-<section th:fragment="panel" data-dtt-panel th:if="${dttSnapshot != null}" class="border rounded p-3"
-         th:with="entry=${dttSnapshot.entry},details=${dttSnapshot.details}"
+<section th:fragment="panel" data-dtt-panel th:if="${dttSnapshot != null}" class="border rounded p-2 my-2"
+         th:with="entry=${dttSnapshot.entry},details=${dttSnapshot.details},
+                  marked=${entry != null and (entry.status == 0 or entry.status == 1 or entry.status == 2)}"
          th:attr="data-tenant-view=${tenantViewToken},data-load-error=#{dtt.bridge.dateError}">
-
-    <h2 class="h5" th:text="${dttSnapshot.topicName}"></h2>
-    <p class="text-body-secondary">
-        <span>DailyTopicTracker</span> · <time th:text="${dttSnapshot.date}"></time>
-        <span th:if="${entry == null}" class="ms-2" th:text="#{dtt.bridge.noEntry}"></span>
-    </p>
-    <label class="form-label d-block" th:if="${details != null}">
-        <span th:text="#{dtt.bridge.date}"></span>
-        <input type="date" class="form-control w-auto" min="0001-01-01" max="9999-12-31"
-               required data-dtt-date th:value="${dttSnapshot.date}"
-               th:attr="data-endpoint=@{/nodes/dtt/{id}/entry(id=${requestedNodeId})},data-discard=#{dtt.bridge.discard}">
-    </label>
-    <form sec:authorize="hasRole('ADMIN')" data-dtt-form method="post"
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+        <h2 class="h6 mb-0" th:text="${dttSnapshot.topicName}"></h2>
+        <span class="badge text-bg-secondary" th:text="${entry == null ? #messages.msg('dtt.bridge.noEntry') : #messages.msg('dtt.bridge.hasEntry')}"></span>
+        <span th:if="${entry != null}" class="small" th:text="${!marked ? #messages.msg('dtt.bridge.noStatus') :
+            (entry.status == 1 ? #messages.msg('dtt.bridge.done') :
+            (entry.status == 2 ? #messages.msg('dtt.bridge.warning') : #messages.msg('dtt.bridge.neutral')))}"></span>
+    </div>
+    <form sec:authorize="hasRole('ADMIN')" data-dtt-form method="post" class="mb-1"
           th:action="@{/nodes/dtt/{id}/today(id=${requestedNodeId})}"
           th:attr="data-error=#{dtt.bridge.saveError},data-conflict=#{dtt.bridge.changed},data-confirm-delete=#{dtt.bridge.confirmDelete}">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
@@ -24,55 +20,77 @@
         <input type="hidden" name="revision" th:value="${dttSnapshot.revision}">
         <input type="hidden" name="date" th:value="${dttSnapshot.date}">
         <input type="hidden" name="dated" th:value="${details != null}">
-        <label class="form-label d-block mb-3">
-            <span th:text="#{dtt.bridge.status}"></span>
-            <select class="form-select w-auto" name="status">
-                <option value="0" th:selected="${entry != null and entry.status == 0}" th:text="#{dtt.bridge.neutral}"></option>
-                <option value="1" th:selected="${entry == null or entry.status == null or entry.status == 1}" th:text="#{dtt.bridge.done}"></option>
-                <option value="2" th:selected="${entry != null and entry.status == 2}" th:text="#{dtt.bridge.warning}"></option>
-            </select>
-        </label>
-        <label class="form-label d-block mb-3">
+        <div class="d-flex flex-wrap align-items-end gap-2 mb-1">
+            <th:block th:replace="~{node/dttBridge :: entryDate}"></th:block>
+            <label class="small mb-0">
+                <span th:text="#{dtt.bridge.status}"></span>
+                <select class="form-select form-select-sm w-auto" name="status" required>
+                    <option value="" th:selected="${!marked}" th:text="#{dtt.bridge.noStatus}"></option>
+                    <option value="0" th:selected="${entry != null and entry.status == 0}" th:text="#{dtt.bridge.neutral}"></option>
+                    <option value="1" th:selected="${entry != null and entry.status == 1}" th:text="#{dtt.bridge.done}"></option>
+                    <option value="2" th:selected="${entry != null and entry.status == 2}" th:text="#{dtt.bridge.warning}"></option>
+                </select>
+            </label>
+        </div>
+        <label class="small d-block mb-1">
             <span th:text="#{dtt.bridge.note}"></span>
-            <textarea class="form-control" name="note" rows="3" maxlength="65536"
+            <textarea class="form-control form-control-sm" name="note" rows="2" maxlength="65536"
                       th:text="${entry == null ? '' : entry.note}"></textarea>
         </label>
-        <div class="d-flex flex-wrap gap-2 align-items-center">
-            <button type="submit" class="btn btn-primary" name="operation" value="save" th:text="#{dtt.bridge.save}"></button>
-            <button type="submit" class="btn btn-outline-danger" name="operation" value="delete"
+        <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-sm btn-primary" name="operation" value="save" th:text="#{dtt.bridge.save}"></button>
+            <button type="submit" class="btn btn-sm btn-outline-danger" name="operation" value="delete" formnovalidate
                     th:if="${entry != null}" th:text="#{dtt.bridge.delete}"></button>
         </div>
     </form>
-    <div sec:authorize="!hasRole('ADMIN')" th:if="${entry != null}">
-        <p th:text="${entry.status == 1 ? #messages.msg('dtt.bridge.done') : (entry.status == 2 ? #messages.msg('dtt.bridge.warning') : #messages.msg('dtt.bridge.neutral'))}"></p>
-        <p style="white-space:pre-wrap" th:text="${entry.note}"></p>
+    <div sec:authorize="!hasRole('ADMIN')" class="mb-1">
+        <div class="d-flex flex-wrap align-items-end gap-2">
+            <th:block th:replace="~{node/dttBridge :: entryDate}"></th:block>
+        </div>
+        <p th:if="${entry != null and !#strings.isEmpty(entry.note)}" class="mb-1 mt-1" style="white-space:pre-wrap" th:text="${entry.note}"></p>
     </div>
-    <p role="status" data-dtt-feedback class="mt-2" th:text="${dttSaved == true ? #messages.msg('dtt.bridge.saved') : ''}"></p>
-    <section th:if="${details != null}" class="border-top pt-3">
-        <h3 class="h6" th:text="#{dtt.bridge.details}"></h3>
-        <dl class="row mb-2">
-            <dt class="col-sm-4" th:text="#{dtt.bridge.topicId}"></dt><dd class="col-sm-8" th:text="${dttSnapshot.topicId}"></dd>
-            <th:block th:if="${details.group != null}">
-                <dt class="col-sm-4" th:text="#{dtt.bridge.group}"></dt><dd class="col-sm-8" th:text="${details.group}"></dd>
-            </th:block>
-            <th:block th:if="${details.category != null}">
-                <dt class="col-sm-4" th:text="#{dtt.bridge.category}"></dt><dd class="col-sm-8" th:text="${details.category}"></dd>
-            </th:block>
-            <th:block th:if="${details.intervalRule != null and !#strings.isEmpty(details.intervalRule)}">
-                <dt class="col-sm-4" th:text="#{dtt.bridge.interval}"></dt><dd class="col-sm-8" th:text="${details.intervalRule}"></dd>
-            </th:block>
-            <th:block th:if="${details.latestDoneDate != null}">
-                <dt class="col-sm-4" th:text="#{dtt.bridge.lastDone}"></dt><dd class="col-sm-8" th:text="${details.latestDoneDate}"></dd>
-            </th:block>
-            <th:block th:if="${details.predictionDate != null}">
-                <dt class="col-sm-4" th:text="#{dtt.bridge.prediction}"></dt><dd class="col-sm-8" th:text="${details.predictionDate}"></dd>
-            </th:block>
+    <p role="status" data-dtt-feedback class="small mb-0" th:text="${dttSaved == true ? #messages.msg('dtt.bridge.saved') : ''}"></p>
+    <section class="border-top mt-2 pt-1 small">
+        <dl class="dtt-topic-details mb-1">
+            <div>
+                <dt th:text="#{dtt.bridge.topicId}"></dt>
+                <dd><a th:href="${dttTopicUrl}" th:text="${dttSnapshot.topicId}" target="_blank" rel="noopener noreferrer"></a></dd>
+            </div>
+            <div th:if="${details != null and details.category != null}">
+                <dt th:text="#{dtt.bridge.category}"></dt>
+                <dd><a th:href="${dttCategoryUrl}" th:text="${details.category}" target="_blank" rel="noopener noreferrer"></a></dd>
+            </div>
+            <div th:if="${details != null and details.group != null}">
+                <dt th:text="#{dtt.bridge.group}"></dt>
+                <dd>
+                    <a th:if="${dttGroupUrl != null}" th:href="${dttGroupUrl}" th:text="${details.group}" target="_blank" rel="noopener noreferrer"></a>
+                    <span th:unless="${dttGroupUrl != null}" th:text="${details.group}"></span>
+                </dd>
+            </div>
+            <div th:if="${details != null and !#strings.isEmpty(details.intervalRule)}">
+                <dt th:text="#{dtt.bridge.interval}"></dt><dd th:text="${details.intervalRule}"></dd>
+            </div>
+            <div th:if="${details != null and details.latestDoneDate != null}">
+                <dt th:text="#{dtt.bridge.lastDone}"></dt><dd th:text="${details.latestDoneDate}"></dd>
+            </div>
+            <div th:if="${details != null and details.predictionDate != null}">
+                <dt th:text="#{dtt.bridge.prediction}"></dt><dd th:text="${details.predictionDate}"></dd>
+            </div>
         </dl>
-        <p th:if="${details.pinned}" th:text="#{dtt.bridge.pinned}"></p>
+        <p th:if="${details != null and details.pinned}" class="mb-1" th:text="#{dtt.bridge.pinned}"></p>
         <div th:if="${dttDescriptionHtml != null}" th:utext="${dttDescriptionHtml}"></div>
-        <div th:if="${dttDescriptionHtml == null and details.description != null}"
+        <div th:if="${dttDescriptionHtml == null and details != null and details.description != null}"
              class="text-break" style="white-space:pre-wrap" th:text="${details.description}"></div>
     </section>
 </section>
+<th:block th:fragment="entryDate">
+    <label class="small mb-0" th:if="${dttSnapshot.details != null}">
+        <span th:text="#{dtt.bridge.date}"></span>
+        <input type="date" class="form-control form-control-sm w-auto" min="0001-01-01" max="9999-12-31"
+               required data-dtt-date th:value="${dttSnapshot.date}"
+               th:attr="data-endpoint=@{/nodes/dtt/{id}/entry(id=${requestedNodeId})},data-discard=#{dtt.bridge.discard}">
+    </label>
+    <time th:if="${dttSnapshot.details == null}" th:text="${dttSnapshot.date}"></time>
+</th:block>
 </body>
 </html>

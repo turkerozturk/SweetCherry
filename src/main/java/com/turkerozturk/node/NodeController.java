@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -50,6 +51,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.LinkedHashMap;
 
 @Controller
@@ -398,13 +400,13 @@ public class NodeController {
         return childrenService.getNaviNodesByFatherId(fatherId).stream()
                 .map(child -> new NavigationChild(child.nodeId(), child.name(),
                         child.nodeIcon().getIconName(), child.hasChildren(),
-                        child.titleColorAsHtmlHex(), child.isReadOnly(), child.boldnessBit(),child.excludedFromSearch(),child.bookmarked(),child.hasTags(),child.tags(),child.displayId(),child.displayDate()))
+                        child.titleColorAsHtmlHex(), child.isReadOnly(), child.boldnessBit(),child.excludedFromSearch(),child.bookmarked(),child.hasTags(),child.tags(),child.displayId(),child.displayDate(),child.shared(),child.sharedMaster()))
                 .toList();
     }
 
     public record NavigationChild(long nodeId, String name, String iconName,
-                                  boolean hasChildren, String titleColor, boolean readOnly, boolean bold,boolean excludedFromSearch,boolean bookmarked,boolean hasTags,String tags,String displayId,String displayDate) {
-        public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold,boolean excludedFromSearch,boolean bookmarked,boolean hasTags,String tags){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,excludedFromSearch,bookmarked,hasTags,tags,"","");}
+                                  boolean hasChildren, String titleColor, boolean readOnly, boolean bold,boolean excludedFromSearch,boolean bookmarked,boolean hasTags,String tags,String displayId,String displayDate, boolean shared, boolean sharedMaster) {
+        public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold,boolean excludedFromSearch,boolean bookmarked,boolean hasTags,String tags){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,excludedFromSearch,bookmarked,hasTags,tags,"","",false,false);}
         public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold,boolean excludedFromSearch,boolean bookmarked,boolean hasTags){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,excludedFromSearch,bookmarked,hasTags,"");}
         public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold,boolean excludedFromSearch,boolean bookmarked){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,excludedFromSearch,bookmarked,false);}
         public NavigationChild(long nodeId,String name,String iconName,boolean hasChildren,String titleColor,boolean readOnly,boolean bold){this(nodeId,name,iconName,hasChildren,titleColor,readOnly,bold,false,false);}
@@ -451,6 +453,21 @@ public class NodeController {
             model.addAttribute("isRootNode", false);
         }
         return "node/treeContentFragment :: treeContent";
+    }
+
+    @Autowired
+    private com.turkerozturk.exportmindmap.MindMapTextContent clipboardContent;
+
+    @GetMapping(value = "/nodes/{nodeId}/clipboard", produces = "text/plain;charset=UTF-8")
+    @RequiresTenant
+    @ResponseBody
+    public ResponseEntity<String> clipboard(@PathVariable long nodeId, @RequestParam String _tenantView) {
+        Node node = nodeService.findDisplayNode(nodeId);
+        if (node == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        String body = clipboardContent.text(node.getNodeId(), node.getSyntax(), node.getTxt());
+        String title = Objects.toString(node.getName(), "");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .body(body.isEmpty() ? title : title + "\n\n" + body);
     }
 
     /** Opens maintained views while migrating legacy desktop/mobile selections. */

@@ -32,6 +32,9 @@ public interface ChildrenRepository extends JpaRepository<Children, Long> {
 
     List<Children> findByMasterId(Long masterId);
 
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT c.masterId FROM Children c WHERE c.masterId IN :ids")
+    List<Long> findSharedMasterIds(@org.springframework.data.repository.query.Param("ids") List<Long> ids);
+
     void deleteByNodeId(Long nodeId);
 
     List<Children> findByFatherIdOrderBySequenceAsc(long fatherId);

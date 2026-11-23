@@ -78,6 +78,8 @@ public class ChildrenService {
 
         // One scalar lookup for the whole branch, not a query for each icon.
         var bookmarks=rows.isEmpty()?java.util.Set.<Long>of():new java.util.HashSet<>(bookmarkRepository.findExistingIds(rows.stream().map(Children::getNodeId).toList()));
+        var sharedMasters = displayIds.isEmpty() ? java.util.Set.<Long>of()
+                : new java.util.HashSet<>(childrenRepository.findSharedMasterIds(displayIds));
         List<NaviNode> result = new ArrayList<>();
         for (int i = 0; i < rows.size(); i++) {
             Children row = rows.get(i);
@@ -92,7 +94,8 @@ public class ChildrenService {
             result.add(new NaviNode(row.getNodeId(), display.getName(), display.getNodeIcon(),
                     !childrenRepository.findByFatherId(row.getNodeId()).isEmpty(),
                     display.getTitleColorAsHtmlHex(), display.isReadOnly(), display.isBoldnessBit(),
-                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId()), !tags.isEmpty(), String.join(" ", tags), treeMetadata.id(row.getNodeId()), treeMetadata.date(display.getCreationTimestamp(),display.getLastSaveTimestamp())));
+                    (int) row.getSequence(), previous, next, display.isSearchExcluded(), bookmarks.contains(row.getNodeId()), !tags.isEmpty(), String.join(" ", tags), treeMetadata.id(row.getNodeId()), treeMetadata.date(display.getCreationTimestamp(),display.getLastSaveTimestamp()),
+                    shared, !shared && sharedMasters.contains(row.getNodeId())));
         }
         return result;
     }

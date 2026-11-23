@@ -52,12 +52,12 @@ public record NaviNode(long nodeId,
                        boolean bookmarked,
                        boolean hasTags,
                        String tags,
-                       String displayId, String displayDate
+                       String displayId, String displayDate, boolean shared, boolean sharedMaster
                        ) {
     public NaviNode(long nodeId,String name,NodeIcon nodeIcon,boolean hasChildren,String titleColorAsHtmlHex,
             boolean isReadOnly,boolean boldnessBit,int sequence,Long prevSiblingNodeId,Long nextSiblingNodeId,
             boolean excludedFromSearch,boolean bookmarked,boolean hasTags,String tags) {
-        this(nodeId,name,nodeIcon,hasChildren,titleColorAsHtmlHex,isReadOnly,boldnessBit,sequence,prevSiblingNodeId,nextSiblingNodeId,excludedFromSearch,bookmarked,hasTags,tags,"","");
+        this(nodeId,name,nodeIcon,hasChildren,titleColorAsHtmlHex,isReadOnly,boldnessBit,sequence,prevSiblingNodeId,nextSiblingNodeId,excludedFromSearch,bookmarked,hasTags,tags,"","",false,false);
     }
     public NaviNode(long nodeId,String name,NodeIcon nodeIcon,boolean hasChildren,String titleColorAsHtmlHex,
             boolean isReadOnly,boolean boldnessBit,int sequence,Long prevSiblingNodeId,Long nextSiblingNodeId,

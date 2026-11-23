@@ -58,10 +58,10 @@ public class DttBridge {
     public record Snapshot(String topicId, String topicName, LocalDate date, TodayEntry entry, String revision,
                            TopicDetails details) {}
     public record TopicDetails(String description, String category, String group, String intervalRule,
-                               LocalDate latestDoneDate, LocalDate predictionDate, boolean pinned) {}
+                               LocalDate latestDoneDate, LocalDate predictionDate, boolean pinned, String categoryId) {}
     public record TodayEntry(Integer status, String note) {}
     public record Update(LocalDate date, String revision, Integer status, String note) {}
-    record Target(URI uri, String token, String topicId, String binding) {}
+    record Target(URI uri, String token, String topicId, String binding, URI base) {}
 
     public boolean populate(Node node, Model model) {
         if (!marked(node)) return false;
@@ -118,6 +118,12 @@ public class DttBridge {
     private static void populatePanel(Model model, Target target, Snapshot snapshot) {
         model.addAttribute("dttSnapshot", snapshot);
         model.addAttribute("dttBinding", target.binding());
+        model.addAttribute("dttTopicUrl", link(target.base(), "entries/weekly-calendar", "topicId", target.topicId()));
+        model.addAttribute("dttCategoryUrl", target.base().resolve("category-groups").toASCIIString());
+        if (snapshot.details() != null && snapshot.details().categoryId() != null) {
+            model.addAttribute("dttGroupUrl", link(target.base(), "entry-filter/form",
+                    "categoryId", snapshot.details().categoryId()));
+        }
         String description = snapshot.details() == null ? null : snapshot.details().description();
         if (description != null && !description.isBlank() && description.length() <= MarkdownRenderer.MAX_CHARACTERS) {
             model.addAttribute("dttDescriptionHtml", NodeMarkup.render("markdown", description));
@@ -177,8 +183,9 @@ public class DttBridge {
     private Target target(Node node, Map<String, String> settings) {
         if (!marked(node)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "dtt.bridge.invalidId");
         String id = topicId(node);
-        URI uri = endpoint(settings, API_PATH + id + "/today");
-        return new Target(uri, token(settings), id, binding(uri));
+        URI base = base(settings);
+        URI uri = base.resolve(API_PATH.substring(1) + id + "/today");
+        return new Target(uri, token(settings), id, binding(uri), base);
     }
 
     private String token(Map<String, String> settings) {
@@ -190,9 +197,18 @@ public class DttBridge {
     }
 
     private static URI endpoint(Map<String, String> settings, String path) {
+        return base(settings).resolve(path.substring(1));
+    }
+
+    private static URI base(Map<String, String> settings) {
         if (settings == null) throw configurationError();
-        URI base = peerUri(settings.getOrDefault(BASE_URL, "").strip());
-        return URI.create(base.toASCIIString().replaceFirst("/+$", "") + path);
+        URI peer = peerUri(settings.getOrDefault(BASE_URL, "").strip());
+        return URI.create(peer.toASCIIString().replaceFirst("/+$", "") + "/");
+    }
+
+    private static String link(URI base, String path, String parameter, String value) {
+        return UriComponentsBuilder.fromUri(base.resolve(path)).queryParam(parameter, "{value}")
+                .encode().buildAndExpand(value).toUri().toASCIIString();
     }
 
     static boolean marked(Node node) {

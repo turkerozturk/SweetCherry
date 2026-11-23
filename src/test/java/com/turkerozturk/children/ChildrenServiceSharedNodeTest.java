@@ -44,6 +44,7 @@ class ChildrenServiceSharedNodeTest {
         assertThat(result).extracting(NaviNode::displayDate).doesNotContainNull().doesNotContain("");
         assertThat(result).extracting(NaviNode::name).containsExactly("Original", "Original");
         assertThat(result).extracting(NaviNode::hasChildren).containsExactly(true, false);
+        assertThat(result).allMatch(NaviNode::shared).noneMatch(NaviNode::sharedMaster);
         assertThat(result).extracting(NaviNode::bookmarked).containsExactly(false,true);
         assertThat(result).allMatch(NaviNode::excludedFromSearch).allMatch(NaviNode::isReadOnly);
         assertThat(result).allMatch(NaviNode::hasTags);
@@ -51,13 +52,18 @@ class ChildrenServiceSharedNodeTest {
         var controller = new com.turkerozturk.node.NodeController();
         ReflectionTestUtils.setField(controller,"childrenService",service);
         var navigation = controller.navigationChildren(0);
-        assertThat(navigation).allMatch(com.turkerozturk.node.NodeController.NavigationChild::hasTags);
+        assertThat(navigation).allMatch(com.turkerozturk.node.NodeController.NavigationChild::hasTags)
+                .allMatch(com.turkerozturk.node.NodeController.NavigationChild::shared);
         assertThat(navigation).extracting(com.turkerozturk.node.NodeController.NavigationChild::tags).containsExactly("project önemli", "project önemli");
         assertThat(navigation).extracting(com.turkerozturk.node.NodeController.NavigationChild::displayId).containsExactly("[000055]","[000056]");
         assertThat(navigation).extracting(com.turkerozturk.node.NodeController.NavigationChild::displayDate).containsExactlyElementsOf(result.stream().map(NaviNode::displayDate).toList());
         verify(bookmarks,times(2)).findExistingIds(List.of(55L,56L));
         verifyNoMoreInteractions(bookmarks);
         verify(children, never()).findByFatherId(10L);
+        when(children.findByFatherId(99L)).thenReturn(List.of(new Children().setNodeId(10)));
+        when(children.findSharedMasterIds(List.of(10L))).thenReturn(List.of(10L));
+        assertThat(service.getNaviNodesByFatherId(99))
+                .allMatch(NaviNode::sharedMaster).noneMatch(NaviNode::shared);
         for (String empty : new String[]{null,"","   "}) {
             master.setTags(empty);
             assertThat(service.getNaviNodesByFatherId(0)).noneMatch(NaviNode::hasTags);

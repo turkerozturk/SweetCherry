@@ -127,6 +127,13 @@
         const states=statusIcons(child);if(states)link.append(states);
         const name = document.createElement('span');
         name.textContent = child.name; name.dataset.inlineSymbols="true";
+        if (child.shared === true) {
+            name.className = 'workspace-shared-reference';
+            name.title = workspace.dataset.sharedReference;
+        } else if (child.sharedMaster === true) {
+            name.className = 'workspace-shared-master';
+            name.title = workspace.dataset.sharedMaster;
+        }
         if (/^#[0-9a-fA-F]{1,6}$/.test(child.titleColor)) name.style.color = '#' + child.titleColor.slice(1).padStart(6, '0');
         if (child.bold) name.style.fontWeight = 'bold';
         for (const [key, value] of [['id', child.displayId], ['date', child.displayDate]]) {

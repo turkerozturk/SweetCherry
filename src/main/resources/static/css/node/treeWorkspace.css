@@ -103,3 +103,16 @@ html[data-bs-theme="dark"] .workspace-tree-row .workspace-tag-indicator {color:#
 .workspace-saved-search-button:focus-visible {outline:2px solid #3584e4}
 .workspace-saved-search-message,#workspace-saved-searches [role=status] {font-size:.85rem;white-space:normal;opacity:.8}
 .workspace-saved-search-pages {display:flex;gap:.4rem}
+
+.dtt-topic-details {display:flex;flex-wrap:wrap;gap:.15rem 1rem}
+.dtt-topic-details dt,.dtt-topic-details dd {display:inline;margin:0}
+.dtt-topic-details dt::after {content:": "}
+
+/* Keep the final fold control above the floating reading-layout button. */
+#workspace-tree-pane {padding-bottom:2.5rem}
+.workspace-shared-reference {text-decoration:underline;text-underline-offset:.16em}
+.workspace-shared-master {font-style:italic}
+.workspace-shared-ids {overflow-wrap:anywhere}
+.workspace-copy-id {padding:0;border:0;background:transparent;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
+#tree-clipboard-dialog {width:min(36rem, 95vw);color:var(--bs-body-color);background:var(--bs-body-bg)}
+#tree-clipboard-dialog::backdrop {background:#0005}

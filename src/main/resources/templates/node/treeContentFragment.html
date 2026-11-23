@@ -13,6 +13,13 @@
                 <span aria-hidden="true"> / </span><a th:href="@{/nodes/{id}(id=${entry.key})}" th:text="${entry.value}" data-inline-symbols></a>
             </th:block>
         </nav>
+        <p th:if="${isSharedNode != true and sharedNodeIds != null and !sharedNodeIds.isEmpty()}"
+           class="workspace-breadcrumbs workspace-shared-ids">
+            <span th:text="#{tree.sharedIds}"></span>
+            <th:block th:each="sharedId, loop : ${sharedNodeIds}">
+                <a th:href="@{/nodes/{id}(id=${sharedId})}" th:text="${sharedId}"></a><span th:unless="${loop.last}">, </span>
+            </th:block>
+        </p>
         <p th:if="${isSharedNode == true}" class="alert alert-info py-1 my-1">
             <span th:text="#{node.sharedReference}"></span> <span th:text="${requestedNodeId}"></span>
             → <a th:href="@{/nodes/{id}(id=${masterNodeId})}" th:text="${masterNodeId}"></a>
@@ -36,6 +43,9 @@
         </form>
         </th:block>
         <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" th:title="#{node.meta.header}" th:aria-label="#{tree.info}"><i class="fas fa-info-circle" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-sm btn-outline-secondary workspace-copy-node"
+                th:attr="data-copy-node=@{/nodes/{id}/clipboard(id=${requestedNodeId},_tenantView=${tenantViewToken})}"
+                th:title="#{tree.clipboard.node}" th:aria-label="#{tree.clipboard.node}"><i class="fas fa-copy" aria-hidden="true"></i></button>
         <a th:if="${webBookmarkUrl != null}" class="node-web-bookmark-open btn btn-sm btn-outline-secondary" style="margin-left:auto;flex:none" th:href="${webBookmarkUrl}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" th:title="#{webBookmark.open}" th:aria-label="#{webBookmark.open}"><img th:src="@{/img/ctbicons/ct_link_website.png}" width="24" height="24" alt=""></a>
         </div>
         </header>
@@ -52,8 +62,10 @@
             <span><b th:text="#{tree.created}"></b>: <span th:text="${#dates.format(new java.util.Date(node.creationTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></span></span>
             <span><b th:text="#{tree.modified}"></b>: <span th:text="${#dates.format(new java.util.Date(node.lastSaveTimestamp * 1000), 'yyyy-MM-dd HH:mm')}"></span></span>
             <span><b th:text="#{tree.children}"></b>: <span th:text="${childNodes != null ? #lists.size(childNodes) : 0}"></span></span>
-            <span><b th:text="#{node.nodeId}"></b>: <span th:text="${node.nodeId}"></span></span>
-            <span th:if="${isSharedNode == true}"><b th:text="#{node.sharedId}"></b>: <span th:text="${requestedNodeId}"></span></span>
+            <span><b th:text="#{node.nodeId}"></b>: <button type="button" class="workspace-copy-id"
+                th:attr="data-copy-node-id=${node.nodeId}" th:title="#{tree.clipboard.id}" th:text="${node.nodeId}"></button></span>
+            <span th:if="${isSharedNode == true}"><b th:text="#{node.sharedId}"></b>: <button type="button" class="workspace-copy-id"
+                th:attr="data-copy-node-id=${requestedNodeId}" th:title="#{tree.clipboard.id}" th:text="${requestedNodeId}"></button></span>
             <span class="workspace-status-tags" th:if="${node.tags != null and !#strings.isEmpty(#strings.trim(node.tags))}" th:title="${node.tags}"><b th:text="#{node.meta.tags}"></b>: <span th:text="${node.tags}"></span></span>
         </th:block>
         <span th:if="${node == null}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}"></span></span>
