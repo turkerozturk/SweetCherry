@@ -45,3 +45,7 @@ try {
 } finally {
     if (Test-Path -LiteralPath $fixture) { Remove-Item -LiteralPath $fixture -Recurse -Force }
 }
+# The negative Maven test intentionally leaves LASTEXITCODE=7. GitHub Actions
+# propagates that value unless a successful test script exits explicitly.
+# Keep this after finally: assertion and cleanup failures must still fail CI.
+exit 0
