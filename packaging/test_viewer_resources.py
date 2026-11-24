@@ -15,6 +15,10 @@ class ViewerResourcesTest(unittest.TestCase):
         for name in (*check.DOC_FILES, f'documentation/releases/v{version}.md'):
             source = check.ROOT / (('distribution-notices/' if name.startswith(('licenses/', 'THIRD-PARTY')) else '') + name)
             destination = cls.bundle / name; destination.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(source, destination)
+        for relative, source in check.BUNDLE_SOURCE_FILES.items():
+            target = cls.bundle / relative; target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(check.ROOT / source, target)
+        for name in ('saved-filters', 'backup'): (cls.bundle / name).mkdir()
         shutil.copytree(check.ROOT / 'external/drawio-images', cls.bundle / 'drawio-images')
         webjar = io.BytesIO()
         with zipfile.ZipFile(webjar, 'w') as nested:
@@ -61,6 +65,27 @@ class ViewerResourcesTest(unittest.TestCase):
     def test_filtered_font_bytes_are_rejected(self):
         entries = dict(self.entries); entries['BOOT-INF/classes/symbols/fa-brands.ttf'] = b'corrupted'; self.write_jar(entries)
         with self.assertRaisesRegex(check.Problem, 'Changed JAR resource bytes: symbols/fa-brands.ttf'): check.verify(self.bundle)
+    def test_private_filters_and_backups_are_preserved_locally_but_rejected_for_release(self):
+        for name in ('saved-filters', 'backup'):
+            private = self.bundle / name / 'private-file'
+            try:
+                private.write_text('must not ship')
+                check.verify(self.bundle)
+                with self.assertRaisesRegex(check.Problem, 'Private/linked'):
+                    check.verify(self.bundle, clean=True)
+            finally:
+                private.unlink()
+
+    def test_changed_migration_tool_is_not_accepted_in_distribution(self):
+        target = self.bundle / 'tools/migrate-saved-filters.py'
+        original = target.read_bytes()
+        try:
+            target.write_bytes(b'incomplete helper')
+            with self.assertRaisesRegex(check.Problem, 'distribution helper'):
+                check.verify(self.bundle)
+        finally:
+            target.write_bytes(original)
+
     def test_custom_manifest_is_allowed_locally_but_never_in_clean_release(self):
         manifest = self.bundle / 'drawio-images/images.properties'; original = manifest.read_bytes()
         try:

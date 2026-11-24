@@ -4,6 +4,22 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-11-25
+
+- Added a remembered reading layout with compact icon buttons and independent visibility controls for the main menu, node title, breadcrumbs, backlinks, node actions and split-pane controls.
+- Added independently switchable tree node IDs and dates with configurable zero padding, date formatting and creation/modification timestamps.
+- Added quick editing of node names and CherryTree icons with a searchable icon chooser and smaller symbol, save and cancel controls.
+- Added clearer shared-node and master-node styling plus clipboard actions for node IDs and node text.
+- Added a confirmed Empty Trash action that processes all trash entries together while preserving shared content outside the trash.
+- Added an optional DailyTopicTracker bridge for viewing and editing dated topic entries, statuses and notes from linked SweetCherry nodes.
+- Added DTT topic descriptions, category/group links, recurrence information, latest completion dates and predicted dates to the node panel.
+- Added full and incremental DTT topic imports that preserve the group/category hierarchy and create topic-linked CTB nodes.
+- Added tenant-wizard DTT connection settings and separate connection tests for the SweetCherry database and the DTT bridge.
+- Made saved searches portable with the application folder and added non-overwriting migration for legacy preference files.
+- Updated the Windows launcher to prefer an adjacent runtime and fall back to compatible 64-bit system Java 17 or newer.
+- Removed launcher and run-script port overrides so external YAML controls HTTP/HTTPS endpoints, with a desktop protocol/port prompt when no external port is specified.
+- Added preserved saved-filters and backup directories, a local launcher build helper and expanded packaging and PowerShell checks.
+
 ## [1.13.0] - 2026-11-21
 
 - Added a read-only multi-page Draw.io attachment viewer with page selection, fullscreen, scrolling, zoom, page fit and horizontal fit.

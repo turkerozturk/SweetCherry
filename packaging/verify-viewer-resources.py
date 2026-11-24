@@ -11,7 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_DIRS = ('static/js/drawio', 'static/js/symbols', 'static/img/ctbicons', 'symbols')
 RESOURCE_FILES = ('static/css/drawioPreview.css', 'static/css/symbols.css', 'templates/common/symbolPicker.html', 'static/js/drawioPreview.js',
                   'templates/attachment/drawioFrame.html')
-DOC_FILES = ('documentation/en/drawio-viewer.md', 'documentation/tr/drawio-viewer.md',
+BUNDLE_SOURCE_FILES = {
+    'tools/migrate-saved-filters.py': 'packaging/migrate-saved-filters.py',
+    'run.bat': 'external/run.bat', 'run.sh': 'external/run.sh',
+    'run.command': 'external/run.command', 'launcher.sh': 'external/launcher.sh',
+}
+DOC_FILES = ('documentation/tree-reading-layout.md', 'documentation/en/dailytopictracker-bridge.md',
+             'documentation/en/portable-launching-and-saved-filters.md', 'documentation/en/build-windows-launcher-locally.md',
+             'documentation/en/drawio-viewer.md', 'documentation/tr/drawio-viewer.md',
              'documentation/en/inline-symbols.md', 'documentation/tr/inline-symbols.md',
              'documentation/en/editor-layout.md', 'documentation/tr/content-zoom-and-editor-controls.md',
              'documentation/examples/drawio-library-shapes.drawio', 'documentation/examples/drawio-viewer-demo.drawio',
@@ -39,6 +46,15 @@ def verify(bundle, root=ROOT, clean=False):
     app_version, fa_version = version(root)
     for relative in (*DOC_FILES, f'documentation/releases/v{app_version}.md', 'drawio-images/README.md', 'drawio-images/images.properties'):
         if not (bundle / relative).is_file(): raise Problem('Missing distribution file: ' + relative)
+    for relative, source in BUNDLE_SOURCE_FILES.items():
+        target = bundle / relative
+        if not target.is_file() or target.read_bytes() != (root / source).read_bytes():
+            raise Problem('Missing/changed distribution helper: ' + relative)
+    for name in ('saved-filters', 'backup'):
+        directory = bundle / name
+        if not directory.is_dir(): raise Problem('Missing private-data directory: ' + name)
+        if clean and (directory.is_symlink() or getattr(directory, 'is_junction', lambda: False)() or any(directory.iterdir())):
+            raise Problem('Private/linked files in clean distribution: ' + name)
     seed = root / 'external/drawio-images'
     if clean:
         replacement_root = bundle / 'drawio-images'

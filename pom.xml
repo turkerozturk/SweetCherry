@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.turkerozturk</groupId>
 	<artifactId>SweetCherry</artifactId>
-	<version>1.13.0</version>
+	<version>1.14.0</version>
 	<name>SweetCherry</name>
 	<description>A web companion and viewer for CherryTree CTB note databases</description>
 	<url>https://github.com/turkerozturk/SweetCherry</url>
@@ -590,6 +590,7 @@
                                 <copy todir="${project.basedir}/release/SweetCherry/documentation" overwrite="true">
                                     <fileset dir="${project.basedir}/documentation">
                                         <include name="releases/**/*.md"/>
+                                        <include name="tree-reading-layout.md"/>
                                         <include name="examples/**/*.drawio"/>
                                         <include name="images/**/*.md"/>
                                         <include name="images/**/*.png"/>
