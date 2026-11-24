@@ -8,8 +8,8 @@ if (!(Test-Path (Join-Path $bundle 'SweetCherry.jar'))) { throw 'Run mvnw.cmd cl
 New-Item $out -ItemType Directory -Force | Out-Null
 Copy-Item (Join-Path $PSScriptRoot 'SweetCherry.ico') (Join-Path $bundle 'SweetCherry.ico') -Force
 [xml]$config = Get-Content (Join-Path $PSScriptRoot 'launch4j.xml') -Raw -Encoding utf8
-$config.launch4jConfig.outfile = Join-Path $bundle 'SweetCherry.exe'
-$config.launch4jConfig.icon = Join-Path $bundle 'SweetCherry.ico'
+$config.launch4jConfig.SelectSingleNode('outfile').InnerText = [string](Join-Path $bundle 'SweetCherry.exe')
+$config.launch4jConfig.SelectSingleNode('icon').InnerText = [string](Join-Path $bundle 'SweetCherry.ico')
 [xml]$pom = Get-Content (Join-Path $repo 'pom.xml') -Raw -Encoding utf8
 $version = [string]$pom.project.version
 if ($version -notmatch '^(\d+)\.(\d+)\.(\d+)(?:-[A-Za-z0-9.-]+)?$') { throw "Unsupported project version: $version" }

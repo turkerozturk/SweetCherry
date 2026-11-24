@@ -64,8 +64,8 @@ if ($LASTEXITCODE -ne 0 -or $runtimeInfo -notmatch 'os.arch\s*=\s*amd64' -or $ru
 }
 Copy-Item "$PSScriptRoot/SweetCherry.ico" $bundle
 [xml]$config = Get-Content "$PSScriptRoot/launch4j.xml" -Raw
-$config.launch4jConfig.outfile = (Join-Path $bundle 'SweetCherry.exe')
-$config.launch4jConfig.icon = (Join-Path $bundle 'SweetCherry.ico')
+$config.launch4jConfig.SelectSingleNode('outfile').InnerText = [string](Join-Path $bundle 'SweetCherry.exe')
+$config.launch4jConfig.SelectSingleNode('icon').InnerText = [string](Join-Path $bundle 'SweetCherry.ico')
 $versionInfo = $config.CreateElement('versionInfo')
 foreach ($entry in ([ordered]@{
     fileVersion=$fileVersion; txtFileVersion=$version; fileDescription='SweetCherry Windows x64 launcher';

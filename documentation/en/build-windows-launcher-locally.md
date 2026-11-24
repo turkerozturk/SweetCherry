@@ -52,8 +52,8 @@ if (!(Test-Path (Join-Path $bundle 'SweetCherry.jar'))) {
 }
 New-Item $out -ItemType Directory -Force | Out-Null
 [xml]$config = Get-Content (Join-Path $repo 'packaging\windows\launch4j.xml') -Raw -Encoding UTF8
-$config.launch4jConfig.outfile = Join-Path $bundle 'SweetCherry.exe'
-$config.launch4jConfig.icon = Join-Path $repo 'packaging\windows\SweetCherry.ico'
+$config.launch4jConfig.SelectSingleNode('outfile').InnerText = [string](Join-Path $bundle 'SweetCherry.exe')
+$config.launch4jConfig.SelectSingleNode('icon').InnerText = [string](Join-Path $repo 'packaging\windows\SweetCherry.ico')
 # Version information is required by the Maven Launch4j plugin.
 [xml]$pom = Get-Content (Join-Path $repo 'pom.xml') -Raw -Encoding utf8
 $version = [string]$pom.project.version
