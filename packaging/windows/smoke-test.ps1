@@ -3,9 +3,10 @@ param([Parameter(Mandatory)][string]$InstallerPath)
 $ErrorActionPreference = 'Stop'
 # Exercise the actual installer, user-file preservation and launcher in a path with spaces/Unicode.
 $testDir = Join-Path $env:RUNNER_TEMP 'SweetCherry test Türkçe'
-New-Item "$testDir/CTBDATA","$testDir/allTenants","$testDir/drawio-images" -ItemType Directory -Force | Out-Null
+New-Item "$testDir/CTBDATA","$testDir/allTenants","$testDir/drawio-images","$testDir/saved-filters","$testDir/backup" -ItemType Directory -Force | Out-Null
 $sentinels = @{
     'drawio-images/images.properties'='KEEP-DRAWIO-MANIFEST'; 'drawio-images/private.png'='KEEP-PRIVATE-IMAGE';
+    'saved-filters/private.json'='KEEP-SAVED-FILTERS'; 'backup/private.ctb'='KEEP-BACKUP';
     'CTBDATA/demo.ctb'='KEEP-CTB'; 'allTenants/demo.txt'='KEEP-TENANT';
     'application.yml'="server:`n  address: 127.0.0.1`nmyapp:`n  openWebBrowserOnStartup: false`n";
     'login-credentials.properties'="admin.password=ci-test-only`nuser.password=ci-test-only`n"
@@ -63,3 +64,38 @@ try {
     if ($process -and !$process.HasExited) { & "$env:SystemRoot/System32/taskkill.exe" /PID $process.Id /T /F | Out-Null }
 }
 Write-Host 'Installer preservation and bundled-runtime launcher smoke tests passed.'
+# The Java-free product must also launch through system Java, using external YAML ports.
+$systemTest = Join-Path $env:RUNNER_TEMP ("SweetCherry-system-java-" + [guid]::NewGuid())
+New-Item $systemTest -ItemType Directory | Out-Null
+Get-ChildItem $testDir -Force | Where-Object { $_.Name -ne 'runtime' } | ForEach-Object { Copy-Item $_.FullName $systemTest -Recurse -Force }
+@'
+server:
+  address: 127.0.0.1
+  port: 18081
+  ssl:
+    enabled: false
+  http:
+    enabled: false
+    port: 18082
+myapp:
+  openWebBrowserOnStartup: false
+  command-line-runner:
+    enabled: false
+'@ | Set-Content "$systemTest/application.yml" -Encoding utf8
+$process = $null
+try {
+    $process = Start-Process "$systemTest/SweetCherry.exe" -WorkingDirectory $env:RUNNER_TEMP -ArgumentList @('--myapp.desktop.enabled=false','--l4j-debug') -PassThru
+    $ready = $false
+    for ($attempt = 0; $attempt -lt 60; $attempt++) {
+        try {
+            $response = Invoke-WebRequest 'http://127.0.0.1:18081/login' -TimeoutSec 2 -SkipHttpErrorCheck
+            if ($response.StatusCode -eq 200 -and $response.Content -match 'name="username"') { $ready = $true; break }
+        } catch { }
+        if ($process.HasExited) { throw 'System Java launcher exited before readiness.' }
+        Start-Sleep -Seconds 1
+    }
+    if (!$ready) { throw 'System Java launcher did not use the external YAML port.' }
+    Write-Host 'System Java fallback and YAML-only port smoke test passed.'
+} finally {
+    if ($process -and !$process.HasExited) { & "$env:SystemRoot/System32/taskkill.exe" /PID $process.Id /T /F | Out-Null }
+}

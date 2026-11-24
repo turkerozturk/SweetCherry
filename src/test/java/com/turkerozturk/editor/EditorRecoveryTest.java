@@ -47,4 +47,22 @@ class EditorRecoveryTest {
         mvc.perform(post("/nodes/content/15").header("X-SweetCherry-Editor-Save","1").param("text","changed")).andExpect(status().isConflict());
         mvc.perform(post("/nodes/content/15").param("text","old browser")).andExpect(view().name("redirect:/nodes/15"));
     }
+    @Test void savedFiltersMoveWithPortableDatabasePathsWhileRecoveryRemainsSeparate(){
+        var old=java.nio.file.Path.of("old-install").toAbsolutePath();var moved=java.nio.file.Path.of("new-install").toAbsolutePath();
+        String relative="jdbc:sqlite:CTBDATA/notes.ctb";
+        String first=EditorRecoveryContext.portableSource(old,relative);
+        assertThat(first).isEqualTo("jdbc:sqlite:portable:CTBDATA/notes.ctb");
+        assertThat(EditorRecoveryContext.portableSource(moved,"jdbc:sqlite:"+moved.resolve("CTBDATA/notes.ctb"))).isEqualTo(first);
+        assertThat(EditorRecoveryContext.portableSource(moved,"jdbc:postgresql://db/notes")).isEqualTo("jdbc:postgresql://db/notes");
+        assertThat(EditorRecoveryContext.portableSource(moved,"jdbc:sqlite:"+old.resolve("other.ctb"))).isNotEqualTo(first);
+        var tenants=mock(TenantService.class);var advice=new EditorRecoveryContext(tenants);var request=new MockHttpServletRequest();
+        TenantContext.setCurrentTenant("Notes");request.setUserPrincipal(()->"admin");
+        try(var source=new HikariDataSource()){
+            source.setJdbcUrl(relative);when(tenants.getAllTenants()).thenReturn(java.util.Map.of("Notes",source));
+            assertThat(advice.savedFiltersScope(request)).isEqualTo("30980165516f655f581361331888ebeb999026de33a026960c348830c8429b81").isNotEqualTo(advice.scope(request));
+            assertThat(source.isRunning()).isFalse();request.setUserPrincipal(()->"reader");
+            String reader=advice.savedFiltersScope(request);request.setUserPrincipal(()->"admin");assertThat(reader).isNotEqualTo(advice.savedFiltersScope(request));
+        }
+    }
+
 }

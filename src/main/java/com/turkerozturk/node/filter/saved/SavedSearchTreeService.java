@@ -21,6 +21,7 @@ public class SavedSearchTreeService {
     public SavedSearchTreeService(SavedFiltersStore store, AdvancedNodeSearch search, Validator validator) {
         this.store=store;this.search=search;this.validator=validator;
     }
+    public void migrate(String scope,String legacy)throws IOException{store.migrate(scope,legacy);}
     public record Branch(String id,String name) {}
     public record Result(long nodeId,String name,String iconName,String titleColor,boolean bold,
             boolean hasTags,String tags,boolean hasChildren,String path) {}

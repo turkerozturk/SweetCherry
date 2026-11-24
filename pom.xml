@@ -517,8 +517,12 @@
 							<target xmlns:unless="ant:unless">
 								<mkdir dir="${project.basedir}/release/SweetCherry/CTBDATA"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/allTenants"/>
+                                <mkdir dir="${project.basedir}/release/SweetCherry/saved-filters"/>
+                                <mkdir dir="${project.basedir}/release/SweetCherry/backup"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/exportedFiles"/>
 								<mkdir dir="${project.basedir}/release/SweetCherry/documentation/tr"/>
+                                <mkdir dir="${project.basedir}/release/SweetCherry/tools"/>
+                                <copy file="${project.basedir}/packaging/migrate-saved-filters.py" tofile="${project.basedir}/release/SweetCherry/tools/migrate-saved-filters.py" overwrite="true"/>
                                 <mkdir dir="${project.basedir}/release/SweetCherry/drawio-images"/>
                                 <!-- User-maintained replacements are external; seed files only if absent. -->
                                 <available file="${project.basedir}/release/SweetCherry/drawio-images/images.properties" property="release.drawio.manifest.exists"/>

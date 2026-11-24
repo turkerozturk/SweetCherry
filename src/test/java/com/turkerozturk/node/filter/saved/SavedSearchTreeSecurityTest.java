@@ -29,7 +29,7 @@ class SavedSearchTreeSecurityTest {
    var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
    var session=new MockHttpSession();session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");TenantContext.setCurrentTenant("Demo");
    var service=context.getBean(SavedSearchTreeService.class);var scopes=context.getBean(EditorRecoveryContext.class);
-   when(scopes.scope(any())).thenReturn("reader-source");when(service.list("reader-source")).thenReturn(List.of());String url="/nodes/saved-filters/tree";
+   when(scopes.savedFiltersScope(any())).thenReturn("reader-source");when(service.list("reader-source")).thenReturn(List.of());String url="/nodes/saved-filters/tree";
    mvc.perform(get(url).session(session).param("_tenantView","current").param("scope","another-user").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"));
    verify(service).list("reader-source");clearInvocations(service);
    mvc.perform(get(url).session(session).param("_tenantView","old").with(user("reader").roles("USER"))).andExpect(status().isConflict());
@@ -38,9 +38,9 @@ class SavedSearchTreeSecurityTest {
    mvc.perform(post(url).session(session).param("_tenantView","current").with(csrf()).with(user("reader").roles("USER"))).andExpect(status().isMethodNotAllowed());
    var controller=context.getBean(SavedSearchTreeController.class);ReflectionTestUtils.setField(controller,"enabled",false);
    mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isNotFound());verifyNoInteractions(service);
-   ReflectionTestUtils.setField(controller,"enabled",true);when(scopes.scope(any())).thenReturn("");
+   ReflectionTestUtils.setField(controller,"enabled",true);when(scopes.savedFiltersScope(any())).thenReturn("");
    mvc.perform(get(url).session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isServiceUnavailable());verifyNoInteractions(service);
-   when(scopes.scope(any())).thenReturn("reader-source");
+   when(scopes.savedFiltersScope(any())).thenReturn("reader-source");
    ReflectionTestUtils.setField(controller,"enabled",true);String id="12345678-1234-1234-1234-123456789abc";
    when(service.results("reader-source",id,1)).thenReturn(new SavedSearchTreeService.Results(id,"Tasks",1,0,false,List.of()));
    mvc.perform(get(url+"/"+id).session(session).param("page","1").param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));

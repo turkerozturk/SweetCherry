@@ -18,7 +18,7 @@ jobs:
         shell: bash
         run: node --test src/test/js/*.test.cjs
       - name: Test release resource verification
-        run: python -m unittest discover -s packaging -p test_viewer_resources.py
+        run: python -m unittest discover -s packaging -p "test_*.py"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

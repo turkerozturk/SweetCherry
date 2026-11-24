@@ -34,6 +34,12 @@ public class SavedFiltersStore {
         if(Files.isSymbolicLink(directory)||Files.isSymbolicLink(file))throw new IOException("Symbolic preference paths are not supported");
         return file;
     }
+    /** Copy a valid legacy file only when the portable destination has never been written. */
+    public synchronized void migrate(String scope,String legacy)throws IOException{
+        if(legacy==null||legacy.isEmpty()||legacy.equals(scope)||Files.exists(file(scope)))return;
+        var previous=read(legacy);if(previous.presets().isEmpty())return;
+        write(scope,new Snapshot(scope,hash(new byte[0]),List.of()),new Document(1,previous.presets()),true);
+    }
     public synchronized Snapshot read(String scope) throws IOException {
         Path file=file(scope);
         if(!Files.exists(file))return new Snapshot(scope,hash(new byte[0]),List.of());
@@ -71,6 +77,9 @@ public class SavedFiltersStore {
         return write(scope,current,new Document(1,List.copyOf(presets)));
     }
     private Snapshot write(String scope,Snapshot current,Document document) throws IOException {
+        return write(scope,current,document,false);
+    }
+    private Snapshot write(String scope,Snapshot current,Document document,boolean onlyIfAbsent) throws IOException {
         byte[] bytes=mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(document);
         if(bytes.length>MAX_BYTES)throw new IllegalArgumentException("Saved filters exceed 1 MiB");
         if(!Files.exists(directory)) {
@@ -82,6 +91,14 @@ public class SavedFiltersStore {
         try {
             if(Files.getFileStore(directory).supportsFileAttributeView("posix"))Files.setPosixFilePermissions(temporary,PosixFilePermissions.fromString("rw-------"));
             Files.write(temporary,bytes);
+            if(onlyIfAbsent){
+                try{
+                    try{Files.createLink(target,temporary);}
+                    catch(UnsupportedOperationException unsupported){Files.copy(temporary,target);}
+                    catch(FileSystemException unsupported){if(Files.exists(target))return read(scope);Files.copy(temporary,target);}
+                }catch(FileAlreadyExistsException concurrent){return read(scope);}
+                return read(scope);
+            }
             checkRevision(read(scope),current.revision());
             try{Files.move(temporary,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}
             catch(AtomicMoveNotSupportedException fallback){Files.move(temporary,target,StandardCopyOption.REPLACE_EXISTING);}

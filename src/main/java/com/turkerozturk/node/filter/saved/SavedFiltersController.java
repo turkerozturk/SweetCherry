@@ -28,7 +28,7 @@ public class SavedFiltersController {
     public ResponseEntity<?> delete(@RequestParam String _tenantView,@RequestBody Delete value,HttpServletRequest request){
         return run(()->store.delete(scope(request),value.revision(),value.id()));
     }
-    private String scope(HttpServletRequest request){String value=scopes.scope(request);if(value.isEmpty())throw new SavedFiltersStore.Conflict();return value;}
+    private String scope(HttpServletRequest request)throws IOException{String value=scopes.savedFiltersScope(request);if(value==null||value.isEmpty())throw new SavedFiltersStore.Conflict();store.migrate(value,scopes.scope(request));return value;}
     @FunctionalInterface private interface Operation{Object call()throws IOException;}
     private ResponseEntity<?> run(Operation operation){
         try{return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(operation.call());}

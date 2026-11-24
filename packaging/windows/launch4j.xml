@@ -12,19 +12,18 @@
   <icon>SweetCherry.ico</icon>
   <singleInstance><mutexName>SweetCherry.Windows.x64</mutexName></singleInstance>
   <jre>
-    <!-- Path-only configuration prevents fallback to an unrelated system Java. -->
-    <path>runtime</path>
+    <!-- Prefer adjacent Java, then JAVA_HOME/PATH, then the Windows registry. -->
+    <path>runtime;%JAVA_HOME%;%PATH%</path>
+    <minVersion>17</minVersion>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
     <!-- Command-line Spring options override these defaults without duplicate option values. -->
     <opt>-Dmyapp.desktop.enabled=true</opt>
-    <opt>-Dserver.port=8443</opt>
-    <opt>-Dserver.http.port=8080</opt>
     <opt>-Dmyapp.openWebBrowserOnStartup=true</opt>
   </jre>
   <messages>
     <startupErr>SweetCherry could not start. Use run.bat for diagnostics and check myapp.log.</startupErr>
-    <jreNotFoundErr>The bundled Java runtime is missing. Extract the complete SweetCherry folder again.</jreNotFoundErr>
+    <jreNotFoundErr>Java 17 or newer (64-bit) was not found. Place Java in runtime or install a system Java 17+ runtime.</jreNotFoundErr>
     <launcherErr>SweetCherry launcher failed. Use run.bat for diagnostics.</launcherErr>
   </messages>
 </launch4jConfig>

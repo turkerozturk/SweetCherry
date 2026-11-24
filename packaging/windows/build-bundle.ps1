@@ -36,7 +36,13 @@ foreach ($file in $seedFiles) {
         throw "Do not package edited Draw.io replacement files: $relative"
     }
 }
-if ((Test-Path (Join-Path $bundle 'login-credentials.properties')) -or (Test-Path (Join-Path $bundle 'saved-filters'))) { throw 'Do not package an already-used distribution.' }
+if (Test-Path (Join-Path $bundle 'login-credentials.properties')) { throw 'Do not package an already-used distribution.' }
+foreach ($name in @('saved-filters','backup')) {
+    $directory = Join-Path $bundle $name
+    if (!(Test-Path -LiteralPath $directory -PathType Container)) { throw "Missing distribution directory: $name" }
+    if ((Get-Item -LiteralPath $directory -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw "Linked private directory: $name" }
+    if (@(Get-ChildItem -LiteralPath $directory -Force).Count) { throw "Do not package private data in $name; use a clean distribution." }
+}
 if ((Get-FileHash $RuntimeArchive -Algorithm SHA256).Hash -ne $RuntimeSha256) { throw 'Runtime checksum mismatch.' }
 [xml]$pom = Get-Content (Join-Path $repo 'pom.xml') -Raw
 $version = ([string]$pom.project.version).ToLowerInvariant()

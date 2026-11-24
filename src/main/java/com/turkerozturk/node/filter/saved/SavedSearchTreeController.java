@@ -25,8 +25,8 @@ public class SavedSearchTreeController {
     private ResponseEntity<?> run(HttpServletRequest request,Operation operation){
         if(!enabled)return error(404,"disabled");
         // An unsupported preference namespace is optional-feature unavailability, not a stale CTB.
-        String scope=scopes.scope(request);if(scope.isEmpty())return error(503,"scope-unavailable");
-        try{return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(operation.call(scope));}
+        String scope=scopes.savedFiltersScope(request);if(scope==null||scope.isEmpty())return error(503,"scope-unavailable");
+        try{service.migrate(scope,scopes.scope(request));return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(operation.call(scope));}
         catch(IllegalArgumentException invalid){return error(400,"invalid");}
         catch(ResponseStatusException missing){return error(missing.getStatusCode().value(),"missing");}
         catch(IOException unavailable){return error(503,"storage");}

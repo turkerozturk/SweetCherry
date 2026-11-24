@@ -47,10 +47,12 @@ Name: "startmenuicon"; Description: "Start menu shortcut / Baslat menusu kisayol
 Name: "{app}\CTBDATA"
 Name: "{app}\allTenants"
 Name: "{app}\exportedFiles"
+Name: "{app}\saved-filters"
+Name: "{app}\backup"
 Name: "{app}\drawio-images"
 [Files]
 ; Package only a clean CI distribution, never a user's data directory.
-Source: "{#SourceDir}\*"; DestDir: "{app}"; Excludes: "CTBDATA\*,allTenants\*,exportedFiles\*,drawio-images\*,application.yml,login-credentials.properties,*.log,*.log.*"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDir}\*"; DestDir: "{app}"; Excludes: "CTBDATA\*,allTenants\*,exportedFiles\*,saved-filters\*,backup\*,drawio-images\*,application.yml,login-credentials.properties,*.log,*.log.*"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#SourceDir}\drawio-images\*"; DestDir: "{app}\drawio-images"; Flags: onlyifdoesntexist recursesubdirs createallsubdirs
 Source: "{#SourceDir}\application.yml"; DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "{#SourceDir}\CTBDATA\demo.ctb"; DestDir: "{app}\CTBDATA"; Flags: onlyifdoesntexist

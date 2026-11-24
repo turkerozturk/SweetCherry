@@ -2,7 +2,7 @@
 
 These instructions build `SweetCherry.exe` from an existing local SweetCherry source folder. No GitHub account, GitHub Actions workflow, push, tag, or release is required. The launcher-only procedure also works with an extracted source archive without a `.git` directory.
 
-`SweetCherry.exe` is a Launch4j launcher for `SweetCherry.jar`. It does not contain the application JAR or Java. Keep it in the complete application folder, with a Windows x64 Java runtime in the `runtime` subfolder. The installer EXE is a separate product built with Inno Setup.
+`SweetCherry.exe` is a Launch4j launcher for `SweetCherry.jar`. It does not contain the application JAR or Java. Keep it in the complete application folder, with either a Windows x64 Java 17+ runtime in the `runtime` subfolder or a system Java 17+ runtime. The installer EXE is a separate product built with Inno Setup.
 
 ## 1. Prepare the tools and source folder
 
@@ -54,6 +54,20 @@ New-Item $out -ItemType Directory -Force | Out-Null
 [xml]$config = Get-Content (Join-Path $repo 'packaging\windows\launch4j.xml') -Raw -Encoding UTF8
 $config.launch4jConfig.outfile = Join-Path $bundle 'SweetCherry.exe'
 $config.launch4jConfig.icon = Join-Path $repo 'packaging\windows\SweetCherry.ico'
+# Version information is required by the Maven Launch4j plugin.
+[xml]$pom = Get-Content (Join-Path $repo 'pom.xml') -Raw -Encoding utf8
+$version = [string]$pom.project.version
+if ($version -notmatch '^(\d+)\.(\d+)\.(\d+)(?:-[A-Za-z0-9.-]+)?$') { throw 'Unsupported project version' }
+$fileVersion = "$($Matches[1]).$($Matches[2]).$($Matches[3]).0"
+$versionInfo = $config.CreateElement('versionInfo')
+foreach ($entry in ([ordered]@{
+    fileVersion=$fileVersion; txtFileVersion=$version; fileDescription='SweetCherry Windows x64 launcher';
+    copyright='2024 Turker Ozturk'; productVersion=$fileVersion; txtProductVersion=$version;
+    productName='SweetCherry'; internalName='SweetCherry'; originalFilename='SweetCherry.exe'
+}).GetEnumerator()) {
+    $node=$config.CreateElement($entry.Key); $node.InnerText=$entry.Value; [void]$versionInfo.AppendChild($node)
+}
+[void]$config.launch4jConfig.AppendChild($versionInfo)
 $config.Save((Join-Path $out 'launch4j.xml'))
 ```
 
@@ -71,7 +85,7 @@ The output is `release\SweetCherry\SweetCherry.exe`. This goal builds only the l
 
 ## 5. Supply Java and the external configuration
 
-The launcher deliberately uses the adjacent `runtime` folder rather than falling back to a system Java installation. You can reuse a complete Windows x64 Java 17 runtime from an existing SweetCherry distribution, or extract a trusted Windows x64 Java 17 JRE ZIP and copy the **contents of its top-level Java folder** into `runtime`.
+The launcher first searches the adjacent `runtime` folder, then `JAVA_HOME` and `PATH`, then the Windows Java registry. Only 64-bit Java 17 or newer is accepted. You can reuse a complete Windows x64 Java 17 runtime from an existing SweetCherry distribution, or extract a trusted Windows x64 Java 17 JRE ZIP and copy the **contents of its top-level Java folder** into `runtime`.
 
 Alternatively, for your own local use, copy the entire JDK 17 already used above. This is larger than a JRE, but requires no additional runtime download:
 
@@ -110,7 +124,7 @@ Start-Process -FilePath (Join-Path $bundle 'SweetCherry.exe') -WorkingDirectory 
 
 Check that the desktop control window opens, the server becomes ready, and the browser opens the application. Test opening a sample database and stopping the application from the control window. If startup fails, inspect `myapp.log` and use `run.bat` from the application folder for console diagnostics.
 
-The launcher is Windows-specific. The Java-free portable ZIP uses the installed system Java through `run.bat`, `run.sh`, or `run.command`; its EXE still requires an adjacent Windows runtime.
+The launcher is Windows-specific. The Java-free portable ZIP uses the installed system Java through `run.bat`, `run.sh`, or `run.command`; its EXE can also use a compatible installed system Java.
 
 ## Optional: build the complete installer and release assets
 

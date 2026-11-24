@@ -29,7 +29,7 @@ class SavedFiltersSecurityTest {
    var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
    var session=new MockHttpSession();session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");TenantContext.setCurrentTenant("Demo");
    var store=context.getBean(com.turkerozturk.node.filter.saved.SavedFiltersStore.class);
-   var scope=context.getBean(EditorRecoveryContext.class);when(scope.scope(any())).thenReturn("a".repeat(64));
+   var scope=context.getBean(EditorRecoveryContext.class);when(scope.savedFiltersScope(any())).thenReturn("a".repeat(64));
    when(store.read(anyString())).thenReturn(new com.turkerozturk.node.filter.saved.SavedFiltersStore.Snapshot("a".repeat(64),"revision",java.util.List.of()));
    mvc.perform(get("/nodes/saved-filters").session(session).param("_tenantView","current").with(user("reader").roles("USER"))).andExpect(status().isOk());verify(store).read("a".repeat(64));clearInvocations(store);
    mvc.perform(post("/nodes/saved-filters").session(session).param("_tenantView","current").contentType("application/json").content("{}").with(user("reader").roles("USER"))).andExpect(status().is3xxRedirection());

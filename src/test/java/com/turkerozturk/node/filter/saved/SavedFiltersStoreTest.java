@@ -26,4 +26,17 @@ class SavedFiltersStoreTest {
   var saved=store.save(scope,store.read(scope).revision(),"","By parent",values);assertThat(store.read(scope)).isEqualTo(saved);assertThat(saved.presets().get(0).fields().get("sortBy")).containsExactly("parent");
  }
 
+ @Test void migrationCopiesLegacyPresetsButNeverReplacesExistingPortablePreferences()throws Exception{
+  String destination="b".repeat(64);var saved=store.save(scope,store.read(scope).revision(),"","Legacy",fields());
+  store.migrate(destination,scope);assertThat(store.read(destination).presets()).isEqualTo(saved.presets());assertThat(store.read(scope)).isEqualTo(saved);
+  var portable=store.read(destination);store.delete(destination,portable.revision(),portable.presets().get(0).id());
+  store.migrate(destination,scope);assertThat(store.read(destination).presets()).isEmpty();assertThat(store.read(scope).presets()).hasSize(1);
+ }
+ @Test void missingLegacyDoesNotCreateAFileAndMalformedLegacyNeverReplacesAnything()throws Exception{
+  String destination="b".repeat(64);store.migrate(destination,scope);assertThat(Files.exists(dir.resolve("filters/"+destination+".json"))).isFalse();
+  Files.createDirectory(dir.resolve("filters"));Files.writeString(dir.resolve("filters/"+scope+".json"),"invalid");
+  assertThatThrownBy(()->store.migrate(destination,scope)).isInstanceOf(java.io.IOException.class);
+  assertThat(Files.exists(dir.resolve("filters/"+destination+".json"))).isFalse();
+ }
+
 }

@@ -96,6 +96,7 @@ server:
         same-site: lax
         # Leave secure unset: Tomcat marks HTTPS cookies Secure and still permits local HTTP.
   http:
+    enabled: true # Optional additional plain HTTP listener; false uses only server.port/SSL.
     port: 8080
   error:
     include-message: never

@@ -17,6 +17,10 @@ public class EditorRecoveryContext {
     public EditorRecoveryContext(TenantService tenants){this.tenants=tenants;}
     @ModelAttribute("editorRecoveryScope")
     public String scope(HttpServletRequest request) {
+        return identity(request,false);
+    }
+    public String savedFiltersScope(HttpServletRequest request){return identity(request,true);}
+    private String identity(HttpServletRequest request,boolean portable){
         String tenant=TenantContext.getCurrentTenant();
         if(tenant==null || request.getUserPrincipal()==null)return "";
         var source=tenants.getAllTenants().get(tenant);
@@ -24,7 +28,19 @@ public class EditorRecoveryContext {
         // Do not enable durable recovery if the database identity is unknown.
         if(!(source instanceof HikariDataSource hikari) || hikari.getJdbcUrl()==null)return "";
         String installation=java.nio.file.Path.of("").toAbsolutePath().normalize().toString();
-        return fingerprint(request.getUserPrincipal().getName(),tenant,installation+"\0"+hikari.getJdbcUrl());
+        return fingerprint(request.getUserPrincipal().getName(),tenant,portable?"saved-filters-v2\0"+portableSource(java.nio.file.Path.of(installation),hikari.getJdbcUrl()):installation+"\0"+hikari.getJdbcUrl());
+    }
+    static String portableSource(java.nio.file.Path installation,String url){
+        String prefix="jdbc:sqlite:";
+        if(!url.startsWith(prefix))return url;
+        String file=url.substring(prefix.length());
+        // URI/memory SQLite sources retain their full explicit identity.
+        if(file.isBlank()||file.startsWith("file:")||file.equals(":memory:")||file.contains("?"))return url;
+        try{
+            var root=installation.toAbsolutePath().normalize();var path=java.nio.file.Path.of(file);
+            path=(path.isAbsolute()?path:root.resolve(path)).normalize();
+            return path.startsWith(root)?prefix+"portable:"+root.relativize(path).toString().replace('\\','/'):prefix+path.toString();
+        }catch(java.nio.file.InvalidPathException invalid){return url;}
     }
     static String fingerprint(String user,String tenant,String url) {
         try {

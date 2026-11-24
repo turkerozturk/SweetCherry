@@ -57,6 +57,11 @@ public class SweetCherry implements CommandLineRunner {
     private static volatile ConfigurableApplicationContext context; // https://www.baeldung.com/java-restart-spring-boot-app
 
     public static void main(String[] args) {
+        if(com.turkerozturk.desktop.DesktopControl.requested(args)){
+            System.setProperty("java.awt.headless","false");
+            try{args=com.turkerozturk.desktop.DesktopConnectionOptions.choose(java.nio.file.Path.of("."),args);if(args==null)return;}
+            catch(Exception error){logger.error("Cannot select connection settings",error);return;}
+        }
         startupArgs = args.clone();
 
         // External YAML must exist before Spring's ConfigData processing, including on first launch.
@@ -76,10 +81,9 @@ public class SweetCherry implements CommandLineRunner {
             application.setHeadless(false);
             application.addListeners((org.springframework.context.ApplicationListener<ApplicationReadyEvent>) event -> {
                 ConfigurableApplicationContext readyContext = event.getApplicationContext();
-                int port = readyContext.getEnvironment().getProperty("server.http.port", Integer.class, 8080);
                 desktop.login(readyContext.getEnvironment().getProperty("myapp.login.admin.name", "admin"),
                         readyContext.getBean(com.turkerozturk.login.SecurityConfig.class).adminPasswordForDesktop());
-                desktop.ready("http://localhost:" + port, readyContext::close,
+                desktop.ready(com.turkerozturk.startup.LocalBrowserAddress.from(readyContext.getEnvironment()), readyContext::close,
                         readyContext.getEnvironment().getProperty("myapp.openWebBrowserOnStartup", Boolean.class, true));
             });
             application.addListeners((org.springframework.context.ApplicationListener<org.springframework.context.event.ContextClosedEvent>) event -> desktop.closed());
@@ -166,11 +170,11 @@ public class SweetCherry implements CommandLineRunner {
      * This method runs immediately after the Spring Boot application has started up.
      */
     @EventListener({ApplicationReadyEvent.class})
-    void applicationReadyEvent() {
+    void applicationReadyEvent(ApplicationReadyEvent event) {
         logger.info("Application started ...");
         if (openWebBrowserOnStartup && !desktopMode) {
             logger.info("launching browser now");
-            browse("http://localhost:" + httpPort);
+            browse(com.turkerozturk.startup.LocalBrowserAddress.from(event.getApplicationContext().getEnvironment()));
         }
     }
 
@@ -225,6 +229,8 @@ public class SweetCherry implements CommandLineRunner {
 
     @Value("${server.http.port:8080}")
     private int httpPort;
+    @Value("${server.http.enabled:true}") private boolean httpEnabled;
+    @Value("${server.port:8080}") private int primaryPort;
 
     @Value("${server.address:127.0.0.1}")
     private String serverAddress;
@@ -250,7 +256,7 @@ public class SweetCherry implements CommandLineRunner {
     public ServletWebServerFactory servletWebServerFactory() {
 
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-        factory.addAdditionalConnectors(connector());
+        if(httpEnabled&&httpPort>0&&httpPort!=primaryPort)factory.addAdditionalConnectors(connector());
         return factory;
 
     }
