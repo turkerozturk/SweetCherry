@@ -57,7 +57,11 @@ class TreeReaderPreferencesTemplateTest {
                 assertThat(page.selectFirst("#workspace-right-frame").attr("title")).isNotBlank();
                 assertThat(page.selectFirst("#tree-workspace").attr("data-split-close-confirm")).isNotBlank();
                 assertThat(page.selectFirst("#workspace-content-splitter").attr("role")).isEqualTo("separator");
-                assertThat(html).doesNotContain("??split.");
+                assertThat(html).doesNotContain("??split.","??inlineEdit.");
+                assertThat(page.select("script[src='"+path+"/js/node/treeInlineEditing.js']")).hasSize(1);
+                assertThat(page.select("link[href='"+path+"/css/node/treeInlineEditing.css']")).hasSize(1);
+                assertThat(page.selectFirst("#tree-workspace").attr("data-editor-leave")).isNotBlank();
+                assertThat(page.selectFirst("#tree-workspace").attr("data-editor-return")).isNotBlank();
                 assertThat(html).doesNotContain("??preferences.");
                 assertThat(page.select("#workspace-saved-searches")).hasSize(1);
                 assertThat(page.selectFirst("#workspace-saved-searches").attr("data-endpoint")).isEqualTo(path+"/nodes/saved-filters/tree");

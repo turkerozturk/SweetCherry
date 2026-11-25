@@ -5,6 +5,7 @@
     <th:block th:replace="~{common/meta :: headerMeta}"></th:block>
     <th:block th:replace="~{common/meta :: headerCssLibraries}"></th:block>
     <link rel="stylesheet" th:href="@{/css/node/treeWorkspace.css}"/>
+    <link rel="stylesheet" th:href="@{/css/node/treeInlineEditing.css}">
     <link rel="stylesheet" th:href="@{/css/node/treeSplitView.css}"/>
     <script th:src="@{/js/node/treeSplitState.js}"></script>
     <link rel="stylesheet" th:href="@{/css/node/treeReadingLayout.css}">
@@ -15,7 +16,7 @@
 </head>
 <body class="tree-workspace-page">
 <header id="workspace-header"><th:block th:replace="~{common/header :: header}"></th:block></header>
-<main id="tree-workspace" th:style="|--tree-width:${treeDefaultWidth}px;--tree-font-size:${treeFontSize}px;--tree-vertical-padding:${treeVerticalPadding}px|" th:attr="data-split-close-confirm=#{split.confirmClose},data-focus-node=${treeFocusNode},data-show-tag-indicator=${treeShowTagIndicator},data-has-tags=#{tree.hasTags},data-default-tree-width=${treeDefaultWidth},data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-missing=#{tree.nodeMissing},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse},data-image-title=#{tree.openImage},data-shared-reference=#{node.sharedReference},data-shared-master=#{tree.sharedMaster}">
+<main id="tree-workspace" th:style="|--tree-width:${treeDefaultWidth}px;--tree-font-size:${treeFontSize}px;--tree-vertical-padding:${treeVerticalPadding}px|" th:attr="data-editor-loading=#{inlineEdit.loading},data-editor-title=#{inlineEdit.title},data-editor-busy=#{inlineEdit.busy},data-editor-leave=#{editor.unsaved},data-editor-return=#{inlineEdit.return},data-editor-separate=#{inlineEdit.separate},data-editor-error=#{inlineEdit.error},data-split-close-confirm=#{split.confirmClose},data-focus-node=${treeFocusNode},data-show-tag-indicator=${treeShowTagIndicator},data-has-tags=#{tree.hasTags},data-default-tree-width=${treeDefaultWidth},data-tenant-view=${tenantViewToken},data-initial-node=${initialNodeId},data-loading=#{tree.loading},data-missing=#{tree.nodeMissing},data-error=#{tree.loadError},data-expired=#{tree.expired},data-stale=#{tree.stale},data-expand=#{tree.expand},data-collapse=#{tree.collapse},data-image-title=#{tree.openImage},data-shared-reference=#{node.sharedReference},data-shared-master=#{tree.sharedMaster}">
     <nav id="workspace-tree-pane" th:attr="aria-label=#{tree.workspace}">
         <a class="workspace-database" th:href="@{/tree(nodeId=0,_tenantView=${tenantViewToken})}"><img th:src="@{/img/ctbicons/{icon}.png(icon=${currentDatabaseIcon})}" width="20" height="20" alt="" class="me-1" aria-hidden="true"><span th:text="${currentTenantName}">Database</span></a>
         <section th:if="${treeSavedSearchesEnabled == true}" id="workspace-saved-searches"
@@ -90,6 +91,7 @@
 <script th:src="@{/js/node/treeKeyboard.js}"></script>
 <script th:src="@{/js/node/treeSplitView.js}"></script>
 <script th:if="${treeSavedSearchesEnabled == true}" th:src="@{/js/node/treeSavedSearches.js}"></script>
+<script th:src="@{/js/node/treeInlineEditing.js}"></script>
 <script th:src="@{/js/node/treeWorkspace.js}"></script>
 <script defer th:src="@{/js/node/treeClipboard.js}"></script>
 <script defer th:src="@{/js/node/dttBridge.js}"></script>

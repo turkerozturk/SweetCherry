@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{_layoutMobile}">
-<head><title th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/node/editorLayout.css}"><link rel="stylesheet" th:href="@{/css/node/editorComfort.css}"></head>
+<head><link rel="stylesheet" th:href="@{/css/node/treeInlineEditing.css}"><script th:src="@{/js/node/inlineEditorBridge.js}"></script><title th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></title><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/node/editorLayout.css}"><link rel="stylesheet" th:href="@{/css/node/editorComfort.css}"></head>
 <body>
 <section layout:fragment="content" class="container-fluid py-1 plain-editor-page">
     <h1 class="fs-5 mb-1" th:text="${node.syntax == 'html' ? #messages.msg('html.editTitle') : (node.syntax == 'markdown' ? #messages.msg('markdown.editTitle') : #messages.msg('tree.editTitle'))}"></h1>
@@ -12,8 +12,8 @@
 <form id="plainEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/content/{nodeId}(nodeId=${node.nodeId})}" method="post">
         <input type="hidden" name="_tenantView" th:value="${tenantViewToken}"/>
         <div class="plain-savebar d-flex flex-wrap gap-1 mb-1">
-            <button type="submit" class="btn btn-sm btn-primary" th:text="#{richtext.edit.save}">Kaydet</button><button type="submit" name="continueEditing" value="true" class="btn btn-sm btn-success" th:text="#{editor.saveContinue}">Save and continue</button>
-            <a class="btn btn-sm btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}">İptal</a>
+            <button type="submit" data-editor-save class="btn btn-sm btn-primary"><i class="fas fa-save" aria-hidden="true"></i> <span th:text="#{richtext.edit.save}"></span></button><button type="submit" data-editor-continue name="continueEditing" value="true" class="btn btn-sm btn-success"><i class="fas fa-save" aria-hidden="true"></i><i class="fas fa-pen" aria-hidden="true"></i> <span th:text="#{editor.saveContinue}"></span></button>
+            <a data-editor-cancel class="btn btn-sm btn-secondary" th:href="@{/nodes/{nodeId}(nodeId=${node.nodeId},_tenantView=${tenantViewToken})}"><i class="fas fa-times" aria-hidden="true"></i> <span th:text="#{richtext.edit.cancel}"></span></a>
             <th:block th:replace="~{common/editorZoomFragment :: zoom}"></th:block>
         </div>
         <label for="nodeText" class="visually-hidden" th:text="#{markdown.contentLabel}"></label>

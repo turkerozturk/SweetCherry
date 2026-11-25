@@ -44,4 +44,19 @@ class EditorComfortTemplateTest {
             assertThat(doc.selectFirst("#richAllowDeletion").hasAttr("checked")).isFalse();
         }
     }
+    @Test void embeddedEditorsKeepNativeWriteAndRecoveryFormsWithAccessibleCompactActions() {
+        for(String language:List.of("en","tr"))for(String syntax:List.of("plain-text","python","markdown","html","custom-colors")) {
+            boolean rich=syntax.equals("custom-colors");var doc=render(rich?"node/richtext-edit":"node/nodeContentEdit",syntax,language);
+            assertThat(doc.select("head script[src='/app/js/node/inlineEditorBridge.js']")).hasSize(1);
+            assertThat(doc.select("head link[href='/app/css/node/treeInlineEditing.css']")).hasSize(1);
+            var form=doc.selectFirst(rich?"#richEditForm":"#plainEditForm");
+            assertThat(form.attr("method")).isEqualTo("post");
+            assertThat(form.selectFirst("input[name=_tenantView]").val()).isEqualTo("current");
+            assertThat(form.select("[data-editor-save] i,[data-editor-continue] i,[data-editor-cancel] i")).hasSize(4);
+            assertThat(form.select("[data-editor-save] span,[data-editor-continue] span,[data-editor-cancel] span").eachText()).allMatch(text->!text.isBlank());
+            assertThat(doc.select("#editorRecovery")).hasSize(1);
+            assertThat(doc.select("script[src='/app/js/common/editorLeaveGuard.js']")).hasSize(1);
+        }
+    }
+
 }

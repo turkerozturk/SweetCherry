@@ -58,6 +58,9 @@
     let state = {expanded: [], selected: 0, width: preferredWidth, top: 0, left: 0};
     try { state = {...state, ...JSON.parse(sessionStorage.getItem(storageKey) || '{}'), width: preferredWidth}; } catch (_) { }
     const expanded = new Set(Array.isArray(state.expanded) ? state.expanded : []);
+    let inlineEditor;
+    let historyIndex=Number.isInteger(history.state?.scTreeIndex)?history.state.scTreeIndex:0,restoringHistory=false;
+    const historyState=id=>({nodeId:Number(id),scTreeIndex:historyIndex});
     let controller;
     let stopped = false;
     const navigationRevision = window.SweetCherryNavigationRevision();
@@ -73,10 +76,13 @@
     /** Stops further actions when the session or selected database is no longer valid. */
     function stop(message) {
         stopped = true;
+        const editing=inlineEditor?.active()||split?.hasEditor?.();
+        inlineEditor?.invalidate(message);
         split?.stop(message);
         savedSearches?.stop();
         controller?.abort();
         scrollTopButton.hidden = true;
+        if(editing){pane.inert=true;status.textContent=message;return;}
         workspace.replaceChildren();
         const text = document.createElement('p');
         text.textContent = message;
@@ -218,7 +224,7 @@
     }
     /** Fetches server-rendered content with existing role, CSRF and tenant safeguards. */
     async function select(id, push = true, reveal = false) {
-        if (stopped) return;
+        if (stopped || inlineEditor&&!inlineEditor.beforeNavigate()) return;
         controller?.abort();
         const active = new AbortController();
         controller = active;
@@ -251,7 +257,7 @@
             status.replaceChildren(template.content.cloneNode(true));
             state.selected = Number(id);
             document.title = fragment.dataset.nodeTitle + ' — SweetCherry';
-            if (push) history.pushState({nodeId: Number(id)}, '', url('/tree', {nodeId: id}));
+            if (push) {historyIndex++;history.pushState(historyState(id), '', url('/tree', {nodeId: id}));}
             document.dispatchEvent(new CustomEvent('sweetcherry:content-loaded', {detail: {root: content}}));
             if (reveal || treeChanged) {
                 const path = content.querySelector('[data-path-ids]')?.dataset.pathIds || '';
@@ -271,7 +277,7 @@
                 state.selected = 0;
                 expanded.delete(String(id));
                 save();
-                history.replaceState({nodeId: 0}, '', url('/tree', {nodeId: 0}));
+                history.replaceState(historyState(0), '', url('/tree', {nodeId: 0}));
                 await select(0, false, false);
                 if (!stopped) {status.textContent = workspace.dataset.missing;split?.message(workspace.dataset.missing);}
                 return;
@@ -287,6 +293,11 @@
         if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         const link = event.target.closest('a[href]');
         if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+        if(link.hasAttribute('data-tree-edit')){
+            event.preventDefault();
+            if(!stopped&&!inlineEditor.open(link.href,state.selected))status.textContent=workspace.dataset.editorBusy;
+            return;
+        }
         const target = new URL(link.href, location.href);
         if (target.origin !== location.origin) return;
         const match = target.pathname.match(/^\/nodes\/(\d+)$/);
@@ -298,7 +309,17 @@
     document.addEventListener('sweetcherry:node-renamed',event=>{
         if(event.detail?.id===String(state.selected))select(state.selected,false,false);
     });
-    window.addEventListener('popstate', () => select(new URL(location.href).searchParams.get('nodeId') || '0', false, true));
+    window.addEventListener('popstate', event => {
+        if(restoringHistory){restoringHistory=false;return;}
+        const next=Number.isInteger(event.state?.scTreeIndex)?event.state.scTreeIndex:null;
+        if(inlineEditor?.active()&&!inlineEditor.canLeave()){
+            if(next!==null&&next!==historyIndex){restoringHistory=true;history.go(historyIndex-next);}
+            else history.replaceState(historyState(state.selected),'',url('/tree',{nodeId:state.selected}));
+            return;
+        }
+        historyIndex=next??0;
+        select(new URL(location.href).searchParams.get('nodeId')||'0',false,true);
+    });
     pane.addEventListener('scroll', save, {passive: true});
 
     function setWidth(value) {
@@ -350,10 +371,16 @@
         if(active===controller){markSelected(id);save();}
     }
     let resolveReady;const ready=new Promise(resolve=>{resolveReady=resolve;});
-    window.SweetCherryWorkspace={selected:()=>state.selected,select:id=>ready.then(()=>select(id,true,true)),
+    inlineEditor=window.SweetCherryTreeEditing.install({workspace,content,token,getSelected:()=>state.selected,
+        async onSaved(id,scroll){
+            await select(id,false,false);
+            const scroller=content.querySelector('.workspace-rendered');
+            if(scroller){scroller.scrollTop=scroll.top;scroller.scrollLeft=scroll.left;scroller.focus({preventScroll:true});}
+        }});
+    window.SweetCherryWorkspace={editorActive:()=>inlineEditor.active(),canLeaveEditor:()=>inlineEditor.canLeave(),invalidateEditor:message=>inlineEditor.invalidate(message),selected:()=>state.selected,select:id=>ready.then(()=>select(id,true,true)),
         status:()=>content.querySelector('template[data-workspace-status]')?.content,
         move:direction=>{
-            if(stopped||!['UP','DOWN','LEFT','RIGHT'].includes(direction))return;
+            if(stopped||inlineEditor.active()||!['UP','DOWN','LEFT','RIGHT'].includes(direction))return;
             const form=content.querySelector('[data-node-move]');
             const button=form?.querySelector('[data-move="'+direction+'"]');
             if(form?.dataset.moveReady==='ready'&&button&&!button.disabled)form.requestSubmit(button);
@@ -377,7 +404,7 @@
             const id = query.has('nodeId') ? workspace.dataset.initialNode : state.selected;
             await select(/^\d+$/.test(String(id)) ? id : 0, false, true);
             pane.scrollTop = top; pane.scrollLeft = left;
-            history.replaceState({nodeId: state.selected}, '', url('/tree', {nodeId: state.selected}));
+            history.replaceState(historyState(state.selected), '', url('/tree', {nodeId: state.selected}));
             split.ready();
             savedSearches?.reload();
             if(workspace.dataset.focusNode===String(state.selected)){

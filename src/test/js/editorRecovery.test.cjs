@@ -8,7 +8,7 @@ function setup(response) {
  const window={addEventListener(){},confirm:()=>true};
  vm.runInNewContext(source,{window,document:{getElementById:id=>elements[id],addEventListener(){}},location,crypto:require('node:crypto').webcrypto,indexedDB:{open(){throw new Error('storage denied');}},localStorage:{getItem:()=>null},URL,URLSearchParams,FormData:class {constructor(){return [['text','unsaved'],['_csrf','token'],['_tenantView','old']];}},AbortController,Event:class {constructor(type){this.type=type;}},setTimeout,clearTimeout,setInterval:()=>0,clearInterval(){},fetch:async(url,options)=>{calls.push({url,options});if(response instanceof Error)throw response;return response;}});
  let text='unsaved';window.EditorRecovery.install(form,{base:'initial',snapshot:()=>({text}),dirty:()=>true,restore(){}});
- return {elements,form,events,calls,navigations,submit:async(submitter)=>{const event={defaultPrevented:false,submitter,preventDefault(){this.defaultPrevented=true;}};await form.handlers.submit(event);assert.equal(event.defaultPrevented,true);}};
+ return {window,elements,form,events,calls,navigations,submit:async(submitter)=>{const event={defaultPrevented:false,submitter,preventDefault(){this.defaultPrevented=true;}};await form.handlers.submit(event);assert.equal(event.defaultPrevented,true);}};
 }
 test('unavailable browser storage does not remove failed-save protection; offline and redirected login preserve editor',async()=>{
  for(const response of [new Error('offline'),{ok:false,headers:{get:()=> 'application/json'}},{ok:true,headers:{get:()=> 'text/html'}}]) {
@@ -23,4 +23,15 @@ test('only a matching explicit successful receipt permits navigation; save-and-c
  }
  const e=setup({ok:true,headers:{get:()=> 'application/json'},json:async()=>({saved:true,redirect:'/app/nodes/content/1'})});
  await e.submit({name:'continueEditing',value:'true'});assert.equal(e.calls[0].options.body.get('continueEditing'),'true');assert.deepEqual(e.events,['editor:saved']);assert.deepEqual(e.navigations,['http://localhost/app/nodes/content/1']);
+});
+
+test('validated receipts return to an inline host instead of navigating the iframe away',async()=>{
+ const e=setup({ok:true,headers:{get:()=> 'application/json'},json:async()=>({saved:true,redirect:'/app/nodes/1'})});
+ const receipts=[];e.window.SweetCherryInlineEditor={saved:async(...args)=>{receipts.push(args);return true;}};
+ await e.submit();assert.deepEqual(receipts,[['http://localhost/app/nodes/1',false]]);assert.equal(e.navigations.length,0);assert.deepEqual(e.events,['editor:saved']);
+});
+test('submission locks the form before awaiting local draft persistence and ignores a second submit',async()=>{
+ const e=setup({ok:true,headers:{get:()=> 'application/json'},json:async()=>({saved:true,redirect:'/app/nodes/1'})});
+ const first=e.submit();assert.equal(e.form.inert,true);const second=e.submit();await Promise.all([first,second]);
+ assert.equal(e.calls.length,1);assert.equal(e.form.inert,false);
 });

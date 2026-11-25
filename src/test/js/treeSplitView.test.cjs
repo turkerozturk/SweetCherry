@@ -126,3 +126,15 @@ test('an embedded reader forwards its node and tenant but never creates a nested
     assert.deepEqual(selected,[5]);assert.deepEqual(messages.map(item=>item.type),['loaded','focus','stop']);
     assert.ok(messages.every(item=>item.token==='current'));assert.equal(messages[0].path,'1,5');
 });
+test('closing the right reader delegates dirty and saving protection to its in-place editor',()=>{
+    const c=setup({open:true,node:20}),reader=c.elements['workspace-right-frame'].contentWindow.SweetCherryWorkspace;
+    let allowed=false,checks=0;reader.canLeaveEditor=()=>{checks++;return allowed;};reader.editorActive=()=>true;
+    c.click(c.toggle);assert.equal(c.state.open,true);assert.equal(checks,1);assert.equal(c.confirmations,0);
+    allowed=true;c.click(c.toggle);assert.equal(c.state.open,false);assert.equal(checks,2);assert.equal(c.confirmations,0);
+});
+test('a stale split retains an in-place draft and invalidates its editor instead of destroying the frame',()=>{
+    const c=setup({open:true,node:20}),frame=c.elements['workspace-right-frame'],reader=frame.contentWindow.SweetCherryWorkspace;
+    let message;reader.editorActive=()=>true;reader.invalidateEditor=value=>{message=value;};
+    const original=frame.src;c.api.stop('Changed database');
+    assert.equal(message,'Changed database');assert.equal(frame.src,original);assert.equal(c.state.open,true);
+});

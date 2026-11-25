@@ -29,7 +29,7 @@
         const choices=get('recoveryDrafts'), restore=get('recoveryRestore'), discard=get('recoveryDiscard'), download=get('recoveryDownload');
         const login=get('recoveryLogin'), rescue=get('recoveryRescue');
         const scope=panel.dataset.scope+':'+location.pathname;
-        let db, records=[], ready=false, writing=false, saving=false, last='', restoredId=null, tick;
+        let db, records=[], ready=false, writing=false, saving=false, preparing=false, last='', restoredId=null, tick;
         // A fresh record per open editor prevents simultaneous tabs from overwriting each other's drafts.
         const id=String(Date.now())+'-'+Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-');
         function say(key,detail=''){status.textContent=message(key)+(detail?' '+detail:'');}
@@ -91,8 +91,10 @@
         window.addEventListener('pagehide',()=>persist());
         // The editor serializes its native fields first. Only an explicit JSON receipt allows navigation.
         form.addEventListener('submit',async event=>{
-            if(event.defaultPrevented)return;event.preventDefault();if(saving || editor.busy?.())return;
-            await persist();if(saving)return;
+            if(event.defaultPrevented)return;event.preventDefault();if(saving || preparing || editor.busy?.())return;
+            preparing=true;form.inert=true;
+            try{await persist();}catch(_){say('storageFailed');}finally{preparing=false;}
+            if(saving)return;
             const sent=JSON.stringify(editor.snapshot());
             const body=new URLSearchParams(new FormData(form));
             if(event.submitter?.name)body.set(event.submitter.name,event.submitter.value);
@@ -109,7 +111,9 @@
                 if(sent!==JSON.stringify(editor.snapshot())){say('savedChanged');return;}
                 if(db)try{await operation(db,'readwrite',store=>store.delete(id));if(restoredId)await operation(db,'readwrite',store=>store.delete(restoredId));}catch(ignored){}
                 form.dispatchEvent(new Event('editor:saved'));
-                location.assign(destination.href);
+                if(window.SweetCherryInlineEditor){
+                    if(!await window.SweetCherryInlineEditor.saved(destination.href,body.get('continueEditing')==='true'))throw new Error('host');
+                }else location.assign(destination.href);
             }catch(error){say('saveFailed');login.hidden=false;}
             finally{clearTimeout(timeout);saving=false;form.inert=false;}
         });

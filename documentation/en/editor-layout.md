@@ -17,3 +17,32 @@ The minus / percentage / plus controls immediately after Save, Save and continue
 Bottom padding leaves approximately 35% of the writing surface below the final line (bounded to 32–240 pixels). This is CSS presentation space, not inserted blank paragraphs. Typing/Enter at the end keeps that room visible; moving to earlier text does not force you back down.
 
 The rich editor keeps Undo/Redo to the right of the WYSIWYG switch, uses four alignment buttons beside the style selector, and sizes tools to their captions instead of stretching every control. The object-deletion checkbox and Manage objects share a separate row above Dismiss link. The backup reminder is last in the tools pane.
+
+## Editing inside the tree workspace
+
+On `/tree`, **Edit** opens the existing editor inside the selected reading pane.
+Plain text, code, Markdown, HTML and rich text keep their existing save, undo/redo,
+zoom, recovery and object protection behavior. The reader toolbar and content are
+replaced for the duration of editing; the main tree and split controls stay available.
+
+- **Save** returns to reading and reloads the saved node at the previous reading scroll position.
+- **Save and continue** reloads the editor with the saved revision and remains in the same pane.
+- **Cancel** restores the original reader without reloading it, unless an earlier Save and continue changed the node.
+- Leaving a dirty editor, changing nodes or closing its split pane requires confirmation.
+  Loading and saving must finish before a pane can be removed.
+- Reading layout preferences remain unchanged. Compact buttons apply to editor actions
+  with icons too. Rich text tools use their existing resizable sidebar at wide pane
+  widths and their existing Controls drawer at narrow widths.
+- Ctrl/middle-clicking an Edit link still opens the standalone editor. Editors opened
+  from other pages keep their existing standalone behavior.
+
+Editors run in designated same-origin frames so their scripts and styles do not
+conflict with reading or another editor. Native write endpoints, permissions, CSRF,
+tenant checks, rich text revisions and JSON save receipts remain authoritative.
+If the selected database or session becomes stale, the draft remains visible and
+recovery download remains available; the frame does not bypass server checks.
+
+Manual regression checks: edit and cancel every syntax; save and Save and continue;
+try node changes and browser Back/Forward with unsaved changes; edit independently
+in both split panes and try closing the right pane; toggle compact layout; check
+rich text undo/redo, object dialogs, tools resizing and recovery after a failed save.

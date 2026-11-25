@@ -4,7 +4,7 @@
         const doc=win.document,core=win.SweetCherrySplitState;
         if(core.embedded(win)){
             const notify=(type,detail={})=>win.frameElement.dispatchEvent(new win.CustomEvent('sweetcherry:split-pane',{detail:{type,token,...detail}}));
-            return {navigate:selectLocal,ready(){},loaded(id,name,path){notify('loaded',{id,name,path});},message(text){notify('message',{text});},stop(message){notify('stop',{message});},restoreFocus(id){notify('focus',{id});}};
+            return {navigate:selectLocal,hasEditor:()=>false,ready(){},loaded(id,name,path){notify('loaded',{id,name,path});},message(text){notify('message',{text});},stop(message){notify('stop',{message});},restoreFocus(id){notify('focus',{id});}};
         }
         let storage;try{storage=win.sessionStorage;}catch(_){}
         const key='sweetcherry.split:'+token,state=core.read(storage,key);
@@ -51,7 +51,8 @@
         function close(force=false){
             if(!enabled)return true;
             // Removing a frame does not reliably trigger an editor's beforeunload guard.
-            try{const childDoc=frame.contentDocument;
+            try{const reader=api();if(!force&&reader?.canLeaveEditor&&!reader.canLeaveEditor())return false;
+                const childDoc=frame.contentDocument;
                 const editing=childDoc?.querySelector('#richEditForm, #plainEditForm, [data-title-form]:not([hidden])')||(!api()&&childDoc?.querySelector('form'));
                 if(!force&&editing&&!win.confirm(workspace.dataset.splitCloseConfirm))return false;
             }catch(_){}
@@ -110,7 +111,8 @@
         win.addEventListener('resize',render);
         const result={navigate,message(){},loaded(){if(!enabled||state.active==='left')return;activate('right').catch(()=>{});},restoreFocus(){},
             ready(){const query=new URL(win.location.href);if(query.searchParams.has('split')){query.searchParams.delete('split');win.history.replaceState(win.history.state,'',query.pathname+query.search+query.hash);}const active=state.active;if(state.open||requested){open();if(!requested&&active==='left')activate('left').catch(()=>{});}else render();},
-            stop(){disposed=true;close(true);},activeRight:()=>enabled&&state.active==='right',
+            hasEditor:()=>api()?.editorActive?.()===true,
+            stop(message){disposed=true;if(api()?.editorActive?.()){api().invalidateEditor(message);return;}close(true);},activeRight:()=>enabled&&state.active==='right',
             move(direction){const reader=api();if(reader)reader.move(direction);}};
         win.SweetCherryTreeSplit=result;return result;
     }

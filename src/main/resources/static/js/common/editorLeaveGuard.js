@@ -5,6 +5,12 @@
             let leaving = false;
             form.addEventListener('editor:saved', () => { leaving = true; });
             const message = form.dataset.leaveMessage;
+            // Same-origin tree hosts can check before removing an editor frame.
+            window.SweetCherryEditorState={
+                dirty:()=>!leaving&&isDirty(),
+                busy:()=>form.inert===true,
+                approveLeave:()=>{leaving=true;}
+            };
             window.addEventListener('beforeunload', event => {
                 if (!leaving && isDirty()) { event.preventDefault(); event.returnValue = ''; }
             });

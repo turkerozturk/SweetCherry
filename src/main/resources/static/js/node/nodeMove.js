@@ -42,6 +42,7 @@
         if(window.SweetCherryTreeSplit?.activeRight()){
             event.preventDefault();window.SweetCherryTreeSplit.move(direction);return;
         }
+        if(window.SweetCherryTreeEditor?.active())return;
         const form = document.querySelector('#workspace-content [data-node-move]');
         if (!form || form.dataset.moveReady !== 'ready') return;
         event.preventDefault();

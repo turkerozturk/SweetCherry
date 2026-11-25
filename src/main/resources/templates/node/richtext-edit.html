@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html th:attr="data-bs-theme=${uiTheme == 'dark' ? 'dark' : 'light'}" lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<head><link rel="stylesheet" th:href="@{/css/node/treeInlineEditing.css}"><script th:src="@{/js/node/inlineEditorBridge.js}"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title th:text="#{richtext.edit.title}">Rich text editor</title>
 <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}"><link rel="stylesheet" th:href="@{/css/node/richTextEditor.css}"><link rel="stylesheet" th:href="@{/css/node/editorComfort.css}"><link rel="stylesheet" th:href="@{/css/node/nodeTargetSearch.css}"><link rel="stylesheet" th:href="@{/css/node/editorRecovery.css}"><link rel="stylesheet" th:href="@{/css/theme.css}"></head>
 <body>
@@ -17,7 +17,7 @@
 <input type="hidden" name="deleted" id="richDeleted" value="[]">
 <input type="hidden" name="codeboxes" id="richCodeboxes" value="{}">
 <input type="hidden" name="tables" id="richTables" value="{}">
-<div class="actions rich-savebar"><button type="button" id="richToolsToggle" aria-controls="richControls" aria-expanded="false" th:text="#{editor.controls}"></button><button type="submit" th:text="#{richtext.edit.save}"></button><button type="submit" name="continueEditing" value="true" class="btn btn-success" th:text="#{editor.saveContinue}">Save and continue</button><a th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}" th:text="#{richtext.edit.cancel}"></a><th:block th:replace="~{common/editorZoomFragment :: zoom}"></th:block></div>
+<div class="actions rich-savebar"><button type="button" id="richToolsToggle" aria-controls="richControls" aria-expanded="false" th:text="#{editor.controls}"></button><button type="submit" data-editor-save><i class="fas fa-save" aria-hidden="true"></i> <span th:text="#{richtext.edit.save}"></span></button><button type="submit" data-editor-continue name="continueEditing" value="true" class="btn btn-success"><i class="fas fa-save" aria-hidden="true"></i><i class="fas fa-pen" aria-hidden="true"></i> <span th:text="#{editor.saveContinue}"></span></button><a data-editor-cancel th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}"><i class="fas fa-times" aria-hidden="true"></i> <span th:text="#{richtext.edit.cancel}"></span></a><th:block th:replace="~{common/editorZoomFragment :: zoom}"></th:block></div>
 <div id="richEditorShell" class="rich-editor-shell">
 <aside id="richControls" th:aria-label="#{editor.controls}"><button type="button" id="richToolsClose" th:text="#{editor.closeControls}"></button>
 
