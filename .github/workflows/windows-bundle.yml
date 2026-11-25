@@ -26,8 +26,17 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
+          check-latest: true
           java-version: '17'
           cache: maven
+      - name: Verify patched Java runtime
+        run: python packaging/verify-java-runtime.py
+
+      - name: Test bundled runtime policy
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: .\packaging\windows\test-runtime-policy.ps1
+
       - name: Test and prepare the existing distribution
         shell: pwsh
         run: |
@@ -51,6 +60,8 @@ jobs:
           Write-Host 'Reading Temurin runtime metadata.'
           $metadata = @(Invoke-RestMethod 'https://api.adoptium.net/v3/assets/latest/17/hotspot?architecture=x64&image_type=jre&os=windows&vendor=eclipse')
           if ($metadata.Count -ne 1) { throw 'Expected one Temurin Windows x64 JRE.' }
+          $releaseVersion = [string]$metadata[0].version_data.openjdk_version
+          if ($releaseVersion -notmatch '^17\.\d+\.\d+(?:\.\d+)?(?:\+|$)' -or [version]($releaseVersion.Split('+')[0]) -lt [version]'17.0.21.1') { throw 'Temurin metadata must provide patched Java 17.0.21.1 or newer.' }
           $package = $metadata[0].binary.package
           if ($package.link -notlike 'https://github.com/adoptium/temurin17-binaries/releases/download/*') { throw 'Unexpected runtime download origin.' }
           $archive = Join-Path $tools 'runtime.zip'

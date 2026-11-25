@@ -59,9 +59,9 @@ $runtime = Join-Path $bundle 'runtime'
 if (Test-Path $runtime) { throw 'runtime already exists; use a fresh staging directory.' }
 Move-Item $runtimeRoots[0].FullName $runtime
 $runtimeInfo = (& "$runtime/bin/java.exe" -XshowSettings:properties -version 2>&1 | Out-String)
-if ($LASTEXITCODE -ne 0 -or $runtimeInfo -notmatch 'os.arch\s*=\s*amd64' -or $runtimeInfo -notmatch 'java.version\s*=\s*17\.') {
-    throw 'The bundle must contain a Windows x64 Java 17 runtime.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect bundled Java runtime.' }
+. "$PSScriptRoot/runtime-policy.ps1"
+Assert-BundleJavaRuntime $runtimeInfo
 Copy-Item "$PSScriptRoot/SweetCherry.ico" $bundle
 [xml]$config = Get-Content "$PSScriptRoot/launch4j.xml" -Raw
 $config.launch4jConfig.SelectSingleNode('outfile').InnerText = [string](Join-Path $bundle 'SweetCherry.exe')

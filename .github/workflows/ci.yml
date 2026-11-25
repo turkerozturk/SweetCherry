@@ -44,8 +44,17 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
+          check-latest: true
           java-version: "17"
           cache: maven
+
+      - name: Verify patched Java runtime
+        run: python packaging/verify-java-runtime.py
+
+      - name: Test bundled runtime policy
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: .\packaging\windows\test-runtime-policy.ps1
 
       - name: Test and package on Linux
         if: runner.os != 'Windows'

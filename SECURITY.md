@@ -56,3 +56,23 @@ An ADMIN-only action can still have a vulnerability. Authorization does not repl
 ## Testing Safely
 
 Test only on systems and data that you own or have explicit permission to use. Use a local test instance and disposable copies of databases. Avoid destructive testing, service disruption, access to other people's data, and requests against systems you are not authorized to test. Keep sensitive reproduction files within the private report.
+
+## Java runtime updates (November 2026)
+
+SweetCherry keeps Java 17 bytecode compatibility. A newer Java major version by
+itself does not resolve CVE-2026-114938: the November 2026 fixes are present in
+Temurin 17.0.21.1+2, 21.0.13.1+2, 25.0.5.1+2 and 27.0.1.1+4. Use the latest
+security-patched release from your Java vendor; these are minimums for this issue,
+not a guarantee against future vulnerabilities.
+
+- CI resolves the latest Java 17 and rejects versions below the patched baseline.
+- Windows bundle downloads still verify SHA-256; metadata and the extracted Java
+  runtime must both meet the Java 17.0.21.1 minimum before packaging.
+- Existing installations do not update Java automatically. If `runtime` is present
+  beside SweetCherry, update that bundled runtime; updating system Java alone does
+  not change it. Without `runtime`, update the Java selected by JAVA_HOME/PATH.
+- Stop SweetCherry, update Java, verify the version, then restart the application.
+  Check `runtime/bin/java -version` (Windows: `runtime\bin\java.exe -version`)
+  for a bundled runtime, or `java -version` for system Java.
+
+Official guidance: https://adoptium.net/news/2026/11/temurin-november-2026-cspu-java4shell
