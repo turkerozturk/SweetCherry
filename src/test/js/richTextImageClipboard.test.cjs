@@ -23,3 +23,7 @@ test('general clipboard read prefers HTML across items and retains plain/image a
  assert.equal(content.html,'<b>Rich</b>');assert.equal(content.text,'Plain');assert.equal(content.image.type,'image/png');
  await assert.rejects(()=>clipboard.readContent(null));
 });
+test('raster file transfers retain every image, including WebP/GIF, instead of only the first one',()=>{
+ const files=[{type:'image/webp'},{type:'image/gif'},{type:'image/jpeg'}];assert.deepEqual(clipboard.fromTransferAll({files}),files);
+ assert.equal(clipboard.fromTransferAll({files:[{type:'image/svg+xml'},{type:'image/avif'}]}).length,0);
+});

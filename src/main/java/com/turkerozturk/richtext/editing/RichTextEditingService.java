@@ -60,6 +60,13 @@ public class RichTextEditingService {
         return new Editor(node, new ProtectedRichTextCodec().open(document, references(objects)), revision(node, objects), info, uploads.fileBytes());
     }
 
+    /** Read-only staging: validate the selected writable node, then return PNG without changing CTB rows. */
+    @Transactional(readOnly=true)
+    public String normalizeImage(long id,String image) {
+        editableNode(id);
+        return "data:image/png;base64,"+java.util.Base64.getEncoder().encodeToString(RasterImageNormalizer.dataUrl(image,uploads.fileBytes()).bytes());
+    }
+
     private Node editableNode(long id) {
         if (!properties.writable()) throw new AccessDeniedException("The selected CTB is read-only.");
         Node node = properties.realNode(id);
@@ -137,7 +144,7 @@ public class RichTextEditingService {
             int limit = uploads.fileBytes();
             images = PendingRichTextImages.decode(imageJson, limit);
             files = PendingRichTextFiles.decode(fileJson, limit);
-            if (images.size() + files.size() > 10 || images.values().stream().mapToLong(bytes -> bytes.length).sum()
+            if (images.values().stream().mapToLong(bytes -> bytes.length).sum()
                     + files.values().stream().mapToLong(file -> file.bytes().length).sum() > EmbeddedUploadPolicy.TOTAL_BYTES)
                 throw new IllegalArgumentException("Upload too large");
             var tableRows = RichTextTableCodec.decode(tableJson);
@@ -161,7 +168,7 @@ public class RichTextEditingService {
             var keys = new java.util.HashSet<String>(images.keySet()); keys.addAll(files.keySet());
             tables.keySet().stream().filter(key -> key.startsWith("new-table:")).forEach(keys::add);
             codeboxes.keySet().stream().filter(key -> key.startsWith("new-codebox:")).forEach(keys::add);
-            if (keys.size() > 10) throw new IllegalArgumentException("Too many new objects");
+            if (keys.stream().filter(key->!key.startsWith("new-image:")).count() > 10) throw new IllegalArgumentException("Too many new objects");
             var edited=new RichTextXmlReader().read(xml);
             var choices=RichTextWikiLinks.decode(wikiChoices);
             var resolved=entityManager.unwrap(org.hibernate.Session.class).doReturningWork(c->RichTextWikiLinks.resolve(c,edited,choices,keepUnresolvedWikiLinks,false).document());

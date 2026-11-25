@@ -28,7 +28,8 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
     const align = element('align'); align.dataset = {choice:'justification'};
     const symbol=element('symbol');symbol.dataset={insertSymbol:'☐'};
     let saved, dirty, windowObject, recovery, uuid=0;
-    ids.richEditForm.querySelector=()=>({value:"initial-revision"});
+    ids.richEditForm.dataset.normalizeImageUrl="/nodes/richtext/edit/1/normalize-image";
+    ids.richEditForm.querySelector=()=>({name:"_csrf",value:"initial-revision"});
     const document = {
         getElementById: id => ids[id],
         querySelectorAll: selector => selector === '[data-insert-symbol]' ? [symbol] : selector === '[data-align]' ? [alignAction] : selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
@@ -49,7 +50,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         }}
     };
     const source = fs.readFileSync(path.join(__dirname, '../../main/resources/static/js/node/richTextEditor.js'), 'utf8');
-    vm.runInNewContext(source, {document, URL, Event:class {}, window:windowObject={EditorRecovery:options.recovery?{install:(form,adapter)=>recovery=adapter}:undefined,isSecureContext:options.secure!==false,RichTextEditorSupport:require('../../main/resources/static/js/node/richTextEditorSupport.js'),RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
+    vm.runInNewContext(source, {document, URL, URLSearchParams, AbortController, setTimeout, clearTimeout, fetch:options.fetch, Event:class {}, window:windowObject={EditorRecovery:options.recovery?{install:(form,adapter)=>recovery=adapter}:undefined,isSecureContext:options.secure!==false,RichTextEditorSupport:require('../../main/resources/static/js/node/richTextEditorSupport.js'),RichTextImageClipboard:require('../../main/resources/static/js/node/richTextImageClipboard.js'),EditorLeaveGuard:{install:(_form,check)=>{dirty=check;}},richEditorDocument:{runs:initialRuns || [{text:'A😀B\nC', attributes:{future:'keep'}}]},richEditorObjects:objects || {},RichTextClipboard:clipboard,richEditorMaxFileBytes:maxFileBytes,
         RichTextVisualModel:visual ? {selection:()=>[Array.from(ids.richText.value.slice(0,ids.richText.selectionStart)).length,Array.from(ids.richText.value.slice(0,ids.richText.selectionEnd)).length],restore:(_,a,b)=>{ids.richText.selectionStart=Array.from(ids.richText.value).slice(0,a).join('').length;ids.richText.selectionEnd=Array.from(ids.richText.value).slice(0,b).join('').length;}} : null},
         crypto:options.crypto||{randomUUID:()=> uuid++===0?'test-uuid':'test-uuid-'+uuid},
         navigator:{clipboard:options.clipboardReader},
@@ -486,12 +487,11 @@ test('a later read failure cannot leave the first image or orphan payload behind
  e.ids.richImageFile.files=[pickedImage('good.png'),pickedImage('bad.png')];await e.fire('richImageFile','change');
  assert.equal(text(e.runs()),'A😀B\nC');assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(e.ids.richUndo.disabled,true);assert.equal(e.dirty(),false);
 });
-test('new object count includes staged attachments and rejects an entire over-limit group',async()=>{
+test('image count is not restricted by a staged attachment or the former ten-object cap',async()=>{
  const e=editor();e.select(0,0);e.ids.richFilePicker.files=[{name:'keep.bin',type:'application/octet-stream',size:1,data:'data:application/octet-stream;base64,AQ=='}];await e.fire('richFilePicker','change');
- await new Promise(resolve=>setImmediate(resolve));const before=text(e.runs());
- e.ids.richImageFile.files=Array.from({length:10},(_,i)=>pickedImage(i+'.png'));await e.fire('richImageFile','change');
- assert.equal(text(e.runs()),before);assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(Object.keys(JSON.parse(e.ids.richFiles.value)).length,1);
- e.ids.richImageFile.files=Array.from({length:9},(_,i)=>pickedImage(i+'.png'));await e.fire('richImageFile','change');e.runs();assert.equal(Object.keys(JSON.parse(e.ids.richImages.value)).length,9);
+ e.ids.richImageFile.files=Array.from({length:32},(_,i)=>pickedImage(i+'.png'));await e.fire('richImageFile','change');e.runs();
+ assert.equal(Object.keys(JSON.parse(e.ids.richImages.value)).length,32);assert.equal(Object.keys(JSON.parse(e.ids.richFiles.value)).length,1);
+ e.key('z');e.runs();assert.deepEqual(JSON.parse(e.ids.richImages.value),{});assert.equal(Object.keys(JSON.parse(e.ids.richFiles.value)).length,1);
 });
 test('total encoded budget rejects the whole group before reading',async()=>{
  let reads=0;const e=editor(undefined,20000000,undefined,undefined,false,{FileReader:class{readAsDataURL(){reads++;}}});
@@ -583,4 +583,10 @@ test('pasting over a text and table selection stages removal and insertion in a 
  e.ids.richAllowDeletion.checked=true;e.select(0,2);e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData:type=>type==='application/x-sweetcherry-richtext+json'?JSON.stringify({version:2,items:[{text:'new',attributes:{}},{table:[['fresh']]}]}):''}});
  assert.equal(text(e.runs()),'new\uFFFCB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),['grid:2']);
  e.key('z');assert.equal(text(e.runs()),'A\uFFFCB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),[]);assert.deepEqual(JSON.parse(e.ids.richTables.value),{});
+});
+test('non-PNG file imports are normalized by the guarded endpoint before entering the model',async()=>{
+ let request;const e=editor(undefined,undefined,undefined,undefined,false,{fetch:async(url,options)=>{request={url,options};return {ok:true,headers:{get:()=> 'application/json'},json:async()=>({data:'data:image/png;base64,AQID'})};}});
+ e.select(1,1);e.ids.richImageFile.files=[{type:'image/webp',size:4,data:'data:image/webp;base64,AQID',name:'photo.webp'}];await e.fire('richImageFile','change');e.runs();
+ assert.equal(request.url,'/nodes/richtext/edit/1/normalize-image');assert.equal(request.options.body.get('_csrf'),'initial-revision');assert.equal(request.options.redirect,'error');
+ assert.deepEqual(Object.values(JSON.parse(e.ids.richImages.value)),['data:image/png;base64,AQID']);
 });

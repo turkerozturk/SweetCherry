@@ -77,10 +77,14 @@ test('HTML paste translates only the sanitized fragment and preserves import ima
 test('portable object snapshots contain data only and reject forged object IDs, remote images and oversized selections',()=>{
  const items=[{text:'Before',attributes:{weight:'heavy',__sweet_object:'image:1'}},{image:'data:image/png;base64,AQID',label:'Photo'},{table:[['cell']]},{codebox:{text:'echo ok',syntax:'sh'}},{file:{name:'notes.txt',data:'AQID'}}];
  const result=clipboard.fromInternal(JSON.stringify({version:2,items}));assert.equal(result.length,5);assert.equal(result[0].attributes.__sweet_object,undefined);
- for(const invalid of [[{image:'https://tracker.example/image.png'}],[{table:[['one'],['two','three']]}],[{codebox:{text:'x',syntax:'<script>'}}],Array.from({length:11},()=>({image:'data:image/png;base64,AQID'}))])assert.throws(()=>clipboard.fromInternal(JSON.stringify({version:2,items:invalid})));
+ for(const invalid of [[{image:'https://tracker.example/image.png'}],[{table:[['one'],['two','three']]}],[{codebox:{text:'x',syntax:'<script>'}}]])assert.throws(()=>clipboard.fromInternal(JSON.stringify({version:2,items:invalid})));
 });
 test('HTML clipboard keeps inline embedded PNG images in their text position without accepting SVG or remote image bytes',()=>{
  const result=clipboard.fromDom(element('DIV',[text('before'),element('IMG',[],{src:'data:image/png;base64,AQID',alt:'Photo'}),text('after')]));
  assert.equal(result[0].text,'before');assert.equal(result[1].image,'data:image/png;base64,AQID');assert.equal(result[2].text,'after');
  assert.equal(clipboard.toHtml([{image:'javascript:alert(1)',label:'Bad'}]),'');
+});
+
+test('portable image snapshots no longer have a ten-image count cap',()=>{
+ assert.equal(clipboard.fromInternal(JSON.stringify({version:2,items:Array.from({length:40},()=>({image:'data:image/png;base64,AQID'}))})).length,40);
 });

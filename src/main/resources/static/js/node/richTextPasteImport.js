@@ -6,8 +6,10 @@
     function handle(html){
         if(typeof html!=='string'||html.length>2000000)return false;
         const fragment=window.DOMPurify.sanitize(html,{RETURN_DOM_FRAGMENT:true,ALLOWED_TAGS:['img'],ALLOWED_ATTR:['src']});
-        if(!Array.from(fragment.querySelectorAll('img')).some(image=>/^https?:\/\//i.test(image.getAttribute('src')||'')))return false;
-        if(!window.confirm(dialog.dataset.clipboardConfirm))return false;
+        const sources=Array.from(fragment.querySelectorAll('img')).map(image=>image.getAttribute('src')||'');
+        const remote=sources.some(src=>/^https?:\/\//i.test(src));
+        if(!remote&&!sources.some(src=>/^data:image\/(jpeg|jpg|gif|webp|bmp|tiff|vnd\.wap\.wbmp);base64,/i.test(src)))return false;
+        if(remote&&!window.confirm(dialog.dataset.clipboardConfirm))return false;
         let ticket,release;try{ticket=window.RichTextImportBridge.capture();release=window.RichTextImportBridge.begin();}catch(_){return true;}
         controller?.abort();const request=new AbortController();controller=request;
         status.hidden=false;status.textContent=dialog.dataset.loading;

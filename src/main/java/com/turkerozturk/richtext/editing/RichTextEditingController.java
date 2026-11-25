@@ -21,6 +21,12 @@ public class RichTextEditingController {
         return "node/richtext-edit";
     }
 
+    @PostMapping("/nodes/richtext/edit/{id}/normalize-image") @ResponseBody
+    public org.springframework.http.ResponseEntity<java.util.Map<String,String>> normalizeImage(@PathVariable long id,@RequestParam String image) {
+        try {return org.springframework.http.ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore()).body(java.util.Map.of("data",service.normalizeImage(id,image)));}
+        catch(IllegalArgumentException error){return org.springframework.http.ResponseEntity.badRequest().body(java.util.Map.of("error","Invalid or oversized raster image"));}
+    }
+
     public String save(long id,String xml,String revision,String images,String files,String tables,String deleted,boolean allowObjectDeletion) {
         return save(id,xml,revision,images,files,tables,deleted,allowObjectDeletion,false);
     }

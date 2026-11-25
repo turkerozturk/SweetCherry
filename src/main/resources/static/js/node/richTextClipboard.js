@@ -116,9 +116,9 @@
                 size+=item.text.length;if(size>200000)throw Error('Clipboard too large');
                 return {text:item.text.replace(/\uFFFC/g,''),attributes:attributes(item.attributes||{})};
             }
-            if(++objects>10)throw Error('Too many objects');
             if(typeof item.image==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(item.image)&&item.image.length<=13000000)
                 return {image:item.image,label:typeof item.label==='string'?item.label.slice(0,255):'Image'};
+            if(++objects>10)throw Error('Too many objects');
             if(Array.isArray(item.table)&&item.table.length>0&&item.table.length<=100&&item.table[0]?.length>0&&item.table[0].length<=20&&item.table.every(row=>Array.isArray(row)&&row.length===item.table[0].length&&row.every(cell=>typeof cell==='string'&&cell.length<=5000)))return {table:item.table};
             if(item.codebox&&typeof item.codebox.text==='string'&&item.codebox.text.length<=200000&&typeof item.codebox.syntax==='string'&&/^[a-zA-Z0-9_+.#-]{1,100}$/.test(item.codebox.syntax))return {codebox:{text:item.codebox.text,syntax:item.codebox.syntax}};
             if(item.file&&typeof item.file.name==='string'&&item.file.name.length>0&&item.file.name.length<=255&&typeof item.file.data==='string'&&/^[A-Za-z0-9+/]*={0,2}$/.test(item.file.data)&&item.file.data.length<=13000000)return {file:{name:item.file.name,data:item.file.data}};

@@ -15,6 +15,7 @@
     let deletedKeys = [];
     const uploadLimit = window.richEditorMaxFileBytes || 9000000;
     let readingImage = false;
+    const nonImageObjects=()=>runs.filter(run=>(run.attributes.__sweet_object||'').startsWith('new-')&&!(run.attributes.__sweet_object||'').startsWith('new-image:')).length;
     const plainClipboard = text => text.replace(/\uFFFC/g, '');
     const mode = document.getElementById('richVisualMode');
     const visual = () => !!(mode && mode.checked && window.RichTextVisualModel);
@@ -335,7 +336,7 @@
         document.getElementById('richCodeboxCancel').addEventListener('click',closeCodebox);
         codeboxDialog.addEventListener('cancel',event=>{event.preventDefault();closeCodebox();});
         document.getElementById('richCodeboxApply').addEventListener('click',()=>{
-            if(text.value.length>200000 || !codeboxKey && runs.filter(run=>(run.attributes.__sweet_object||'').startsWith('new-')).length>=10){error.hidden=false;return;}
+            if(text.value.length>200000 || !codeboxKey && nonImageObjects()>=10){error.hidden=false;return;}
             const value={text:text.value,syntax};
             if(!codeboxKey){
                 closeCodebox();captureSelection();
@@ -392,7 +393,7 @@
             const rows=readCells();
             if(Number(rowCount.value)!==rows.length || Number(columnCount.value)!==rows[0].length || rows.some(row=>row.some(value=>value.length>5000))){error.hidden=false;return;}
             if(!tableKey) {
-                if(runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length>=10){error.hidden=false;return;}
+                if(nonImageObjects()>=10){error.hidden=false;return;}
                 closeTable();captureSelection();
                 if(!replace(selection[0],selection[1],'\uFFFC'))return;
                 tableKey='new-table:'+window.RichTextEditorSupport.objectId(crypto);
@@ -604,6 +605,18 @@
         render(); focusEditor(); restoreSelection(); commitHistory(); return true;
     }
     /** Keeps file data local until Save and adds its protected slot to the shared undo/redo model. */
+    async function normalizeRaster(image){
+        const body=new URLSearchParams({image,_tenantView:window.richEditorTenant||''});
+        const csrf=form.querySelector('input[name="_csrf"]');if(csrf)body.set('_csrf',csrf.value);
+        const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),30000);
+        try{
+            const response=await fetch(form.dataset.normalizeImageUrl,{method:'POST',body,credentials:'same-origin',redirect:'error',signal:controller.signal});
+            if(!response.ok||!(response.headers.get('Content-Type')||'').includes('application/json'))throw Error('type');
+            const result=await response.json();
+            if(typeof result.data!=='string'||!/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(result.data)||result.data.length>Math.ceil(uploadLimit/3)*4+32)throw Error('size');
+            return result.data;
+        }finally{clearTimeout(timeout);}
+    }
     const addImage = file => addObject(file, false);
     /** Adds images or attachments as protected slots; file content remains local until Save. */
     function fileError(status,code) {
@@ -624,7 +637,7 @@
             const activeKeys = runs.map(run=>run.attributes.__sweet_object);
             const activeImages = Object.entries(pendingImages).filter(([key])=>activeKeys.includes(key));
             const activeFiles = Object.entries(pendingFiles).filter(([key])=>activeKeys.includes(key));
-            if (runs.filter(run=>(run.attributes.__sweet_object || '').startsWith('new-')).length + files.length > 10) throw new Error('objects');
+            if (attachment && nonImageObjects() + files.length > 10) throw new Error('objects');
             for(const file of files){
                 if(file.size > uploadLimit) throw new Error('size');
                 if(attachment && (!file.name || file.name.length > 255)) throw new Error('name');
@@ -638,7 +651,10 @@
                 let data=await new Promise((resolve,reject)=>{
                     const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reader.onabort=()=>reject(new Error('read'));reader.readAsDataURL(file);
                 });
-                if(!attachment)data='data:'+mime+';base64,'+data.slice(data.indexOf(',')+1);
+                if(!attachment){
+                    data='data:'+mime+';base64,'+data.slice(data.indexOf(',')+1);
+                    if(mime!=='image/png')data=await normalizeRaster(data);
+                }
                 if(source !== JSON.stringify(runs)) throw new Error('changed');
                 total+=data.length;if(total>29000000)throw new Error('objects');
                 prepared.push({file,data,key:(attachment?'new-file:':'new-image:')+window.RichTextEditorSupport.objectId(crypto)});
@@ -692,7 +708,7 @@
             if(source!==JSON.stringify(runs))throw new Error('changed');
             selection=at;focusEditor();restoreSelection();
             const map={'text/html':content.html||'','text/plain':content.text||'','application/x-sweetcherry-richtext+json':content.own||''};
-            paste({preventDefault(){},clipboardData:{files:content.image?[content.image]:[],getData:type=>map[type]||''}});
+            paste({preventDefault(){},clipboardData:{files:content.images||(content.image?[content.image]:[]),getData:type=>map[type]||''}});
         }catch(error){show(error.message==='changed'?'changed':'empty');}
     });
     /** Snapshot objects into portable data, never reusable database IDs or remote URLs. */
@@ -761,7 +777,7 @@
             }else if(item.text)incoming.push({text:item.text,attributes:{...item.attributes}});
         }
         if(!incoming.length)return false;
-        if(runs.filter(run=>(run.attributes.__sweet_object||'').startsWith('new-')).length+Object.keys(newTables).length+Object.keys(newImages).length+Object.keys(newCodeboxes).length+Object.keys(newFiles).length>10
+        if(nonImageObjects()+Object.keys(newTables).length+Object.keys(newCodeboxes).length+Object.keys(newFiles).length>10
             || Object.keys({...tableChanges,...newTables}).length>20 || JSON.stringify({...tableChanges,...newTables}).length>2000000)throw new Error('Clipboard tables too large');
         if(Object.keys({...codeboxChanges,...newCodeboxes}).length>20||JSON.stringify({...codeboxChanges,...newCodeboxes}).length>2000000)throw Error('Clipboard codeboxes too large');
         const active=runs.map(run=>run.attributes.__sweet_object);
@@ -786,18 +802,18 @@
         const clipboardHint=document.getElementById('richClipboardHint');if(clipboardHint)clipboardHint.hidden=true;
         const transfer=event.clipboardData,clipboard=window.RichTextClipboard;
         if(!transfer)return;
-        const file=window.RichTextImageClipboard?.fromTransfer(transfer);
+        const imageFiles=window.RichTextImageClipboard?.fromTransferAll(transfer)||[],file=imageFiles[0];
         const plain=transfer.getData('text/plain');
         if(clipboard){
             const own=transfer.getData('application/x-sweetcherry-richtext+json'),html=transfer.getData('text/html');
             try{
                 if(own&&pasteStructured(clipboard.fromInternal(own)))return;
-                if(file && !plain.trim()){addImage(file);return;}
+                if(file && !plain.trim()){addObjects(imageFiles,false,imageFiles.length>1);return;}
                 if(html&&window.RichTextPasteImport?.handle(html))return;
                 if(html&&pasteStructured(clipboard.fromHtml(html,document)))return;
             }catch(_){const status=document.getElementById('richPasteStatus');if(status)status.hidden=false;return;}
         }
-        if(file)addImage(file);else if(plain){visualChange(plainClipboard(plain).replace(/\r\n?/g,'\n'));const hint=document.getElementById('richClipboardHint');if(hint && visual()){hint.textContent=hint.dataset.plain;hint.hidden=false;}}
+        if(file)addObjects(imageFiles,false,imageFiles.length>1);else if(plain){visualChange(plainClipboard(plain).replace(/\r\n?/g,'\n'));const hint=document.getElementById('richClipboardHint');if(hint && visual()){hint.textContent=hint.dataset.plain;hint.hidden=false;}}
         else {const hint=document.getElementById('richClipboardHint');if(hint){hint.hidden=false;const types=window.RichTextImageClipboard?.formats(transfer);hint.textContent=hint.dataset.empty+(types?' ('+types+')':'');}}
     }
     for(const target of [input,preview])target.addEventListener('copy',copySelection);

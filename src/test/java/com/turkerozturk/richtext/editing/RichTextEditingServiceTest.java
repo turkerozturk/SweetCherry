@@ -186,6 +186,20 @@ class RichTextEditingServiceTest {
         verify(entityManager).clear();
     }
 
+    @Test void moreThanTenImagesSaveWithoutLiftingTheSharedByteBudget()throws Exception {
+        var out=new java.io.ByteArrayOutputStream();javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(1,1,java.awt.image.BufferedImage.TYPE_INT_RGB),"png",out);
+        var images=new java.util.LinkedHashMap<String,String>();var xml=new StringBuilder("<node>");
+        for(int n=0;n<32;n++){String key="new-image:i"+n;images.put(key,"data:image/png;base64,"+java.util.Base64.getEncoder().encodeToString(out.toByteArray()));xml.append("<rich_text __sweet_object='").append(key).append("'>\uFFFC</rich_text>");}
+        xml.append("</node>");service.save(12,xml.toString(),service.open(12).revision(),tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(images));
+        assertThat(RichTextEditingService.readObjects(connection,12)).hasSize(32);
+    }
+    @Test void normalizeImageStagesNoDatabaseWritesAndRejectsReadOnlyNodes()throws Exception {
+        var out=new java.io.ByteArrayOutputStream();javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(1,1,java.awt.image.BufferedImage.TYPE_INT_RGB),"gif",out);
+        String image="data:image/gif;base64,"+java.util.Base64.getEncoder().encodeToString(out.toByteArray());
+        assertThat(service.normalizeImage(12,image)).startsWith("data:image/png;base64,");verify(query,never()).executeUpdate();assertThat(RichTextEditingService.readObjects(connection,12)).isEmpty();
+        when(properties.writable()).thenReturn(false);assertThatThrownBy(()->service.normalizeImage(12,image)).isInstanceOf(AccessDeniedException.class);
+    }
+
     @Test void insertsValidatedImageAtItsFinalUnicodeOffset() throws Exception {
         var picture = new java.awt.image.BufferedImage(1, 1, java.awt.image.BufferedImage.TYPE_INT_RGB);
         var bytes = new java.io.ByteArrayOutputStream(); javax.imageio.ImageIO.write(picture, "png", bytes);

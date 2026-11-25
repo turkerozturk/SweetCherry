@@ -23,3 +23,8 @@ test('link insertion ends only at the right edge, keeping other formatting and c
  assert.deepEqual(linkRange(runs,2),[0,3]);assert.deepEqual(linkRange(runs,3),[0,3]);
  assert.equal(linkRange(runs,4),null);
 });
+test('WebP, GIF, BMP and TIFF byte signatures work without trustworthy MIME or filename metadata',async()=>{
+ for(const [bytes,mime] of [[[71,73,70,56,57,97],'image/gif'],[[82,73,70,70,0,0,0,0,87,69,66,80],'image/webp'],[[66,77,0,0],'image/bmp'],[[73,73,42,0],'image/tiff']])assert.equal(await support.imageMime(new Blob([new Uint8Array(bytes)],{type:'application/octet-stream'})),mime);
+ assert.equal(await support.imageMime({type:'image/jpg'}),'image/jpeg');
+ await assert.rejects(()=>support.imageMime(new Blob(['<svg/>'],{type:'image/svg+xml'})),/type/);
+});

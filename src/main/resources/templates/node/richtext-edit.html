@@ -6,7 +6,7 @@
 <body>
 <header class="rich-page-header"><h1 th:text="#{richtext.edit.title}"></h1><strong data-inline-symbols th:text="${editor.node.name}"></strong></header>
 <div th:replace="~{common/editorRecoveryFragment :: recovery}"></div>
-<form id="richEditForm" th:attr="data-leave-message=#{editor.unsaved}" th:action="@{/nodes/richtext/edit/{id}(id=${editor.node.nodeId})}" method="post">
+<form id="richEditForm" th:attr="data-leave-message=#{editor.unsaved},data-normalize-image-url=@{/nodes/richtext/edit/{id}/normalize-image(id=${editor.node.nodeId})}" th:action="@{/nodes/richtext/edit/{id}(id=${editor.node.nodeId})}" method="post">
 <input type="hidden" name="_tenantView" th:value="${tenantViewToken}">
 <input type="hidden" name="revision" th:value="${editor.revision}">
 <input type="hidden" name="xml" id="richXml">
@@ -68,7 +68,7 @@
 <button type="button" id="richAutoLink" th:title="#{editor.linkSelectionHelp}"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> <span th:text="#{editor.linkSelection}"></span></button>
 <button type="button" id="clearFormat"><i class="fas fa-eraser" aria-hidden="true"></i> <span th:text="#{richtext.edit.clear}"></span></button>
 
-<input type="file" id="richImageFile" accept="image/png,image/jpeg" multiple hidden>
+<input type="file" id="richImageFile" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp,image/tiff,image/vnd.wap.wbmp,.jpg,.jpeg,.gif,.webp,.bmp,.tif,.tiff,.wbmp" multiple hidden>
 <input type="file" id="richFilePicker" hidden>
 <span id="richImageHelp" class="note" th:text="#{richtext.edit.imagesHelp}"></span>
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>

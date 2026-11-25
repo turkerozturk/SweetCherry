@@ -46,27 +46,31 @@ public class WebContentImportService {
         return sanitize(content,page.uri(),doc.title().substring(0,Math.min(200,doc.title().length())),page.uri().toString(),deadline,budget);
     }
     private Result sanitize(Element content,java.net.URI base,String title,String sourceUrl,long deadline,Budget budget)throws java.io.IOException {
-        int skipped=0,total=0,occurrences=0;var images=new LinkedHashMap<String,String>();var cached=new HashMap<String,String>();
+        int skipped=0,total=0;long pixels=0;var imagePixels=new HashMap<String,Long>();var images=new LinkedHashMap<String,String>();var cached=new HashMap<String,String>();
         for(var image:content.select("img")) {
             image.removeAttr("data-import-image");
             String source=image.attr("src");if(source.isBlank())source=image.attr("data-src");
             if(source.isBlank())source=image.attr("data-original");
             String absolute="";
             try {
-                if(occurrences>=8 || source.isBlank())throw new Problem("large");
-                absolute=base==null?allowedUri(source).toString():base.resolve(source).toString();
+                if(source.isBlank())throw new Problem("large");
+                absolute=source.startsWith("data:")?source:base==null?allowedUri(source).toString():base.resolve(source).toString();
                 String key=cached.get(absolute);
                 if(key==null) {
-                    if(images.size()>=8 || total>=10_000_000)throw new Problem("large");
+                    if(total>=10_000_000||System.nanoTime()>deadline)throw new Problem("large");
                     int limit=Math.min(uploads.fileBytes(),10_000_000-total);
-                    var resource=fetcher.fetch(absolute,limit,deadline,budget);
-                    if(!Set.of("image/png","image/jpeg").contains(resource.type()))throw new Problem("type");
-                    String raw="data:"+resource.type()+";base64,"+Base64.getEncoder().encodeToString(resource.bytes());
-                    var json=tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(Map.of("new-image:web",raw));
-                    byte[] png=PendingRichTextImages.decode(json,limit).get("new-image:web");total+=png.length;
-                    key="image"+images.size();images.put(key,"data:image/png;base64,"+Base64.getEncoder().encodeToString(png));cached.put(absolute,key);
+                    RasterImageNormalizer.Png png;
+                    if(absolute.startsWith("data:"))png=RasterImageNormalizer.dataUrl(absolute,limit);
+                    else {
+                        var resource=fetcher.fetch(absolute,limit,deadline,budget);
+                        if(!RasterImageNormalizer.MIME_TYPES.contains(resource.type())&&!resource.type().equals("application/octet-stream"))throw new Problem("type");
+                        png=RasterImageNormalizer.normalize(resource.bytes(),limit);
+                    }
+                    total+=png.bytes().length;
+                    key="image"+images.size();images.put(key,"data:image/png;base64,"+Base64.getEncoder().encodeToString(png.bytes()));cached.put(absolute,key);imagePixels.put(key,png.pixels());
                 }
-                occurrences++;image.attr("data-import-image",key);
+                if(pixels+imagePixels.get(key)>RasterImageNormalizer.TOTAL_PIXELS)throw new Problem("large");
+                pixels+=imagePixels.get(key);image.attr("data-import-image",key);
             } catch(java.io.IOException|IllegalArgumentException|Problem error) {skipped++;}
             image.removeAttr("src");image.removeAttr("srcset");image.removeAttr("data-src");image.removeAttr("data-original");
             if(!image.hasAttr("data-import-image")) {

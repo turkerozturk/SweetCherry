@@ -55,13 +55,13 @@ class WebContentImportTest {
         var result=new WebContentImportService(fetcher,uploads).load("https://example.org/a");
         assertThat(result.images()).isEmpty();assertThat(result.html()).contains("Broken").doesNotContain("data-import-image");assertThat(result.skippedImages()).isEqualTo(1);
     }
-    @Test void duplicateImagesAreFetchedOnceAndOnlyEightOccurrencesAreEmbedded() throws Exception {
+    @Test void duplicateImagesAreFetchedOnceWithoutAnEightOccurrenceCap() throws Exception {
         var fetcher=mock(PublicWebFetcher.class);var uploads=mock(EmbeddedUploadPolicy.class);when(uploads.fileBytes()).thenReturn(9_000_000);
         when(fetcher.fetch(eq("https://example.org/a"),anyInt(),anyLong(),any())).thenReturn(resource("<img src='image.png' alt='Photo'>".repeat(12),"https://example.org/a","text/html"));
         var image=new java.awt.image.BufferedImage(1,1,java.awt.image.BufferedImage.TYPE_INT_RGB);var out=new java.io.ByteArrayOutputStream();javax.imageio.ImageIO.write(image,"png",out);
         when(fetcher.fetch(eq("https://example.org/image.png"),anyInt(),anyLong(),any())).thenReturn(new Resource(out.toByteArray(),URI.create("https://example.org/image.png"),"image/png",null));
         var result=new WebContentImportService(fetcher,uploads).load("https://example.org/a");
-        assertThat(result.images()).hasSize(1);assertThat(org.jsoup.Jsoup.parse(result.html()).select("img")).hasSize(8);assertThat(result.skippedImages()).isEqualTo(4);
+        assertThat(result.images()).hasSize(1);assertThat(org.jsoup.Jsoup.parse(result.html()).select("img")).hasSize(12);assertThat(result.skippedImages()).isZero();
         verify(fetcher,times(1)).fetch(eq("https://example.org/image.png"),anyInt(),anyLong(),any());
     }
     @Test void remoteErrorDetailsAreNotReturnedToBrowser() throws Exception {
@@ -86,6 +86,18 @@ class WebContentImportTest {
         assertThat(result.images()).isEmpty();assertThat(result.skippedImages()).isEqualTo(3);assertThat(result.html()).contains("Relative","Private","File").doesNotContain("<img");
         verify(fetcher).fetch(eq("http://127.0.0.1/private"),anyInt(),anyLong(),any());verifyNoMoreInteractions(fetcher);
         assertThatThrownBy(()->service.loadClipboard("x".repeat(2_000_001))).isInstanceOf(Problem.class).hasMessage("large");
+    }
+    @Test void moreThanEightDistinctWebpImagesAndEmbeddedGifNormalizeToPng()throws Exception {
+        var fetcher=mock(PublicWebFetcher.class);var uploads=mock(EmbeddedUploadPolicy.class);when(uploads.fileBytes()).thenReturn(9_000_000);
+        byte[] webp;try(var source=getClass().getResourceAsStream("/fixtures/raster-import/lossless.webp")){webp=source.readAllBytes();}
+        when(fetcher.fetch(anyString(),anyInt(),anyLong(),any())).thenReturn(new Resource(webp,URI.create("https://example.org/image.webp"),"image/webp",null));
+        String html=java.util.stream.IntStream.range(0,14).mapToObj(n->"<img src='https://example.org/"+n+".webp'>").collect(java.util.stream.Collectors.joining());
+        var service=new WebContentImportService(fetcher,uploads);var result=service.loadClipboard(html);
+        assertThat(result.images()).hasSize(14);assertThat(result.skippedImages()).isZero();assertThat(result.images().values()).allMatch(data->data.startsWith("data:image/png;base64,"));
+        verify(fetcher,times(14)).fetch(anyString(),anyInt(),anyLong(),any());clearInvocations(fetcher);
+        byte[] gif;try(var source=getClass().getResourceAsStream("/fixtures/raster-import/animated.gif")){gif=source.readAllBytes();}
+        result=service.loadClipboard("<img src='data:image/gif;base64,"+java.util.Base64.getEncoder().encodeToString(gif)+"'>");
+        assertThat(result.images()).hasSize(1);assertThat(result.skippedImages()).isZero();verifyNoInteractions(fetcher);
     }
     static Resource resource(String body,String url,String type){return new Resource(body.getBytes(StandardCharsets.UTF_8),URI.create(url),type,"UTF-8");}
 }

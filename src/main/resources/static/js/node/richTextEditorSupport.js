@@ -10,9 +10,11 @@
     }
     async function imageMime(file) {
         const declared=(file.type||'').toLowerCase();
-        if(['image/png','image/jpeg'].includes(declared))return declared;
+        if(['image/png','image/jpeg','image/gif','image/webp','image/bmp','image/tiff','image/vnd.wap.wbmp'].includes(declared))return declared;
         if(declared==='image/jpg')return 'image/jpeg';
         if(declared==='image/x-png')return 'image/png';
+        if(['image/x-bmp','image/x-ms-bmp'].includes(declared))return 'image/bmp';
+        if(declared==='image/x-tiff')return 'image/tiff';
         // Android/cloud providers may supply no MIME type or application/octet-stream.
         // Inspect bytes instead of trusting a filename; the server validates and normalizes again.
         const blob=file.slice(0,12);
@@ -22,6 +24,10 @@
         const bytes=new Uint8Array(buffer);
         if(bytes.length>=8 && [137,80,78,71,13,10,26,10].every((b,i)=>bytes[i]===b))return 'image/png';
         if(bytes.length>=3 && bytes[0]===255 && bytes[1]===216 && bytes[2]===255)return 'image/jpeg';
+        if(bytes.length>=6 && String.fromCharCode(...bytes.slice(0,6)).match(/^GIF8[79]a$/))return 'image/gif';
+        if(bytes.length>=12 && String.fromCharCode(...bytes.slice(0,4))==='RIFF' && String.fromCharCode(...bytes.slice(8,12))==='WEBP')return 'image/webp';
+        if(bytes[0]===66 && bytes[1]===77)return 'image/bmp';
+        if(bytes.length>=4 && (bytes[0]===73&&bytes[1]===73&&bytes[2]===42&&bytes[3]===0 || bytes[0]===77&&bytes[1]===77&&bytes[2]===0&&bytes[3]===42))return 'image/tiff';
         throw new Error('type');
     }
     /** Code-point offsets; formatting splits must not terminate a logical hyperlink. */

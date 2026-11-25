@@ -268,3 +268,14 @@ existing pinned Font Awesome Free WebJar WOFF2 fonts, used for PDF embedding.
 They retain the original glyphs and Font Awesome names and remain under
 SIL Open Font License 1.1; the WebJar LICENSE is included beside these files.
 No additional icon set or external font service is used.
+
+## Raster import / WebP (2026-11-26)
+
+`com.twelvemonkeys.imageio:imageio-webp:3.15.3` and its `imageio-core`,
+`imageio-metadata`, `common-image`, `common-io` and `common-lang` dependencies
+provide local Java raster decoding. They use the BSD license; no native binary,
+SVG/Batik renderer or external conversion service is added. The complete distinct
+source copyright/license headers for these modules are retained under
+[licenses/upstream-reference/twelvemonkeys-3.15.3](licenses/upstream-reference/twelvemonkeys-3.15.3/),
+with versioned Maven Central source URLs. Coordinates, binary hashes and additional
+source notices are recorded in [JAR-INVENTORY.json](licenses/JAR-INVENTORY.json).

@@ -68,3 +68,31 @@ text and links. Downloads carry no browser cookies and private/local addresses
 remain blocked. Text, images and tables keep their selection order. Images that
 cannot be fetched are counted and replaced by their alternative text. If import
 fails or the editor changes while loading, the selection is not overwritten.
+
+## Raster formats and image budgets
+
+Image files, clipboard image items, embedded clipboard rasters and public web
+images accept PNG, JPG/JPEG, WebP, GIF, BMP, TIFF and WBMP. Actual image bytes are
+validated; file extensions do not authorize content. New CTB image rows contain
+PNG. Animated GIF/WebP and multipage TIFF use their first frame/page, so animation
+is not retained. SVG and AVIF are not supported by this raster import path.
+WebP decoding uses the packaged TwelveMonkeys ImageIO plugin locally, without
+native codec installation or a conversion service.
+
+Non-PNG local files are normalized through an ADMIN/CSRF/current-tenant protected
+staging endpoint before insertion, so their editor previews match the saved PNG.
+This endpoint never writes CTB rows. Save still revalidates every image.
+
+The former 8-image web-import and 10-new-object image limits are removed. Images
+no longer count against the separate attachment/table/codebox object limit.
+Multiple clipboard image files and file-picker images share one undo step.
+
+There is no fixed image-count cap, but safety budgets remain: the tenant's per-file
+limit (normally 9 MB, applying to source and normalized PNG); 20 MB total staged
+binary uploads and 30 million JSON characters; at most 8192 pixels per dimension
+and 16 million pixels per image; 64 million decoded pixels and a 30-second decode
+budget per saved image batch. Web import retains its 10 MB normalized-image,
+20 MB network and 30-second request budgets, and counts images it skips.
+Small icons can therefore exceed the old count limits while large images may
+still reach a byte/pixel/time budget. Private-network URL restrictions and
+cookie-free web fetching remain unchanged.

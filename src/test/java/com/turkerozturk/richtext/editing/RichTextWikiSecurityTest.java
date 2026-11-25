@@ -38,6 +38,21 @@ class RichTextWikiSecurityTest {
             mvc.perform(post("/nodes/richtext/edit/1/wiki-links").param("xml","<node/>").session(session).param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());verifyNoInteractions(service);
         }
     }
+    @Test void normalizationRequiresAdminCsrfAndCurrentTenantAndNeverSaves()throws Exception {
+        try(var context=new AnnotationConfigWebApplicationContext()) {
+            context.setServletContext(new MockServletContext());context.register(Config.class);context.refresh();
+            var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+            var session=new MockHttpSession();session.setAttribute(TenantContext.SESSION_VARIABLE__TENANT_VIEW_TOKEN,"current");
+            var service=context.getBean(RichTextEditingService.class);TenantContext.setCurrentTenant("Test");
+            String route="/nodes/richtext/edit/1/normalize-image";
+            mvc.perform(post(route).param("image","input").session(session).param("_tenantView","current").with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+            mvc.perform(post(route).param("image","input").session(session).param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
+            mvc.perform(post(route).param("image","input").session(session).param("_tenantView","old").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isConflict());verifyNoInteractions(service);
+            when(service.normalizeImage(1,"input")).thenReturn("data:image/png;base64,AQID");
+            mvc.perform(post(route).param("image","input").session(session).param("_tenantView","current").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.data").value("data:image/png;base64,AQID"));
+            verify(service).normalizeImage(1,"input");verifyNoMoreInteractions(service);
+        } finally {TenantContext.clear();}
+    }
     @Configuration @EnableWebSecurity @EnableWebMvc @EnableMethodSecurity
     static class Config implements WebMvcConfigurer {
         @Bean org.springframework.web.servlet.ViewResolver viewResolver(){return (name,locale)->new org.springframework.web.servlet.view.InternalResourceView("/test-view");}
