@@ -21,6 +21,7 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
         ids.richCodeboxLanguages.querySelectorAll=()=>[];
         ids.richCodeboxSearch.dispatchEvent=()=>{};
     }
+    ids.richPreview.querySelectorAll=()=>{const slots=[];function visit(node){if(node.dataset?.richObject)slots.push(node);for(const child of node.childNodes||[])visit(child);}visit(ids.richPreview);return slots;};
     if (visual) { ids.richVisualMode=element('richVisualMode'); ids.richVisualMode.checked=true; }
     const bold = element('bold'); bold.dataset = {format:'weight', value:'heavy'};
     const alignAction=element('alignAction');alignAction.dataset={align:'center'};
@@ -31,7 +32,13 @@ function editor(initialRuns, maxFileBytes, objects, clipboard, visual = false, o
     const document = {
         getElementById: id => ids[id],
         querySelectorAll: selector => selector === '[data-insert-symbol]' ? [symbol] : selector === '[data-align]' ? [alignAction] : selector === '[data-format]' ? [bold] : selector === '[data-choice]' ? [align] : [],
-        createElement: () => element(),
+        createElement: tag => {
+            if(tag==='canvas'&&options.canvas)return options.canvas;
+            const node=element();node.tagName=tag.toUpperCase();
+            node.querySelector=selector=>node.childNodes.find(child=>child.tagName===selector.toUpperCase());
+            if(tag==='img'&&options.loadedImage)Object.assign(node,options.loadedImage);
+            return node;
+        },
         createDocumentFragment: () => element(),
         createTextNode: text => ({text}),
         implementation: {createDocument() {
@@ -115,11 +122,11 @@ test('rendering keeps a final empty paragraph after Enter', () => {
     assert.equal(text(e.runs()),'A\n');
 });
 
-test('copy/paste omits protected object characters without removing existing slots', () => {
+test('unavailable copied objects get explicit text placeholders without removing existing slots', () => {
     const e=editor([{text:'A',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}},{text:'B',attributes:{}}]);
     e.select(0,3);let copied;
     e.fire('richText','copy',{preventDefault(){},clipboardData:{setData(type,value){copied=value;}}});
-    assert.equal(copied,'AB');
+    assert.equal(copied,'A[image:1]B');
     e.select(3,3);e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData(){return 'X\uFFFCY';}}});
     assert.equal(text(e.runs()),'A\uFFFCBXY');
     assert.equal(e.runs().filter(run=>run.attributes.__sweet_object).length,1);
@@ -528,3 +535,52 @@ test('symbol insertion rejects stale content and protected objects',()=>{
   const e=editor();e.fire('alignAction','click');assert.equal(e.runs().at(-1).attributes.justification,'center');assert.equal(e.runs()[0].attributes.justification,undefined);
   e.fire('alignAction','click');assert.equal(e.runs().at(-1).attributes.justification,'center');e.key('z');assert.equal(e.dirty(),false);
  });
+
+test('unlocked Delete stages database objects and undo/redo restores the explicit deletion list',()=>{
+ const e=editor([{text:'A',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}},{text:'B',attributes:{}}]);
+ e.ids.richAllowDeletion.checked=true;e.select(1,2);e.type('AB');
+ assert.equal(text(e.runs()),'AB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),['image:1']);
+ e.key('z');assert.equal(text(e.runs()),'A\uFFFCB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),[]);
+ e.key('y');assert.equal(text(e.runs()),'AB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),['image:1']);
+});
+test('table copy/paste exports a snapshot and allocates a new object rather than reusing its database key',()=>{
+ const clipboard=require('../../main/resources/static/js/node/richTextClipboard.js');
+ const e=editor([{text:'A',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'grid:2'}},{text:'B',attributes:{}}],null,{'grid:2':{label:'Table',tableRows:[['cell']]}},clipboard);
+ const data={};e.select(0,3);e.fire('richText','copy',{preventDefault(){},clipboardData:{setData:(type,value)=>data[type]=value}});
+ assert.equal(data['text/plain'],'AcellB');assert.doesNotMatch(data['application/x-sweetcherry-richtext+json'],/grid:2|__sweet_object/);
+ e.select(3,3);e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData:type=>data[type]||''}});
+ assert.equal(text(e.runs()),'A\uFFFCBA\uFFFCB');assert.deepEqual(Object.values(JSON.parse(e.ids.richTables.value)),[[['cell']]]);
+ e.key('z');assert.equal(text(e.runs()),'A\uFFFCB');assert.deepEqual(JSON.parse(e.ids.richTables.value),{});
+});
+test('cut never removes an object that could not be fully snapshotted',()=>{
+ const e=editor([{text:'\uFFFC',attributes:{__sweet_object:'image:5'}}]);e.ids.richAllowDeletion.checked=true;e.select(0,1);
+ e.fire('richText','cut',{preventDefault(){},clipboardData:{setData(){}}});
+ assert.equal(text(e.runs()),'\uFFFC');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),[]);
+});
+test('codebox snapshots keep code and syntax when pasted as fresh editable objects',()=>{
+ const clip=require('../../main/resources/static/js/node/richTextClipboard.js');
+ const e=editor([{text:'X',attributes:{}}],null,null,clip,false,{codeboxes:true});e.select(1,1);
+ e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData:type=>type==='application/x-sweetcherry-richtext+json'?JSON.stringify({version:2,items:[{codebox:{text:'print(1)',syntax:'python'}}]}):''}});
+ assert.equal(text(e.runs()),'X\uFFFC');assert.deepEqual(Object.values(JSON.parse(e.ids.richCodeboxes.value)),[{text:'print(1)',syntax:'python'}]);
+});
+test('a loaded existing image copies as PNG bytes and pastes after its source is removed',()=>{
+ const clip=require('../../main/resources/static/js/node/richTextClipboard.js');let drawn=0;
+ const e=editor([{text:'\uFFFC',attributes:{__sweet_object:'image:7'}}],null,{'image:7':{label:'Photo',imageUrl:'/images/1/7'}},clip,false,{loadedImage:{complete:true,naturalWidth:2,naturalHeight:2},canvas:{getContext:()=>({drawImage(){drawn++;}}),toDataURL:()=> 'data:image/png;base64,AQID'}});
+ const data={};e.ids.richAllowDeletion.checked=true;e.select(0,1);e.fire('richText','cut',{preventDefault(){},clipboardData:{setData:(type,value)=>data[type]=value}});
+ assert.equal(drawn,1);assert.equal(text(e.runs()),'');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),['image:7']);
+ assert.doesNotMatch(data['application/x-sweetcherry-richtext+json'],/\/images\/|image:7/);
+ e.select(0,0);e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData:type=>data[type]||''}});
+ assert.equal(text(e.runs()),'\uFFFC');assert.deepEqual(Object.values(JSON.parse(e.ids.richImages.value)),['data:image/png;base64,AQID']);
+});
+test('visual Backspace removes the adjacent object only when deletion is enabled',()=>{
+ const e=editor([{text:'A',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'image:1'}},{text:'B',attributes:{}}],null,null,null,true);
+ e.select(2,2);const remove=()=>e.fire('richPreview','beforeinput',{inputType:'deleteContentBackward',cancelable:true,preventDefault(){}});
+ remove();assert.equal(text(e.runs()),'A\uFFFCB');e.ids.richAllowDeletion.checked=true;remove();assert.equal(text(e.runs()),'AB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),['image:1']);
+});
+test('pasting over a text and table selection stages removal and insertion in a single undo step',()=>{
+ const clip=require('../../main/resources/static/js/node/richTextClipboard.js');
+ const e=editor([{text:'A',attributes:{}},{text:'\uFFFC',attributes:{__sweet_object:'grid:2'}},{text:'B',attributes:{}}],null,{'grid:2':{label:'Table',tableRows:[['old']]}},clip);
+ e.ids.richAllowDeletion.checked=true;e.select(0,2);e.fire('richText','paste',{preventDefault(){},clipboardData:{files:[],getData:type=>type==='application/x-sweetcherry-richtext+json'?JSON.stringify({version:2,items:[{text:'new',attributes:{}},{table:[['fresh']]}]}):''}});
+ assert.equal(text(e.runs()),'new\uFFFCB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),['grid:2']);
+ e.key('z');assert.equal(text(e.runs()),'A\uFFFCB');assert.deepEqual(JSON.parse(e.ids.richDeleted.value),[]);assert.deepEqual(JSON.parse(e.ids.richTables.value),{});
+});

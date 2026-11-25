@@ -62,7 +62,10 @@ class TreeReaderPreferencesTemplateTest {
                 assertThat(page.select("link[href='"+path+"/css/node/treeInlineEditing.css']")).hasSize(1);
                 assertThat(page.selectFirst("#tree-workspace").attr("data-editor-leave")).isNotBlank();
                 assertThat(page.selectFirst("#tree-workspace").attr("data-editor-return")).isNotBlank();
-                assertThat(html).doesNotContain("??preferences.");
+                assertThat(html).doesNotContain("??preferences.","??menu.group.");
+                assertThat(page.select(".navbar details.sc-menu-group")).hasSize(7);
+                assertThat(page.select("link[href='"+path+"/css/common/menuGroups.css']")).hasSize(1);
+                assertThat(page.select(".sc-menu-group summary").eachText()).allMatch(text->!text.isBlank());
                 assertThat(page.select("#workspace-saved-searches")).hasSize(1);
                 assertThat(page.selectFirst("#workspace-saved-searches").attr("data-endpoint")).isEqualTo(path+"/nodes/saved-filters/tree");
                 assertThat(page.select("script[src='"+path+"/js/node/treeSavedSearches.js']")).hasSize(1);

@@ -66,7 +66,8 @@
             const next=styles(node,a);
             if(tag==='BR'){add('\n',next);return;}
             if(tag==='IMG'){
-                const data=importedImages[node.getAttribute('data-import-image')];
+                const source=node.getAttribute('src')||'';
+                const data=importedImages[node.getAttribute('data-import-image')] || (/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(source)&&source.length<=13000000?source:null);
                 if(typeof data==='string' && data.startsWith('data:image/png;base64,')){items.push({image:data,label:node.getAttribute('alt')||'Image'});return;}
                 const link=external(node.getAttribute('src')||'');const alt=node.getAttribute('alt')||'';
                 if(link)add(alt||link.slice(5),{...next,link});else if(alt)add(alt,next);
@@ -106,15 +107,41 @@
         });
         return fromDom(fragment,importedImages);
     }
+    function typedItems(items){
+        if(!Array.isArray(items)||items.length>10000)throw Error('Invalid clipboard');
+        let size=0,objects=0;
+        const result=items.map(item=>{
+            if(!item||typeof item!=='object')throw Error('Invalid clipboard');
+            if(typeof item.text==='string'){
+                size+=item.text.length;if(size>200000)throw Error('Clipboard too large');
+                return {text:item.text.replace(/\uFFFC/g,''),attributes:attributes(item.attributes||{})};
+            }
+            if(++objects>10)throw Error('Too many objects');
+            if(typeof item.image==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(item.image)&&item.image.length<=13000000)
+                return {image:item.image,label:typeof item.label==='string'?item.label.slice(0,255):'Image'};
+            if(Array.isArray(item.table)&&item.table.length>0&&item.table.length<=100&&item.table[0]?.length>0&&item.table[0].length<=20&&item.table.every(row=>Array.isArray(row)&&row.length===item.table[0].length&&row.every(cell=>typeof cell==='string'&&cell.length<=5000)))return {table:item.table};
+            if(item.codebox&&typeof item.codebox.text==='string'&&item.codebox.text.length<=200000&&typeof item.codebox.syntax==='string'&&/^[a-zA-Z0-9_+.#-]{1,100}$/.test(item.codebox.syntax))return {codebox:{text:item.codebox.text,syntax:item.codebox.syntax}};
+            if(item.file&&typeof item.file.name==='string'&&item.file.name.length>0&&item.file.name.length<=255&&typeof item.file.data==='string'&&/^[A-Za-z0-9+/]*={0,2}$/.test(item.file.data)&&item.file.data.length<=13000000)return {file:{name:item.file.name,data:item.file.data}};
+            throw Error('Invalid clipboard object');
+        });
+        return result.filter(item=>item.text||item.image||item.table||item.codebox||item.file);
+    }
     function fromInternal(json){
-        if(json.length>2000000)throw new Error('Clipboard too large');const rows=JSON.parse(json);
-        if(!Array.isArray(rows)||rows.length>10000)throw new Error('Invalid clipboard');let length=0;
-        return rows.map(run=>{if(!run||typeof run.text!=='string'||!run.attributes||typeof run.attributes!=='object'||Array.isArray(run.attributes))throw new Error('Invalid clipboard');length+=run.text.length;if(length>200000)throw new Error('Clipboard too large');return {text:run.text.replace(/\uFFFC/g,''),attributes:attributes(run.attributes)};}).filter(run=>run.text);
+        if(typeof json!=='string'||json.length>30000000)throw Error('Clipboard too large');
+        const value=JSON.parse(json);
+        if(Array.isArray(value))return typedItems(value.map(run=>({text:run?.text,attributes:run?.attributes})));
+        if(value?.version!==2)throw Error('Invalid clipboard version');
+        return typedItems(value.items);
     }
     const escape=text=>text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     /** Supplies interoperable safe HTML plus private CTB text metadata for SweetCherry-to-SweetCherry copy. */
     function toHtml(runs){return runs.map(run=>{
-        const a=attributes(run.attributes),css=['white-space:pre-wrap'];
+        if(run.image&&(!/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(run.image)))return '';
+        if(run.image)return '<img alt="'+escape(run.label||'Image')+'" src="'+run.image+'">';
+        if(run.table)return '<table>'+run.table.map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell).replace(/\n/g,'<br>')+'</td>').join('')+'</tr>').join('')+'</table>';
+        if(run.codebox)return '<pre>'+escape(run.codebox.text)+'</pre>';
+        if(run.file)return '<span>'+escape(run.file.name)+'</span>';
+        const a=attributes(run.attributes||{}),css=['white-space:pre-wrap'];
         if(a.weight)css.push('font-weight:bold');if(a.style)css.push('font-style:italic');if(a.family)css.push('font-family:monospace');
         const decoration=[a.underline?'underline':'',a.strikethrough?'line-through':''].filter(Boolean).join(' ');if(decoration)css.push('text-decoration:'+decoration);
         const cssColor=value=>value.length===13?'#'+value.slice(1,3)+value.slice(5,7)+value.slice(9,11):value;

@@ -68,5 +68,24 @@ class WebContentImportTest {
         var fetcher=mock(PublicWebFetcher.class);when(fetcher.fetch(anyString(),anyInt(),anyLong(),any())).thenThrow(new java.io.IOException("private path or credentials"));
         assertThatThrownBy(()->new WebContentImportService(fetcher,mock(EmbeddedUploadPolicy.class)).load("https://example.org/")).isInstanceOf(Problem.class).hasMessage("network");
     }
+    @Test void pastedHtmlFetchesOnlyImagesAndPreservesTextOrderWithoutLoadingItsSourcePage()throws Exception {
+        var fetcher=mock(PublicWebFetcher.class);var uploads=mock(EmbeddedUploadPolicy.class);when(uploads.fileBytes()).thenReturn(9_000_000);
+        var image=new java.awt.image.BufferedImage(2,2,java.awt.image.BufferedImage.TYPE_INT_RGB);var out=new java.io.ByteArrayOutputStream();javax.imageio.ImageIO.write(image,"png",out);
+        when(fetcher.fetch(eq("https://example.org/photo.png"),anyInt(),anyLong(),any())).thenReturn(new Resource(out.toByteArray(),URI.create("https://example.org/photo.png"),"image/png",null));
+        var result=new WebContentImportService(fetcher,uploads).loadClipboard("<p>Before</p><img src='https://example.org/photo.png' alt='Photo'><p>After</p><script>bad()</script><iframe src='https://example.org/'></iframe>");
+        assertThat(result.images()).hasSize(1);assertThat(result.html()).contains("Before","After","data-import-image").doesNotContain("<script","<iframe","src=");
+        assertThat(result.html().indexOf("Before")).isLessThan(result.html().indexOf("data-import-image"));
+        assertThat(result.html().indexOf("After")).isGreaterThan(result.html().indexOf("data-import-image"));
+        verify(fetcher).fetch(eq("https://example.org/photo.png"),anyInt(),anyLong(),any());verifyNoMoreInteractions(fetcher);
+    }
+    @Test void clipboardRelativeImagesAndPrivateAddressesDoNotBypassTheExistingFetcher()throws Exception {
+        var fetcher=mock(PublicWebFetcher.class);var uploads=mock(EmbeddedUploadPolicy.class);when(uploads.fileBytes()).thenReturn(9_000_000);
+        when(fetcher.fetch(eq("http://127.0.0.1/private"),anyInt(),anyLong(),any())).thenThrow(new Problem("blocked"));
+        var service=new WebContentImportService(fetcher,uploads);
+        var result=service.loadClipboard("<img src='relative.png' alt='Relative'><img src='http://127.0.0.1/private' alt='Private'><img src='file:///private' alt='File'>");
+        assertThat(result.images()).isEmpty();assertThat(result.skippedImages()).isEqualTo(3);assertThat(result.html()).contains("Relative","Private","File").doesNotContain("<img");
+        verify(fetcher).fetch(eq("http://127.0.0.1/private"),anyInt(),anyLong(),any());verifyNoMoreInteractions(fetcher);
+        assertThatThrownBy(()->service.loadClipboard("x".repeat(2_000_001))).isInstanceOf(Problem.class).hasMessage("large");
+    }
     static Resource resource(String body,String url,String type){return new Resource(body.getBytes(StandardCharsets.UTF_8),URI.create(url),type,"UTF-8");}
 }

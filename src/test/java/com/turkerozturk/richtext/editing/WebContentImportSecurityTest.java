@@ -29,21 +29,26 @@ class WebContentImportSecurityTest {
             mvc.perform(post("/nodes/richtext/import/1").param("url","https://example.org").with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
             verifyNoInteractions(context.getBean(WebContentImportService.class),Config.editingMock);
             mvc.perform(post("/nodes/richtext/import/1").param("url","https://example.org").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isOk()).andExpect(jsonPath("$.title").value("Page"));
-            verify(Config.editingMock).open(1);
+            mvc.perform(post("/nodes/richtext/import/1/clipboard").param("html","<p>Text</p>").with(user("reader").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+            mvc.perform(post("/nodes/richtext/import/1/clipboard").param("html","<p>Text</p>").with(user("admin").roles("ADMIN")).with(csrf().useInvalidToken())).andExpect(status().isForbidden());
+            mvc.perform(post("/nodes/richtext/import/1/clipboard").param("html","<p>Text</p>").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isOk());
+            verify(Config.editingMock,times(2)).open(1);
         }
     }
     @Test void readOnlyOrDisabledImportDoesNotFetch() {
         var editing=mock(RichTextEditingService.class);var importer=mock(WebContentImportService.class);var controller=new WebContentImportController(editing,importer);
         when(editing.open(1)).thenThrow(new org.springframework.security.access.AccessDeniedException("read only"));
         assertThatThrownBy(()->controller.load(1,"https://example.org")).isInstanceOf(org.springframework.security.access.AccessDeniedException.class);verifyNoInteractions(importer);
+        assertThatThrownBy(()->controller.clipboard(1,"<p>Text</p>")).isInstanceOf(org.springframework.security.access.AccessDeniedException.class);verifyNoInteractions(importer);
         ReflectionTestUtils.setField(controller,"enabled",false);
         assertThatThrownBy(()->controller.load(1,"https://example.org")).isInstanceOf(PublicWebFetcher.Problem.class).hasMessage("disabled");verifyNoInteractions(importer);
+        assertThatThrownBy(()->controller.clipboard(1,"<p>Text</p>")).isInstanceOf(PublicWebFetcher.Problem.class).hasMessage("disabled");verifyNoInteractions(importer);
     }
     @Configuration @EnableWebSecurity @EnableWebMvc @EnableMethodSecurity
     static class Config {
         @Bean InMemoryUserDetailsManager users(){return new InMemoryUserDetailsManager();}
         static final RichTextEditingService editingMock=mock(RichTextEditingService.class);
-        @Bean WebContentImportService importer(){var s=mock(WebContentImportService.class);when(s.load(anyString())).thenReturn(new WebContentImportService.Result("Page","https://example.org","<p>Text</p>",java.util.Map.of(),0));return s;}
+        @Bean WebContentImportService importer(){var s=mock(WebContentImportService.class);when(s.load(anyString())).thenReturn(new WebContentImportService.Result("Page","https://example.org","<p>Text</p>",java.util.Map.of(),0));when(s.loadClipboard(anyString())).thenReturn(new WebContentImportService.Result("","","<p>Text</p>",java.util.Map.of(),0));return s;}
         @Bean WebContentImportController controller(WebContentImportService importer){return new WebContentImportController(editingMock,importer);}
         @Bean SecurityFilterChain chain(HttpSecurity http)throws Exception {
             var config=new SecurityConfig();ReflectionTestUtils.setField(config,"loginUserName","user");ReflectionTestUtils.setField(config,"loginAdminName","admin");

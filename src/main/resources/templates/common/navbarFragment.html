@@ -9,7 +9,7 @@
     <meta charset="UTF-8">
 </head>
 <body>
-<div th:fragment="navbarFragment">
+<div th:fragment="navbarFragment"><link rel="stylesheet" th:href="@{/css/common/menuGroups.css}">
 
 
     <nav class="navbar navbar-expand-lg bg-light" style="z-index: 100;">
@@ -41,7 +41,7 @@
                             Application
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
+                            <li><details class="sc-menu-group"><summary class="dropdown-item" th:text="#{menu.group.browse}"></summary><ul class="list-unstyled sc-menu-items"><li>
                                 <a class="dropdown-item" href="/"
                                    th:title="#{root.nodeTree.description}"
                                 >
@@ -74,7 +74,7 @@
                                 </a>
                             </li>
 
-                            <li>
+                            </ul></details></li><li><details class="sc-menu-group"><summary class="dropdown-item" th:text="#{menu.group.transfer}"></summary><ul class="list-unstyled sc-menu-items"><li>
                                 <a class="dropdown-item" href="/mindmap-export"
                                    th:title="#{root.mindmap-export.description}"
                                 >
@@ -88,7 +88,7 @@
                             <li sec:authorize="hasRole('ADMIN')" th:if="${dttTopicImportAvailable == true}"><a class="dropdown-item" th:href="@{/dtt-topic-import(_tenantView=${tenantViewToken})}"><i class="fas fa-upload"></i> <span th:text="#{dttImport.title}"></span></a></li>
 
                             <div class="dropdown-divider"></div>
-                            <li><button type="button" class="dropdown-item" th:disabled="${currentTenantName == null}" data-quick-switch-open aria-controls="quick-switch-dialog"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> <span th:text="#{quick.switch}">Quick switch</span> <kbd>/</kbd></button></li>
+                            </ul></details></li><li><button type="button" class="dropdown-item" th:disabled="${currentTenantName == null}" data-quick-switch-open aria-controls="quick-switch-dialog"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> <span th:text="#{quick.switch}">Quick switch</span> <kbd>/</kbd></button></li>
                             <li sec:authorize="hasRole('ADMIN')"><button type="button" class="dropdown-item" th:disabled="${currentTenantName == null}" data-quick-note-open aria-controls="quick-note-dialog"><i class="fas fa-pen-to-square" aria-hidden="true"></i> <span th:text="#{quick.note}">Quick note</span></button></li>
                             <li>
                                 <button type="button" class="dropdown-item" th:disabled="${currentTenantName == null}" data-node-go-open aria-controls="node-go-dialog" aria-haspopup="dialog"><i class="fas fa-arrow-right-to-bracket" aria-hidden="true"></i> <span th:text="#{node.go.title}">Go to Node ID</span></button>
@@ -96,7 +96,7 @@
                             <div class="dropdown-divider"></div>
 
 
-                            <li>
+                            <li><details class="sc-menu-group"><summary class="dropdown-item" th:text="#{menu.group.tools}"></summary><ul class="list-unstyled sc-menu-items"><li>
                                 <a class="dropdown-item" href="/icons"
                                    th:title="#{root.icons.description}"
                                 >
@@ -113,7 +113,7 @@
                                 </a>
                             </li>
 
-                            <th:block th:replace="~{common/sortChildren :: menu}"></th:block>
+                            </ul></details></li><th:block th:replace="~{common/sortChildren :: menu}"></th:block>
                         </ul>
                     </li>
 
@@ -138,7 +138,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                            aria-expanded="false"
-                           th:text="#{navbar.viewMode}"
+                           data-bs-auto-close="outside" th:text="#{navbar.viewMode}"
                         >
                             View Mode
                         </a>
@@ -355,7 +355,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                            aria-expanded="false"
-                           th:text="#{navbar.user}"
+                           data-bs-auto-close="outside" th:text="#{navbar.user}"
                         >
                             User
                         </a>
@@ -369,11 +369,11 @@
                                 <li><a class="dropdown-item" th:href="@{/help/index}"><i class="fas fa-life-ring"></i> <span th:text="#{navbar.legacyHelp}">Old Help</span></a></li>
                                 <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/settings}"><i class="fas fa-info-circle"></i> <span th:text="#{settings.otherInfo}">Other Information</span></a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><button type="button" class="dropdown-item" data-confirm-toggle="creation" role="menuitemcheckbox" aria-checked="true"><span data-confirm-mark aria-hidden="true">✓</span> <span th:text="#{preferences.confirm.creation}"></span></button></li>
+                                <li><details class="sc-menu-group"><summary class="dropdown-item" th:text="#{menu.group.preferences}"></summary><ul class="list-unstyled sc-menu-items"><li><button type="button" class="dropdown-item" data-confirm-toggle="creation" role="menuitemcheckbox" aria-checked="true"><span data-confirm-mark aria-hidden="true">✓</span> <span th:text="#{preferences.confirm.creation}"></span></button></li>
                                 <li><button type="button" class="dropdown-item" data-confirm-toggle="duplication" role="menuitemcheckbox" aria-checked="true"><span data-confirm-mark aria-hidden="true">✓</span> <span th:text="#{preferences.confirm.duplication}"></span></button></li>
                                 <li><button type="button" class="dropdown-item" data-confirm-toggle="deletion" role="menuitemcheckbox" aria-checked="true"><span data-confirm-mark aria-hidden="true">✓</span> <span th:text="#{preferences.confirm.deletion}"></span></button></li>
                                 <li><button type="button" class="dropdown-item" data-symbol-picker-open th:text="#{symbols.open}"></button></li>
-                                <li><button type="button" class="dropdown-item" data-node-background-open th:text="#{preferences.background}"></button></li>
+                                <li><button type="button" class="dropdown-item" data-node-background-open th:text="#{preferences.background}"></button></li></ul></details></li>
                             </th:block>
                         </ul>
                     </li>

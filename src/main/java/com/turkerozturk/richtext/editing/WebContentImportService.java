@@ -22,6 +22,17 @@ public class WebContentImportService {
         catch(java.io.IOException|IllegalArgumentException error){throw new Problem("network");}
         finally {slots.release();}
     }
+    /** Pasted HTML is data; only its approved public image URLs are fetched. */
+    public Result loadClipboard(String html) {
+        if(html==null||html.length()>2_000_000)throw new Problem("large");
+        if(!slots.tryAcquire())throw new Problem("busy");
+        try {
+            var content=Jsoup.parseBodyFragment(html).body();
+            content.select("script,style,noscript,iframe,object,embed,svg,math,template,form,nav,header,footer,aside,[hidden],[aria-hidden=true]").remove();
+            return sanitize(content,null,"","",System.nanoTime()+30_000_000_000L,new Budget());
+        } catch(java.io.IOException|IllegalArgumentException error){throw new Problem("network");}
+        finally {slots.release();}
+    }
     private Result importPage(String url) throws java.io.IOException {
         long deadline=System.nanoTime()+30_000_000_000L;
         var budget=new Budget();
@@ -32,6 +43,9 @@ public class WebContentImportService {
         doc.select("base").remove();doc.setBaseUri(page.uri().toString());
         Element content=doc.selectFirst("article");if(content==null)content=doc.selectFirst("main, [role=main]");if(content==null)content=doc.body();
         content.select("script,style,noscript,iframe,object,embed,svg,math,template,form,nav,header,footer,aside,[hidden],[aria-hidden=true]").remove();
+        return sanitize(content,page.uri(),doc.title().substring(0,Math.min(200,doc.title().length())),page.uri().toString(),deadline,budget);
+    }
+    private Result sanitize(Element content,java.net.URI base,String title,String sourceUrl,long deadline,Budget budget)throws java.io.IOException {
         int skipped=0,total=0,occurrences=0;var images=new LinkedHashMap<String,String>();var cached=new HashMap<String,String>();
         for(var image:content.select("img")) {
             image.removeAttr("data-import-image");
@@ -40,7 +54,7 @@ public class WebContentImportService {
             String absolute="";
             try {
                 if(occurrences>=8 || source.isBlank())throw new Problem("large");
-                absolute=page.uri().resolve(source).toString();
+                absolute=base==null?allowedUri(source).toString():base.resolve(source).toString();
                 String key=cached.get(absolute);
                 if(key==null) {
                     if(images.size()>=8 || total>=10_000_000)throw new Problem("large");
@@ -61,13 +75,13 @@ public class WebContentImportService {
             }
         }
         for(var link:content.select("a[href]")) {
-            try {link.attr("href",allowedUri(page.uri().resolve(link.attr("href")).toString()).toString());}
+            try {link.attr("href",allowedUri(base==null?link.attr("href"):base.resolve(link.attr("href")).toString()).toString());}
             catch(Problem|IllegalArgumentException error){link.removeAttr("href");}
         }
         var safe=Safelist.relaxed().addAttributes(":all","style","align").addAttributes("img","data-import-image");
         safe.removeAttributes("img","src","width","height");
-        String html=Jsoup.clean(content.html(),page.uri().toString(),safe,new org.jsoup.nodes.Document.OutputSettings().prettyPrint(false));
+        String html=Jsoup.clean(content.html(),sourceUrl,safe,new org.jsoup.nodes.Document.OutputSettings().prettyPrint(false));
         if(html.length()>2_000_000)throw new Problem("large");
-        return new Result(doc.title().substring(0,Math.min(200,doc.title().length())),page.uri().toString(),html,Map.copyOf(images),skipped);
+        return new Result(title,sourceUrl,html,Map.copyOf(images),skipped);
     }
 }

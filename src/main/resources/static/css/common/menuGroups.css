@@ -1,0 +1,7 @@
+/* Native disclosure groups avoid hover-only nested menus and fit narrow screens. */
+.navbar .sc-menu-group>summary{cursor:pointer;font-weight:600;list-style:revert;display:list-item;list-style-position:inside}
+.navbar .sc-menu-group>summary:focus-visible{outline:2px solid var(--bs-primary,#0d6efd);outline-offset:-2px}
+.navbar .sc-menu-group[open]>summary{background:var(--bs-tertiary-bg,transparent)}
+.navbar .sc-menu-items{margin:0;padding:.15rem 0 .35rem .55rem;border-inline-start:2px solid var(--bs-border-color,#ccc)}
+.navbar .sc-menu-items .dropdown-item{white-space:normal;overflow-wrap:anywhere}
+.navbar .dropdown-menu{max-height:calc(100dvh - 4rem);overflow-y:auto;max-width:calc(100vw - 1rem)}

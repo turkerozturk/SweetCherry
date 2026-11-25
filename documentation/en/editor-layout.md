@@ -46,3 +46,25 @@ Manual regression checks: edit and cancel every syntax; save and Save and contin
 try node changes and browser Back/Forward with unsaved changes; edit independently
 in both split panes and try closing the right pane; toggle compact layout; check
 rich text undo/redo, object dialogs, tools resizing and recovery after a failed save.
+
+## Selections containing objects
+
+Rich text Copy now takes snapshots of loaded images, tables and codeboxes in their
+text positions. Paste creates fresh objects, including when pasting into another
+rich text editor. PNG snapshots contain image bytes, not references to database
+rows; tables and codeboxes remain editable. Newly added, unsaved file attachments
+can also be copied. Existing saved attachments and anchors use explicit text
+placeholders; Cut does not remove a selection if any object could not be fully
+copied. Wait for an image to finish loading before copying it. Browser clipboard
+format restrictions and existing upload/object limits still apply.
+
+Enable **Allow object deletion** to use Delete/Backspace, Cut, or paste-over-selection
+on a selection containing objects. Removal is staged in the same undo history as
+text and only reaches the database on Save. Manage objects remains available.
+
+When pasted HTML contains external images, a confirmation offers to download its
+public PNG/JPEG images through the existing web import policy. Declining keeps
+text and links. Downloads carry no browser cookies and private/local addresses
+remain blocked. Text, images and tables keep their selection order. Images that
+cannot be fetched are counted and replaced by their alternative text. If import
+fails or the editor changes while loading, the selection is not overwritten.

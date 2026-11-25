@@ -18,6 +18,8 @@
 <input type="hidden" name="codeboxes" id="richCodeboxes" value="{}">
 <input type="hidden" name="tables" id="richTables" value="{}">
 <div class="actions rich-savebar"><button type="button" id="richToolsToggle" aria-controls="richControls" aria-expanded="false" th:text="#{editor.controls}"></button><button type="submit" data-editor-save><i class="fas fa-save" aria-hidden="true"></i> <span th:text="#{richtext.edit.save}"></span></button><button type="submit" data-editor-continue name="continueEditing" value="true" class="btn btn-success"><i class="fas fa-save" aria-hidden="true"></i><i class="fas fa-pen" aria-hidden="true"></i> <span th:text="#{editor.saveContinue}"></span></button><a data-editor-cancel th:href="@{/nodes/{id}(id=${editor.node.nodeId},_tenantView=${tenantViewToken})}"><i class="fas fa-times" aria-hidden="true"></i> <span th:text="#{richtext.edit.cancel}"></span></a><th:block th:replace="~{common/editorZoomFragment :: zoom}"></th:block></div>
+<p id="richClipboardHint" class="note" role="alert" hidden th:attr="data-objects=#{richtext.clipboardObjectsUnavailable},data-empty=#{richtext.clipboardUnavailable},data-http=#{richtext.clipboardHttp},data-plain=#{richtext.clipboardPlain},data-changed=#{richtext.file.changed}"></p>
+<p id="richPasteStatus" th:data-error="#{richtext.edit.pasteError}" class="note" role="alert" hidden th:text="#{richtext.edit.pasteError}"></p>
 <div id="richEditorShell" class="rich-editor-shell">
 <aside id="richControls" th:aria-label="#{editor.controls}"><button type="button" id="richToolsClose" th:text="#{editor.closeControls}"></button>
 
@@ -72,7 +74,7 @@
 <span class="note" th:text="#{richtext.edit.fileLimit(${editor.maxEmbeddedFileBytes / 1000000})}"></span>
 <span id="richImageStatus" role="status" th:attr="data-loading=#{richtext.file.loading},data-error=#{richtext.edit.imageError},data-error-size=#{richtext.file.size},data-error-type=#{richtext.file.type},data-error-read=#{richtext.file.read},data-error-name=#{richtext.file.name},data-error-changed=#{richtext.file.changed},data-error-objects=#{richtext.file.objects},data-error-unsupported=#{richtext.file.unsupported}"></span>
 </div>
-<p id="richClipboardHint" class="note" role="alert" hidden th:attr="data-empty=#{richtext.clipboardUnavailable},data-http=#{richtext.clipboardHttp},data-plain=#{richtext.clipboardPlain},data-changed=#{richtext.file.changed}"></p>
+
 <p id="richAutoLinkError" role="alert" hidden th:text="#{editor.linkSelectionError}"></p>
     <div th:replace="~{common/backupWarningFragment :: backupWarning}"></div>
 </aside>
@@ -81,7 +83,7 @@
 <label id="richTextLabel" for="richText" th:text="#{richtext.edit.text}"></label>
 <textarea id="richText" spellcheck="false"></textarea>
 <h2 id="richPreviewTitle" th:attr="data-visual=#{richtext.edit.text},data-preview=#{richtext.edit.preview}" th:text="#{richtext.edit.preview}"></h2><div id="richPreview" aria-labelledby="richPreviewTitle"></div>
-<p id="richPasteStatus" class="note" role="alert" hidden th:text="#{richtext.edit.pasteError}"></p>
+
 <p id="selectionHint" class="note" hidden th:text="#{richtext.edit.select}"></p>
 <p id="richDeletionHint" role="alert" hidden th:text="#{richtext.edit.deletionLocked}"></p>
 
@@ -150,7 +152,7 @@
 <button type="button" id="richLinkCancel" th:text="#{richtext.edit.cancel}"></button>
 </div>
 </dialog>
-<dialog id="richWebDialog" style="width:45rem;max-width:95vw;max-height:90vh;overflow:auto" aria-labelledby="richWebTitle"
+<dialog th:data-clipboard-endpoint="@{/nodes/richtext/import/{id}/clipboard(id=${editor.node.nodeId})}" th:data-clipboard-confirm="#{richtext.clipboardWebConfirm}" th:data-clipboard-failed="#{richtext.clipboardWebFailed}" th:data-clipboard-done="#{richtext.clipboardWebDone}" id="richWebDialog" style="width:45rem;max-width:95vw;max-height:90vh;overflow:auto" aria-labelledby="richWebTitle"
  th:attr="data-endpoint=@{/nodes/richtext/import/{id}(id=${editor.node.nodeId})},data-loading=#{richtext.web.loading},data-summary=#{richtext.web.summary},data-error=#{richtext.web.error},data-error-url=#{richtext.web.urlError},data-error-blocked=#{richtext.web.blocked},data-error-large=#{richtext.web.large},data-error-busy=#{richtext.web.busy},data-error-type=#{richtext.web.type},data-error-timeout=#{richtext.web.timeout},data-error-disabled=#{richtext.web.disabled},data-error-empty=#{richtext.web.empty},data-error-changed=#{richtext.web.changed},data-error-network=#{richtext.web.network}">
 <h2 id="richWebTitle" th:text="#{richtext.webImport}"></h2>
 <p class="note" th:text="#{richtext.web.help}"></p>
@@ -172,7 +174,7 @@
 <script th:src="@{/js/node/richTextWikiLinks.js}"></script>
 <script th:src="@{/js/node/editorComfort.js}"></script>
 <script src="/js/node/richTextEditor.js"></script>
-<script th:src="@{/js/node/richTextWebImport.js}"></script>
+<script th:src="@{/js/node/richTextWebImport.js}"></script><script th:src="@{/js/node/richTextPasteImport.js}"></script>
 <script th:src="@{/js/common/nodeTargetSearch.js}"></script>
 <script th:src="@{/js/node/richTextInternalLink.js}"></script>
 <script th:src="@{/js/node/richTextEditorLayout.js}"></script>

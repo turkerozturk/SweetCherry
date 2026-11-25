@@ -19,7 +19,7 @@ class EditorComfortTemplateTest {
         var context=new WebContext(JakartaServletWebApplication.buildApplication(servlet).buildExchange(request,new MockHttpServletResponse()),Locale.forLanguageTag(language));
         var node=new Node();node.setNodeId(3);node.setName("<literal>");node.setTxt("Text\n😀");node.setSyntax(syntax);context.setVariable("node",node);context.setVariable("tenantViewToken","current");context.setVariable("editorRecoveryScope","scope");
         context.setVariable("editor",Map.of("node",node,"document",Map.of("runs",List.of()),"revision","r","objects",Map.of(),"maxEmbeddedFileBytes",9000000));
-        String html=engine.process(template,context);assertThat(html).doesNotContain("??editor.","??view.","<literal>");return org.jsoup.Jsoup.parse(html);
+        String html=engine.process(template,context);assertThat(html).doesNotContain("??editor.","??view.","??richtext.","<literal>");return org.jsoup.Jsoup.parse(html);
     }
     @Test void everyContentEditorHasTranslatedContextAwareZoomAfterCancelAndBeforeWriting() {
         for(String language:List.of("en","tr"))for(String syntax:List.of("plain-text","python","markdown","html","custom-colors")) {
@@ -55,6 +55,11 @@ class EditorComfortTemplateTest {
             assertThat(form.select("[data-editor-save] i,[data-editor-continue] i,[data-editor-cancel] i")).hasSize(4);
             assertThat(form.select("[data-editor-save] span,[data-editor-continue] span,[data-editor-cancel] span").eachText()).allMatch(text->!text.isBlank());
             assertThat(doc.select("#editorRecovery")).hasSize(1);
+            if(rich){
+                assertThat(doc.select("script[src='/app/js/node/richTextPasteImport.js']")).hasSize(1);
+                assertThat(doc.selectFirst("#richWebDialog").attr("data-clipboard-endpoint")).isEqualTo("/app/nodes/richtext/import/3/clipboard");
+                assertThat(doc.selectFirst("#richWebDialog").attr("data-clipboard-confirm")).isNotBlank();
+            }
             assertThat(doc.select("script[src='/app/js/common/editorLeaveGuard.js']")).hasSize(1);
         }
     }

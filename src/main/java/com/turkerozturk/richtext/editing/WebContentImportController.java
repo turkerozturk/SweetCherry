@@ -20,6 +20,12 @@ public class WebContentImportController {
         editing.open(id); // ADMIN + selected tenant + writable CTB/node, same checks as the editor.
         return importer.load(url);
     }
+    @PostMapping("/nodes/richtext/import/{id}/clipboard")
+    public WebContentImportService.Result clipboard(@PathVariable long id,@RequestParam String html) {
+        if(!enabled)throw new PublicWebFetcher.Problem("disabled");
+        editing.open(id);
+        return importer.loadClipboard(html);
+    }
     @ExceptionHandler(PublicWebFetcher.Problem.class)
     ResponseEntity<java.util.Map<String,String>> failed(PublicWebFetcher.Problem error) {
         return ResponseEntity.status(error.code.equals("busy")?429:422).body(java.util.Map.of("error",error.code));
