@@ -1,6 +1,12 @@
 name: Portable distribution (Windows builder)
 on:
   workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Optional source tag/commit; empty builds the selected workflow ref'
+        required: false
+        default: ''
+        type: string
 permissions:
   contents: read
 jobs:
@@ -9,6 +15,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.ref }}
       - name: Set up Node.js for JavaScript tests
         uses: actions/setup-node@v6
         with:
@@ -60,8 +68,9 @@ jobs:
           Write-Host 'Reading Temurin runtime metadata.'
           $metadata = @(Invoke-RestMethod 'https://api.adoptium.net/v3/assets/latest/17/hotspot?architecture=x64&image_type=jre&os=windows&vendor=eclipse')
           if ($metadata.Count -ne 1) { throw 'Expected one Temurin Windows x64 JRE.' }
-          $releaseVersion = [string]$metadata[0].version_data.openjdk_version
-          if ($releaseVersion -notmatch '^17\.\d+\.\d+(?:\.\d+)?(?:\+|$)' -or [version]($releaseVersion.Split('+')[0]) -lt [version]'17.0.21.1') { throw 'Temurin metadata must provide patched Java 17.0.21.1 or newer.' }
+          $releaseVersion = [string]$metadata[0].version.openjdk_version
+          Write-Host "Temurin release: $($metadata[0].release_name); openjdk_version: $releaseVersion"
+          if ($releaseVersion -notmatch '^17\.\d+\.\d+(?:\.\d+)?(?:\+|$)' -or [version]($releaseVersion.Split('+')[0]) -lt [version]'17.0.21.1') { throw "Temurin metadata must provide patched Java 17.0.21.1 or newer; received '$releaseVersion' from '$($metadata[0].release_name)'." }
           $package = $metadata[0].binary.package
           if ($package.link -notlike 'https://github.com/adoptium/temurin17-binaries/releases/download/*') { throw 'Unexpected runtime download origin.' }
           $archive = Join-Path $tools 'runtime.zip'
@@ -108,12 +117,15 @@ jobs:
           . ./packaging/windows/runtime-policy.ps1
           Assert-BundleJavaRuntime $runtimeInfo
           $actual = [regex]::Match($runtimeInfo, '(?m)^\s*java.version\s*=\s*(\S+)').Groups[1].Value
+          $sourceCommit = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot determine source commit.' }
           @(
             '## Verified Windows runtime',
             '',
             '| Item | Value |',
             '| --- | --- |',
-            "| Commit | $env:GITHUB_SHA |",
+            "| Source commit | $sourceCommit |",
+            "| Workflow commit | $env:GITHUB_SHA |",
             "| Temurin release | $env:SC_RUNTIME_VERSION |",
             "| Extracted java.version | $actual |",
             "| Runtime archive SHA-256 | $env:SC_RUNTIME_SHA256 |",

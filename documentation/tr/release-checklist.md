@@ -2,6 +2,8 @@
 
 Sürüm **1.15.0**, etiket **v1.15.0**. Hazırlık yaması `9fa77d3` üzerine uygulanır. Java tabanı **17** ve CTB şeması korunur. Bu belge komutları tarif eder; commit, push, etiket veya yayın oluşturmaz.
 
+> Mevcut `v1.15.0` etiketiyle metadata hatasını gideriyorsanız: `sweetcherry-f916655-temurin-metadata-fix.patch` düzeltmesini `main` üzerine uygulayıp commit/push edin; etiketi yeniden oluşturmayın. Aşağıdaki **3. bölümdeki main + source_ref** adımını kullanın. Eski release hazırlık yamasını ikinci kez uygulamayın.
+
 ## 1. Hazırlık yamasını uygula ve doğrula
 
 Çalışan uygulamayı durdurun. Temiz ve güncel `main` üzerinde, yama depo klasörünün yanındaysa:
@@ -76,14 +78,28 @@ Yayımlanmış etiketi taşımayın; force push kullanmayın.
 
 ## 3. Paketleri etiketten üret
 
-Actions → **Portable distribution (Windows builder)** → **Run workflow** → **v1.15.0**. Başarılı görevin **sweetcherry-release-assets** artifact'ini indirin. Ürünler:
+`v1.15.0` etiketi zaten oluşturulduysa onu taşımayın ve tekrar oluşturmayın.
+Paketleme düzeltmesini `main` üzerine commit/push edip CI'ı kontrol ettikten sonra:
+
+Actions → **Portable distribution (Windows builder)** → **Run workflow**:
+
+- **Use workflow from:** `main` (düzeltilmiş workflow).
+- **source_ref:** `v1.15.0` (derlenecek uygulama kaynağı).
+
+Eski başarısız görevi Re-run yapmak veya workflow kaynağı olarak eski etiketi
+seçmek eski hatalı tanımı tekrar çalıştırır. Bu işlemde POM sürümü **1.15.0** ve
+uygulama kaynağı mevcut `v1.15.0` etiketi olarak kalır; yalnız paketleme workflow'u
+`main` üzerinden gelir. Workflow özeti kaynak commit'i ile workflow commit'ini
+ayrı gösterir. `build-info.json` içindeki commit, `git rev-parse "v1.15.0^{commit}"`
+ile eşleşmeli.
+ Başarılı görevin **sweetcherry-release-assets** artifact'ini indirin. Ürünler:
 
 - `sweetcherry_1.15.0_all_os_portable.zip`
 - `sweetcherry_1.15.0_all_os_portable_with_java_and_setup.exe`
 - `sweetcherry-1.15.0-third_party_licences.zip`
 - `sha256sums.txt`
 
-Workflow gerçek JAR'ı ve açılmış Java'sız ZIP'i doğrular; yerel viewer/font kaynaklarını, yeni kılavuzları, filtre aktarım aracını ve temiz özel dizinleri kontrol eder. Windows smoke testi gerçek kurucunun çıkardığı runtime sürümünü, kurucu dosya korumasını, runtime önceliğini, sistem Java'sıyla EXE başlatmayı ve YAML portunu kontrol eder. Workflow özeti gerçek runtime sürümünü, runtime arşiv SHA-256 değerini ve hazırlık commit'ini gösterir; bu bilgileri de kontrol edin.
+Workflow gerçek JAR'ı ve açılmış Java'sız ZIP'i doğrular; yerel viewer/font kaynaklarını, yeni kılavuzları, filtre aktarım aracını ve temiz özel dizinleri kontrol eder. Windows smoke testi gerçek kurucunun çıkardığı runtime sürümünü, kurucu dosya korumasını, runtime önceliğini, sistem Java'sıyla EXE başlatmayı ve YAML portunu kontrol eder. Workflow özeti gerçek runtime sürümünü, runtime arşiv SHA-256 değerini, kaynak ve workflow commit'lerini gösterir; bu bilgileri de kontrol edin.
 
 ZIP'te `runtime/` olmamalı; setup Windows Java runtime içermeli. `build-info.json` sürüm **1.15.0**, `packageRuntimeIncluded` ZIP için **false**, setup için **true** olmalı. Commit alanını `git rev-parse "v1.15.0^{commit}"` ile karşılaştırın. Lisans/atıflar iki pakette de bulunmalı.
 

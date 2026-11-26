@@ -40,6 +40,11 @@ jobs:
         shell: powershell
         run: .\packaging\windows\test-launcher-config.ps1
 
+      - name: Test Temurin download metadata with Windows PowerShell
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: .\packaging\windows\test-runtime-metadata.ps1
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
