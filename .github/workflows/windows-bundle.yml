@@ -100,6 +100,25 @@ jobs:
               if (!(Test-Path $copy) -or (Get-FileHash $_.FullName).Hash -ne (Get-FileHash $copy).Hash) { throw "Portable file changed/missing: $relative" }
             }
           }
+      - name: Record verified bundled Java in workflow summary
+        shell: pwsh
+        run: |
+          $runtimeInfo = (& ./release/SweetCherry/runtime/bin/java.exe -XshowSettings:properties -version 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect final bundled Java.' }
+          . ./packaging/windows/runtime-policy.ps1
+          Assert-BundleJavaRuntime $runtimeInfo
+          $actual = [regex]::Match($runtimeInfo, '(?m)^\s*java.version\s*=\s*(\S+)').Groups[1].Value
+          @(
+            '## Verified Windows runtime',
+            '',
+            '| Item | Value |',
+            '| --- | --- |',
+            "| Commit | $env:GITHUB_SHA |",
+            "| Temurin release | $env:SC_RUNTIME_VERSION |",
+            "| Extracted java.version | $actual |",
+            "| Runtime archive SHA-256 | $env:SC_RUNTIME_SHA256 |",
+            '| Minimum November 2026 baseline | 17.0.21.1 (CVE-2026-114938) |'
+          ) | Out-File -LiteralPath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
       - name: Test installer and launcher without system Java
         shell: pwsh
         run: |

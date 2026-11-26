@@ -1,6 +1,6 @@
 # SweetCherry kurulum ve kullanım kılavuzu
 
-> Bu belge kaynak koddan derleme içindir. Hazır Windows paketini kullanmak için [kurulum kılavuzuna](installation.md) bakın. Bu sürümün kaynağı için `v1.7.0` etiketini kullanabilirsiniz; `main` geliştirme dalıdır.
+> Bu belge kaynak koddan derleme içindir. Hazır Windows paketini kullanmak için [kurulum kılavuzuna](installation.md) bakın. Bu sürümün kaynağı için `v1.15.0` etiketini kullanabilirsiniz; `main` geliştirme dalıdır.
 
 ## SweetCherry nedir?
 

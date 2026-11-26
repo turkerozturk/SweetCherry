@@ -4,6 +4,20 @@ SweetCherry'deki kullanıcıya dönük önemli değişiklikler bu dosyada kayded
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-11-26
+
+- Added in-place plain-text, code, Markdown, HTML and rich-text editors inside the `/tree` content pane.
+- Preserved reading preferences and scroll position when returning from editing, with independent split-pane editing and unsaved-change guards.
+- Grouped crowded application, view and reader-preference menus into click-to-open sections suitable for keyboard and narrow-screen use.
+- Added portable clipboard snapshots of loaded images, tables and codeboxes that paste as fresh objects, including into another rich-text editor.
+- Added Delete/Backspace, Cut and paste-over-selection for object-containing selections when Allow object deletion is enabled, sharing text undo/redo history.
+- Added confirmed retrieval of public images within pasted HTML while retaining the order of text, images and tables.
+- Added local WebP, GIF, BMP, TIFF and WBMP decoding alongside PNG and JPG/JPEG, with new CTB images normalized to static PNG.
+- Removed the former 8-image web-import and 10-new-object image caps while retaining byte, pixel and time budgets.
+- Updated CI and Windows bundling to require security-patched Java, including the November 2026 CVE-2026-114938 fix.
+- Replaced mismatched Maven wrapper scripts with Apache Wrapper 3.3.4 `only-script` launchers and checksum-verified Maven downloads.
+
+
 ## [1.14.0] - 2026-11-25
 
 - Added a remembered reading layout with compact icon buttons and independent visibility controls for the main menu, node title, breadcrumbs, backlinks, node actions and split-pane controls.

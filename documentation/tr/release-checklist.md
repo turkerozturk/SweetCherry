@@ -1,6 +1,6 @@
-# SweetCherry 1.14.0 yayın adımları — 25 Kasım 2026
+# SweetCherry 1.15.0 yayın adımları — 26 Kasım 2026
 
-Sürüm **1.14.0**, etiket **v1.14.0**. Hazırlık yaması `4de6d34` üzerine uygulanır. Java tabanı **17** ve CTB şeması korunur. Bu belge komutları tarif eder; commit, push, etiket veya yayın oluşturmaz.
+Sürüm **1.15.0**, etiket **v1.15.0**. Hazırlık yaması `9fa77d3` üzerine uygulanır. Java tabanı **17** ve CTB şeması korunur. Bu belge komutları tarif eder; commit, push, etiket veya yayın oluşturmaz.
 
 ## 1. Hazırlık yamasını uygula ve doğrula
 
@@ -9,12 +9,13 @@ Sürüm **1.14.0**, etiket **v1.14.0**. Hazırlık yaması `4de6d34` üzerine uy
 ```bat
 git switch main
 git pull --ff-only
-git apply --check ..\sweetcherry-4de6d34-release-1.14.0.patch
-git apply ..\sweetcherry-4de6d34-release-1.14.0.patch
+git apply --check ..\sweetcherry-9fa77d3-release-1.15.0.patch
+git apply ..\sweetcherry-9fa77d3-release-1.15.0.patch
 git diff --check
 node --test src/test/js/*.test.cjs
 python -m unittest discover -s packaging -p "test_*.py"
 powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/test-launcher-config.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/test-runtime-policy.ps1
 mvnw.cmd clean package
 python packaging/verify-viewer-resources.py
 python packaging/update-jar-notices.py --check
@@ -28,23 +29,29 @@ Yerel EXE'yi de denemek için, paketleme sonrasında:
 powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/build-launcher.ps1
 ```
 
-`release/SweetCherry/` altında JAR, yeni release notu, okuma düzeni/DTT/taşınabilirlik kılavuzları, `tools/migrate-saved-filters.py`, boş `saved-filters/` ve `backup/` klasörleri bulunmalı. Maven mevcut özel dosyaları korur. **Yayın paketi için ayrı, temiz checkout/staging kullanın:** kendi kayıtlı aramalarınızı, yedeklerinizi, kimlik bilgilerinizi veya özel resimlerinizi dağıtmayın. `python packaging/verify-viewer-resources.py --clean` yayın staging'inde geçmeli; kişisel dosyaları silerek staging temizlemeyin.
+`release/SweetCherry/` altında JAR, `documentation/releases/v1.15.0.md`, editör/resim sınırları ve diğer kılavuzlar, `tools/migrate-saved-filters.py`, boş `saved-filters/` ve `backup/` klasörleri bulunmalı. Maven mevcut özel dosyaları korur. **Yayın paketi için ayrı, temiz checkout/staging kullanın:** kendi kayıtlı aramalarınızı, yedeklerinizi, kimlik bilgilerinizi veya özel resimlerinizi dağıtmayın. `python packaging/verify-viewer-resources.py --clean` yayın staging'inde geçmeli; kişisel dosyaları silerek staging temizlemeyin.
 
 Kopya CTB ile şunları kontrol edin:
 
-- Okuma düzeninde kompakt düğmeler ve ana menü/başlık/breadcrumbs/backlinks/toolbar/split kontrolleri; gizlenen alanlara erişim ve sayfa değiştirince tercihlerin korunması.
-- Varsayılanı kapalı ağaç kimlik/tarih önekleri, padding ve created/modified biçimleri; hızlı ad+ikon kaydetme/iptal; shared/master ayrımı ve panoya kopyalama.
-- Kopya veride tüm çöp kutusunu boşaltma ve dışarıda paylaşılan içeriklerin korunması.
-- İsteğe bağlı DTT bağlantı testleri, tarih seçimi, durum/not kaydetme/silme, konu detayları, eksik konu ve tam katalog aktarımı; USER/ADMIN ve yazılabilirlik sınırları.
-- Kayıtlı aramaları önce özgün konumda yeni sürümle açıp taşıma veya açık eski JSON aktarımı; mevcut hedef filtrelerin korunması.
-- EXE'yi önce kendi runtime'ıyla, sonra runtime'sız ve uygun sistem Java 17+ ile başlatma; özel YAML HTTP portu ve yapılandırılmış HTTPS; port yoksa masaüstü formu.
+- `/tree` içinde düz metin/kod, Markdown, HTML ve rich text editörlerini açma; Save, Save and continue, Cancel ve önceki okuma düzenine dönüş.
+- Her iki split bölmesinde bağımsız düzenleme; kaydetmeden düğüm değiştirme, Geri/İleri ve sağ bölmeyi kapatma onayları; kompakt düğmeler, undo/redo ve kurtarma.
+- Menü alt gruplarını mouse, klavye ve dar ekranla açma; mevcut eylemlerin erişilebilirliği.
+- Metin + yüklü resim + tablo/codebox seçimini kopyalama ve başka editöre yapıştırma; Allow object deletion ile Delete/Backspace, Kes, seçimin üzerine yapıştırma ve undo/redo.
+- Web resimleri indirme onayını kabul/ret; WebP/GIF/JPG/JPEG/BMP/TIFF örnekleri, ilk kare/sayfanın PNG olması, 8/10'dan fazla küçük resim ekleme; atlanan resim sayısı ve hata durumunda seçimin korunması.
+- Mevcut kayıtlı ekli dosya/anchor kopyalamada metin yer tutucusu ve Kes'in seçimi koruması; salt okunur ve USER yazma korumaları.
+- EXE, YAML portları, sistem Java fallback ve önceki CTB okuma işlevleri için kısa kullanım kontrolü.
+
+Java tabanı 17 olarak kalır; **paket runtime'ı en az 17.0.21.1** olmalıdır. Workflow güncel Temurin Windows x64 JRE'yi indirir, arşiv SHA-256'sını doğrular ve çıkarılan Java'yı da denetler. Bu, CVE-2026-114938 için Kasım 2026 alt sınırıdır; sistem Java'sı ve eski `runtime` klasörleri otomatik güncellenmez. [Güvenlik notlarına](../../SECURITY.md) bakın.
 
 Yalnız hazırlık yamasındaki dosyaları gözden geçirip stage edin:
 
 ```bat
 git diff --check
+git add pom.xml README.md CHANGELOG.md .github/workflows/windows-bundle.yml packaging/windows/smoke-test.ps1
+git add documentation/en/editor-layout.md documentation/en/setup-and-run.md
+git add documentation/tr/installation.md documentation/tr/setup-and-run.md documentation/tr/content-zoom-and-editor-controls.md documentation/tr/release-checklist.md documentation/releases/v1.15.0.md
 git diff --cached --stat
-git commit -m "Prepare SweetCherry 1.14.0 release"
+git commit -m "Prepare SweetCherry 1.15.0 release"
 git push origin main
 ```
 
@@ -55,30 +62,30 @@ Windows/Linux CI ve Windows PowerShell kontrolü başarılı olmalı. `git statu
 ```bat
 git status --short
 git log -1 --oneline
-git tag -l v1.14.0
+git tag -l v1.15.0
 ```
 
 Etiket henüz yoksa, yeni hazırlık commit'inde:
 
 ```bat
-git tag -a v1.14.0 -m "SweetCherry 1.14.0"
-git push origin v1.14.0
+git tag -a v1.15.0 -m "SweetCherry 1.15.0"
+git push origin v1.15.0
 ```
 
 Yayımlanmış etiketi taşımayın; force push kullanmayın.
 
 ## 3. Paketleri etiketten üret
 
-Actions → **Portable distribution (Windows builder)** → **Run workflow** → **v1.14.0**. Başarılı görevin **sweetcherry-release-assets** artifact'ini indirin. Ürünler:
+Actions → **Portable distribution (Windows builder)** → **Run workflow** → **v1.15.0**. Başarılı görevin **sweetcherry-release-assets** artifact'ini indirin. Ürünler:
 
-- `sweetcherry_1.14.0_all_os_portable.zip`
-- `sweetcherry_1.14.0_all_os_portable_with_java_and_setup.exe`
-- `sweetcherry-1.14.0-third_party_licences.zip`
+- `sweetcherry_1.15.0_all_os_portable.zip`
+- `sweetcherry_1.15.0_all_os_portable_with_java_and_setup.exe`
+- `sweetcherry-1.15.0-third_party_licences.zip`
 - `sha256sums.txt`
 
-Workflow gerçek JAR'ı ve açılmış Java'sız ZIP'i doğrular; yerel viewer/font kaynaklarını, yeni kılavuzları, filtre aktarım aracını ve temiz özel dizinleri kontrol eder. Windows smoke testi kurucu dosya korumasını, runtime önceliğini, sistem Java'sıyla EXE başlatmayı ve YAML portunu kontrol eder. DTT ayrı uygulamadır; token/gerçek DTT adreslerini release staging'ine eklemeyin.
+Workflow gerçek JAR'ı ve açılmış Java'sız ZIP'i doğrular; yerel viewer/font kaynaklarını, yeni kılavuzları, filtre aktarım aracını ve temiz özel dizinleri kontrol eder. Windows smoke testi gerçek kurucunun çıkardığı runtime sürümünü, kurucu dosya korumasını, runtime önceliğini, sistem Java'sıyla EXE başlatmayı ve YAML portunu kontrol eder. Workflow özeti gerçek runtime sürümünü, runtime arşiv SHA-256 değerini ve hazırlık commit'ini gösterir; bu bilgileri de kontrol edin.
 
-ZIP'te `runtime/` olmamalı; setup Windows Java runtime içermeli. `build-info.json` sürüm **1.14.0**, `packageRuntimeIncluded` ZIP için **false**, setup için **true** olmalı. Commit alanını `git rev-parse "v1.14.0^{commit}"` ile karşılaştırın. Lisans/atıflar iki pakette de bulunmalı.
+ZIP'te `runtime/` olmamalı; setup Windows Java runtime içermeli. `build-info.json` sürüm **1.15.0**, `packageRuntimeIncluded` ZIP için **false**, setup için **true** olmalı. Commit alanını `git rev-parse "v1.15.0^{commit}"` ile karşılaştırın. Lisans/atıflar iki pakette de bulunmalı.
 
 ## 4. Checksum ve son paket denemesi
 
@@ -98,13 +105,21 @@ Get-Content .\sha256sums.txt | ForEach-Object {
 
 Java'sız EXE'nin sistem Java'sıyla çalışması için bu release'in yeni launcher'ı gerekir. Linux/macOS için uygun script ve yerel Java kullanın. macOS/i386 için test edilmiş destek iddiası eklemeyin.
 
+Çıkarılan Windows setup klasöründe ayrıca:
+
+```bat
+runtime\bin\java.exe -version
+```
+
+Çıktı en az `17.0.21.1` olmalı. `build-info.json` içindeki `java` değeri workflow'da indirilen Temurin sürümüyle eşleşmeli. Windows paketini yeniden test etmeden kaynak testlerinin geçmesini yayın onayı saymayın. Java'sız ZIP kullanıcılarının ayrıca güvenlik yamalı sistem Java'sı gerekir.
+
 ## 5. GitHub Release
 
 Releases → **Draft a new release**:
 
-- Tag: **v1.14.0**
-- Title: **SweetCherry 1.14.0**
-- Description: `documentation/releases/v1.14.0.md` içeriği; bağlantılar etikete bağlı mutlak GitHub adresleridir.
+- Tag: **v1.15.0**
+- Title: **SweetCherry 1.15.0**
+- Description: `documentation/releases/v1.15.0.md` içeriği; bağlantılar etikete bağlı mutlak GitHub adresleridir.
 - Assets: yukarıdaki dört dosya; kaynak yaması ürün asset'i değildir.
 
 Son kontroller tamamlanınca **Set as a pre-release** kapalı, **Set as the latest release** açık → **Publish release**. İndirme bağlantıları, etiket/commit eşleşmesi ve checksum'ları kontrol edin. Önceki release/etiketleri değiştirmeyin.

@@ -63,7 +63,7 @@ on a selection containing objects. Removal is staged in the same undo history as
 text and only reaches the database on Save. Manage objects remains available.
 
 When pasted HTML contains external images, a confirmation offers to download its
-public PNG/JPEG images through the existing web import policy. Declining keeps
+public raster images through the existing web import policy. Declining keeps
 text and links. Downloads carry no browser cookies and private/local addresses
 remain blocked. Text, images and tables keep their selection order. Images that
 cannot be fetched are counted and replaced by their alternative text. If import
@@ -96,3 +96,16 @@ budget per saved image batch. Web import retains its 10 MB normalized-image,
 Small icons can therefore exceed the old count limits while large images may
 still reach a byte/pixel/time budget. Private-network URL restrictions and
 cookie-free web fetching remain unchanged.
+
+### Why some website images may be skipped
+
+Budgets are only one cause. Image hosts may require browser cookies/login, block
+hotlink/direct requests, return an error or use an unsupported image format.
+SweetCherry does not run the source page's JavaScript; JavaScript-only images,
+`srcset` choices and site-specific lazy loading may not expose a usable source.
+Relative clipboard image URLs cannot be resolved without the source page URL.
+Skipped images are counted and replaced by alternative text when available.
+See the preceding budget values before treating a partial import as damage.
+The per-file tenant setting is configurable; the remaining byte/pixel/time budgets
+are code limits, not all exposed as YAML/System settings. A separately downloaded
+supported image can also be inserted with Add image.

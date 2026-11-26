@@ -20,6 +20,12 @@ foreach ($entry in $sentinels.GetEnumerator()) {
 foreach ($file in @('drawio-images/README.md','documentation/examples/drawio-library-shapes.drawio','documentation/examples/drawio-viewer-demo.drawio')) {
     if (!(Test-Path (Join-Path $testDir $file))) { throw "Installer omitted $file" }
 }
+# Verify the runtime extracted by the actual installer, not only the build staging folder.
+$installedRuntimeInfo = (& "$testDir/runtime/bin/java.exe" -XshowSettings:properties -version 2>&1 | Out-String)
+if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect installed Java runtime.' }
+. "$PSScriptRoot/runtime-policy.ps1"
+Assert-BundleJavaRuntime $installedRuntimeInfo
+Write-Host 'Installed Java runtime meets the November 2026 security baseline.'
 # Remove deliberately invalid CTB fixture before startup; it was only an overwrite sentinel.
 Remove-Item "$testDir/CTBDATA/demo.ctb","$testDir/allTenants/demo.txt"
 # Empty PATH and JAVA_HOME in this child environment prove the EXE uses its bundled runtime.

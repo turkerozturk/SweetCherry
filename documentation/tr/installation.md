@@ -1,11 +1,11 @@
-# SweetCherry 1.14.0 — hazır paketleri kullanma
+# SweetCherry 1.15.0 — hazır paketleri kullanma
 
-[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.14.0) işletim sisteminize uygun kullanım biçimini seçin:
+[Release sayfasından](https://github.com/turkerozturk/SweetCherry/releases/tag/v1.15.0) işletim sisteminize uygun kullanım biçimini seçin:
 
-- `sweetcherry_1.14.0_all_os_portable_with_java_and_setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
-- `sweetcherry_1.14.0_all_os_portable.zip`: Java içermeyen portable paket. Sisteminize/işlemcinize uygun Java 17+ kurulu olmalıdır.
+- `sweetcherry_1.15.0_all_os_portable_with_java_and_setup.exe`: klasör seçme sihirbazı ve isteğe bağlı kısayollar.
+- `sweetcherry_1.15.0_all_os_portable.zip`: Java içermeyen portable paket. Sisteminize/işlemcinize uygun Java 17+ kurulu olmalıdır.
 
-Yalnız setup EXE, Windows x64 Java 17 içerir; Windows 10/11 x64 üzerinde ayrıca Java kurmanız gerekmez. Adında all_os olsa da kurucu EXE ve içindeki Java yalnız Windows x64 içindir. ZIP tüm sistemlerin scriptlerini içerir: Windows için `run.bat`, Linux/Raspberry Pi için `sh ./launcher.sh` (masaüstü) veya `sh ./run.sh` (terminal), macOS için `sh ./run.command`. Klasörün tamamını çıkarıp birlikte tutun. ZIP içindeki `SweetCherry.exe` yanındaki Windows runtime klasörünü gerektirir; Java’sız ZIP’te `run.bat` kullanın. macOS ve 32 bit/i386 işletim sistemleri denenmemiştir; uygun Java yanında yerel SQLite/JDBC bağımlılıklarının da uyumu gerekir. Unix ZIP çıkarımında çalıştırma izni korunmazsa scriptleri `sh` ile çağırabilirsiniz. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
+Yalnız setup EXE, Kasım 2026 güvenlik alt sınırı olan 17.0.21.1 veya daha yeni Windows x64 Java 17 içerir; Windows 10/11 x64 üzerinde ayrıca Java kurmanız gerekmez. Adında all_os olsa da kurucu EXE ve içindeki Java yalnız Windows x64 içindir. ZIP tüm sistemlerin scriptlerini içerir: Windows için `run.bat`, Linux/Raspberry Pi için `sh ./launcher.sh` (masaüstü) veya `sh ./run.sh` (terminal), macOS için `sh ./run.command`. Klasörün tamamını çıkarıp birlikte tutun. ZIP içindeki `SweetCherry.exe` önce yanındaki Windows `runtime` klasörünü, yoksa uyumlu 64 bit sistem Java 17+ kurulumunu kullanır; `run.bat` da kullanılabilir. macOS ve 32 bit/i386 işletim sistemleri denenmemiştir; uygun Java yanında yerel SQLite/JDBC bağımlılıklarının da uyumu gerekir. Unix ZIP çıkarımında çalıştırma izni korunmazsa scriptleri `sh` ile çağırabilirsiniz. GitHub’ın **Source code** ZIP’i hazır uygulama değildir. Kurucuyu ZIP’in içinden çalıştırmayın.
 
 Aşağıdaki kontrol penceresi adımları Windows kurucusu içindir; script ile başlatanlar parolayı yerel konsoldan veya oluşan parola dosyasından alabilir.
 
@@ -53,3 +53,5 @@ Zengin metin ve düz metin editörlerindeki **33~** düğmesi imlece 33 tilde ve
 
 
 [Tutarlı CTB yedekleme](ctb-backups.md)
+
+Sistem Java’sı için de güvenlik yamalı güncel sürümü kullanın. Yanınızda `runtime` varsa sistem Java güncellemesi onu değiştirmez; yeni runtime klasörünü eskiyle birleştirmeyin. Ayrıntılar: [güvenlik notları](../../SECURITY.md).

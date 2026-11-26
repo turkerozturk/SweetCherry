@@ -55,3 +55,59 @@ Save / Save and continue / Cancel sağındaki eksi, yüzde ve artı düğmeleri 
 Son satırın altında yazım yüzeyinin yaklaşık %35'i kadar (32–240 piksel aralığında) rahatlık alanı bulunur. Bu CSS boşluğudur; içerikte boş paragraf/satır oluşturmaz. Sonda yazarken veya Enter kullanırken boşluk görünür kalır. Önceki satırlarda çalışmak sizi tekrar sona atmaz.
 
 Rich text araçlarında Undo/Redo WYSIWYG anahtarının sağındadır; stil listesinin yanında dört hizalama düğmesi bulunur. Kontroller metinleri kadar yer kaplar, dar alanda gerektiğinde sarılır. Nesne silme izni ve Manage objects, Dismiss link üzerinde ayrı bir satırdadır. Yedekleme hatırlatması araç panelinin en altındadır.
+
+## 1.15.0: ağaç içinde düzenleme ve resimli içerik
+
+`/tree` içindeki Edit, editörü içerik bölmesinde açar. Save okuma görünümünü ve
+kaydırma konumunu geri getirir; Save and continue aynı bölmede düzenlemeye devam
+eder. Kaydedilmemiş değişikliklerle gezinme veya split bölmesini kapatma onay ister.
+Okuma düzeni tercihleri korunur; dar bölmede rich text araçları Controls çekmecesindedir.
+
+Yüklü resimler, tablolar ve codebox'lar metin içindeki konumlarıyla kopyalanabilir;
+yapıştırıldıklarında yeni nesneler oluşturulur. **Allow object deletion / Nesne
+silmeye izin ver** açıkken Delete, Backspace, Kes ve seçimin üzerine yapıştırma
+nesnelerle de çalışır. Save öncesinde undo/redo ile geri alınabilir. Mevcut kayıtlı
+ekli dosya ve anchor'lar nesne olarak kopyalanmaz; metin yer tutucusu ve uyarı
+kullanılır, tam kopyalanamayan nesne varsa Kes seçimi silmez.
+
+PNG, JPG/JPEG, WebP, GIF, BMP, TIFF ve WBMP içe aktarılabilir. Yeni CTB resimleri
+PNG olarak kaydedilir; animasyonlu GIF/WebP ve çok sayfalı TIFF'in ilk karesi/sayfası
+alınır. SVG ve AVIF bu yolda desteklenmez. Yerel dosyalarda PNG dışındaki resimler,
+editöre eklenmeden önce yerel Java decoder ile dönüştürülür; bu hazırlık işlemi CTB'ye yazmaz.
+
+### Resim adedi ve güvenlik bütçeleri
+
+Eski 8 web resmi ve 10 yeni nesne sınırları resimler için kaldırıldı. Ancak resim
+adedi sınırının olmaması, toplam veri veya çalışma süresinin sınırsız olması değildir:
+
+| Kontrol | Sınır |
+| --- | --- |
+| Tek dosya/resim | Varsayılan 9 MB; tenant ayarı `custom.maxEmbeddedFileSizeMB` ile 1–20 MB; kaynak ve dönüştürülmüş PNG ayrı ayrı sığmalı. |
+| Bir kayıttaki toplam yeni ikili yükleme | 20 MB; resim ve ekli dosyalar birlikte. |
+| Yükleme JSON'u | Toplam 30 milyon karakter. |
+| Tek resmin genişliği/yüksekliği | Her kenar en çok 8192 piksel. |
+| Tek resmin piksel sayısı | En çok 16 milyon. |
+| Bir kayıttaki resimlerin toplam çözülmüş pikseli | En çok 64 milyon. |
+| Bir kayıt için resim çözme bütçesi | 30 saniye. |
+| Web içe aktarmadaki dönüştürülmüş resimler | Toplam 10 MB. |
+| Web sayfası ve resimlerin ağ bütçesi | Toplam 20 MB ve 30 saniye. |
+
+Tek dosya ayarı dışında bunlar mevcut kodun güvenlik bütçeleridir; hepsi için
+`application.yml` veya Settings alanı bulunmaz. Resim dışındaki nesnelerin ayrı
+sınırları da devam eder. HTML panosunda ayrıca boyut ve DOM karmaşıklığı kontrolleri vardır.
+
+### Gazete veya başka bir siteden bazı resimler neden gelmeyebilir?
+
+Limitler tek olası neden değildir. Resim sunucusu cookie/giriş veya uygun Referer
+isteyebilir, doğrudan indirmeyi engelleyebilir, URL erişilemez olabilir ya da resim
+yalnız JavaScript çalıştıktan sonra yükleniyor olabilir. `srcset` veya siteye özel
+lazy-loading kodu her zaman gerçek resim URL'sine çevrilemez. Panodaki göreli URL'ler
+kaynak sayfa bilinmediğinde çözülemez; desteklenmeyen veya bozuk resimler de atlanır.
+
+SweetCherry web sayfasının scriptlerini çalıştırmaz ve tarayıcınızın oturum
+cookie'lerini kullanmaz. Yalnız doğrulanmış herkese açık HTTP/HTTPS adreslerini
+alır; özel/yerel ağ hedefleri engellenir. Yapıştırmada uzak resimler indirilmeden
+önce onay sorulur. Atlanan resimlerin sayısı sonuçta gösterilir; resim yerine varsa
+alternatif metin kullanılır. Gerekirse erişebildiğiniz resmi ayrıca indirip Resim
+ekle ile deneyebilirsiniz. İçe aktarma başarısızsa veya içerik yükleme sırasında
+değişmişse mevcut seçimin üzerine yazılmaz.
